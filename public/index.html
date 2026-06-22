@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abunəlik İdarəetmə Dashboard</title>
+  <!-- Outfit & Inter Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+  <!-- ========================================== -->
+  <!-- LOGIN PAGE -->
+  <!-- ========================================== -->
+  <div id="login-container" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-icon">
+          <i data-lucide="shield-check"></i>
+        </div>
+        <h2>Sistemə Giriş</h2>
+        <p>API-ya qoşulmaq üçün istifadəçi adı və şifrə daxil edin</p>
+      </div>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="login-username">İstifadəçi adı</label>
+          <div class="input-wrapper">
+            <i data-lucide="user"></i>
+            <input type="text" id="login-username" placeholder="admin" required autocomplete="username">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="login-password">Şifrə</label>
+          <div class="input-wrapper">
+            <i data-lucide="lock"></i>
+            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+        </div>
+        <div id="login-error" class="form-error-msg hidden"></div>
+        <button type="submit" class="btn btn-primary btn-block" id="login-submit-btn">
+          <span>Daxil Ol</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MAIN APP CONTAINER -->
+  <!-- ========================================== -->
+  <div id="app-container" class="app-layout hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <i data-lucide="layers"></i>
+        </div>
+        <div class="brand-name">
+          <h1>Abunəlik</h1>
+          <span>Yoxlama Paneli</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item active" data-tab="dashboard">
+            <i data-lucide="home"></i>
+            <span>Dashboard</span>
+          </li>
+          <li class="nav-item" data-tab="users">
+            <i data-lucide="users"></i>
+            <span>İstifadəçilər</span>
+          </li>
+          <li class="nav-item" data-tab="subscriptions">
+            <i data-lucide="credit-card"></i>
+            <span>Abunəliklər</span>
+          </li>
+          <li class="nav-item" data-tab="payments">
+            <i data-lucide="history"></i>
+            <span>Ödəniş Tarixçəsi</span>
+          </li>
+          <li class="nav-item" data-tab="notifications">
+            <i data-lucide="bell"></i>
+            <span>Bildirişlər</span>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar">AD</div>
+          <div class="user-meta">
+            <span class="user-name">Admin</span>
+            <span class="user-role">Sistem İdarəçisi</span>
+          </div>
+        </div>
+        <button id="logout-btn" class="btn btn-logout" title="Çıxış">
+          <i data-lucide="log-out"></i>
+          <span>Çıxış Et</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="header-title">
+          <h2 id="page-title">Dashboard</h2>
+          <p id="page-subtitle">Sistem vəziyyəti və ümumi statistik göstəricilər</p>
+        </div>
+        <div class="header-actions">
+          <div class="status-indicator connected">
+            <span class="pulse"></span>
+            <span>API Qoşuldu</span>
+          </div>
+          <a href="/api-docs/" target="_blank" class="btn btn-secondary">
+            <i data-lucide="file-text"></i>
+            <span>Swagger Sənədləri</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Dynamic Tab Contents -->
+      <div class="content-body">
+        
+        <!-- 1. DASHBOARD TAB -->
+        <section id="tab-dashboard" class="tab-pane active">
+          <!-- Stats Cards Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon users-color">
+                <i data-lucide="users"></i>
+              </div>
+              <div class="stat-info">
+                <h3>İstifadəçilər</h3>
+                <p class="stat-value" id="stat-users-count">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon sub-color">
+                <i data-lucide="credit-card"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Aktiv Abunəliklər</h3>
+                <p class="stat-value" id="stat-subs-count">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon income-color">
+                <i data-lucide="dollar-sign"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Ümumi Qazanc</h3>
+                <p class="stat-value" id="stat-revenue-value">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon bell-color">
+                <i data-lucide="bell"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Bildirişlər</h3>
+                <p class="stat-value" id="stat-notifs-count">-</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Grid -->
+          <div class="dashboard-grid">
+            <!-- Recent Activity -->
+            <div class="dashboard-card col-span-2">
+              <div class="card-header">
+                <h3>Son Aktivliklər</h3>
+                <p>Tətbiq üzərindən icra olunan son əməliyyatlar</p>
+              </div>
+              <div class="card-body">
+                <div class="timeline" id="recent-activity-list">
+                  <div class="loading-spinner"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="dashboard-card">
+              <div class="card-header">
+                <h3>Kateqoriyalar</h3>
+                <p>Abunəliklərin kateqoriyalar üzrə faiz nisbəti</p>
+              </div>
+              <div class="card-body">
+                <div id="category-chart-container" class="chart-wrapper">
+                  <div class="loading-spinner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. USERS TAB -->
+        <section id="tab-users" class="tab-pane">
+          <div class="section-actions">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="users-search" placeholder="İstifadəçi adı və ya email ilə axtar...">
+            </div>
+            <button class="btn btn-primary" onclick="openModal('user-modal')">
+              <i data-lucide="plus"></i>
+              <span>Yeni İstifadəçi</span>
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Ad Soyad</th>
+                  <th>Email</th>
+                  <th>Yaradılma Tarixi</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 3. SUBSCRIPTIONS TAB -->
+        <section id="tab-subscriptions" class="tab-pane">
+          <div class="section-actions">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="subs-search" placeholder="Abunəlik adı ilə axtar...">
+            </div>
+            <button class="btn btn-primary" onclick="openModal('sub-modal')">
+              <i data-lucide="plus"></i>
+              <span>Yeni Abunəlik</span>
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>İstifadəçi</th>
+                  <th>Abunəlik Adı</th>
+                  <th>Qiymət</th>
+                  <th>Tezlik</th>
+                  <th>Başlama Tarixi</th>
+                  <th>Növbəti Ödəniş</th>
+                  <th>Kateqoriya</th>
+                  <th>Status</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody id="subs-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. PAYMENTS TAB -->
+        <section id="tab-payments" class="tab-pane">
+          <div class="section-actions">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="payments-search" placeholder="İstifadəçi və ya abunəlik ilə axtar...">
+            </div>
+            <button class="btn btn-primary" onclick="openModal('payment-modal')">
+              <i data-lucide="plus"></i>
+              <span>Yeni Ödəniş Qeydi</span>
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>İstifadəçi</th>
+                  <th>Abunəlik</th>
+                  <th>Ödəniş Tarixi</th>
+                  <th>Məbləğ</th>
+                  <th>Status</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 5. NOTIFICATIONS TAB -->
+        <section id="tab-notifications" class="tab-pane">
+          <div class="section-actions">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="notifs-search" placeholder="Başlıq və ya mesaj ilə axtar...">
+            </div>
+            <button class="btn btn-primary" onclick="openModal('notif-modal')">
+              <i data-lucide="send"></i>
+              <span>Yeni Bildiriş Göndər</span>
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>İstifadəçi</th>
+                  <th>Başlıq</th>
+                  <th>Mesaj</th>
+                  <th>Göndərilmə Tarixi</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody id="notifs-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL FORMS -->
+  <!-- ========================================== -->
+
+  <!-- 1. USER MODAL (ADD/EDIT) -->
+  <div id="user-modal" class="modal">
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <h3 id="user-modal-title">Yeni İstifadəçi Əlavə Et</h3>
+        <button class="modal-close" onclick="closeModal('user-modal')">&times;</button>
+      </div>
+      <form id="user-form">
+        <input type="hidden" id="user-id-field">
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label for="user-ad">Ad Soyad *</label>
+            <input type="text" id="user-ad" placeholder="Məs: Əli Vəliyev" required minlength="3" maxlength="100">
+            <span class="field-error" id="error-user-ad"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="user-email">Email *</label>
+            <input type="email" id="user-email" placeholder="Məs: ali@example.com" required maxlength="100">
+            <span class="field-error" id="error-user-email"></span>
+          </div>
+          <div class="form-group col-span-2" id="user-date-group">
+            <label for="user-date">Yaradılma Tarixi (Köhnə tarix daxil etmək üçün, İsteğe bağlı)</label>
+            <input type="text" id="user-date" placeholder="YYYY-MM-DD HH:MI:SS formatında">
+            <span class="field-error" id="error-user-date"></span>
+          </div>
+        </div>
+        <div id="user-form-general-error" class="form-error-msg hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('user-modal')">Ləğv Et</button>
+          <button type="submit" class="btn btn-primary" id="user-submit-btn">Yadda Saxla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. SUBSCRIPTION MODAL (ADD/EDIT) -->
+  <div id="sub-modal" class="modal">
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <h3 id="sub-modal-title">Yeni Abunəlik Əlavə Et</h3>
+        <button class="modal-close" onclick="closeModal('sub-modal')">&times;</button>
+      </div>
+      <form id="sub-form">
+        <input type="hidden" id="sub-id-field">
+        <div class="form-grid">
+          <div class="form-group col-span-2" id="sub-user-select-container">
+            <label for="sub-user">İstifadəçi *</label>
+            <select id="sub-user" required>
+              <option value="">İstifadəçi seçin...</option>
+            </select>
+            <span class="field-error" id="error-sub-user"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="sub-ad">Abunəlik Adı *</label>
+            <input type="text" id="sub-ad" placeholder="Məs: Netflix, Spotify..." required>
+            <span class="field-error" id="error-sub-ad"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-qiymet">Qiymət *</label>
+            <input type="number" id="sub-qiymet" step="0.01" min="0" placeholder="12.99" required>
+            <span class="field-error" id="error-sub-qiymet"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-valyuta">Valyuta</label>
+            <select id="sub-valyuta">
+              <option value="AZN">AZN</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+            <span class="field-error" id="error-sub-valyuta"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="sub-tezlik">Ödəniş Tezliyi</label>
+            <select id="sub-tezlik">
+              <option value="monthly">Aylıq</option>
+              <option value="yearly">İllik</option>
+              <option value="weekly">Həftəlik</option>
+            </select>
+            <span class="field-error" id="error-sub-tezlik"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-baslama-tarixi">Başlama Tarixi *</label>
+            <input type="date" id="sub-baslama-tarixi" required>
+            <span class="field-error" id="error-sub-baslama-tarixi"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-novbeti-odenis">Növbəti Ödəniş Tarixi *</label>
+            <input type="date" id="sub-novbeti-odenis" required>
+            <span class="field-error" id="error-sub-novbeti-odenis"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-kateqoriya">Kateqoriya</label>
+            <input type="text" id="sub-kateqoriya" placeholder="Məs: Entertainment, Utilities">
+            <span class="field-error" id="error-sub-kateqoriya"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-status">Status</label>
+            <select id="sub-status">
+              <option value="active">Aktiv</option>
+              <option value="inactive">Deaktiv</option>
+            </select>
+            <span class="field-error" id="error-sub-status"></span>
+          </div>
+        </div>
+        <div id="sub-form-general-error" class="form-error-msg hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('sub-modal')">Ləğv Et</button>
+          <button type="submit" class="btn btn-primary" id="sub-submit-btn">Yadda Saxla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. PAYMENT MODAL (ADD/EDIT) -->
+  <div id="payment-modal" class="modal">
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <h3 id="payment-modal-title">Yeni Ödəniş Qeydi Əlavə Et</h3>
+        <button class="modal-close" onclick="closeModal('payment-modal')">&times;</button>
+      </div>
+      <form id="payment-form">
+        <input type="hidden" id="payment-id-field">
+        <div class="form-grid">
+          <div class="form-group col-span-2" id="payment-user-select-container">
+            <label for="payment-user">İstifadəçi *</label>
+            <select id="payment-user" required onchange="loadUserSubs(this.value)">
+              <option value="">İstifadəçi seçin...</option>
+            </select>
+            <span class="field-error" id="error-payment-user"></span>
+          </div>
+          <div class="form-group col-span-2" id="payment-sub-select-container">
+            <label for="payment-sub">Abunəlik *</label>
+            <select id="payment-sub" required disabled>
+              <option value="">Əvvəlcə istifadəçi seçin...</option>
+            </select>
+            <span class="field-error" id="error-payment-sub"></span>
+          </div>
+          <div class="form-group">
+            <label for="payment-tarix">Ödəniş Tarixi *</label>
+            <input type="date" id="payment-tarix" required>
+            <span class="field-error" id="error-payment-tarix"></span>
+          </div>
+          <div class="form-group">
+            <label for="payment-mebleq">Məbləğ *</label>
+            <input type="number" id="payment-mebleq" step="0.01" min="0" placeholder="12.99" required>
+            <span class="field-error" id="error-payment-mebleq"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="payment-status">Status</label>
+            <select id="payment-status">
+              <option value="success">Uğurlu (Success)</option>
+              <option value="fail">Uğursuz (Fail)</option>
+            </select>
+            <span class="field-error" id="error-payment-status"></span>
+          </div>
+        </div>
+        <div id="payment-form-general-error" class="form-error-msg hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('payment-modal')">Ləğv Et</button>
+          <button type="submit" class="btn btn-primary" id="payment-submit-btn">Yadda Saxla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. NOTIFICATION MODAL (SEND) -->
+  <div id="notif-modal" class="modal">
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <h3>Yeni Bildiriş Göndər</h3>
+        <button class="modal-close" onclick="closeModal('notif-modal')">&times;</button>
+      </div>
+      <form id="notif-form">
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label for="notif-user">İstifadəçi *</label>
+            <select id="notif-user" required>
+              <option value="">İstifadəçi seçin...</option>
+            </select>
+            <span class="field-error" id="error-notif-user"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="notif-basliq">Başlıq *</label>
+            <input type="text" id="notif-basliq" placeholder="Məs: Ödəniş xatırlatması" required>
+            <span class="field-error" id="error-notif-basliq"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="notif-mesaj">Mesaj *</label>
+            <textarea id="notif-mesaj" placeholder="Mesajı bura daxil edin..." required rows="4"></textarea>
+            <span class="field-error" id="error-notif-mesaj"></span>
+          </div>
+        </div>
+        <div id="notif-form-general-error" class="form-error-msg hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('notif-modal')">Ləğv Et</button>
+          <button type="submit" class="btn btn-primary">Göndər</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <!-- ========================================== -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Custom Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>

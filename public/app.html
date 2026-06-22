@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SubTrack — Abunəlik İdarəetmə</title>
+  <meta name="description" content="Bütün abunəliklərinizi bir yerdə idarə edin. Netflix, Spotify, və daha çoxu.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- ===================== SCREENS ===================== -->
+
+<!-- SCREEN: Landing / Welcome -->
+<div id="screen-landing" class="screen active">
+  <div class="landing-bg">
+    <div class="landing-orb orb1"></div>
+    <div class="landing-orb orb2"></div>
+    <div class="landing-orb orb3"></div>
+  </div>
+  <nav class="landing-nav">
+    <div class="nav-logo">
+      <div class="logo-mark"><i data-lucide="layers"></i></div>
+      <span>SubTrack</span>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-ghost" onclick="showScreen('screen-login')">Giriş Et</button>
+      <button class="btn btn-primary" onclick="showScreen('screen-register')">Başla</button>
+    </div>
+  </nav>
+
+  <main class="landing-hero">
+    <div class="hero-badge"><i data-lucide="zap"></i> Bütün abunəliklərin bir yerdə</div>
+    <h1 class="hero-title">Abunəliklərini<br><span class="gradient-text">nəzarət altına al</span></h1>
+    <p class="hero-subtitle">Netflix, Spotify, YouTube Premium və daha çox — hamısını izlə, xərclərini bil, vaxtında xatır.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary btn-lg" onclick="showScreen('screen-register')">
+        <i data-lucide="user-plus"></i>
+        Pulsuz Qeydiyyat
+      </button>
+      <button class="btn btn-outline btn-lg" onclick="showScreen('screen-login')">
+        Hesabım var
+        <i data-lucide="arrow-right"></i>
+      </button>
+    </div>
+
+    <div class="hero-cards">
+      <div class="hero-card">
+        <div class="hc-icon" style="background:linear-gradient(135deg,#e50914,#b30710);">N</div>
+        <div class="hc-info"><span>Netflix</span><small>13.99 AZN/ay</small></div>
+        <span class="hc-badge active">Aktiv</span>
+      </div>
+      <div class="hero-card">
+        <div class="hc-icon" style="background:linear-gradient(135deg,#1db954,#158a3e);">S</div>
+        <div class="hc-info"><span>Spotify</span><small>6.99 AZN/ay</small></div>
+        <span class="hc-badge active">Aktiv</span>
+      </div>
+      <div class="hero-card">
+        <div class="hc-icon" style="background:linear-gradient(135deg,#ff0000,#cc0000);">Y</div>
+        <div class="hc-info"><span>YouTube Premium</span><small>9.99 AZN/ay</small></div>
+        <span class="hc-badge active">Aktiv</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- SCREEN: Register -->
+<div id="screen-register" class="screen">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <button class="back-btn" onclick="showScreen('screen-landing')"><i data-lucide="arrow-left"></i></button>
+      <div class="auth-header">
+        <div class="auth-logo"><i data-lucide="layers"></i></div>
+        <h2>Hesab Yarat</h2>
+        <p>Bütün abunəliklərini izləməyə başla</p>
+      </div>
+      <form id="register-form">
+        <div class="form-group">
+          <label>Ad Soyad</label>
+          <div class="input-icon-wrap">
+            <i data-lucide="user"></i>
+            <input type="text" id="reg-name" placeholder="Adınızı daxil edin" required minlength="3">
+          </div>
+          <span class="field-err" id="err-reg-name"></span>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <div class="input-icon-wrap">
+            <i data-lucide="mail"></i>
+            <input type="email" id="reg-email" placeholder="email@example.com" required>
+          </div>
+          <span class="field-err" id="err-reg-email"></span>
+        </div>
+        <div class="field-err form-general-err" id="err-reg-general"></div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="reg-submit">
+          <span>Qeydiyyatdan Keç</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+      <p class="auth-switch">Artıq hesabın var? <a onclick="showScreen('screen-login')">Giriş et</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: Login -->
+<div id="screen-login" class="screen">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <button class="back-btn" onclick="showScreen('screen-landing')"><i data-lucide="arrow-left"></i></button>
+      <div class="auth-header">
+        <div class="auth-logo"><i data-lucide="layers"></i></div>
+        <h2>Xoş Gəldin</h2>
+        <p>Email ünvanınla daxil ol</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Email</label>
+          <div class="input-icon-wrap">
+            <i data-lucide="mail"></i>
+            <input type="email" id="login-email" placeholder="email@example.com" required>
+          </div>
+          <span class="field-err" id="err-login-email"></span>
+        </div>
+        <div class="field-err form-general-err" id="err-login-general"></div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-submit">
+          <span>Daxil Ol</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+      <p class="auth-switch">Hesabın yoxdur? <a onclick="showScreen('screen-register')">Qeydiyyat</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: Main App (after login) -->
+<div id="screen-app" class="screen">
+  <!-- Bottom Navigation (mobile-first) -->
+  <nav class="bottom-nav">
+    <button class="bnav-item active" data-page="home" onclick="switchPage('home')">
+      <i data-lucide="home"></i><span>Ana Səhifə</span>
+    </button>
+    <button class="bnav-item" data-page="subscriptions" onclick="switchPage('subscriptions')">
+      <i data-lucide="credit-card"></i><span>Abunəliklər</span>
+    </button>
+    <button class="bnav-item" data-page="payments" onclick="switchPage('payments')">
+      <i data-lucide="history"></i><span>Ödənişlər</span>
+    </button>
+    <button class="bnav-item" data-page="notifications" onclick="switchPage('notifications')">
+      <i data-lucide="bell"></i><span>Bildirişlər</span>
+    </button>
+    <button class="bnav-item" data-page="profile" onclick="switchPage('profile')">
+      <i data-lucide="user"></i><span>Profil</span>
+    </button>
+  </nav>
+
+  <div class="app-content">
+
+    <!-- PAGE: Home -->
+    <div id="page-home" class="page active">
+      <div class="page-header">
+        <div>
+          <p class="greeting-small">Xoş gəldin 👋</p>
+          <h2 id="home-username">İstifadəçi</h2>
+        </div>
+        <div class="header-avatar" id="home-avatar">U</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-item">
+          <span class="s-label">Bu ay xərc</span>
+          <span class="s-value" id="home-monthly-cost">0.00 AZN</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-item">
+          <span class="s-label">Aktiv abunəlik</span>
+          <span class="s-value" id="home-active-count">0</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-item">
+          <span class="s-label">İllik xərc</span>
+          <span class="s-value" id="home-yearly-cost">0.00 AZN</span>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <h3>Növbəti Ödənişlər</h3>
+        <button class="btn-text" onclick="switchPage('subscriptions')">Hamısı <i data-lucide="chevron-right"></i></button>
+      </div>
+      <div id="home-upcoming" class="upcoming-list">
+        <div class="skeleton-list"></div>
+      </div>
+
+      <div class="section-title">
+        <h3>Son Bildirişlər</h3>
+        <button class="btn-text" onclick="switchPage('notifications')">Hamısı <i data-lucide="chevron-right"></i></button>
+      </div>
+      <div id="home-notifs" class="notif-preview-list">
+        <div class="skeleton-list"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: Subscriptions -->
+    <div id="page-subscriptions" class="page">
+      <div class="page-header">
+        <h2>Abunəliklər</h2>
+        <button class="btn btn-primary btn-sm" onclick="openSubModal()">
+          <i data-lucide="plus"></i> Əlavə Et
+        </button>
+      </div>
+
+      <div class="filter-tabs" id="sub-filter-tabs">
+        <button class="ftab active" data-filter="all" onclick="filterSubs('all', this)">Hamısı</button>
+        <button class="ftab" data-filter="active" onclick="filterSubs('active', this)">Aktiv</button>
+        <button class="ftab" data-filter="inactive" onclick="filterSubs('inactive', this)">Deaktiv</button>
+      </div>
+
+      <div id="subs-list" class="subs-grid">
+        <div class="loading-pulse"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: Payments -->
+    <div id="page-payments" class="page">
+      <div class="page-header">
+        <h2>Ödəniş Tarixçəsi</h2>
+      </div>
+      <div id="payments-list" class="payments-list">
+        <div class="loading-pulse"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: Notifications -->
+    <div id="page-notifications" class="page">
+      <div class="page-header">
+        <h2>Bildirişlər</h2>
+      </div>
+      <div id="notifs-list" class="notifs-list">
+        <div class="loading-pulse"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: Profile -->
+    <div id="page-profile" class="page">
+      <div class="page-header">
+        <h2>Profilim</h2>
+      </div>
+      <div class="profile-card">
+        <div class="profile-avatar" id="profile-avatar-big">U</div>
+        <h3 id="profile-name-display">-</h3>
+        <p id="profile-email-display" style="color:var(--text-muted); font-size:14px;">-</p>
+      </div>
+
+      <div class="settings-section">
+        <h4>Məlumatları Yenilə</h4>
+        <form id="profile-form">
+          <div class="form-group">
+            <label>Ad Soyad</label>
+            <div class="input-icon-wrap">
+              <i data-lucide="user"></i>
+              <input type="text" id="profile-name" placeholder="Ad Soyad" required minlength="3">
+            </div>
+            <span class="field-err" id="err-profile-name"></span>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <div class="input-icon-wrap">
+              <i data-lucide="mail"></i>
+              <input type="email" id="profile-email" placeholder="email@example.com" required>
+            </div>
+            <span class="field-err" id="err-profile-email"></span>
+          </div>
+          <div class="field-err form-general-err" id="err-profile-general"></div>
+          <button type="submit" class="btn btn-primary btn-block">Yadda Saxla</button>
+        </form>
+      </div>
+
+      <button class="btn btn-danger-outline btn-block" onclick="logout()">
+        <i data-lucide="log-out"></i> Çıxış Et
+      </button>
+    </div>
+
+  </div><!-- /app-content -->
+</div><!-- /screen-app -->
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- Add/Edit Subscription Modal -->
+<div id="sub-modal" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3 id="sub-modal-title">Yeni Abunəlik</h3>
+      <button class="modal-close-btn" onclick="closeSubModal()"><i data-lucide="x"></i></button>
+    </div>
+    <form id="sub-modal-form">
+      <input type="hidden" id="sub-modal-id">
+      <div class="form-group">
+        <label>Abunəlik Adı *</label>
+        <div class="input-icon-wrap">
+          <i data-lucide="tag"></i>
+          <input type="text" id="sm-name" placeholder="Netflix, Spotify..." required>
+        </div>
+        <span class="field-err" id="err-sm-name"></span>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Qiymət *</label>
+          <input type="number" id="sm-price" step="0.01" min="0.01" placeholder="12.99" required>
+          <span class="field-err" id="err-sm-price"></span>
+        </div>
+        <div class="form-group">
+          <label>Valyuta</label>
+          <select id="sm-currency">
+            <option value="AZN">AZN</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Ödəniş Tezliyi</label>
+        <div class="freq-tabs" id="freq-tabs">
+          <button type="button" class="ftab active" data-val="monthly" onclick="selectFreq('monthly',this)">Aylıq</button>
+          <button type="button" class="ftab" data-val="yearly" onclick="selectFreq('yearly',this)">İllik</button>
+          <button type="button" class="ftab" data-val="weekly" onclick="selectFreq('weekly',this)">Həftəlik</button>
+        </div>
+        <input type="hidden" id="sm-freq" value="monthly">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Başlama Tarixi *</label>
+          <input type="date" id="sm-start" required>
+          <span class="field-err" id="err-sm-start"></span>
+        </div>
+        <div class="form-group">
+          <label>Növbəti Ödəniş *</label>
+          <input type="date" id="sm-next" required>
+          <span class="field-err" id="err-sm-next"></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Kateqoriya</label>
+        <div class="cat-chips" id="cat-chips">
+          <button type="button" class="chip" onclick="selectCat('Entertainment',this)">🎬 Əyləncə</button>
+          <button type="button" class="chip" onclick="selectCat('Music',this)">🎵 Musiqi</button>
+          <button type="button" class="chip" onclick="selectCat('Software',this)">💻 Proqram</button>
+          <button type="button" class="chip" onclick="selectCat('Gaming',this)">🎮 Oyun</button>
+          <button type="button" class="chip" onclick="selectCat('Education',this)">📚 Təhsil</button>
+          <button type="button" class="chip" onclick="selectCat('Other',this)">📦 Digər</button>
+        </div>
+        <input type="hidden" id="sm-category" value="">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <div class="toggle-row">
+          <span>Aktiv</span>
+          <label class="toggle">
+            <input type="checkbox" id="sm-active" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="field-err form-general-err" id="err-sm-general"></div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="sm-submit-btn">Yadda Saxla</button>
+    </form>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script src="app-main.js"></script>
+</body>
+</html>
