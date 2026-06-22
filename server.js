@@ -200,6 +200,8 @@ app.get('/api/istifadeciler', async (req, res) => {
  *           application/json:
  *             schema:
  *               type: object
+ *               required:
+ *                 - istifadeci_id
  *               properties:
  *                 ID:
  *                   type: integer
@@ -291,7 +293,7 @@ app.post('/api/istifadeciler', async (req, res) => {
 
   try {
     // ID yoxlanışı (əgər ID daxil edilibsə)
-    if (id) {
+    if (history_id) {
       const idCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :id`, { id });
       if (idCheck.rows.length > 0) {
         return res.status(400).json({ error: 'Bu ID ilə artıq istifadəçi mövcuddur.' });
@@ -306,7 +308,7 @@ app.post('/api/istifadeciler', async (req, res) => {
 
     let sql;
     let binds;
-    if (id) {
+    if (history_id) {
       sql = `INSERT INTO istifadeciler (id, ad, email) VALUES (:id, :ad, :email)`;
       binds = { id, ad: trimmedAd, email: trimmedEmail };
     } else {
@@ -508,6 +510,8 @@ app.delete('/api/istifadeciler/:id', async (req, res) => {
  *           application/json:
  *             schema:
  *               type: object
+ *               required:
+ *                 - istifadeci_id
  *               properties:
  *                 ID:
  *                   type: integer
@@ -646,7 +650,7 @@ app.post('/api/abunelikler', async (req, res) => {
     const yaradilmaCol = yaradilma_tarixi ? ', yaradilma_tarixi' : '';
     const yaradilmaVal = yaradilma_tarixi ? `, TO_TIMESTAMP(:yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS')` : '';
 
-    if (id) {
+    if (history_id) {
       sql = `
         INSERT INTO abunelikler (id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status${yaradilmaCol})
         VALUES (:id, :istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :status${yaradilmaVal})
@@ -863,6 +867,8 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
  *           application/json:
  *             schema:
  *               type: object
+ *               required:
+ *                 - istifadeci_id
  *               properties:
  *                 ID:
  *                   type: integer
@@ -944,7 +950,7 @@ app.post('/api/bildirisler', async (req, res) => {
 
     let sql;
     let binds;
-    if (id) {
+    if (history_id) {
       sql = `INSERT INTO bildirisler (id, istifadeci_id, basliq, mesaj) VALUES (:id, :istifadeci_id, :basliq, :mesaj)`;
       binds = { id, istifadeci_id, basliq, mesaj };
     } else {
@@ -1089,6 +1095,8 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  *           application/json:
  *             schema:
  *               type: object
+ *               required:
+ *                 - istifadeci_id
  *               properties:
  *                 ID:
  *                   type: integer
@@ -1143,7 +1151,7 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
  *               - odenis_tarixi
  *               - mebleq
  *             properties:
- *               id:
+ *               history_id:
  *                 type: integer
  *                 description: Ödəniş tarixçəsinin ID-si (isteğe bağlı)
  *                 example: 5
@@ -1169,7 +1177,7 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
  *         description: Ödəniş tarixçəsi qeydi əlavə edildi
  */
 app.post('/api/odenis-tarixcesi', async (req, res) => {
-  const { id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status } = req.body;
+  const { history_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status } = req.body;
   if (!abunelik_id || !istifadeci_id || !odenis_tarixi || !mebleq) {
     return res.status(400).json({ error: 'Məcburi sahələri (abunelik_id, istifadeci_id, odenis_tarixi, mebleq) doldurun.' });
   }
@@ -1200,12 +1208,12 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
 
     let sql;
     let binds;
-    if (id) {
+    if (history_id) {
       sql = `
-        INSERT INTO odenis_tarixcesi (id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
-        VALUES (:id, :abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi, 'YYYY-MM-DD'), :mebleq, :status)
+        INSERT INTO odenis_tarixcesi (history_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
+        VALUES (:history_id, :abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi, 'YYYY-MM-DD'), :mebleq, :status)
       `;
-      binds = { id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status: statusValue };
+      binds = { history_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status: statusValue };
     } else {
       sql = `
         INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
@@ -1402,7 +1410,7 @@ app.get('/api/odenis-metodlari', async (req, res) => {
  *               - ad
  *               - kart_tipi
  *             properties:
- *               istifadeci_id:
+ *               istifadeci_card_id:
  *                 type: integer
  *               ad:
  *                 type: string
@@ -1773,12 +1781,6 @@ app.put('/api/budceler/:id', async (req, res) => {
  *   get:
  *     summary: İstifadəçinin fərdi ayarlarını gətirir
  *     tags: [Ayarlar]
- *     parameters:
- *       - in: path
- *         name: istifadeci_id
- *         required: true
- *         schema:
- *           type: integer
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
@@ -1812,16 +1814,10 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
 
 /**
  * @swagger
- * /api/ayarlar/{istifadeci_id}:
+ * /api/ayarlar:
  *   put:
  *     summary: İstifadəçinin fərdi ayarlarını yeniləyir və ya yaradır
  *     tags: [Ayarlar]
- *     parameters:
- *       - in: path
- *         name: istifadeci_id
- *         required: true
- *         schema:
- *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -1829,6 +1825,9 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
+ *               istifadeci_id:
+ *                 type: integer
+ *                 description: Istifad?�inin ID-si
  *               esas_valyuta:
  *                 type: string
  *                 enum: [AZN, USD, EUR]
@@ -1853,9 +1852,8 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
  *       200:
  *         description: Ayarlar yeniləndi
  */
-app.put('/api/ayarlar/:istifadeci_id', async (req, res) => {
-  const { istifadeci_id } = req.params;
-  const { esas_valyuta, bildiris_metodu, dil, tema } = req.body;
+app.put('/api/ayarlar', async (req, res) => {
+  const { istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema } = req.body;
   try {
     // ── Validasiya ──────────────────────────────────────────────────────────
     const ICAZE_VERILEN_VALYUTALAR   = ['AZN', 'USD', 'EUR'];
