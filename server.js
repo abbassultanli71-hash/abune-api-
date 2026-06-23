@@ -10,7 +10,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Helper to recursively normalize object keys to lowercase
 function lowercaseKeys(obj) {
   if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
     return Object.keys(obj).reduce((acc, key) => {
@@ -23,7 +22,6 @@ function lowercaseKeys(obj) {
   return obj;
 }
 
-// Middleware to normalize request body keys to lowercase
 app.use((req, res, next) => {
   if (req.body) {
     req.body = lowercaseKeys(req.body);
@@ -35,22 +33,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
 
-// Basic Authentication Middleware
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     res.setHeader('WWW-Authenticate', 'Basic realm="Secure API"');
     return res.status(401).send('Giriş qadağandır: İstifadəçi adı və şifrə tələb olunur.');
   }
-
   try {
     const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
     const user = auth[0];
     const pass = auth[1];
-
     const API_USER = process.env.API_USER || 'admin';
     const API_PASSWORD = process.env.API_PASSWORD || 'admin123';
-
     if (user === API_USER && pass === API_PASSWORD) {
       next();
     } else {
@@ -63,7 +57,6 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// Swagger UI configuration
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -73,14 +66,8 @@ const swaggerOptions = {
       description: 'Oracle verilənlər bazası ilə inteqrasiya olunmuş abunəlik idarəetmə platformasının API-ı.',
     },
     servers: [
-      {
-        url: '/',
-        description: 'Cari Server (Lokal və ya Tunel)',
-      },
-      {
-        url: `http://localhost:${PORT}`,
-        description: 'Yerli API Serveri',
-      },
+      { url: '/', description: 'Cari Server (Lokal və ya Tunel)' },
+      { url: `http://localhost:${PORT}`, description: 'Yerli API Serveri' },
     ],
     components: {
       securitySchemes: {
@@ -91,11 +78,7 @@ const swaggerOptions = {
         }
       }
     },
-    security: [
-      {
-        basicAuth: []
-      }
-    ]
+    security: [{ basicAuth: [] }]
   },
   apis: ['./server.js'],
 };
@@ -104,17 +87,14 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', authMiddleware, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/api', authMiddleware);
 
-// Root route serves the admin Dashboard
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// /app route serves the user-facing Subscription App
 app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'app.html'));
 });
 
-// Helper functions for Date and Timestamp validation
 function isValidDate(dateStr) {
   if (typeof dateStr !== 'string') return false;
   const regex = /^\d{4}-\d{2}-\d{2}$/;
@@ -154,7 +134,6 @@ function isValidCurrency(valyuta) {
   const v = getValidCurrency(valyuta);
   return ICAZE_VERILEN_VALYUTALAR.includes(v);
 }
-
 
 // =============================================
 // --- ISTIFADECILER (Users) ROUTES ---
@@ -200,8 +179,6 @@ app.get('/api/istifadeciler', async (req, res) => {
  *           application/json:
  *             schema:
  *               type: object
- *               required:
- *                 - istifadeci_id
  *               properties:
  *                 ID:
  *                   type: integer
@@ -260,7 +237,7 @@ app.get('/api/istifadeciler/:id', async (req, res) => {
  */
 app.post('/api/istifadeciler', async (req, res) => {
   const { id, ad, email } = req.body;
-  
+
   if (!ad || !email) {
     return res.status(400).json({ error: 'Ad və email sahələri məcburidir.' });
   }
@@ -292,15 +269,13 @@ app.post('/api/istifadeciler', async (req, res) => {
   }
 
   try {
-    // ID yoxlanışı (əgər ID daxil edilibsə)
-    if (history_id) {
+    if (id) {
       const idCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :id`, { id });
       if (idCheck.rows.length > 0) {
         return res.status(400).json({ error: 'Bu ID ilə artıq istifadəçi mövcuddur.' });
       }
     }
 
-    // Email yoxlanışı
     const emailCheck = await executeQuery(`SELECT email FROM istifadeciler WHERE email = :email`, { email: trimmedEmail });
     if (emailCheck.rows.length > 0) {
       return res.status(400).json({ error: 'Bu email ünvanı ilə artıq istifadəçi mövcuddur.' });
@@ -308,7 +283,7 @@ app.post('/api/istifadeciler', async (req, res) => {
 
     let sql;
     let binds;
-    if (history_id) {
+    if (id) {
       sql = `INSERT INTO istifadeciler (id, ad, email) VALUES (:id, :ad, :email)`;
       binds = { id, ad: trimmedAd, email: trimmedEmail };
     } else {
@@ -317,11 +292,9 @@ app.post('/api/istifadeciler', async (req, res) => {
     }
     await executeQuery(sql, binds, { autoCommit: true });
 
-    // 1. Yeni yaradılan istifadəçinin ID-sini tapırıq (email unikal olduğu üçün)
     const userResult = await executeQuery(`SELECT id FROM istifadeciler WHERE email = :email`, { email: trimmedEmail });
     const userId = userResult.rows[0].ID;
 
-    // 2. Bu istifadəçi üçün avtomatik olaraq default ayarlar yaradırıq
     await executeQuery(`
       INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema)
       VALUES (:userId, 'AZN', 'email', 'az', 'dark')
@@ -412,7 +385,7 @@ app.put('/api/istifadeciler/:id', async (req, res) => {
   try {
     let sql;
     let binds;
-    
+
     if (yaradilma_tarixi) {
       sql = `UPDATE istifadeciler SET ad = :ad, email = :email, yaradilma_tarixi = TO_TIMESTAMP(:yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') WHERE id = :id`;
       binds = { ad: trimmedAd, email: trimmedEmail, yaradilma_tarixi, id };
@@ -420,20 +393,18 @@ app.put('/api/istifadeciler/:id', async (req, res) => {
       sql = `UPDATE istifadeciler SET ad = :ad, email = :email WHERE id = :id`;
       binds = { ad: trimmedAd, email: trimmedEmail, id };
     }
-    
+
     const result = await executeQuery(sql, binds, { autoCommit: true });
     if (result.rowsAffected === 0) {
       return res.status(404).json({ error: 'İstifadəçi tapılmadı.' });
     }
 
-    // Yenilənmiş istifadəçinin məlumatlarını bazadan gətirib cavabda qaytarırıq
     const updated = await executeQuery(
       `SELECT id, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler WHERE id = :id`,
       { id }
     );
     res.json({ message: 'İstifadəçi uğurla yeniləndi.', istifadeci: updated.rows[0] });
   } catch (err) {
-    // Eyni ID və ya email-in təkrar istifadəsi xətası (Unique/Primary Key Constraint)
     if (err.message && err.message.includes('ORA-00001')) {
       if (err.message.includes('ISTIFADECILER') && err.message.includes('ID') || err.message.includes('SYS_')) {
         if (err.message.includes('EMAIL')) {
@@ -443,12 +414,9 @@ app.put('/api/istifadeciler/:id', async (req, res) => {
       }
       return res.status(400).json({ error: 'Məlumatların unikallığı pozuldu (eyni ID və ya email artıq mövcuddur).' });
     }
-    
-    // Xarici açar (Foreign Key) məhdudiyyəti xətası
     if (err.message && err.message.includes('ORA-02292')) {
       return res.status(400).json({ error: 'İstifadəçinin abunəliyi və ya bildirişi olduğu üçün onun ID-sini dəyişmək olmaz (Foreign Key Constraint).' });
     }
-    
     res.status(500).json({ error: err.message });
   }
 });
@@ -510,10 +478,8 @@ app.delete('/api/istifadeciler/:id', async (req, res) => {
  *           application/json:
  *             schema:
  *               type: object
- *               required:
- *                 - istifadeci_id
  *               properties:
- *                 ID:
+ *                 ABUNELIK_ID:
  *                   type: integer
  *                 ISTIFADECI_ID:
  *                   type: integer
@@ -542,7 +508,7 @@ app.get('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const sql = `
-      SELECT id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi,
+      SELECT id AS abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi,
              TO_CHAR(baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
              TO_CHAR(novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
              kateqoriya, status,
@@ -578,7 +544,7 @@ app.get('/api/abunelikler/:id', async (req, res) => {
  *               - baslama_tarixi
  *               - novbeti_odenis_tarixi
  *             properties:
- *               id:
+ *               abunelik_id:
  *                 type: integer
  *                 description: Abunəliyin ID-si (isteğe bağlı)
  *                 example: 3
@@ -620,7 +586,7 @@ app.get('/api/abunelikler/:id', async (req, res) => {
  *         description: Abunəlik əlavə edildi
  */
 app.post('/api/abunelikler', async (req, res) => {
-  const { id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status, yaradilma_tarixi } = req.body;
+  const { abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status, yaradilma_tarixi } = req.body;
   if (!istifadeci_id || !ad || !qiymet || !baslama_tarixi || !novbeti_odenis_tarixi) {
     return res.status(400).json({ error: 'Məcburi sahələri (istifadeci_id, ad, qiymet, baslama_tarixi, novbeti_odenis_tarixi) doldurun.' });
   }
@@ -637,7 +603,6 @@ app.post('/api/abunelikler', async (req, res) => {
     return res.status(400).json({ error: `Yaradılma tarixi düzgün deyil: "${yaradilma_tarixi}" mövcud olmayan və ya yanlış formatda tarixdir (Format: YYYY-MM-DD HH24:MI:SS).` });
   }
   try {
-    // İstifadəçinin mövcudluğunu yoxlayırıq
     const userCheckSql = `SELECT id FROM istifadeciler WHERE id = :istifadeci_id`;
     const userCheckResult = await executeQuery(userCheckSql, { istifadeci_id });
     if (userCheckResult.rows.length === 0) {
@@ -650,13 +615,13 @@ app.post('/api/abunelikler', async (req, res) => {
     const yaradilmaCol = yaradilma_tarixi ? ', yaradilma_tarixi' : '';
     const yaradilmaVal = yaradilma_tarixi ? `, TO_TIMESTAMP(:yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS')` : '';
 
-    if (history_id) {
+    if (abunelik_id) {
       sql = `
         INSERT INTO abunelikler (id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status${yaradilmaCol})
-        VALUES (:id, :istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :status${yaradilmaVal})
+        VALUES (:abunelik_id, :istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :status${yaradilmaVal})
       `;
       binds = {
-        id, istifadeci_id, ad, qiymet,
+        abunelik_id, istifadeci_id, ad, qiymet,
         valyuta: getValidCurrency(valyuta),
         odenis_tezliyi: odenis_tezliyi || 'monthly',
         baslama_tarixi, novbeti_odenis_tarixi,
@@ -746,16 +711,16 @@ app.post('/api/abunelikler', async (req, res) => {
  *         description: Abunəlik yeniləndi
  *       404:
  *         description: Abunəlik tapılmadı
- * */
+ */
 app.put('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
-  const { id: bodyId, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status } = req.body;
-  
+  const { abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status } = req.body;
+
   if (!ad || !qiymet || !baslama_tarixi || !novbeti_odenis_tarixi) {
     return res.status(400).json({ error: 'Məcburi sahələri (ad, qiymet, baslama_tarixi, novbeti_odenis_tarixi) doldurun.' });
   }
 
-  if (bodyId && Number(bodyId) !== Number(id)) {
+  if (abunelik_id && Number(abunelik_id) !== Number(id)) {
     return res.status(400).json({ error: 'Abunəliyin ID-si dəyişdirilə bilməz.' });
   }
 
@@ -772,7 +737,6 @@ app.put('/api/abunelikler/:id', async (req, res) => {
   }
 
   try {
-    // 1. Abunəliyin mövcudluğunu yoxlayırıq
     const subCheckSql = `SELECT id, istifadeci_id FROM abunelikler WHERE id = :id`;
     const subCheckResult = await executeQuery(subCheckSql, { id });
     if (subCheckResult.rows.length === 0) {
@@ -780,7 +744,6 @@ app.put('/api/abunelikler/:id', async (req, res) => {
     }
     const currentSub = subCheckResult.rows[0];
 
-    // 2. İstifadəçinin (istifadeci_id) dəyişdirilməməsini yoxlayırıq
     if (istifadeci_id !== undefined && Number(istifadeci_id) !== Number(currentSub.ISTIFADECI_ID)) {
       return res.status(400).json({ error: 'Abunəliyin aid olduğu istifadəçi (istifadeci_id) dəyişdirilə bilməz.' });
     }
@@ -867,10 +830,8 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
  *           application/json:
  *             schema:
  *               type: object
- *               required:
- *                 - istifadeci_id
  *               properties:
- *                 ID:
+ *                 BILDIRIS_ID:
  *                   type: integer
  *                 ISTIFADECI_ID:
  *                   type: integer
@@ -887,7 +848,7 @@ app.get('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const sql = `
-      SELECT id, istifadeci_id, basliq, mesaj,
+      SELECT id AS bildiris_id, istifadeci_id, basliq, mesaj,
              TO_CHAR(gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi
       FROM bildirisler WHERE id = :id
     `;
@@ -918,7 +879,7 @@ app.get('/api/bildirisler/:id', async (req, res) => {
  *               - basliq
  *               - mesaj
  *             properties:
- *               id:
+ *               bildiris_id:
  *                 type: integer
  *                 description: Bildirişin ID-si (isteğe bağlı)
  *                 example: 5
@@ -936,12 +897,11 @@ app.get('/api/bildirisler/:id', async (req, res) => {
  *         description: Bildiriş göndərildi
  */
 app.post('/api/bildirisler', async (req, res) => {
-  const { id, istifadeci_id, basliq, mesaj } = req.body;
+  const { bildiris_id, istifadeci_id, basliq, mesaj } = req.body;
   if (!istifadeci_id || !basliq || !mesaj) {
     return res.status(400).json({ error: 'Məcburi sahələri (istifadeci_id, basliq, mesaj) doldurun.' });
   }
   try {
-    // İstifadəçinin mövcudluğunu yoxlayırıq
     const userCheckSql = `SELECT id FROM istifadeciler WHERE id = :istifadeci_id`;
     const userCheckResult = await executeQuery(userCheckSql, { istifadeci_id });
     if (userCheckResult.rows.length === 0) {
@@ -950,9 +910,9 @@ app.post('/api/bildirisler', async (req, res) => {
 
     let sql;
     let binds;
-    if (history_id) {
-      sql = `INSERT INTO bildirisler (id, istifadeci_id, basliq, mesaj) VALUES (:id, :istifadeci_id, :basliq, :mesaj)`;
-      binds = { id, istifadeci_id, basliq, mesaj };
+    if (bildiris_id) {
+      sql = `INSERT INTO bildirisler (id, istifadeci_id, basliq, mesaj) VALUES (:bildiris_id, :istifadeci_id, :basliq, :mesaj)`;
+      binds = { bildiris_id, istifadeci_id, basliq, mesaj };
     } else {
       sql = `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`;
       binds = { istifadeci_id, basliq, mesaj };
@@ -1010,12 +970,11 @@ app.put('/api/bildirisler/:id', async (req, res) => {
     return res.status(400).json({ error: 'Məcburi sahələri (basliq, mesaj) doldurun.' });
   }
 
-  if (req.body.id !== undefined && Number(req.body.id) !== Number(id)) {
+  if (req.body.bildiris_id !== undefined && Number(req.body.bildiris_id) !== Number(id)) {
     return res.status(400).json({ error: 'Bildirişin ID-si dəyişdirilə bilməz.' });
   }
 
   try {
-    // 1. Bildirişin mövcudluğunu yoxlayırıq
     const checkSql = `SELECT id, istifadeci_id FROM bildirisler WHERE id = :id`;
     const checkResult = await executeQuery(checkSql, { id });
     if (checkResult.rows.length === 0) {
@@ -1023,7 +982,6 @@ app.put('/api/bildirisler/:id', async (req, res) => {
     }
     const currentNotification = checkResult.rows[0];
 
-    // 2. İstifadəçinin (istifadeci_id) dəyişdirilməməsini yoxlayırıq
     if (req.body.istifadeci_id !== undefined && Number(req.body.istifadeci_id) !== Number(currentNotification.ISTIFADECI_ID)) {
       return res.status(400).json({ error: 'Bildirişin aid olduğu istifadəçi (istifadeci_id) dəyişdirilə bilməz.' });
     }
@@ -1095,10 +1053,8 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  *           application/json:
  *             schema:
  *               type: object
- *               required:
- *                 - istifadeci_id
  *               properties:
- *                 ID:
+ *                 ODENIS_TARIXCESI_ID:
  *                   type: integer
  *                 ABUNELIK_ID:
  *                   type: integer
@@ -1118,7 +1074,7 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const sql = `
-      SELECT id, abunelik_id, istifadeci_id,
+      SELECT id AS odenis_tarixcesi_id, abunelik_id, istifadeci_id,
              TO_CHAR(odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi,
              mebleq, status
       FROM odenis_tarixcesi WHERE id = :id
@@ -1151,7 +1107,7 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
  *               - odenis_tarixi
  *               - mebleq
  *             properties:
- *               history_id:
+ *               odenis_tarixcesi_id:
  *                 type: integer
  *                 description: Ödəniş tarixçəsinin ID-si (isteğe bağlı)
  *                 example: 5
@@ -1177,7 +1133,7 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
  *         description: Ödəniş tarixçəsi qeydi əlavə edildi
  */
 app.post('/api/odenis-tarixcesi', async (req, res) => {
-  const { history_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status } = req.body;
+  const { odenis_tarixcesi_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status } = req.body;
   if (!abunelik_id || !istifadeci_id || !odenis_tarixi || !mebleq) {
     return res.status(400).json({ error: 'Məcburi sahələri (abunelik_id, istifadeci_id, odenis_tarixi, mebleq) doldurun.' });
   }
@@ -1189,14 +1145,12 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
     return res.status(400).json({ error: 'Status yalnız "success" və ya "fail" ola bilər.' });
   }
   try {
-    // 1. İstifadəçinin mövcudluğunu yoxlayırıq
     const userCheckSql = `SELECT id FROM istifadeciler WHERE id = :istifadeci_id`;
     const userCheckResult = await executeQuery(userCheckSql, { istifadeci_id });
     if (userCheckResult.rows.length === 0) {
       return res.status(400).json({ error: 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.' });
     }
 
-    // 2. Abunəliyin mövcudluğunu və bu istifadəçiyə aid olub-olmadığını yoxlayırıq
     const subCheckSql = `SELECT id, istifadeci_id FROM abunelikler WHERE id = :abunelik_id`;
     const subCheckResult = await executeQuery(subCheckSql, { abunelik_id });
     if (subCheckResult.rows.length === 0) {
@@ -1208,12 +1162,12 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
 
     let sql;
     let binds;
-    if (history_id) {
+    if (odenis_tarixcesi_id) {
       sql = `
-        INSERT INTO odenis_tarixcesi (history_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
-        VALUES (:history_id, :abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi, 'YYYY-MM-DD'), :mebleq, :status)
+        INSERT INTO odenis_tarixcesi (id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
+        VALUES (:odenis_tarixcesi_id, :abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi, 'YYYY-MM-DD'), :mebleq, :status)
       `;
-      binds = { history_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status: statusValue };
+      binds = { odenis_tarixcesi_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status: statusValue };
     } else {
       sql = `
         INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
@@ -1286,7 +1240,6 @@ app.put('/api/odenis-tarixcesi/:id', async (req, res) => {
     return res.status(400).json({ error: 'Status yalnız "success" və ya "fail" ola bilər.' });
   }
   try {
-    // 1. Ödəniş tarixçəsinin mövcudluğunu yoxlayırıq və cari məlumatları əldə edirik
     const historyCheckSql = `SELECT id, abunelik_id, istifadeci_id FROM odenis_tarixcesi WHERE id = :id`;
     const historyCheckResult = await executeQuery(historyCheckSql, { id });
     if (historyCheckResult.rows.length === 0) {
@@ -1296,17 +1249,14 @@ app.put('/api/odenis-tarixcesi/:id', async (req, res) => {
     const currentAbunelikId = currentHistory.ABUNELIK_ID;
     const currentIstifadeciId = currentHistory.ISTIFADECI_ID;
 
-    // 2. ID-nin body vasitəsilə dəyişdirilməməsini yoxlayırıq
-    if (req.body.id !== undefined && Number(req.body.id) !== Number(id)) {
+    if (req.body.odenis_tarixcesi_id !== undefined && Number(req.body.odenis_tarixcesi_id) !== Number(id)) {
       return res.status(400).json({ error: 'Ödəniş tarixçəsinin ID-si dəyişdirilə bilməz.' });
     }
 
-    // 3. İstifadəçinin (istifadeci_id) body vasitəsilə dəyişdirilməməsini yoxlayırıq
     if (req.body.istifadeci_id !== undefined && Number(req.body.istifadeci_id) !== Number(currentIstifadeciId)) {
       return res.status(400).json({ error: 'Ödəniş tarixçəsinin aid olduğu istifadəçi (istifadeci_id) dəyişdirilə bilməz.' });
     }
 
-    // 4. Abunəliyin (abunelik_id) body vasitəsilə dəyişdirilməməsini yoxlayırıq
     if (req.body.abunelik_id !== undefined && Number(req.body.abunelik_id) !== Number(currentAbunelikId)) {
       return res.status(400).json({ error: 'Ödəniş tarixçəsinin aid olduğu abunəlik (abunelik_id) dəyişdirilə bilməz.' });
     }
@@ -1319,7 +1269,7 @@ app.put('/api/odenis-tarixcesi/:id', async (req, res) => {
         status = :status
       WHERE id = :id
     `;
-    const result = await executeQuery(sql, { abunelik_id, odenis_tarixi, mebleq, status: statusValue, id }, { autoCommit: true });
+    const result = await executeQuery(sql, { abunelik_id: currentAbunelikId, odenis_tarixi, mebleq, status: statusValue, id }, { autoCommit: true });
     if (result.rowsAffected === 0) {
       return res.status(404).json({ error: 'Ödəniş tarixçəsi tapılmadı.' });
     }
@@ -1362,6 +1312,10 @@ app.delete('/api/odenis-tarixcesi/:id', async (req, res) => {
   }
 });
 
+// =============================================
+// --- ODENIS METODLARI (Payment Methods) ROUTES ---
+// =============================================
+
 /**
  * @swagger
  * /api/odenis-metodlari:
@@ -1385,7 +1339,7 @@ app.get('/api/odenis-metodlari', async (req, res) => {
     return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
   }
   try {
-    const sql = `SELECT id, istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status FROM odenis_metodlari WHERE istifadeci_id = :istifadeci_id`;
+    const sql = `SELECT id AS card_id, istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status FROM odenis_metodlari WHERE istifadeci_id = :istifadeci_id`;
     const result = await executeQuery(sql, { istifadeci_id });
     res.json(result.rows);
   } catch (err) {
@@ -1410,7 +1364,7 @@ app.get('/api/odenis-metodlari', async (req, res) => {
  *               - ad
  *               - kart_tipi
  *             properties:
- *               istifadeci_card_id:
+ *               istifadeci_id:
  *                 type: integer
  *               ad:
  *                 type: string
@@ -1436,22 +1390,15 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     return res.status(400).json({ error: 'istifadeci_id, ad və kart_tipi sahələri məcburidir.' });
   }
 
-  // Kart tipi validasiyası
   const ICAZE_VERILEN_KARTLAR = [
-    'visa', 'mastercard', 'maestro', 'unionpay', 'american express', 'amex', 
+    'visa', 'mastercard', 'maestro', 'unionpay', 'american express', 'amex',
     'birkart', 'tamkart', 'bolkart', 'ucard'
   ];
   const KART_FORMATLARI = {
-    'visa': 'Visa',
-    'mastercard': 'Mastercard',
-    'maestro': 'Maestro',
-    'unionpay': 'UnionPay',
-    'american express': 'American Express',
-    'amex': 'American Express',
-    'birkart': 'Birkart',
-    'tamkart': 'Tamkart',
-    'bolkart': 'Bolkart',
-    'ucard': 'Ucard'
+    'visa': 'Visa', 'mastercard': 'Mastercard', 'maestro': 'Maestro',
+    'unionpay': 'UnionPay', 'american express': 'American Express',
+    'amex': 'American Express', 'birkart': 'Birkart', 'tamkart': 'Tamkart',
+    'bolkart': 'Bolkart', 'ucard': 'Ucard'
   };
 
   const normalizedKartTipi = kart_tipi.trim().toLowerCase();
@@ -1472,14 +1419,64 @@ app.post('/api/odenis-metodlari', async (req, res) => {
       INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi)
       VALUES (:istifadeci_id, :ad, :kart_tipi, :son_dord_reqem, :kart_istifade_tarixi)
     `;
-    await executeQuery(sql, { 
-      istifadeci_id, 
-      ad, 
-      kart_tipi: formattedKartTipi, 
-      son_dord_reqem: son_dord_reqem || null, 
-      kart_istifade_tarixi: kart_istifade_tarixi || null 
+    await executeQuery(sql, {
+      istifadeci_id, ad,
+      kart_tipi: formattedKartTipi,
+      son_dord_reqem: son_dord_reqem || null,
+      kart_istifade_tarixi: kart_istifade_tarixi || null
     }, { autoCommit: true });
     res.status(201).json({ message: 'Ödəniş metodu uğurla əlavə edildi.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * @swagger
+ * /api/odenis-metodlari/{id}:
+ *   get:
+ *     summary: ID-yə görə ödəniş metodunu gətirir
+ *     tags: [Ödəniş Metodları]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 CARD_ID:
+ *                   type: integer
+ *                 ISTIFADECI_ID:
+ *                   type: integer
+ *                 AD:
+ *                   type: string
+ *                 KART_TIPI:
+ *                   type: string
+ *                 SON_DORD_REQEM:
+ *                   type: string
+ *                 KART_ISTIFADE_TARIXI:
+ *                   type: string
+ *                 STATUS:
+ *                   type: string
+ *       404:
+ *         description: Tapılmadı
+ */
+app.get('/api/odenis-metodlari/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const sql = `SELECT id AS card_id, istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status FROM odenis_metodlari WHERE id = :id`;
+    const result = await executeQuery(sql, { id });
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Ödəniş metodu tapılmadı.' });
+    }
+    res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -1514,7 +1511,6 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  *                 type: string
  *                 enum: [Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard]
  *                 example: Visa
- *                 description: Azərbaycanda istifadə olunan populyar kart növləri
  *               son_dord_reqem:
  *                 type: string
  *                 example: "1234"
@@ -1535,22 +1531,15 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
     return res.status(400).json({ error: 'ad və kart_tipi sahələri məcburidir.' });
   }
 
-  // Kart tipi validasiyası
   const ICAZE_VERILEN_KARTLAR = [
-    'visa', 'mastercard', 'maestro', 'unionpay', 'american express', 'amex', 
+    'visa', 'mastercard', 'maestro', 'unionpay', 'american express', 'amex',
     'birkart', 'tamkart', 'bolkart', 'ucard'
   ];
   const KART_FORMATLARI = {
-    'visa': 'Visa',
-    'mastercard': 'Mastercard',
-    'maestro': 'Maestro',
-    'unionpay': 'UnionPay',
-    'american express': 'American Express',
-    'amex': 'American Express',
-    'birkart': 'Birkart',
-    'tamkart': 'Tamkart',
-    'bolkart': 'Bolkart',
-    'ucard': 'Ucard'
+    'visa': 'Visa', 'mastercard': 'Mastercard', 'maestro': 'Maestro',
+    'unionpay': 'UnionPay', 'american express': 'American Express',
+    'amex': 'American Express', 'birkart': 'Birkart', 'tamkart': 'Tamkart',
+    'bolkart': 'Bolkart', 'ucard': 'Ucard'
   };
 
   const normalizedKartTipi = kart_tipi.trim().toLowerCase();
@@ -1564,20 +1553,17 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
   try {
     const sql = `
       UPDATE odenis_metodlari SET
-        ad = :ad,
-        kart_tipi = :kart_tipi,
+        ad = :ad, kart_tipi = :kart_tipi,
         son_dord_reqem = :son_dord_reqem,
         kart_istifade_tarixi = :kart_istifade_tarixi,
         status = :status
       WHERE id = :id
     `;
-    const result = await executeQuery(sql, { 
-      ad, 
-      kart_tipi: formattedKartTipi, 
-      son_dord_reqem: son_dord_reqem || null, 
-      kart_istifade_tarixi: kart_istifade_tarixi || null, 
-      status: status || 'active', 
-      id 
+    const result = await executeQuery(sql, {
+      ad, kart_tipi: formattedKartTipi,
+      son_dord_reqem: son_dord_reqem || null,
+      kart_istifade_tarixi: kart_istifade_tarixi || null,
+      status: status || 'active', id
     }, { autoCommit: true });
     if (result.rowsAffected === 0) {
       return res.status(404).json({ error: 'Ödəniş metodu tapılmadı.' });
@@ -1618,6 +1604,10 @@ app.delete('/api/odenis-metodlari/:id', async (req, res) => {
   }
 });
 
+// =============================================
+// --- BUDCELER (Budgets) ROUTES ---
+// =============================================
+
 /**
  * @swagger
  * /api/budceler:
@@ -1640,7 +1630,7 @@ app.get('/api/budceler', async (req, res) => {
     return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
   }
   try {
-    const sql = `SELECT id, istifadeci_id, limit_mebleq, valyuta, bildiris_faizi FROM budceler WHERE istifadeci_id = :istifadeci_id`;
+    const sql = `SELECT istifadeci_id, limit_mebleq, valyuta, bildiris_faizi FROM budceler WHERE istifadeci_id = :istifadeci_id`;
     const result = await executeQuery(sql, { istifadeci_id });
     res.json(result.rows);
   } catch (err) {
@@ -1697,11 +1687,10 @@ app.post('/api/budceler', async (req, res) => {
       INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, bildiris_faizi)
       VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :bildiris_faizi)
     `;
-    await executeQuery(sql, { 
-      istifadeci_id, 
-      limit_mebleq, 
-      valyuta: getValidCurrency(valyuta), 
-      bildiris_faizi: bildiris_faizi || 90.00 
+    await executeQuery(sql, {
+      istifadeci_id, limit_mebleq,
+      valyuta: getValidCurrency(valyuta),
+      bildiris_faizi: bildiris_faizi || 90.00
     }, { autoCommit: true });
     res.status(201).json({ message: 'Büdcə limiti uğurla quraşdırıldı.' });
   } catch (err) {
@@ -1760,11 +1749,11 @@ app.put('/api/budceler/:id', async (req, res) => {
         bildiris_faizi = :bildiris_faizi
       WHERE id = :id
     `;
-    const result = await executeQuery(sql, { 
-      limit_mebleq, 
-      valyuta: getValidCurrency(valyuta), 
-      bildiris_faizi: bildiris_faizi || 90.00, 
-      id 
+    const result = await executeQuery(sql, {
+      limit_mebleq,
+      valyuta: getValidCurrency(valyuta),
+      bildiris_faizi: bildiris_faizi || 90.00,
+      id
     }, { autoCommit: true });
     if (result.rowsAffected === 0) {
       return res.status(404).json({ error: 'Büdcə limiti tapılmadı.' });
@@ -1775,23 +1764,47 @@ app.put('/api/budceler/:id', async (req, res) => {
   }
 });
 
+// =============================================
+// --- AYARLAR (Settings) ROUTES ---
+// =============================================
+
 /**
  * @swagger
  * /api/ayarlar/{istifadeci_id}:
  *   get:
  *     summary: İstifadəçinin fərdi ayarlarını gətirir
  *     tags: [Ayarlar]
+ *     parameters:
+ *       - in: path
+ *         name: istifadeci_id
+ *         required: true
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ISTIFADECI_ID:
+ *                   type: integer
+ *                 ESAS_VALYUTA:
+ *                   type: string
+ *                 BILDIRIS_METODU:
+ *                   type: string
+ *                 DIL:
+ *                   type: string
+ *                 TEMA:
+ *                   type: string
  */
 app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
   const { istifadeci_id } = req.params;
   try {
-    const sql = `SELECT id, istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`;
+    const sql = `SELECT istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`;
     const result = await executeQuery(sql, { istifadeci_id });
     if (result.rows.length === 0) {
-      // Default ayarlar database-ə yazılır (initialize-on-first-access)
       await executeQuery(
         `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema)
          VALUES (:istifadeci_id, 'AZN', 'email', 'az', 'dark')`,
@@ -1814,10 +1827,16 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
 
 /**
  * @swagger
- * /api/ayarlar:
+ * /api/ayarlar/{istifadeci_id}:
  *   put:
  *     summary: İstifadəçinin fərdi ayarlarını yeniləyir və ya yaradır
  *     tags: [Ayarlar]
+ *     parameters:
+ *       - in: path
+ *         name: istifadeci_id
+ *         required: true
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -1825,37 +1844,30 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               istifadeci_id:
- *                 type: integer
- *                 description: Istifad?�inin ID-si
  *               esas_valyuta:
  *                 type: string
  *                 enum: [AZN, USD, EUR]
  *                 example: AZN
- *                 description: Yalnız AZN, USD və ya EUR daxil edilə bilər
  *               bildiris_metodu:
  *                 type: string
  *                 enum: [email, telegram]
  *                 example: email
- *                 description: Yalnız email və ya telegram daxil edilə bilər
  *               dil:
  *                 type: string
  *                 enum: [az, en, ru, tr, de, fr, es, it, pt, ar, zh, ja, ko, hi, nl, pl, sv, no, da, fi, cs, sk, ro, hu, uk, ka, kk, uz, hy, fa, he, id, ms, th, vi, el, bg, hr, sr, lt, lv, et, sl, sq, mk, bs, is, ga, cy, eu, ca, gl, mt, af, sw, tl, bn, ur, ta, te, kn, ml, si, my, km, lo, mn, ne, ps, so, am, ha, yo, ig]
  *                 example: az
- *                 description: ISO 639-1 dil kodu (dünya dilləri)
  *               tema:
  *                 type: string
  *                 enum: [light, dark]
  *                 example: dark
- *                 description: Yalnız light və ya dark daxil edilə bilər
  *     responses:
  *       200:
  *         description: Ayarlar yeniləndi
  */
-app.put('/api/ayarlar', async (req, res) => {
-  const { istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema } = req.body;
+app.put('/api/ayarlar/:istifadeci_id', async (req, res) => {
+  const { istifadeci_id } = req.params;
+  const { esas_valyuta, bildiris_metodu, dil, tema } = req.body;
   try {
-    // ── Validasiya ──────────────────────────────────────────────────────────
     const ICAZE_VERILEN_VALYUTALAR   = ['AZN', 'USD', 'EUR'];
     const ICAZE_VERILEN_BILDIRISLER  = ['email', 'telegram'];
     const ICAZE_VERILEN_TEMALAR      = ['light', 'dark'];
@@ -1869,34 +1881,25 @@ app.put('/api/ayarlar', async (req, res) => {
     ];
 
     if (esas_valyuta && !ICAZE_VERILEN_VALYUTALAR.includes(esas_valyuta.toUpperCase())) {
-      return res.status(400).json({
-        error: `Yanlış valyuta: "${esas_valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`
-      });
+      return res.status(400).json({ error: `Yanlış valyuta: "${esas_valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.` });
     }
     if (bildiris_metodu && !ICAZE_VERILEN_BILDIRISLER.includes(bildiris_metodu.toLowerCase())) {
-      return res.status(400).json({
-        error: `Yanlış bildiriş metodu: "${bildiris_metodu}". Yalnız ${ICAZE_VERILEN_BILDIRISLER.join(', ')} daxil edilə bilər.`
-      });
+      return res.status(400).json({ error: `Yanlış bildiriş metodu: "${bildiris_metodu}". Yalnız ${ICAZE_VERILEN_BILDIRISLER.join(', ')} daxil edilə bilər.` });
     }
     if (tema && !ICAZE_VERILEN_TEMALAR.includes(tema.toLowerCase())) {
-      return res.status(400).json({
-        error: `Yanlış tema: "${tema}". Yalnız ${ICAZE_VERILEN_TEMALAR.join(', ')} daxil edilə bilər.`
-      });
+      return res.status(400).json({ error: `Yanlış tema: "${tema}". Yalnız ${ICAZE_VERILEN_TEMALAR.join(', ')} daxil edilə bilər.` });
     }
     if (dil && !ICAZE_VERILEN_DILLER.includes(dil.toLowerCase())) {
-      return res.status(400).json({
-        error: `Yanlış dil kodu: "${dil}". ISO 639-1 formatında dünya dillərindən biri olmalıdır (məs: az, en, ru, tr, de...).`
-      });
+      return res.status(400).json({ error: `Yanlış dil kodu: "${dil}". ISO 639-1 formatında dünya dillərindən biri olmalıdır (məs: az, en, ru, tr, de...).` });
     }
-    // ────────────────────────────────────────────────────────────────────────
 
     const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
     if (userCheck.rows.length === 0) {
       return res.status(404).json({ error: 'İstifadəçi tapılmadı.' });
     }
 
-    const settingsCheck = await executeQuery(`SELECT id FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`, { istifadeci_id });
-    
+    const settingsCheck = await executeQuery(`SELECT istifadeci_id FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`, { istifadeci_id });
+
     let sql;
     if (settingsCheck.rows.length > 0) {
       sql = `
@@ -1913,7 +1916,7 @@ app.put('/api/ayarlar', async (req, res) => {
         VALUES (:istifadeci_id, :esas_valyuta, :bildiris_metodu, :dil, :tema)
       `;
     }
-    
+
     await executeQuery(sql, {
       istifadeci_id,
       esas_valyuta:    (esas_valyuta    ? esas_valyuta.toUpperCase()    : 'AZN'),
@@ -1928,7 +1931,6 @@ app.put('/api/ayarlar', async (req, res) => {
   }
 });
 
-// Server start
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
   console.log(`Swagger documentation is available on http://localhost:${PORT}/api-docs`);
