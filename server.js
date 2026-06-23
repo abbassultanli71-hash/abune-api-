@@ -473,14 +473,65 @@ app.delete('/api/istifadeciler/:id', async (req, res) => {
  *         description: İstifadəçinin ID-si
  *     responses:
  *       200:
- *         description: Uğurlu əməliyyat
+ *         description: Uğurlu əməliyyat (siyahı boş ola bilər)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     subscriptions:
+ *                       type: array
+ *                       items:
+ *                         type: object
  *       400:
  *         description: istifadeci_id göndərilmədi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: Bad Request
+ *                 data:
+ *                   nullable: true
+ *                   example: null
+ *                 error:
+ *                   type: object
+ *                   properties:
+ *                     code:
+ *                       type: string
+ *                       example: MISSING_PARAMETER
+ *                     message:
+ *                       type: string
+ *                       example: istifadeci_id sorğu parametri məcburidir.
+ *       500:
+ *         description: Server xətası
  */
 app.get('/api/abunelikler', async (req, res) => {
   const { istifadeci_id } = req.query;
   if (!istifadeci_id) {
-    return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
+    return res.status(400).json({
+      code: 400,
+      message: 'Bad Request',
+      data: null,
+      error: {
+        code: 'MISSING_PARAMETER',
+        message: 'istifadeci_id sorğu parametri məcburidir.'
+      }
+    });
   }
   try {
     const sql = `
@@ -492,76 +543,30 @@ app.get('/api/abunelikler', async (req, res) => {
       FROM abunelikler WHERE istifadeci_id = :istifadeci_id ORDER BY id
     `;
     const result = await executeQuery(sql, { istifadeci_id });
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-/**
- * @swagger
- * /api/abunelikler/{id}:
- *   get:
- *     summary: ID-yə görə abunəliyi gətirir
- *     tags: [Abunəliklər]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Abunəliyin ID-si
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 ABUNELIK_ID:
- *                   type: integer
- *                 ISTIFADECI_ID:
- *                   type: integer
- *                 AD:
- *                   type: string
- *                 QIYMET:
- *                   type: number
- *                 VALYUTA:
- *                   type: string
- *                 ODENIS_TEZLIYI:
- *                   type: string
- *                 BASLAMA_TARIXI:
- *                   type: string
- *                 NOVBETI_ODENIS_TARIXI:
- *                   type: string
- *                 KATEQORIYA:
- *                   type: string
- *                 STATUS:
- *                   type: string
- *                 YARADILMA_TARIXI:
- *                   type: string
- *       404:
- *         description: Abunəlik tapılmadı
- */
-app.get('/api/abunelikler/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const sql = `
-      SELECT id AS abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi,
-             TO_CHAR(baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
-             TO_CHAR(novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
-             kateqoriya, status,
-             TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
-      FROM abunelikler WHERE id = :id
-    `;
-    const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Abunəlik tapılmadı.' });
+      return res.status(200).json({
+        code: 200,
+        message: 'No subscriptions found',
+        data: { subscriptions: [] }
+      });
     }
-    res.json(result.rows[0]);
+
+    res.status(200).json({
+      code: 200,
+      message: 'Success',
+      data: { subscriptions: result.rows }
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      code: 500,
+      message: 'Internal Server Error',
+      data: null,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: err.message
+      }
+    });
   }
 });
 
@@ -865,14 +870,65 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
  *         description: İstifadəçinin ID-si
  *     responses:
  *       200:
- *         description: Uğurlu əməliyyat
+ *         description: Uğurlu əməliyyat (siyahı boş ola bilər)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     notifications:
+ *                       type: array
+ *                       items:
+ *                         type: object
  *       400:
  *         description: istifadeci_id göndərilmədi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: Bad Request
+ *                 data:
+ *                   nullable: true
+ *                   example: null
+ *                 error:
+ *                   type: object
+ *                   properties:
+ *                     code:
+ *                       type: string
+ *                       example: MISSING_PARAMETER
+ *                     message:
+ *                       type: string
+ *                       example: istifadeci_id sorğu parametri məcburidir.
+ *       500:
+ *         description: Server xətası
  */
 app.get('/api/bildirisler', async (req, res) => {
   const { istifadeci_id } = req.query;
   if (!istifadeci_id) {
-    return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
+    return res.status(400).json({
+      code: 400,
+      message: 'Bad Request',
+      data: null,
+      error: {
+        code: 'MISSING_PARAMETER',
+        message: 'istifadeci_id sorğu parametri məcburidir.'
+      }
+    });
   }
   try {
     const sql = `
@@ -881,61 +937,30 @@ app.get('/api/bildirisler', async (req, res) => {
       FROM bildirisler WHERE istifadeci_id = :istifadeci_id ORDER BY id DESC
     `;
     const result = await executeQuery(sql, { istifadeci_id });
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-/**
- * @swagger
- * /api/bildirisler/{id}:
- *   get:
- *     summary: ID-yə görə bildirişi gətirir
- *     tags: [Bildirişlər]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Bildirişin ID-si
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 BILDIRIS_ID:
- *                   type: integer
- *                 ISTIFADECI_ID:
- *                   type: integer
- *                 BASLIQ:
- *                   type: string
- *                 MESAJ:
- *                   type: string
- *                 GONDERILME_TARIXI:
- *                   type: string
- *       404:
- *         description: Bildiriş tapılmadı
- */
-app.get('/api/bildirisler/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const sql = `
-      SELECT id AS bildiris_id, istifadeci_id, basliq, mesaj,
-             TO_CHAR(gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi
-      FROM bildirisler WHERE id = :id
-    `;
-    const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Bildiriş tapılmadı.' });
+      return res.status(200).json({
+        code: 200,
+        message: 'No notifications found',
+        data: { notifications: [] }
+      });
     }
-    res.json(result.rows[0]);
+
+    res.status(200).json({
+      code: 200,
+      message: 'Success',
+      data: { notifications: result.rows }
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      code: 500,
+      message: 'Internal Server Error',
+      data: null,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: err.message
+      }
+    });
   }
 });
 
@@ -1125,14 +1150,65 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  *         description: İstifadəçinin ID-si
  *     responses:
  *       200:
- *         description: Uğurlu əməliyyat
+ *         description: Uğurlu əməliyyat (siyahı boş ola bilər)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     paymentHistory:
+ *                       type: array
+ *                       items:
+ *                         type: object
  *       400:
  *         description: istifadeci_id göndərilmədi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: Bad Request
+ *                 data:
+ *                   nullable: true
+ *                   example: null
+ *                 error:
+ *                   type: object
+ *                   properties:
+ *                     code:
+ *                       type: string
+ *                       example: MISSING_PARAMETER
+ *                     message:
+ *                       type: string
+ *                       example: istifadeci_id sorğu parametri məcburidir.
+ *       500:
+ *         description: Server xətası
  */
 app.get('/api/odenis-tarixcesi', async (req, res) => {
   const { istifadeci_id } = req.query;
   if (!istifadeci_id) {
-    return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
+    return res.status(400).json({
+      code: 400,
+      message: 'Bad Request',
+      data: null,
+      error: {
+        code: 'MISSING_PARAMETER',
+        message: 'istifadeci_id sorğu parametri məcburidir.'
+      }
+    });
   }
   try {
     const sql = `
@@ -1142,65 +1218,30 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
       FROM odenis_tarixcesi WHERE istifadeci_id = :istifadeci_id ORDER BY odenis_tarixi DESC
     `;
     const result = await executeQuery(sql, { istifadeci_id });
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-/**
- * @swagger
- * /api/odenis-tarixcesi/{id}:
- *   get:
- *     summary: ID-yə görə ödəniş tarixçəsini gətirir
- *     tags: [Ödəniş Tarixçəsi]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Ödəniş tarixçəsinin ID-si
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 ODENIS_TARIXCESI_ID:
- *                   type: integer
- *                 ABUNELIK_ID:
- *                   type: integer
- *                 ISTIFADECI_ID:
- *                   type: integer
- *                 ODENIS_TARIXI:
- *                   type: string
- *                 MEBLEQ:
- *                   type: number
- *                 STATUS:
- *                   type: string
- *                   enum: [success, fail]
- *       404:
- *         description: Ödəniş tarixçəsi tapılmadı
- */
-app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const sql = `
-      SELECT id AS odenis_tarixcesi_id, abunelik_id, istifadeci_id,
-             TO_CHAR(odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi,
-             mebleq, status
-      FROM odenis_tarixcesi WHERE id = :id
-    `;
-    const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Ödəniş tarixçəsi tapılmadı.' });
+      return res.status(200).json({
+        code: 200,
+        message: 'No payment history found',
+        data: { paymentHistory: [] }
+      });
     }
-    res.json(result.rows[0]);
+
+    res.status(200).json({
+      code: 200,
+      message: 'Success',
+      data: { paymentHistory: result.rows }
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      code: 500,
+      message: 'Internal Server Error',
+      data: null,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: err.message
+      }
+    });
   }
 });
 
