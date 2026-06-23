@@ -460,6 +460,46 @@ app.delete('/api/istifadeciler/:id', async (req, res) => {
 
 /**
  * @swagger
+ * /api/abunelikler:
+ *   get:
+ *     summary: İstifadəçinin abunəliklərini istifadeci_id ilə axtarır/siyahılayır
+ *     tags: [Abunəliklər]
+ *     parameters:
+ *       - in: query
+ *         name: istifadeci_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: İstifadəçinin ID-si
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ *       400:
+ *         description: istifadeci_id göndərilmədi
+ */
+app.get('/api/abunelikler', async (req, res) => {
+  const { istifadeci_id } = req.query;
+  if (!istifadeci_id) {
+    return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
+  }
+  try {
+    const sql = `
+      SELECT id AS abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi,
+             TO_CHAR(baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
+             TO_CHAR(novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
+             kateqoriya, status,
+             TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
+      FROM abunelikler WHERE istifadeci_id = :istifadeci_id ORDER BY id
+    `;
+    const result = await executeQuery(sql, { istifadeci_id });
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * @swagger
  * /api/abunelikler/{id}:
  *   get:
  *     summary: ID-yə görə abunəliyi gətirir
@@ -812,6 +852,43 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
 
 /**
  * @swagger
+ * /api/bildirisler:
+ *   get:
+ *     summary: İstifadəçinin bildirişlərini istifadeci_id ilə axtarır/siyahılayır
+ *     tags: [Bildirişlər]
+ *     parameters:
+ *       - in: query
+ *         name: istifadeci_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: İstifadəçinin ID-si
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ *       400:
+ *         description: istifadeci_id göndərilmədi
+ */
+app.get('/api/bildirisler', async (req, res) => {
+  const { istifadeci_id } = req.query;
+  if (!istifadeci_id) {
+    return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
+  }
+  try {
+    const sql = `
+      SELECT id AS bildiris_id, istifadeci_id, basliq, mesaj,
+             TO_CHAR(gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi
+      FROM bildirisler WHERE istifadeci_id = :istifadeci_id ORDER BY id DESC
+    `;
+    const result = await executeQuery(sql, { istifadeci_id });
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * @swagger
  * /api/bildirisler/{id}:
  *   get:
  *     summary: ID-yə görə bildirişi gətirir
@@ -1032,6 +1109,44 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
 // =============================================
 // --- ODENIS TARIXCESI (Payment History) ROUTES ---
 // =============================================
+
+/**
+ * @swagger
+ * /api/odenis-tarixcesi:
+ *   get:
+ *     summary: İstifadəçinin ödəniş tarixçəsini istifadeci_id ilə axtarır/siyahılayır
+ *     tags: [Ödəniş Tarixçəsi]
+ *     parameters:
+ *       - in: query
+ *         name: istifadeci_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: İstifadəçinin ID-si
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ *       400:
+ *         description: istifadeci_id göndərilmədi
+ */
+app.get('/api/odenis-tarixcesi', async (req, res) => {
+  const { istifadeci_id } = req.query;
+  if (!istifadeci_id) {
+    return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
+  }
+  try {
+    const sql = `
+      SELECT id AS odenis_tarixcesi_id, abunelik_id, istifadeci_id,
+             TO_CHAR(odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi,
+             mebleq, status
+      FROM odenis_tarixcesi WHERE istifadeci_id = :istifadeci_id ORDER BY odenis_tarixi DESC
+    `;
+    const result = await executeQuery(sql, { istifadeci_id });
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 /**
  * @swagger
