@@ -175,11 +175,13 @@ async function addAutoNotification(userId, appAd, novbetiOdenisTarixi, odenisTez
     const mm = String(gonderilme.getUTCMonth() + 1).padStart(2, '0');
     const dd = String(gonderilme.getUTCDate()).padStart(2, '0');
     const gonderilmeTarixiStr = `${yyyy}-${mm}-${dd}`;
+
     const basliq = `${appAd} abunəliyi aktivdir`;
     const mesaj = `${appAd} abunəliyiniz uğurla aktivləşdirildi. Növbəti ödəniş tarixi: ${novbetiOdenisTarixi}.`;
+
     await executeQuery(
       `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj, gonderilme_tarixi)
-       VALUES (:istifadeci_id, :basliq, :mesaj, :gonderilme_tarixi)`,
+       VALUES (:istifadeci_id, :basliq, :mesaj, TO_DATE(:gonderilme_tarixi, 'YYYY-MM-DD'))`,
       { istifadeci_id: userId, basliq, mesaj, gonderilme_tarixi: gonderilmeTarixiStr },
       { autoCommit: true }
     );
@@ -563,7 +565,7 @@ app.post('/api/abunelikler', async (req, res) => {
     return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Başlama tarixi düzgün deyil (Format: YYYY-MM-DD).`);
 
   if (kateqoriya && !ICAZE_VERILEN_KATEQORIYALAR.includes(kateqoriya))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_CATEGORY', `Yalnış kateqoriya.`);
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CATEGORY', `Yanlış kateqoriya.`);
 
   const novbetiOdenisTarixi = hesablaNovbetiOdenisTarixi(baslama_tarixi, odenisTezliyi);
 
@@ -572,7 +574,6 @@ app.post('/api/abunelikler', async (req, res) => {
     if (userId === null)
       return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'İstifadəçi mövcud deyil.');
 
-    // Abunəliyi əlavə et
     await executeQuery(
       `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi,
         baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status)
@@ -587,7 +588,6 @@ app.post('/api/abunelikler', async (req, res) => {
       { autoCommit: true }
     );
 
-    // Yeni yaranan abunəliyin ID-sini tap
     const newSub = await executeQuery(
       `SELECT id FROM abunelikler
        WHERE istifadeci_id = :istifadeci_id AND ad = :ad
@@ -596,10 +596,8 @@ app.post('/api/abunelikler', async (req, res) => {
     );
     const newSubId = newSub.rows.length > 0 ? newSub.rows[0].ID : null;
 
-    // Avtomatik bildiriş əlavə et
     await addAutoNotification(userId, ad, novbetiOdenisTarixi, odenisTezliyi);
 
-    // Avtomatik ödəniş tarixçəsi əlavə et
     if (newSubId) {
       await addAutoPaymentHistory(userId, newSubId, parsedQiymet, baslama_tarixi);
     }
@@ -800,8 +798,7 @@ app.get('/api/bildirisler', async (req, res) => {
     if (userId === null)
       return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    // Cədvəldəki köhnə bildirişlər
-   const result = await executeQuery(
+    const result = await executeQuery(
       `SELECT b.id AS bildiris_id, u.username, b.basliq, b.mesaj,
               TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD HH24:MI:SS') as gonderilme_tarixi
        FROM bildirisler b JOIN istifadeciler u ON b.istifadeci_id = u.id
