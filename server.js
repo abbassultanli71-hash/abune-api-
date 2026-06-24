@@ -494,25 +494,7 @@ app.get('/api/abunelikler', async (req, res) => {
  *       404:
  *         description: Abunəlik tapılmadı
  */
-app.get('/api/abunelikler/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const sql = `
-      SELECT a.id AS abunelik_id, u.username, a.ad, a.qiymet, a.valyuta, a.odenis_tezliyi,
-             TO_CHAR(a.baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
-             TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
-             a.kateqoriya, a.status,
-             TO_CHAR(a.yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
-      FROM abunelikler a JOIN istifadeciler u ON a.istifadeci_id = u.id
-      WHERE a.id = :id
-    `;
-    const result = await executeQuery(sql, { id });
-    if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
-    return successResponse(res, 200, 'Success', { subscription: result.rows[0] });
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
-});
+
 
 /**
  * @swagger
@@ -847,25 +829,6 @@ app.get('/api/bildirisler', async (req, res) => {
  *       404:
  *         description: Bildiriş tapılmadı
  */
-app.get('/api/bildirisler/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const sql = `
-      SELECT b.id AS bildiris_id, u.username, b.abunelik_id, a.ad AS app_adi,
-             b.basliq, b.mesaj,
-             TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') AS gonderilme_tarixi
-      FROM bildirisler b
-      JOIN istifadeciler u ON b.istifadeci_id = u.id
-      LEFT JOIN abunelikler a ON b.abunelik_id = a.id
-      WHERE b.id = :id
-    `;
-    const result = await executeQuery(sql, { id });
-    if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
-    return successResponse(res, 200, 'Success', { notification: result.rows[0] });
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
-});
 
 /**
  * @swagger
@@ -1124,6 +1087,22 @@ app.put('/api/bildirisler/:id', async (req, res) => {
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
+  // app_adi yoxlaması — basliq və mesajda app adı uyğun olmalıdır
+const appAdiResult = await executeQuery(
+  `SELECT a.ad AS app_adi FROM abunelikler a WHERE a.id = :abunelik_id`,
+  { abunelik_id: current.ABUNELIK_ID }
+);
+const appAdi = appAdiResult.rows[0]?.APP_ADI || '';
+
+if (appAdi && !trimmedBasliq.startsWith(appAdi)) {
+  return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
+    `Başlıq "${appAdi}" app adı ilə başlamalıdır. Məsələn: "${appAdi} - Yenilənmiş Xatırlatma".`);
+}
+
+if (appAdi && !trimmedMesaj.includes(appAdi)) {
+  return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
+    `Mesaj içərisində "${appAdi}" app adı olmalıdır.`);
+}
 });
 
 /**
@@ -1273,31 +1252,7 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
  *       404:
  *         description: Tapılmadı
  */
-app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const sql = `
-      SELECT o.id AS odenis_tarixcesi_id,
-             o.abunelik_id,
-             a.ad AS app_adi,
-             u.username,
-             TO_CHAR(o.odenis_tarixi,          'YYYY-MM-DD') AS odenis_tarixi,
-             TO_CHAR(a.novbeti_odenis_tarixi,   'YYYY-MM-DD') AS novbeti_odenis_tarixi,
-             o.mebleq,
-             o.status
-      FROM odenis_tarixcesi o
-      JOIN istifadeciler  u ON o.istifadeci_id = u.id
-      JOIN abunelikler    a ON o.abunelik_id   = a.id
-      WHERE o.id = :id
-    `;
-    const result = await executeQuery(sql, { id });
-    if (result.rows.length === 0)
-      return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
-    return successResponse(res, 200, 'Success', { paymentHistory: result.rows[0] });
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
-});
+
 
 /**
  * @swagger
