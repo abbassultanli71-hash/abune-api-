@@ -1030,10 +1030,7 @@ app.put('/api/bildirisler/:id', async (req, res) => {
 
     const current = checkResult.rows[0];
 
-    // username göndərilibsə, eyni olmalıdır
-    if (username !== undefined && username !== null && String(username).trim() !== current.USERNAME)
-      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE',
-        `Bildirişin aid olduğu istifadəçi dəyişdirilə bilməz. Mövcud username: "${current.USERNAME}".`);
+ 
 
     // abunelik_id göndərilibsə, eyni olmalıdır
     if (abunelik_id !== undefined && abunelik_id !== null && Number(abunelik_id) !== Number(current.ABUNELIK_ID))
