@@ -1005,7 +1005,7 @@ app.post('/api/bildirisler', async (req, res) => {
  */
 app.put('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
-  const { username, abunelik_id, basliq, mesaj } = req.body;
+  const { abunelik_id, basliq, mesaj } = req.body;
 
   if (!basliq || !mesaj)
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (basliq, mesaj) doldurun.');
