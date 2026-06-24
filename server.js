@@ -1986,5 +1986,5 @@ app.put('/api/ayarlar/:username', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
   console.log(`Swagger documentation is available on http://localhost:${PORT}/api-docs`);
-  Remove ID GET endpoints and add notification validation;
+  //Remove ID GET endpoints and add notification validation;
 });
