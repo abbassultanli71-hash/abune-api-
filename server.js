@@ -759,9 +759,44 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: string
+ *         description: İstifadəçinin username-i
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     notifications:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           bildiris_id:
+ *                             type: integer
+ *                           username:
+ *                             type: string
+ *                           abunelik_id:
+ *                             type: integer
+ *                           app_adi:
+ *                             type: string
+ *                           basliq:
+ *                             type: string
+ *                           mesaj:
+ *                             type: string
+ *                           gonderilme_tarixi:
+ *                             type: string
+ *                             format: date
  *       400:
  *         description: username göndərilmədi
  *       404:
@@ -774,9 +809,17 @@ app.get('/api/bildirisler', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    const sql = `SELECT b.id AS bildiris_id, u.username, b.basliq, b.mesaj, TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi
-                 FROM bildirisler b JOIN istifadeciler u ON b.istifadeci_id = u.id
-                 WHERE b.istifadeci_id = :istifadeci_id ORDER BY b.id DESC`;
+    // abunelik_id və app_adi (abunəlik adı) də qaytarılır
+    const sql = `
+      SELECT b.id AS bildiris_id, u.username, b.abunelik_id, a.ad AS app_adi,
+             b.basliq, b.mesaj,
+             TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') AS gonderilme_tarixi
+      FROM bildirisler b
+      JOIN istifadeciler u ON b.istifadeci_id = u.id
+      LEFT JOIN abunelikler a ON b.abunelik_id = a.id
+      WHERE b.istifadeci_id = :istifadeci_id
+      ORDER BY b.id DESC
+    `;
     const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No notifications found', { notifications: [] });
     return successResponse(res, 200, 'Success', { notifications: result.rows });
@@ -797,6 +840,7 @@ app.get('/api/bildirisler', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Bildiriş ID-si
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
@@ -806,9 +850,15 @@ app.get('/api/bildirisler', async (req, res) => {
 app.get('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `SELECT b.id AS bildiris_id, u.username, b.basliq, b.mesaj, TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi
-                 FROM bildirisler b JOIN istifadeciler u ON b.istifadeci_id = u.id
-                 WHERE b.id = :id`;
+    const sql = `
+      SELECT b.id AS bildiris_id, u.username, b.abunelik_id, a.ad AS app_adi,
+             b.basliq, b.mesaj,
+             TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') AS gonderilme_tarixi
+      FROM bildirisler b
+      JOIN istifadeciler u ON b.istifadeci_id = u.id
+      LEFT JOIN abunelikler a ON b.abunelik_id = a.id
+      WHERE b.id = :id
+    `;
     const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
     return successResponse(res, 200, 'Success', { notification: result.rows[0] });
@@ -821,7 +871,10 @@ app.get('/api/bildirisler/:id', async (req, res) => {
  * @swagger
  * /api/bildirisler:
  *   post:
- *     summary: Yeni bildiriş göndərir (ID avtomatik yaranır)
+ *     summary: >
+ *       Yeni bildiriş yaradır. Başlıq və mesaj server tərəfindən avtomatik
+ *       generasiya olunur — ödəmə tezliyinə görə neçə gün qaldığı hesablanır.
+ *       App adı (abunelik.ad) yalnız həmin istifadəçiyə aid abunəlikdən götürülür.
  *     tags: [Bildirişlər]
  *     requestBody:
  *       required: true
@@ -831,35 +884,142 @@ app.get('/api/bildirisler/:id', async (req, res) => {
  *             type: object
  *             required:
  *               - username
- *               - basliq
- *               - mesaj
+ *               - abunelik_id
  *             properties:
  *               username:
  *                 type: string
  *                 example: abbas.abbasov
- *               basliq:
- *                 type: string
- *                 example: Yaxınlaşan Ödəniş
- *               mesaj:
- *                 type: string
- *                 example: Netflix abunəliyiniz növbəti ay üçün yenilənəcək.
+ *               abunelik_id:
+ *                 type: integer
+ *                 example: 3
+ *                 description: >
+ *                   Bildiriş yaradılacaq abunəliyin ID-si.
+ *                   Bu abunəlik mütləq həmin username-ə aid olmalıdır.
  *     responses:
  *       201:
- *         description: Bildiriş göndərildi
+ *         description: >
+ *           Bildiriş yaradıldı. Cavabda avtomatik generasiya olunmuş
+ *           başlıq, mesaj və gonderilme_tarixi (bu günün tarixi) qaytarılır.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 201
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     basliq:
+ *                       type: string
+ *                       example: "Netflix - Ödəniş Xatırlatması"
+ *                     mesaj:
+ *                       type: string
+ *                       example: "Netflix abunəliyinizin növbəti ödənişinə 7 gün qalmışdır (2026-07-01)."
+ *                     gonderilme_tarixi:
+ *                       type: string
+ *                       example: "2026-06-24"
+ *       400:
+ *         description: >
+ *           Xəta halları — abunelik_id həmin user-ə aid deyil,
+ *           abunəlik tapılmadı, və ya abunəlik deaktivdir.
+ *       404:
+ *         description: İstifadəçi tapılmadı
  */
 app.post('/api/bildirisler', async (req, res) => {
-  const { username, basliq, mesaj } = req.body;
-  if (!username || !basliq || !mesaj) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (username, basliq, mesaj) doldurun.');
-  try {
-    const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
+  const { username, abunelik_id } = req.body;
 
+  if (!username || abunelik_id === undefined || abunelik_id === null)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (username, abunelik_id) doldurun.');
+
+  try {
+    // 1. İstifadəçini tap
+    const userId = await getUserIdByUsername(username);
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    // 2. Abunəliyi tap — mütləq həmin istifadəçiyə aid olmalıdır
+    const subResult = await executeQuery(
+      `SELECT a.id, a.ad, a.odenis_tezliyi,
+              TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') AS novbeti_odenis_tarixi,
+              a.status, a.istifadeci_id
+       FROM abunelikler a
+       WHERE a.id = :abunelik_id`,
+      { abunelik_id }
+    );
+
+    if (subResult.rows.length === 0)
+      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_NOT_FOUND', 'Göstərilən abunelik_id ilə abunəlik tapılmadı.');
+
+    const sub = subResult.rows[0];
+
+    // 3. Abunəlik bu istifadəçiyə aidmi?
+    if (Number(sub.ISTIFADECI_ID) !== Number(userId))
+      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_USER_MISMATCH',
+        `Bu abunəlik (ID: ${abunelik_id}) "${username}" istifadəçisinə aid deyil. Yalnız öz abunəlikləriniz üçün bildiriş yarada bilərsiniz.`);
+
+    // 4. Abunəlik aktiv olmalıdır
+    if (sub.STATUS !== 'active')
+      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_INACTIVE',
+        `"${sub.AD}" abunəliyi aktiv deyil (status: ${sub.STATUS}). Yalnız aktiv abunəliklər üçün bildiriş yaradıla bilər.`);
+
+    // 5. Neçə gün qaldığını hesabla
+    const appAdi = sub.AD;
+    const novbetiTarix = sub.NOVBETI_ODENIS_TARIXI; // 'YYYY-MM-DD'
+    const odenisTezliyi = sub.ODENIS_TEZLIYI;
+
+    const bugun = new Date();
+    bugun.setUTCHours(0, 0, 0, 0);
+    const [ny, nm, nd] = novbetiTarix.split('-').map(Number);
+    const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
+    const qalanGun = Math.ceil((novbetiDate - bugun) / (1000 * 60 * 60 * 24));
+
+    // 6. Ödəniş tezliyinə görə xəbərdarlıq həddi
+    // weekly: 2 gün, monthly: 7 gün, quarterly: 14 gün, yearly: 30 gün
+    const xeberdarliqHeddi = {
+      weekly: 2,
+      monthly: 7,
+      quarterly: 14,
+      yearly: 30
+    };
+    const heddiGun = xeberdarliqHeddi[odenisTezliyi] || 7;
+
+    // 7. Avtomatik başlıq və mesaj generasiyası
+    let basliq, mesaj;
+    if (qalanGun < 0) {
+      basliq = `${appAdi} - Gecikmiş Ödəniş`;
+      mesaj = `"${appAdi}" abunəliyinizin ödənişi ${Math.abs(qalanGun)} gün gecikib (son tarix: ${novbetiTarix}). Zəhmət olmasa ödənişi tamamlayın.`;
+    } else if (qalanGun === 0) {
+      basliq = `${appAdi} - Bu Gün Ödəniş Günüdür`;
+      mesaj = `"${appAdi}" abunəliyinizin ödəniş tarixi bu gündür (${novbetiTarix}). Ödənişi tamamlamağı unutmayın.`;
+    } else if (qalanGun <= heddiGun) {
+      basliq = `${appAdi} - Ödəniş Xatırlatması`;
+      mesaj = `"${appAdi}" abunəliyinizin növbəti ödənişinə ${qalanGun} gün qalmışdır (${novbetiTarix}).`;
+    } else {
+      basliq = `${appAdi} - Ödəniş Məlumatı`;
+      mesaj = `"${appAdi}" abunəliyinizin növbəti ödənişi ${novbetiTarix} tarixindədir (${qalanGun} gün qalıb).`;
+    }
+
+    // 8. Bildirişi DB-yə yaz — gonderilme_tarixi server tərəfindən SYSDATE ilə avtomatik qoyulur
     await executeQuery(
-      `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`,
-      { istifadeci_id: userId, basliq, mesaj },
+      `INSERT INTO bildirisler (istifadeci_id, abunelik_id, basliq, mesaj)
+       VALUES (:istifadeci_id, :abunelik_id, :basliq, :mesaj)`,
+      { istifadeci_id: userId, abunelik_id, basliq, mesaj },
       { autoCommit: true }
     );
-    return successResponse(res, 201, 'Created', { message: 'Bildiriş uğurla göndərildi.' });
+
+    // 9. Uğurlu cavab — generasiya olunmuş məlumatları göndər
+    const bugunStr = bugun.toISOString().slice(0, 10);
+    return successResponse(res, 201, 'Created', {
+      message: 'Bildiriş uğurla yaradıldı.',
+      basliq,
+      mesaj,
+      gonderilme_tarixi: bugunStr,
+      app_adi: appAdi,
+      qalan_gun: qalanGun
+    });
+
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
@@ -869,7 +1029,9 @@ app.post('/api/bildirisler', async (req, res) => {
  * @swagger
  * /api/bildirisler/{id}:
  *   put:
- *     summary: Bildiriş məlumatlarını yeniləyir
+ *     summary: >
+ *       Bildirişin başlıq və mesajını yeniləyir.
+ *       Bildirişin aid olduğu istifadəçi (username) və abunəlik (abunelik_id / app adı) dəyişdirilə bilməz.
  *     tags: [Bildirişlər]
  *     parameters:
  *       - in: path
@@ -877,6 +1039,7 @@ app.post('/api/bildirisler', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Bildiriş ID-si
  *     requestBody:
  *       required: true
  *       content:
@@ -887,30 +1050,75 @@ app.post('/api/bildirisler', async (req, res) => {
  *               - basliq
  *               - mesaj
  *             properties:
+ *               username:
+ *                 type: string
+ *                 description: >
+ *                   İstəyə görə göndərilə bilər, lakin mövcud bildirişin
+ *                   username-i ilə eyni olmalıdır — dəyişdirilmir.
+ *                 example: abbas.abbasov
+ *               abunelik_id:
+ *                 type: integer
+ *                 description: >
+ *                   İstəyə görə göndərilə bilər, lakin mövcud bildirişin
+ *                   abunelik_id-si ilə eyni olmalıdır — dəyişdirilmir.
+ *                 example: 3
  *               basliq:
  *                 type: string
- *                 example: Yaxınlaşan Ödəniş
+ *                 example: "Netflix - Yenilənmiş Xatırlatma"
  *               mesaj:
  *                 type: string
- *                 example: Netflix abunəliyiniz növbəti ay üçün yenilənəcək.
+ *                 example: "Netflix abunəliyinizin ödənişi yaxınlaşır."
  *     responses:
  *       200:
  *         description: Bildiriş yeniləndi
+ *       400:
+ *         description: username və ya abunelik_id uyğun gəlmir
  *       404:
  *         description: Bildiriş tapılmadı
  */
 app.put('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
-  const { username, basliq, mesaj } = req.body;
-  if (!basliq || !mesaj) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (basliq, mesaj) doldurun.');
+  const { username, abunelik_id, basliq, mesaj } = req.body;
+
+  if (!basliq || !mesaj)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (basliq, mesaj) doldurun.');
+
+  const trimmedBasliq = String(basliq).trim();
+  const trimmedMesaj  = String(mesaj).trim();
+  if (!trimmedBasliq || !trimmedMesaj)
+    return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'basliq və mesaj boş ola bilməz.');
+
   try {
+    // Mövcud bildirişi yoxla
     const checkResult = await executeQuery(
-      `SELECT b.id, u.username FROM bildirisler b JOIN istifadeciler u ON b.istifadeci_id = u.id WHERE b.id = :id`, { id }
+      `SELECT b.id, b.abunelik_id, u.username
+       FROM bildirisler b
+       JOIN istifadeciler u ON b.istifadeci_id = u.id
+       WHERE b.id = :id`,
+      { id }
     );
-    if (checkResult.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
-    if (username !== undefined && username !== null && username !== checkResult.rows[0].USERNAME)
-      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Bildirişin aid olduğu istifadəçi (username) dəyişdirilə bilməz.');
-    await executeQuery(`UPDATE bildirisler SET basliq=:basliq, mesaj=:mesaj WHERE id=:id`, { basliq, mesaj, id }, { autoCommit: true });
+    if (checkResult.rows.length === 0)
+      return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
+
+    const current = checkResult.rows[0];
+
+    // username göndərilibsə, eyni olmalıdır
+    if (username !== undefined && username !== null && String(username).trim() !== current.USERNAME)
+      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE',
+        `Bildirişin aid olduğu istifadəçi dəyişdirilə bilməz. Mövcud username: "${current.USERNAME}".`);
+
+    // abunelik_id göndərilibsə, eyni olmalıdır
+    if (abunelik_id !== undefined && abunelik_id !== null && Number(abunelik_id) !== Number(current.ABUNELIK_ID))
+      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_IMMUTABLE',
+        `Bildirişin aid olduğu abunəlik (app) dəyişdirilə bilməz. Mövcud abunelik_id: ${current.ABUNELIK_ID}.`);
+
+    // Yalnız başlıq və mesajı yenilə
+    await executeQuery(
+      `UPDATE bildirisler SET basliq = :basliq, mesaj = :mesaj WHERE id = :id`,
+      { basliq: trimmedBasliq, mesaj: trimmedMesaj, id },
+      { autoCommit: true }
+    );
+
     return successResponse(res, 200, 'Updated', { message: 'Bildiriş uğurla yeniləndi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
@@ -929,6 +1137,7 @@ app.put('/api/bildirisler/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
+ *         description: Bildiriş ID-si
  *     responses:
  *       200:
  *         description: Bildiriş silindi
@@ -938,13 +1147,19 @@ app.put('/api/bildirisler/:id', async (req, res) => {
 app.delete('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await executeQuery(`DELETE FROM bildirisler WHERE id = :id`, { id }, { autoCommit: true });
-    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
+    const result = await executeQuery(
+      `DELETE FROM bildirisler WHERE id = :id`,
+      { id },
+      { autoCommit: true }
+    );
+    if (result.rowsAffected === 0)
+      return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
     return successResponse(res, 200, 'Deleted', { message: 'Bildiriş uğurla silindi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
+
 
 // =============================================
 // --- ODENIS TARIXCESI (Payment History) ROUTES ---
@@ -954,7 +1169,10 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  * @swagger
  * /api/odenis-tarixcesi:
  *   get:
- *     summary: İstifadəçinin ödəniş tarixçəsini siyahılayır (username ilə)
+ *     summary: >
+ *       İstifadəçinin bütün ödəniş tarixçəsini siyahılayır (username ilə).
+ *       Hər qeydin aid olduğu abunəlik adı (app_adi) və növbəti ödəniş tarixi
+ *       (novbeti_odenis_tarixi) da qaytarılır.
  *     tags: [Ödəniş Tarixçəsi]
  *     parameters:
  *       - in: query
@@ -965,6 +1183,38 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     paymentHistory:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           odenis_tarixcesi_id:
+ *                             type: integer
+ *                           abunelik_id:
+ *                             type: integer
+ *                           app_adi:
+ *                             type: string
+ *                           username:
+ *                             type: string
+ *                           odenis_tarixi:
+ *                             type: string
+ *                             format: date
+ *                           novbeti_odenis_tarixi:
+ *                             type: string
+ *                             format: date
+ *                           mebleq:
+ *                             type: number
+ *                           status:
+ *                             type: string
+ *                             enum: [success, fail]
  *       400:
  *         description: username göndərilmədi
  *       404:
@@ -972,16 +1222,32 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  */
 app.get('/api/odenis-tarixcesi', async (req, res) => {
   const { username } = req.query;
-  if (!username) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
+  if (!username)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
   try {
     const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    const sql = `SELECT o.id AS odenis_tarixcesi_id, o.abunelik_id, u.username, TO_CHAR(o.odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi, o.mebleq, o.status
-                 FROM odenis_tarixcesi o JOIN istifadeciler u ON o.istifadeci_id = u.id
-                 WHERE o.istifadeci_id = :istifadeci_id ORDER BY o.odenis_tarixi DESC`;
+    // app_adi (abunəliyin adı) və novbeti_odenis_tarixi da qaytarılır
+    const sql = `
+      SELECT o.id AS odenis_tarixcesi_id,
+             o.abunelik_id,
+             a.ad AS app_adi,
+             u.username,
+             TO_CHAR(o.odenis_tarixi,          'YYYY-MM-DD') AS odenis_tarixi,
+             TO_CHAR(a.novbeti_odenis_tarixi,   'YYYY-MM-DD') AS novbeti_odenis_tarixi,
+             o.mebleq,
+             o.status
+      FROM odenis_tarixcesi o
+      JOIN istifadeciler  u ON o.istifadeci_id = u.id
+      JOIN abunelikler    a ON o.abunelik_id   = a.id
+      WHERE o.istifadeci_id = :istifadeci_id
+      ORDER BY o.odenis_tarixi DESC
+    `;
     const result = await executeQuery(sql, { istifadeci_id: userId });
-    if (result.rows.length === 0) return successResponse(res, 200, 'No payment history found', { paymentHistory: [] });
+    if (result.rows.length === 0)
+      return successResponse(res, 200, 'No payment history found', { paymentHistory: [] });
     return successResponse(res, 200, 'Success', { paymentHistory: result.rows });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
@@ -992,7 +1258,7 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
  * @swagger
  * /api/odenis-tarixcesi/{id}:
  *   get:
- *     summary: ID-yə görə ödəniş tarixçəsini gətirir
+ *     summary: ID-yə görə ödəniş tarixçəsi qeydini gətirir
  *     tags: [Ödəniş Tarixçəsi]
  *     parameters:
  *       - in: path
@@ -1009,11 +1275,23 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
 app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `SELECT o.id AS odenis_tarixcesi_id, o.abunelik_id, u.username, TO_CHAR(o.odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi, o.mebleq, o.status
-                 FROM odenis_tarixcesi o JOIN istifadeciler u ON o.istifadeci_id = u.id
-                 WHERE o.id = :id`;
+    const sql = `
+      SELECT o.id AS odenis_tarixcesi_id,
+             o.abunelik_id,
+             a.ad AS app_adi,
+             u.username,
+             TO_CHAR(o.odenis_tarixi,          'YYYY-MM-DD') AS odenis_tarixi,
+             TO_CHAR(a.novbeti_odenis_tarixi,   'YYYY-MM-DD') AS novbeti_odenis_tarixi,
+             o.mebleq,
+             o.status
+      FROM odenis_tarixcesi o
+      JOIN istifadeciler  u ON o.istifadeci_id = u.id
+      JOIN abunelikler    a ON o.abunelik_id   = a.id
+      WHERE o.id = :id
+    `;
     const result = await executeQuery(sql, { id });
-    if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
+    if (result.rows.length === 0)
+      return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
     return successResponse(res, 200, 'Success', { paymentHistory: result.rows[0] });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
@@ -1024,7 +1302,11 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
  * @swagger
  * /api/odenis-tarixcesi:
  *   post:
- *     summary: Yeni ödəniş tarixçəsi qeydi əlavə edir (username ilə)
+ *     summary: >
+ *       Yeni ödəniş tarixçəsi qeydi əlavə edir.
+ *       ID avtomatik yaranır. abunelik_id mütləq həmin username-ə aid olmalıdır.
+ *       odenis_tarixi abunəliyin novbeti_odenis_tarixi ilə eyni olmalıdır —
+ *       əks halda xəta qaytarılır.
  *     tags: [Ödəniş Tarixçəsi]
  *     requestBody:
  *       required: true
@@ -1035,52 +1317,111 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
  *             required:
  *               - abunelik_id
  *               - username
- *               - odenis_tarixi
  *               - mebleq
+ *               - odenis_tarixi
  *             properties:
  *               abunelik_id:
  *                 type: integer
- *                 example: 1
+ *                 example: 3
  *               username:
  *                 type: string
  *                 example: abbas.abbasov
  *               odenis_tarixi:
  *                 type: string
  *                 format: date
- *                 example: "2026-06-19"
+ *                 example: "2026-07-01"
+ *                 description: >
+ *                   Abunəliyin novbeti_odenis_tarixi ilə eyni olmalıdır.
  *               mebleq:
  *                 type: number
  *                 example: 12.99
  *               status:
  *                 type: string
  *                 enum: [success, fail]
+ *                 default: success
  *                 example: success
  *     responses:
  *       201:
  *         description: Əlavə edildi
+ *       400:
+ *         description: >
+ *           odenis_tarixi novbeti_odenis_tarixi ilə uyğun gəlmir,
+ *           abunəlik bu istifadəçiyə aid deyil, və s.
+ *       404:
+ *         description: İstifadəçi tapılmadı
  */
 app.post('/api/odenis-tarixcesi', async (req, res) => {
   const { abunelik_id, username, odenis_tarixi, mebleq, status } = req.body;
+
+  // Məcburi sahələr
   if (!abunelik_id || !username || !odenis_tarixi || mebleq === undefined || mebleq === null)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (abunelik_id, username, odenis_tarixi, mebleq) doldurun.');
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS',
+      'Məcburi sahələri (abunelik_id, username, odenis_tarixi, mebleq) doldurun.');
+
+  // Tarix formatı
   if (!isValidDate(odenis_tarixi))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Ödəniş tarixi düzgün deyil: "${odenis_tarixi}" (Format: YYYY-MM-DD).`);
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE',
+      `Ödəniş tarixi düzgün deyil: "${odenis_tarixi}" (Format: YYYY-MM-DD).`);
+
+  // Məbləğ
+  const parsedMebleq = Number(mebleq);
+  if (isNaN(parsedMebleq) || parsedMebleq <= 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'Məbləğ 0-dan böyük olmalıdır.');
+
+  // Status
   const statusValue = status || 'success';
   if (statusValue !== 'success' && statusValue !== 'fail')
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS', 'Status yalnız "success" və ya "fail" ola bilər.');
-  try {
-    const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
-    const subCheck = await executeQuery(`SELECT id, istifadeci_id FROM abunelikler WHERE id = :abunelik_id`, { abunelik_id });
-    if (subCheck.rows.length === 0) return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_NOT_FOUND', 'Qeyd olunan abunəlik (abunelik_id) mövcud deyil.');
-    if (Number(subCheck.rows[0].ISTIFADECI_ID) !== Number(userId)) return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_USER_MISMATCH', 'Qeyd olunan abunəlik daxil etdiyiniz istifadəçiyə məxsus deyil.');
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS',
+      'Status yalnız "success" və ya "fail" ola bilər.');
 
+  try {
+    // İstifadəçi yoxlaması
+    const userId = await getUserIdByUsername(username);
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    // Abunəlik yoxlaması
+    const subResult = await executeQuery(
+      `SELECT id, istifadeci_id, ad,
+              TO_CHAR(novbeti_odenis_tarixi, 'YYYY-MM-DD') AS novbeti_odenis_tarixi,
+              status AS sub_status
+       FROM abunelikler
+       WHERE id = :abunelik_id`,
+      { abunelik_id }
+    );
+    if (subResult.rows.length === 0)
+      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_NOT_FOUND',
+        'Göstərilən abunelik_id ilə abunəlik tapılmadı.');
+
+    const sub = subResult.rows[0];
+
+    // Abunəlik bu istifadəçiyə aidmi?
+    if (Number(sub.ISTIFADECI_ID) !== Number(userId))
+      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_USER_MISMATCH',
+        `Bu abunəlik (ID: ${abunelik_id}) "${username}" istifadəçisinə aid deyil.`);
+
+    // odenis_tarixi == novbeti_odenis_tarixi olmalıdır
+    const novbetiTarix = sub.NOVBETI_ODENIS_TARIXI;
+    if (odenis_tarixi !== novbetiTarix)
+      return errorResponse(res, 400, 'Bad Request', 'DATE_MISMATCH',
+        `Ödəniş tarixi ("${odenis_tarixi}") abunəliyin növbəti ödəniş tarixi ilə ("${novbetiTarix}") eyni olmalıdır. ` +
+        `Zəhmət olmasa odenis_tarixi olaraq "${novbetiTarix}" daxil edin.`);
+
+    // Qeydi əlavə et
     await executeQuery(
-      `INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status) VALUES (:abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi,'YYYY-MM-DD'), :mebleq, :status)`,
-      { abunelik_id, istifadeci_id: userId, odenis_tarixi, mebleq, status: statusValue },
+      `INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
+       VALUES (:abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi, 'YYYY-MM-DD'), :mebleq, :status)`,
+      { abunelik_id, istifadeci_id: userId, odenis_tarixi, mebleq: parsedMebleq, status: statusValue },
       { autoCommit: true }
     );
-    return successResponse(res, 201, 'Created', { message: 'Ödəniş tarixçəsi qeydi uğurla əlavə edildi.' });
+
+    return successResponse(res, 201, 'Created', {
+      message: 'Ödəniş tarixçəsi qeydi uğurla əlavə edildi.',
+      app_adi: sub.AD,
+      odenis_tarixi,
+      mebleq: parsedMebleq,
+      status: statusValue
+    });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
@@ -1090,7 +1431,10 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
  * @swagger
  * /api/odenis-tarixcesi/{id}:
  *   put:
- *     summary: Ödəniş tarixçəsi qeydini yeniləyir
+ *     summary: >
+ *       Ödəniş tarixçəsi qeydini yeniləyir.
+ *       Qeydin aid olduğu istifadəçi (username) və abunəlik (abunelik_id) dəyişdirilə bilməz.
+ *       odenis_tarixi abunəliyin hazırkı novbeti_odenis_tarixi ilə eyni olmalıdır.
  *     tags: [Ödəniş Tarixçəsi]
  *     parameters:
  *       - in: path
@@ -1108,10 +1452,22 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
  *               - odenis_tarixi
  *               - mebleq
  *             properties:
+ *               username:
+ *                 type: string
+ *                 description: >
+ *                   İstəyə görə göndərilə bilər, lakin mövcud qeydin
+ *                   username-i ilə eyni olmalıdır — dəyişdirilmir.
+ *               abunelik_id:
+ *                 type: integer
+ *                 description: >
+ *                   İstəyə görə göndərilə bilər, lakin mövcud qeydin
+ *                   abunelik_id-si ilə eyni olmalıdır — dəyişdirilmir.
  *               odenis_tarixi:
  *                 type: string
  *                 format: date
- *                 example: "2026-06-19"
+ *                 example: "2026-07-01"
+ *                 description: >
+ *                   Abunəliyin novbeti_odenis_tarixi ilə eyni olmalıdır.
  *               mebleq:
  *                 type: number
  *                 example: 12.99
@@ -1122,66 +1478,103 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
  *     responses:
  *       200:
  *         description: Yeniləndi
+ *       400:
+ *         description: username, abunelik_id uyğun gəlmir və ya tarix yanlışdır
  *       404:
  *         description: Tapılmadı
  */
 app.put('/api/odenis-tarixcesi/:id', async (req, res) => {
   const { id } = req.params;
   const { username, abunelik_id, odenis_tarixi, mebleq, status } = req.body;
+
+  // Məcburi sahələr
   if (!odenis_tarixi || mebleq === undefined || mebleq === null)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (odenis_tarixi, mebleq) doldurun.');
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS',
+      'Məcburi sahələri (odenis_tarixi, mebleq) doldurun.');
+
+  // Tarix formatı
   if (!isValidDate(odenis_tarixi))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Ödəniş tarixi düzgün deyil: "${odenis_tarixi}" (Format: YYYY-MM-DD).`);
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE',
+      `Ödəniş tarixi düzgün deyil: "${odenis_tarixi}" (Format: YYYY-MM-DD).`);
+
+  // Məbləğ
+  const parsedMebleq = Number(mebleq);
+  if (isNaN(parsedMebleq) || parsedMebleq <= 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'Məbləğ 0-dan böyük olmalıdır.');
+
+  // Status
   const statusValue = status || 'success';
   if (statusValue !== 'success' && statusValue !== 'fail')
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS', 'Status yalnız "success" və ya "fail" ola bilər.');
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS',
+      'Status yalnız "success" və ya "fail" ola bilər.');
+
   try {
-    const historyCheck = await executeQuery(
-      `SELECT o.id, o.abunelik_id, u.username FROM odenis_tarixcesi o JOIN istifadeciler u ON o.istifadeci_id = u.id WHERE o.id = :id`, { id }
+    // Mövcud qeydi tap
+    const historyResult = await executeQuery(
+      `SELECT o.id, o.abunelik_id, u.username,
+              TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') AS novbeti_odenis_tarixi,
+              a.ad AS app_adi
+       FROM odenis_tarixcesi o
+       JOIN istifadeciler u ON o.istifadeci_id = u.id
+       JOIN abunelikler   a ON o.abunelik_id   = a.id
+       WHERE o.id = :id`,
+      { id }
     );
-    if (historyCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
-    const { ABUNELIK_ID: currentAbunelikId, USERNAME: currentUsername } = historyCheck.rows[0];
-    if (username !== undefined && username !== null && username !== currentUsername)
-      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Ödəniş tarixçəsinin aid olduğu istifadəçi dəyişdirilə bilməz.');
-    if (abunelik_id !== undefined && Number(abunelik_id) !== Number(currentAbunelikId))
-      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_IMMUTABLE', 'Ödəniş tarixçəsinin aid olduğu abunəlik dəyişdirilə bilməz.');
-    await executeQuery(`UPDATE odenis_tarixcesi SET abunelik_id=:abunelik_id, odenis_tarixi=TO_DATE(:odenis_tarixi,'YYYY-MM-DD'), mebleq=:mebleq, status=:status WHERE id=:id`,
-      { abunelik_id: currentAbunelikId, odenis_tarixi, mebleq, status: statusValue, id }, { autoCommit: true });
-    return successResponse(res, 200, 'Updated', { message: 'Ödəniş tarixçəsi uğurla yeniləndi.' });
+    if (historyResult.rows.length === 0)
+      return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
+
+    const current = historyResult.rows[0];
+
+    // username dəyişdirilə bilməz
+    if (username !== undefined && username !== null && String(username).trim() !== current.USERNAME)
+      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE',
+        `Ödəniş tarixçəsinin aid olduğu istifadəçi dəyişdirilə bilməz. Mövcud username: "${current.USERNAME}".`);
+
+    // abunelik_id dəyişdirilə bilməz
+    if (abunelik_id !== undefined && abunelik_id !== null && Number(abunelik_id) !== Number(current.ABUNELIK_ID))
+      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_IMMUTABLE',
+        `Ödəniş tarixçəsinin aid olduğu abunəlik dəyişdirilə bilməz. Mövcud abunelik_id: ${current.ABUNELIK_ID}.`);
+
+    // odenis_tarixi == novbeti_odenis_tarixi olmalıdır
+    const novbetiTarix = current.NOVBETI_ODENIS_TARIXI;
+    if (odenis_tarixi !== novbetiTarix)
+      return errorResponse(res, 400, 'Bad Request', 'DATE_MISMATCH',
+        `Ödəniş tarixi ("${odenis_tarixi}") abunəliyin növbəti ödəniş tarixi ilə ("${novbetiTarix}") eyni olmalıdır. ` +
+        `Zəhmət olmasa odenis_tarixi olaraq "${novbetiTarix}" daxil edin.`);
+
+    // Yenilə
+    await executeQuery(
+      `UPDATE odenis_tarixcesi
+       SET odenis_tarixi = TO_DATE(:odenis_tarixi, 'YYYY-MM-DD'),
+           mebleq        = :mebleq,
+           status        = :status
+       WHERE id = :id`,
+      { odenis_tarixi, mebleq: parsedMebleq, status: statusValue, id },
+      { autoCommit: true }
+    );
+
+    return successResponse(res, 200, 'Updated', {
+      message: 'Ödəniş tarixçəsi uğurla yeniləndi.',
+      app_adi: current.APP_ADI
+    });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
-/**
- * @swagger
- * /api/odenis-tarixcesi/{id}:
- *   delete:
- *     summary: Ödəniş tarixçəsi qeydini silir
- *     tags: [Ödəniş Tarixçəsi]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Silindi
- *       404:
- *         description: Tapılmadı
- */
-app.delete('/api/odenis-tarixcesi/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await executeQuery(`DELETE FROM odenis_tarixcesi WHERE id = :id`, { id }, { autoCommit: true });
-    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
-    return successResponse(res, 200, 'Deleted', { message: 'Ödəniş tarixçəsi uğurla silindi.' });
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
+// DELETE — ödəniş tarixçəsi üçün DELETE əməliyyatı mövcud deyil (biznes qaydası).
+// /api/odenis-tarixcesi/:id DELETE → 405 Method Not Allowed
+app.delete('/api/odenis-tarixcesi/:id', (req, res) => {
+  return res.status(405).json({
+    code: 405,
+    message: 'Method Not Allowed',
+    data: null,
+    error: {
+      code: 'DELETE_NOT_ALLOWED',
+      message: 'Ödəniş tarixçəsi qeydləri silinə bilməz. Bu əməliyyat icazəsizdir (audit məqsədilə saxlanılır).'
+    }
+  });
 });
-
 // =============================================
 // --- ODENIS METODLARI (Payment Methods) ROUTES ---
 // =============================================
