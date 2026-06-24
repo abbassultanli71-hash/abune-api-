@@ -59,8 +59,8 @@ const swaggerOptions = {
     openapi: '3.0.0',
     info: {
       title: 'Abunəlik İdarəetmə Platforması API',
-      version: '1.0.0',
-      description: 'Oracle verilənlər bazası ilə inteqrasiya olunmuş abunəlik idarəetmə platformasının API-ı.',
+      version: '1.1.0',
+      description: 'Oracle verilənlər bazası ilə inteqrasiya olunmuş abunəlik idarəetmə platformasının API-ı. Bütün istifadəçi-aid endpointlər "username" üzərindən işləyir.',
     },
     servers: [
       { url: '/', description: 'Cari Server (Lokal və ya Tunel)' },
@@ -94,23 +94,21 @@ function isValidDate(dateStr) {
   return day >= 1 && day <= daysInMonth[month - 1];
 }
 
-function isValidTimestamp(tsStr) {
-  if (typeof tsStr !== 'string') return false;
-  const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
-  if (!regex.test(tsStr)) return false;
-  const [datePart, timePart] = tsStr.split(' ');
-  if (!isValidDate(datePart)) return false;
-  const [hour, min, sec] = timePart.split(':').map(Number);
-  return hour >= 0 && hour < 24 && min >= 0 && min < 60 && sec >= 0 && sec < 60;
-}
-
 function isValidEmail(email) {
   if (typeof email !== 'string') return false;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function isValidUsername(username) {
+  if (typeof username !== 'string') return false;
+  const trimmed = username.trim();
+  return /^[a-zA-Z0-9_.]{3,50}$/.test(trimmed);
+}
+
 const ICAZE_VERILEN_VALYUTALAR = ['AZN', 'USD', 'EUR'];
 const ICAZE_VERILEN_ODENIS_TEZLIKLERI = ['monthly', 'yearly', 'quarterly', 'weekly'];
+const ICAZE_VERILEN_KATEQORIYALAR = ['Entertainment', 'Music', 'Education', 'Health & Fitness', 'Productivity', 'Gaming', 'Cloud Storage', 'News', 'Food & Delivery', 'Shopping', 'Finance', 'Other'];
+const ICAZE_VERILEN_STATUSLAR = ['active', 'deactive'];
 
 function getValidCurrency(valyuta) {
   if (!valyuta) return 'AZN';
@@ -121,6 +119,41 @@ function getValidCurrency(valyuta) {
 
 function isValidCurrency(valyuta) {
   return ICAZE_VERILEN_VALYUTALAR.includes(getValidCurrency(valyuta));
+}
+
+// İstifadəçinin username-inə görə daxili (Oracle) ID-sini tapır.
+// Bütün API endpointləri istifadəçini "username" ilə qəbul edir, daxili sorğularda isə FK üçün bu ID istifadə olunur.
+async function getUserIdByUsername(username) {
+  if (!username) return null;
+  const result = await executeQuery(`SELECT id FROM istifadeciler WHERE username = :username`, { username });
+  if (result.rows.length === 0) return null;
+  return result.rows[0].ID;
+}
+
+// baslama_tarixi və odenis_tezliyi-nə əsasən növbəti ödəniş tarixini avtomatik hesablayır.
+// Bu sahə heç vaxt birbaşa client tərəfindən göndərilmir, həmişə server tərəfindən default olaraq hesablanır.
+function hesablaNovbetiOdenisTarixi(baslamaTarixiStr, odenisTezliyi) {
+  const [y, m, d] = baslamaTarixiStr.split('-').map(Number);
+  const next = new Date(Date.UTC(y, m - 1, d));
+  switch (odenisTezliyi) {
+    case 'weekly':
+      next.setUTCDate(next.getUTCDate() + 7);
+      break;
+    case 'quarterly':
+      next.setUTCMonth(next.getUTCMonth() + 3);
+      break;
+    case 'yearly':
+      next.setUTCFullYear(next.getUTCFullYear() + 1);
+      break;
+    case 'monthly':
+    default:
+      next.setUTCMonth(next.getUTCMonth() + 1);
+      break;
+  }
+  const yyyy = next.getUTCFullYear();
+  const mm = String(next.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(next.getUTCDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 // Standard response helpers
@@ -171,7 +204,7 @@ function errorResponse(res, statusCode, message, errorCode, errorMessage) {
  */
 app.get('/api/istifadeciler', async (req, res) => {
   try {
-    const sql = `SELECT id, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler ORDER BY id`;
+    const sql = `SELECT id, username, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler ORDER BY id`;
     const result = await executeQuery(sql);
     return successResponse(res, 200, 'Success', { users: result.rows });
   } catch (err) {
@@ -181,43 +214,27 @@ app.get('/api/istifadeciler', async (req, res) => {
 
 /**
  * @swagger
- * /api/istifadeciler/{id}:
+ * /api/istifadeciler/{username}:
  *   get:
- *     summary: ID-yə görə istifadəçini gətirir
+ *     summary: Username-ə görə istifadəçini gətirir
  *     tags: [İstifadəçilər]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: Success
- *                 data:
- *                   type: object
- *                   properties:
- *                     user:
- *                       type: object
  *       404:
  *         description: İstifadəçi tapılmadı
  */
-app.get('/api/istifadeciler/:id', async (req, res) => {
-  const { id } = req.params;
+app.get('/api/istifadeciler/:username', async (req, res) => {
+  const { username } = req.params;
   try {
-    const sql = `SELECT id, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler WHERE id = :id`;
-    const result = await executeQuery(sql, { id });
+    const sql = `SELECT id, username, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler WHERE username = :username`;
+    const result = await executeQuery(sql, { username });
     if (result.rows.length === 0) {
       return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
     }
@@ -231,7 +248,7 @@ app.get('/api/istifadeciler/:id', async (req, res) => {
  * @swagger
  * /api/istifadeciler:
  *   post:
- *     summary: Yeni istifadəçi əlavə edir
+ *     summary: Yeni istifadəçi əlavə edir (ID avtomatik sıra ilə yaranır)
  *     tags: [İstifadəçilər]
  *     requestBody:
  *       required: true
@@ -240,12 +257,13 @@ app.get('/api/istifadeciler/:id', async (req, res) => {
  *           schema:
  *             type: object
  *             required:
+ *               - username
  *               - ad
  *               - email
  *             properties:
- *               id:
- *                 type: integer
- *                 example: 3
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
  *               ad:
  *                 type: string
  *                 example: Abbas Abbasov
@@ -257,42 +275,34 @@ app.get('/api/istifadeciler/:id', async (req, res) => {
  *         description: İstifadəçi yaradıldı
  */
 app.post('/api/istifadeciler', async (req, res) => {
-  const { id, ad, email } = req.body;
+  const { username, ad, email } = req.body;
 
-  if (!ad || !email) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Ad və email sahələri məcburidir.');
+  if (!username || !ad || !email) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və email sahələri məcburidir.');
 
+  const trimmedUsername = String(username).trim();
   const trimmedAd = String(ad).trim();
   const trimmedEmail = String(email).trim();
 
-  if (trimmedAd.length === 0 || trimmedEmail.length === 0) return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'Ad və email sahələri boş qoyula bilməz.');
+  if (trimmedUsername.length === 0 || trimmedAd.length === 0 || trimmedEmail.length === 0) return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'username, ad və email sahələri boş qoyula bilməz.');
+  if (!isValidUsername(trimmedUsername)) return errorResponse(res, 400, 'Bad Request', 'INVALID_USERNAME', 'Username yalnız hərf, rəqəm, "_" və "." ola bilər və 3-50 simvol aralığında olmalıdır.');
   if (trimmedAd.length < 3 || trimmedAd.length > 100) return errorResponse(res, 400, 'Bad Request', 'INVALID_NAME_LENGTH', 'Ad ən azı 3 və ən çoxu 100 simvoldan ibarət olmalıdır.');
   if (!isValidEmail(trimmedEmail)) return errorResponse(res, 400, 'Bad Request', 'INVALID_EMAIL', 'Email ünvanının formatı yanlışdır (nümunə: ad@example.com).');
   if (trimmedEmail.length > 100) return errorResponse(res, 400, 'Bad Request', 'EMAIL_TOO_LONG', 'Email ən çoxu 100 simvoldan ibarət olmalıdır.');
 
-  if (id !== undefined && id !== null) {
-    const parsedId = Number(id);
-    if (!Number.isInteger(parsedId) || parsedId <= 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_ID', 'ID yalnız müsbət tam ədəd olmalıdır.');
-  }
-
   try {
-    if (id) {
-      const idCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :id`, { id });
-      if (idCheck.rows.length > 0) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ID', 'Bu ID ilə artıq istifadəçi mövcuddur.');
-    }
+    const usernameCheck = await executeQuery(`SELECT username FROM istifadeciler WHERE username = :username`, { username: trimmedUsername });
+    if (usernameCheck.rows.length > 0) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_USERNAME', 'Bu username ilə artıq istifadəçi mövcuddur.');
+
     const emailCheck = await executeQuery(`SELECT email FROM istifadeciler WHERE email = :email`, { email: trimmedEmail });
     if (emailCheck.rows.length > 0) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_EMAIL', 'Bu email ünvanı ilə artıq istifadəçi mövcuddur.');
 
-    let sql, binds;
-    if (id) {
-      sql = `INSERT INTO istifadeciler (id, ad, email) VALUES (:id, :ad, :email)`;
-      binds = { id, ad: trimmedAd, email: trimmedEmail };
-    } else {
-      sql = `INSERT INTO istifadeciler (ad, email) VALUES (:ad, :email)`;
-      binds = { ad: trimmedAd, email: trimmedEmail };
-    }
-    await executeQuery(sql, binds, { autoCommit: true });
+    await executeQuery(
+      `INSERT INTO istifadeciler (username, ad, email) VALUES (:username, :ad, :email)`,
+      { username: trimmedUsername, ad: trimmedAd, email: trimmedEmail },
+      { autoCommit: true }
+    );
 
-    const userResult = await executeQuery(`SELECT id FROM istifadeciler WHERE email = :email`, { email: trimmedEmail });
+    const userResult = await executeQuery(`SELECT id FROM istifadeciler WHERE username = :username`, { username: trimmedUsername });
     const userId = userResult.rows[0].ID;
     await executeQuery(
       `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema) VALUES (:userId, 'AZN', 'email', 'az', 'dark')`,
@@ -300,23 +310,23 @@ app.post('/api/istifadeciler', async (req, res) => {
     );
     return successResponse(res, 201, 'Created', { message: 'İstifadəçi və onun ilkin ayarları uğurla yaradıldı.' });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Məlumatların unikallığı pozuldu (eyni ID və ya email artıq mövcuddur).');
+    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Məlumatların unikallığı pozuldu (eyni username və ya email artıq mövcuddur).');
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
 /**
  * @swagger
- * /api/istifadeciler/{id}:
+ * /api/istifadeciler/{username}:
  *   put:
- *     summary: İstifadəçi məlumatlarını yeniləyir
+ *     summary: İstifadəçi məlumatlarını yeniləyir (istəyə görə username də dəyişdirilə bilər)
  *     tags: [İstifadəçilər]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -333,18 +343,19 @@ app.post('/api/istifadeciler', async (req, res) => {
  *               email:
  *                 type: string
  *                 example: abbas@example.com
- *               yaradilma_tarixi:
+ *               username:
  *                 type: string
- *                 example: "2026-06-19 12:00:00"
+ *                 description: Yalnız username-i dəyişmək istəyəndə göndərin.
+ *                 example: abbas.new
  *     responses:
  *       200:
  *         description: İstifadəçi yeniləndi
  *       404:
  *         description: İstifadəçi tapılmadı
  */
-app.put('/api/istifadeciler/:id', async (req, res) => {
-  const { id } = req.params;
-  const { ad, email, yaradilma_tarixi } = req.body;
+app.put('/api/istifadeciler/:username', async (req, res) => {
+  const { username } = req.params;
+  const { ad, email, username: yeniUsername } = req.body;
 
   if (!ad || !email) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Ad və email sahələri məcburidir.');
   const trimmedAd = String(ad).trim();
@@ -353,54 +364,63 @@ app.put('/api/istifadeciler/:id', async (req, res) => {
   if (trimmedAd.length < 3 || trimmedAd.length > 100) return errorResponse(res, 400, 'Bad Request', 'INVALID_NAME_LENGTH', 'Ad ən azı 3 və ən çoxu 100 simvoldan ibarət olmalıdır.');
   if (!isValidEmail(trimmedEmail)) return errorResponse(res, 400, 'Bad Request', 'INVALID_EMAIL', 'Email ünvanının formatı yanlışdır.');
   if (trimmedEmail.length > 100) return errorResponse(res, 400, 'Bad Request', 'EMAIL_TOO_LONG', 'Email ən çoxu 100 simvoldan ibarət olmalıdır.');
-  if (yaradilma_tarixi && !isValidTimestamp(yaradilma_tarixi)) return errorResponse(res, 400, 'Bad Request', 'INVALID_TIMESTAMP', `Yaradılma tarixi düzgün deyil: "${yaradilma_tarixi}" (Format: YYYY-MM-DD HH24:MI:SS).`);
-  if (req.body.id !== undefined && Number(req.body.id) !== Number(id)) return errorResponse(res, 400, 'Bad Request', 'ID_IMMUTABLE', 'İstifadəçinin ID-si dəyişdirilə bilməz.');
+
+  let trimmedYeniUsername = null;
+  if (yeniUsername !== undefined && yeniUsername !== null && String(yeniUsername).trim() !== '') {
+    trimmedYeniUsername = String(yeniUsername).trim();
+    if (!isValidUsername(trimmedYeniUsername)) return errorResponse(res, 400, 'Bad Request', 'INVALID_USERNAME', 'Username yalnız hərf, rəqəm, "_" və "." ola bilər və 3-50 simvol aralığında olmalıdır.');
+  }
 
   try {
-    let sql, binds;
-    if (yaradilma_tarixi) {
-      sql = `UPDATE istifadeciler SET ad = :ad, email = :email, yaradilma_tarixi = TO_TIMESTAMP(:yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') WHERE id = :id`;
-      binds = { ad: trimmedAd, email: trimmedEmail, yaradilma_tarixi, id };
-    } else {
-      sql = `UPDATE istifadeciler SET ad = :ad, email = :email WHERE id = :id`;
-      binds = { ad: trimmedAd, email: trimmedEmail, id };
+    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE username = :username`, { username });
+    if (userCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    if (trimmedYeniUsername && trimmedYeniUsername !== username) {
+      const dupCheck = await executeQuery(`SELECT username FROM istifadeciler WHERE username = :yeniUsername`, { yeniUsername: trimmedYeniUsername });
+      if (dupCheck.rows.length > 0) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_USERNAME', 'Bu username ilə artıq istifadəçi mövcuddur.');
     }
-    const result = await executeQuery(sql, binds, { autoCommit: true });
+
+    const emailCheck = await executeQuery(`SELECT email FROM istifadeciler WHERE email = :email AND username != :username`, { email: trimmedEmail, username });
+    if (emailCheck.rows.length > 0) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_EMAIL', 'Bu email ünvanı ilə artıq istifadəçi mövcuddur.');
+
+    const finalUsername = trimmedYeniUsername || username;
+    const sql = `UPDATE istifadeciler SET username = :finalUsername, ad = :ad, email = :email WHERE username = :username`;
+    const result = await executeQuery(sql, { finalUsername, ad: trimmedAd, email: trimmedEmail, username }, { autoCommit: true });
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
     const updated = await executeQuery(
-      `SELECT id, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler WHERE id = :id`, { id }
+      `SELECT id, username, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler WHERE username = :finalUsername`, { finalUsername }
     );
     return successResponse(res, 200, 'Updated', { user: updated.rows[0] });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Bu email və ya ID artıq mövcuddur.');
-    if (err.message && err.message.includes('ORA-02292')) return errorResponse(res, 400, 'Bad Request', 'FK_CONSTRAINT', 'İstifadəçinin abunəliyi və ya bildirişi olduğu üçün ID dəyişdirilə bilməz.');
+    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Bu email və ya username artıq mövcuddur.');
+    if (err.message && err.message.includes('ORA-02292')) return errorResponse(res, 400, 'Bad Request', 'FK_CONSTRAINT', 'İstifadəçinin abunəliyi və ya bildirişi olduğu üçün username dəyişdirilə bilməz.');
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
 /**
  * @swagger
- * /api/istifadeciler/{id}:
+ * /api/istifadeciler/{username}:
  *   delete:
  *     summary: İstifadəçini silir
  *     tags: [İstifadəçilər]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: İstifadəçi silindi
  *       404:
  *         description: İstifadəçi tapılmadı
  */
-app.delete('/api/istifadeciler/:id', async (req, res) => {
-  const { id } = req.params;
+app.delete('/api/istifadeciler/:username', async (req, res) => {
+  const { username } = req.params;
   try {
-    const result = await executeQuery(`DELETE FROM istifadeciler WHERE id = :id`, { id }, { autoCommit: true });
+    const result = await executeQuery(`DELETE FROM istifadeciler WHERE username = :username`, { username }, { autoCommit: true });
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
     return successResponse(res, 200, 'Deleted', { message: 'İstifadəçi uğurla silindi.' });
   } catch (err) {
@@ -416,33 +436,39 @@ app.delete('/api/istifadeciler/:id', async (req, res) => {
  * @swagger
  * /api/abunelikler:
  *   get:
- *     summary: İstifadəçinin abunəliklərini siyahılayır
+ *     summary: İstifadəçinin abunəliklərini siyahılayır (username ilə)
  *     tags: [Abunəliklər]
  *     parameters:
  *       - in: query
- *         name: istifadeci_id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
  *       400:
- *         description: istifadeci_id göndərilmədi
+ *         description: username göndərilmədi
+ *       404:
+ *         description: İstifadəçi tapılmadı
  */
 app.get('/api/abunelikler', async (req, res) => {
-  const { istifadeci_id } = req.query;
-  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
+  const { username } = req.query;
+  if (!username) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
   try {
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
     const sql = `
-      SELECT id AS abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi,
-             TO_CHAR(baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
-             TO_CHAR(novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
-             kateqoriya, status,
-             TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
-      FROM abunelikler WHERE istifadeci_id = :istifadeci_id ORDER BY id
+      SELECT a.id AS abunelik_id, u.username, a.ad, a.qiymet, a.valyuta, a.odenis_tezliyi,
+             TO_CHAR(a.baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
+             TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
+             a.kateqoriya, a.status,
+             TO_CHAR(a.yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
+      FROM abunelikler a JOIN istifadeciler u ON a.istifadeci_id = u.id
+      WHERE a.istifadeci_id = :istifadeci_id ORDER BY a.id
     `;
-    const result = await executeQuery(sql, { istifadeci_id });
+    const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No subscriptions found', { subscriptions: [] });
     return successResponse(res, 200, 'Success', { subscriptions: result.rows });
   } catch (err) {
@@ -472,12 +498,13 @@ app.get('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const sql = `
-      SELECT id AS abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi,
-             TO_CHAR(baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
-             TO_CHAR(novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
-             kateqoriya, status,
-             TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
-      FROM abunelikler WHERE id = :id
+      SELECT a.id AS abunelik_id, u.username, a.ad, a.qiymet, a.valyuta, a.odenis_tezliyi,
+             TO_CHAR(a.baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
+             TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
+             a.kateqoriya, a.status,
+             TO_CHAR(a.yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
+      FROM abunelikler a JOIN istifadeciler u ON a.istifadeci_id = u.id
+      WHERE a.id = :id
     `;
     const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
@@ -491,7 +518,7 @@ app.get('/api/abunelikler/:id', async (req, res) => {
  * @swagger
  * /api/abunelikler:
  *   post:
- *     summary: Yeni abunəlik əlavə edir
+ *     summary: Yeni abunəlik əlavə edir (novbeti_odenis_tarixi avtomatik hesablanır)
  *     tags: [Abunəliklər]
  *     requestBody:
  *       required: true
@@ -500,18 +527,14 @@ app.get('/api/abunelikler/:id', async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - istifadeci_id
+ *               - username
  *               - ad
  *               - qiymet
  *               - baslama_tarixi
- *               - novbeti_odenis_tarixi
  *             properties:
- *               abunelik_id:
- *                 type: integer
- *                 example: 3
- *               istifadeci_id:
- *                 type: integer
- *                 example: 1
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
  *               ad:
  *                 type: string
  *                 example: Netflix
@@ -530,29 +553,20 @@ app.get('/api/abunelikler/:id', async (req, res) => {
  *               baslama_tarixi:
  *                 type: string
  *                 format: date
- *                 example: "2026-01-01"
- *               novbeti_odenis_tarixi:
- *                 type: string
- *                 format: date
- *                 example: "2026-07-01"
+ *                 example: "2026-06-24"
  *               kateqoriya:
  *                 type: string
+ *                 enum: [Entertainment, Music, Education, "Health & Fitness", Productivity, Gaming, "Cloud Storage", News, "Food & Delivery", Shopping, Finance, Other]
  *                 example: Entertainment
- *               status:
- *                 type: string
- *                 example: active
- *               yaradilma_tarixi:
- *                 type: string
- *                 example: "2026-06-19 10:00:00"
  *     responses:
  *       201:
- *         description: Abunəlik əlavə edildi
+ *         description: Abunəlik əlavə edildi (status avtomatik "active", novbeti_odenis_tarixi avtomatik hesablanır)
  */
 app.post('/api/abunelikler', async (req, res) => {
-  const { abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status, yaradilma_tarixi } = req.body;
+  const { username, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya } = req.body;
 
-  if (!istifadeci_id || !ad || qiymet === undefined || qiymet === null || !baslama_tarixi || !novbeti_odenis_tarixi)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (istifadeci_id, ad, qiymet, baslama_tarixi, novbeti_odenis_tarixi) doldurun.');
+  if (!username || !ad || qiymet === undefined || qiymet === null || !baslama_tarixi)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (username, ad, qiymet, baslama_tarixi) doldurun.');
 
   const parsedQiymet = Number(qiymet);
   if (isNaN(parsedQiymet) || parsedQiymet <= 0)
@@ -568,34 +582,26 @@ app.post('/api/abunelikler', async (req, res) => {
   if (!isValidDate(baslama_tarixi))
     return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Başlama tarixi düzgün deyil: "${baslama_tarixi}" (Format: YYYY-MM-DD).`);
 
-  if (!isValidDate(novbeti_odenis_tarixi))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Növbəti ödəniş tarixi düzgün deyil: "${novbeti_odenis_tarixi}" (Format: YYYY-MM-DD).`);
+  if (kateqoriya && !ICAZE_VERILEN_KATEQORIYALAR.includes(kateqoriya))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CATEGORY', `Yanlış kateqoriya: "${kateqoriya}". Yalnız ${ICAZE_VERILEN_KATEQORIYALAR.join(', ')} daxil edilə bilər.`);
 
-  if (yaradilma_tarixi && !isValidTimestamp(yaradilma_tarixi))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_TIMESTAMP', `Yaradılma tarixi düzgün deyil: "${yaradilma_tarixi}" (Format: YYYY-MM-DD HH24:MI:SS).`);
+  const novbetiOdenisTarixi = hesablaNovbetiOdenisTarixi(baslama_tarixi, odenisTezliyi);
 
   try {
-    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
-    if (userCheck.rows.length === 0) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.');
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
 
-    const yaradilmaCol = yaradilma_tarixi ? ', yaradilma_tarixi' : '';
-    const yaradilmaVal = yaradilma_tarixi ? `, TO_TIMESTAMP(:yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS')` : '';
-
-    let sql, binds;
-    if (abunelik_id) {
-      sql = `INSERT INTO abunelikler (id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status${yaradilmaCol})
-             VALUES (:abunelik_id, :istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :status${yaradilmaVal})`;
-      binds = { abunelik_id, istifadeci_id, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya: kateqoriya || null, status: status || 'active', ...(yaradilma_tarixi && { yaradilma_tarixi }) };
-    } else {
-      sql = `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status${yaradilmaCol})
-             VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :status${yaradilmaVal})`;
-      binds = { istifadeci_id, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya: kateqoriya || null, status: status || 'active', ...(yaradilma_tarixi && { yaradilma_tarixi }) };
-    }
+    const sql = `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status)
+                 VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, 'active')`;
+    const binds = {
+      istifadeci_id: userId, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
+      odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
+      kateqoriya: kateqoriya || null
+    };
 
     await executeQuery(sql, binds, { autoCommit: true });
-    return successResponse(res, 201, 'Created', { message: 'Abunəlik uğurla əlavə edildi.' });
+    return successResponse(res, 201, 'Created', { message: 'Abunəlik uğurla əlavə edildi.', novbeti_odenis_tarixi: novbetiOdenisTarixi });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ID', 'Bu abunəlik ID-si artıq mövcuddur.');
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
@@ -604,7 +610,7 @@ app.post('/api/abunelikler', async (req, res) => {
  * @swagger
  * /api/abunelikler/{id}:
  *   put:
- *     summary: Abunəlik məlumatlarını yeniləyir
+ *     summary: Abunəlik məlumatlarını yeniləyir (novbeti_odenis_tarixi avtomatik yenidən hesablanır)
  *     tags: [Abunəliklər]
  *     parameters:
  *       - in: path
@@ -622,7 +628,6 @@ app.post('/api/abunelikler', async (req, res) => {
  *               - ad
  *               - qiymet
  *               - baslama_tarixi
- *               - novbeti_odenis_tarixi
  *             properties:
  *               ad:
  *                 type: string
@@ -630,7 +635,6 @@ app.post('/api/abunelikler', async (req, res) => {
  *               qiymet:
  *                 type: number
  *                 example: 12.99
- *                 description: 0-dan böyük olmalıdır
  *               valyuta:
  *                 type: string
  *                 enum: [AZN, USD, EUR]
@@ -643,15 +647,13 @@ app.post('/api/abunelikler', async (req, res) => {
  *                 type: string
  *                 format: date
  *                 example: "2026-01-01"
- *               novbeti_odenis_tarixi:
- *                 type: string
- *                 format: date
- *                 example: "2026-07-01"
  *               kateqoriya:
  *                 type: string
+ *                 enum: [Entertainment, Music, Education, "Health & Fitness", Productivity, Gaming, "Cloud Storage", News, "Food & Delivery", Shopping, Finance, Other]
  *                 example: Entertainment
  *               status:
  *                 type: string
+ *                 enum: [active, deactive]
  *                 example: active
  *     responses:
  *       200:
@@ -661,13 +663,10 @@ app.post('/api/abunelikler', async (req, res) => {
  */
 app.put('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
-  const { abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status } = req.body;
+  const { username, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, status } = req.body;
 
-  if (!ad || qiymet === undefined || qiymet === null || !baslama_tarixi || !novbeti_odenis_tarixi)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (ad, qiymet, baslama_tarixi, novbeti_odenis_tarixi) doldurun.');
-
-  if (abunelik_id && Number(abunelik_id) !== Number(id))
-    return errorResponse(res, 400, 'Bad Request', 'ID_IMMUTABLE', 'Abunəliyin ID-si dəyişdirilə bilməz.');
+  if (!ad || qiymet === undefined || qiymet === null || !baslama_tarixi)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (ad, qiymet, baslama_tarixi) doldurun.');
 
   const parsedQiymet = Number(qiymet);
   if (isNaN(parsedQiymet) || parsedQiymet <= 0)
@@ -683,21 +682,33 @@ app.put('/api/abunelikler/:id', async (req, res) => {
   if (!isValidDate(baslama_tarixi))
     return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Başlama tarixi düzgün deyil: "${baslama_tarixi}" (Format: YYYY-MM-DD).`);
 
-  if (!isValidDate(novbeti_odenis_tarixi))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Növbəti ödəniş tarixi düzgün deyil: "${novbeti_odenis_tarixi}" (Format: YYYY-MM-DD).`);
+  if (kateqoriya && !ICAZE_VERILEN_KATEQORIYALAR.includes(kateqoriya))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CATEGORY', `Yanlış kateqoriya: "${kateqoriya}". Yalnız ${ICAZE_VERILEN_KATEQORIYALAR.join(', ')} daxil edilə bilər.`);
+
+  const statusValue = status || 'active';
+  if (!ICAZE_VERILEN_STATUSLAR.includes(statusValue))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS', `Yanlış status: "${status}". Yalnız ${ICAZE_VERILEN_STATUSLAR.join(', ')} daxil edilə bilər.`);
+
+  const novbetiOdenisTarixi = hesablaNovbetiOdenisTarixi(baslama_tarixi, odenisTezliyi);
 
   try {
-    const subCheck = await executeQuery(`SELECT id, istifadeci_id FROM abunelikler WHERE id = :id`, { id });
+    const subCheck = await executeQuery(
+      `SELECT a.id, u.username FROM abunelikler a JOIN istifadeciler u ON a.istifadeci_id = u.id WHERE a.id = :id`, { id }
+    );
     if (subCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
 
-    if (istifadeci_id !== undefined && Number(istifadeci_id) !== Number(subCheck.rows[0].ISTIFADECI_ID))
-      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Abunəliyin aid olduğu istifadəçi (istifadeci_id) dəyişdirilə bilməz.');
+    if (username !== undefined && username !== null && username !== subCheck.rows[0].USERNAME)
+      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Abunəliyin aid olduğu istifadəçi (username) dəyişdirilə bilməz.');
 
     const sql = `UPDATE abunelikler SET ad=:ad, qiymet=:qiymet, valyuta=:valyuta, odenis_tezliyi=:odenis_tezliyi,
                  baslama_tarixi=TO_DATE(:baslama_tarixi,'YYYY-MM-DD'), novbeti_odenis_tarixi=TO_DATE(:novbeti_odenis_tarixi,'YYYY-MM-DD'),
                  kateqoriya=:kateqoriya, status=:status WHERE id=:id`;
-    await executeQuery(sql, { ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya: kateqoriya || null, status: status || 'active', id }, { autoCommit: true });
-    return successResponse(res, 200, 'Updated', { message: 'Abunəlik uğurla yeniləndi.' });
+    await executeQuery(sql, {
+      ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi,
+      baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi, kateqoriya: kateqoriya || null,
+      status: statusValue, id
+    }, { autoCommit: true });
+    return successResponse(res, 200, 'Updated', { message: 'Abunəlik uğurla yeniləndi.', novbeti_odenis_tarixi: novbetiOdenisTarixi });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
@@ -740,26 +751,33 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
  * @swagger
  * /api/bildirisler:
  *   get:
- *     summary: İstifadəçinin bildirişlərini siyahılayır
+ *     summary: İstifadəçinin bildirişlərini siyahılayır (username ilə)
  *     tags: [Bildirişlər]
  *     parameters:
  *       - in: query
- *         name: istifadeci_id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
  *       400:
- *         description: istifadeci_id göndərilmədi
+ *         description: username göndərilmədi
+ *       404:
+ *         description: İstifadəçi tapılmadı
  */
 app.get('/api/bildirisler', async (req, res) => {
-  const { istifadeci_id } = req.query;
-  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
+  const { username } = req.query;
+  if (!username) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
   try {
-    const sql = `SELECT id AS bildiris_id, istifadeci_id, basliq, mesaj, TO_CHAR(gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi FROM bildirisler WHERE istifadeci_id = :istifadeci_id ORDER BY id DESC`;
-    const result = await executeQuery(sql, { istifadeci_id });
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    const sql = `SELECT b.id AS bildiris_id, u.username, b.basliq, b.mesaj, TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi
+                 FROM bildirisler b JOIN istifadeciler u ON b.istifadeci_id = u.id
+                 WHERE b.istifadeci_id = :istifadeci_id ORDER BY b.id DESC`;
+    const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No notifications found', { notifications: [] });
     return successResponse(res, 200, 'Success', { notifications: result.rows });
   } catch (err) {
@@ -788,7 +806,9 @@ app.get('/api/bildirisler', async (req, res) => {
 app.get('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `SELECT id AS bildiris_id, istifadeci_id, basliq, mesaj, TO_CHAR(gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi FROM bildirisler WHERE id = :id`;
+    const sql = `SELECT b.id AS bildiris_id, u.username, b.basliq, b.mesaj, TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi
+                 FROM bildirisler b JOIN istifadeciler u ON b.istifadeci_id = u.id
+                 WHERE b.id = :id`;
     const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
     return successResponse(res, 200, 'Success', { notification: result.rows[0] });
@@ -801,7 +821,7 @@ app.get('/api/bildirisler/:id', async (req, res) => {
  * @swagger
  * /api/bildirisler:
  *   post:
- *     summary: Yeni bildiriş göndərir
+ *     summary: Yeni bildiriş göndərir (ID avtomatik yaranır)
  *     tags: [Bildirişlər]
  *     requestBody:
  *       required: true
@@ -810,16 +830,13 @@ app.get('/api/bildirisler/:id', async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - istifadeci_id
+ *               - username
  *               - basliq
  *               - mesaj
  *             properties:
- *               bildiris_id:
- *                 type: integer
- *                 example: 5
- *               istifadeci_id:
- *                 type: integer
- *                 example: 1
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
  *               basliq:
  *                 type: string
  *                 example: Yaxınlaşan Ödəniş
@@ -831,24 +848,19 @@ app.get('/api/bildirisler/:id', async (req, res) => {
  *         description: Bildiriş göndərildi
  */
 app.post('/api/bildirisler', async (req, res) => {
-  const { bildiris_id, istifadeci_id, basliq, mesaj } = req.body;
-  if (!istifadeci_id || !basliq || !mesaj) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (istifadeci_id, basliq, mesaj) doldurun.');
+  const { username, basliq, mesaj } = req.body;
+  if (!username || !basliq || !mesaj) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (username, basliq, mesaj) doldurun.');
   try {
-    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
-    if (userCheck.rows.length === 0) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.');
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
 
-    let sql, binds;
-    if (bildiris_id) {
-      sql = `INSERT INTO bildirisler (id, istifadeci_id, basliq, mesaj) VALUES (:bildiris_id, :istifadeci_id, :basliq, :mesaj)`;
-      binds = { bildiris_id, istifadeci_id, basliq, mesaj };
-    } else {
-      sql = `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`;
-      binds = { istifadeci_id, basliq, mesaj };
-    }
-    await executeQuery(sql, binds, { autoCommit: true });
+    await executeQuery(
+      `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`,
+      { istifadeci_id: userId, basliq, mesaj },
+      { autoCommit: true }
+    );
     return successResponse(res, 201, 'Created', { message: 'Bildiriş uğurla göndərildi.' });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ID', 'Bu bildiriş ID-si artıq mövcuddur.');
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
@@ -889,14 +901,15 @@ app.post('/api/bildirisler', async (req, res) => {
  */
 app.put('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
-  const { basliq, mesaj } = req.body;
+  const { username, basliq, mesaj } = req.body;
   if (!basliq || !mesaj) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (basliq, mesaj) doldurun.');
-  if (req.body.bildiris_id !== undefined && Number(req.body.bildiris_id) !== Number(id)) return errorResponse(res, 400, 'Bad Request', 'ID_IMMUTABLE', 'Bildirişin ID-si dəyişdirilə bilməz.');
   try {
-    const checkResult = await executeQuery(`SELECT id, istifadeci_id FROM bildirisler WHERE id = :id`, { id });
+    const checkResult = await executeQuery(
+      `SELECT b.id, u.username FROM bildirisler b JOIN istifadeciler u ON b.istifadeci_id = u.id WHERE b.id = :id`, { id }
+    );
     if (checkResult.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
-    if (req.body.istifadeci_id !== undefined && Number(req.body.istifadeci_id) !== Number(checkResult.rows[0].ISTIFADECI_ID))
-      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Bildirişin aid olduğu istifadəçi dəyişdirilə bilməz.');
+    if (username !== undefined && username !== null && username !== checkResult.rows[0].USERNAME)
+      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Bildirişin aid olduğu istifadəçi (username) dəyişdirilə bilməz.');
     await executeQuery(`UPDATE bildirisler SET basliq=:basliq, mesaj=:mesaj WHERE id=:id`, { basliq, mesaj, id }, { autoCommit: true });
     return successResponse(res, 200, 'Updated', { message: 'Bildiriş uğurla yeniləndi.' });
   } catch (err) {
@@ -941,26 +954,33 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  * @swagger
  * /api/odenis-tarixcesi:
  *   get:
- *     summary: İstifadəçinin ödəniş tarixçəsini siyahılayır
+ *     summary: İstifadəçinin ödəniş tarixçəsini siyahılayır (username ilə)
  *     tags: [Ödəniş Tarixçəsi]
  *     parameters:
  *       - in: query
- *         name: istifadeci_id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
  *       400:
- *         description: istifadeci_id göndərilmədi
+ *         description: username göndərilmədi
+ *       404:
+ *         description: İstifadəçi tapılmadı
  */
 app.get('/api/odenis-tarixcesi', async (req, res) => {
-  const { istifadeci_id } = req.query;
-  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
+  const { username } = req.query;
+  if (!username) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
   try {
-    const sql = `SELECT id AS odenis_tarixcesi_id, abunelik_id, istifadeci_id, TO_CHAR(odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi, mebleq, status FROM odenis_tarixcesi WHERE istifadeci_id = :istifadeci_id ORDER BY odenis_tarixi DESC`;
-    const result = await executeQuery(sql, { istifadeci_id });
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    const sql = `SELECT o.id AS odenis_tarixcesi_id, o.abunelik_id, u.username, TO_CHAR(o.odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi, o.mebleq, o.status
+                 FROM odenis_tarixcesi o JOIN istifadeciler u ON o.istifadeci_id = u.id
+                 WHERE o.istifadeci_id = :istifadeci_id ORDER BY o.odenis_tarixi DESC`;
+    const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No payment history found', { paymentHistory: [] });
     return successResponse(res, 200, 'Success', { paymentHistory: result.rows });
   } catch (err) {
@@ -989,7 +1009,9 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
 app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `SELECT id AS odenis_tarixcesi_id, abunelik_id, istifadeci_id, TO_CHAR(odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi, mebleq, status FROM odenis_tarixcesi WHERE id = :id`;
+    const sql = `SELECT o.id AS odenis_tarixcesi_id, o.abunelik_id, u.username, TO_CHAR(o.odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi, o.mebleq, o.status
+                 FROM odenis_tarixcesi o JOIN istifadeciler u ON o.istifadeci_id = u.id
+                 WHERE o.id = :id`;
     const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
     return successResponse(res, 200, 'Success', { paymentHistory: result.rows[0] });
@@ -1002,7 +1024,7 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
  * @swagger
  * /api/odenis-tarixcesi:
  *   post:
- *     summary: Yeni ödəniş tarixçəsi qeydi əlavə edir
+ *     summary: Yeni ödəniş tarixçəsi qeydi əlavə edir (username ilə)
  *     tags: [Ödəniş Tarixçəsi]
  *     requestBody:
  *       required: true
@@ -1012,19 +1034,16 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
  *             type: object
  *             required:
  *               - abunelik_id
- *               - istifadeci_id
+ *               - username
  *               - odenis_tarixi
  *               - mebleq
  *             properties:
- *               odenis_tarixcesi_id:
- *                 type: integer
- *                 example: 5
  *               abunelik_id:
  *                 type: integer
  *                 example: 1
- *               istifadeci_id:
- *                 type: integer
- *                 example: 1
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
  *               odenis_tarixi:
  *                 type: string
  *                 format: date
@@ -1041,33 +1060,28 @@ app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
  *         description: Əlavə edildi
  */
 app.post('/api/odenis-tarixcesi', async (req, res) => {
-  const { odenis_tarixcesi_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status } = req.body;
-  if (!abunelik_id || !istifadeci_id || !odenis_tarixi || mebleq === undefined || mebleq === null)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (abunelik_id, istifadeci_id, odenis_tarixi, mebleq) doldurun.');
+  const { abunelik_id, username, odenis_tarixi, mebleq, status } = req.body;
+  if (!abunelik_id || !username || !odenis_tarixi || mebleq === undefined || mebleq === null)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (abunelik_id, username, odenis_tarixi, mebleq) doldurun.');
   if (!isValidDate(odenis_tarixi))
     return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Ödəniş tarixi düzgün deyil: "${odenis_tarixi}" (Format: YYYY-MM-DD).`);
   const statusValue = status || 'success';
   if (statusValue !== 'success' && statusValue !== 'fail')
     return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS', 'Status yalnız "success" və ya "fail" ola bilər.');
   try {
-    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
-    if (userCheck.rows.length === 0) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.');
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
     const subCheck = await executeQuery(`SELECT id, istifadeci_id FROM abunelikler WHERE id = :abunelik_id`, { abunelik_id });
     if (subCheck.rows.length === 0) return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_NOT_FOUND', 'Qeyd olunan abunəlik (abunelik_id) mövcud deyil.');
-    if (Number(subCheck.rows[0].ISTIFADECI_ID) !== Number(istifadeci_id)) return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_USER_MISMATCH', 'Qeyd olunan abunəlik daxil etdiyiniz istifadəçiyə məxsus deyil.');
+    if (Number(subCheck.rows[0].ISTIFADECI_ID) !== Number(userId)) return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_USER_MISMATCH', 'Qeyd olunan abunəlik daxil etdiyiniz istifadəçiyə məxsus deyil.');
 
-    let sql, binds;
-    if (odenis_tarixcesi_id) {
-      sql = `INSERT INTO odenis_tarixcesi (id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status) VALUES (:odenis_tarixcesi_id, :abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi,'YYYY-MM-DD'), :mebleq, :status)`;
-      binds = { odenis_tarixcesi_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status: statusValue };
-    } else {
-      sql = `INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status) VALUES (:abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi,'YYYY-MM-DD'), :mebleq, :status)`;
-      binds = { abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status: statusValue };
-    }
-    await executeQuery(sql, binds, { autoCommit: true });
+    await executeQuery(
+      `INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status) VALUES (:abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi,'YYYY-MM-DD'), :mebleq, :status)`,
+      { abunelik_id, istifadeci_id: userId, odenis_tarixi, mebleq, status: statusValue },
+      { autoCommit: true }
+    );
     return successResponse(res, 201, 'Created', { message: 'Ödəniş tarixçəsi qeydi uğurla əlavə edildi.' });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ID', 'Bu ödəniş tarixçəsi ID-si artıq mövcuddur.');
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
@@ -1113,7 +1127,7 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
  */
 app.put('/api/odenis-tarixcesi/:id', async (req, res) => {
   const { id } = req.params;
-  const { odenis_tarixi, mebleq, status } = req.body;
+  const { username, abunelik_id, odenis_tarixi, mebleq, status } = req.body;
   if (!odenis_tarixi || mebleq === undefined || mebleq === null)
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (odenis_tarixi, mebleq) doldurun.');
   if (!isValidDate(odenis_tarixi))
@@ -1122,12 +1136,15 @@ app.put('/api/odenis-tarixcesi/:id', async (req, res) => {
   if (statusValue !== 'success' && statusValue !== 'fail')
     return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS', 'Status yalnız "success" və ya "fail" ola bilər.');
   try {
-    const historyCheck = await executeQuery(`SELECT id, abunelik_id, istifadeci_id FROM odenis_tarixcesi WHERE id = :id`, { id });
+    const historyCheck = await executeQuery(
+      `SELECT o.id, o.abunelik_id, u.username FROM odenis_tarixcesi o JOIN istifadeciler u ON o.istifadeci_id = u.id WHERE o.id = :id`, { id }
+    );
     if (historyCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
-    const { ABUNELIK_ID: currentAbunelikId, ISTIFADECI_ID: currentIstifadeciId } = historyCheck.rows[0];
-    if (req.body.odenis_tarixcesi_id !== undefined && Number(req.body.odenis_tarixcesi_id) !== Number(id)) return errorResponse(res, 400, 'Bad Request', 'ID_IMMUTABLE', 'Ödəniş tarixçəsinin ID-si dəyişdirilə bilməz.');
-    if (req.body.istifadeci_id !== undefined && Number(req.body.istifadeci_id) !== Number(currentIstifadeciId)) return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Ödəniş tarixçəsinin aid olduğu istifadəçi dəyişdirilə bilməz.');
-    if (req.body.abunelik_id !== undefined && Number(req.body.abunelik_id) !== Number(currentAbunelikId)) return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_IMMUTABLE', 'Ödəniş tarixçəsinin aid olduğu abunəlik dəyişdirilə bilməz.');
+    const { ABUNELIK_ID: currentAbunelikId, USERNAME: currentUsername } = historyCheck.rows[0];
+    if (username !== undefined && username !== null && username !== currentUsername)
+      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Ödəniş tarixçəsinin aid olduğu istifadəçi dəyişdirilə bilməz.');
+    if (abunelik_id !== undefined && Number(abunelik_id) !== Number(currentAbunelikId))
+      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_IMMUTABLE', 'Ödəniş tarixçəsinin aid olduğu abunəlik dəyişdirilə bilməz.');
     await executeQuery(`UPDATE odenis_tarixcesi SET abunelik_id=:abunelik_id, odenis_tarixi=TO_DATE(:odenis_tarixi,'YYYY-MM-DD'), mebleq=:mebleq, status=:status WHERE id=:id`,
       { abunelik_id: currentAbunelikId, odenis_tarixi, mebleq, status: statusValue, id }, { autoCommit: true });
     return successResponse(res, 200, 'Updated', { message: 'Ödəniş tarixçəsi uğurla yeniləndi.' });
@@ -1173,24 +1190,29 @@ app.delete('/api/odenis-tarixcesi/:id', async (req, res) => {
  * @swagger
  * /api/odenis-metodlari:
  *   get:
- *     summary: İstifadəçinin ödəniş metodlarını siyahılayır
+ *     summary: İstifadəçinin ödəniş metodlarını siyahılayır (username ilə)
  *     tags: [Ödəniş Metodları]
  *     parameters:
  *       - in: query
- *         name: istifadeci_id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
  */
 app.get('/api/odenis-metodlari', async (req, res) => {
-  const { istifadeci_id } = req.query;
-  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
+  const { username } = req.query;
+  if (!username) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
   try {
-    const sql = `SELECT id AS card_id, istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status FROM odenis_metodlari WHERE istifadeci_id = :istifadeci_id`;
-    const result = await executeQuery(sql, { istifadeci_id });
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    const sql = `SELECT c.id AS card_id, u.username, c.ad, c.kart_tipi, c.son_dord_reqem, c.kart_istifade_tarixi, c.status
+                 FROM odenis_metodlari c JOIN istifadeciler u ON c.istifadeci_id = u.id
+                 WHERE c.istifadeci_id = :istifadeci_id`;
+    const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No payment methods found', { cards: [] });
     return successResponse(res, 200, 'Success', { cards: result.rows });
   } catch (err) {
@@ -1219,7 +1241,9 @@ app.get('/api/odenis-metodlari', async (req, res) => {
 app.get('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `SELECT id AS card_id, istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status FROM odenis_metodlari WHERE id = :id`;
+    const sql = `SELECT c.id AS card_id, u.username, c.ad, c.kart_tipi, c.son_dord_reqem, c.kart_istifade_tarixi, c.status
+                 FROM odenis_metodlari c JOIN istifadeciler u ON c.istifadeci_id = u.id
+                 WHERE c.id = :id`;
     const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
     return successResponse(res, 200, 'Success', { card: result.rows[0] });
@@ -1232,7 +1256,7 @@ app.get('/api/odenis-metodlari/:id', async (req, res) => {
  * @swagger
  * /api/odenis-metodlari:
  *   post:
- *     summary: Yeni ödəniş metodu (kart) əlavə edir
+ *     summary: Yeni ödəniş metodu (kart) əlavə edir (username ilə)
  *     tags: [Ödəniş Metodları]
  *     requestBody:
  *       required: true
@@ -1241,12 +1265,13 @@ app.get('/api/odenis-metodlari/:id', async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - istifadeci_id
+ *               - username
  *               - ad
  *               - kart_tipi
  *             properties:
- *               istifadeci_id:
- *                 type: integer
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
  *               ad:
  *                 type: string
  *                 example: Maaş Kartı
@@ -1265,8 +1290,8 @@ app.get('/api/odenis-metodlari/:id', async (req, res) => {
  *         description: Ödəniş metodu yaradıldı
  */
 app.post('/api/odenis-metodlari', async (req, res) => {
-  const { istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi } = req.body;
-  if (!istifadeci_id || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'istifadeci_id, ad və kart_tipi sahələri məcburidir.');
+  const { username, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi } = req.body;
+  if (!username || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və kart_tipi sahələri məcburidir.');
 
   const ICAZE_VERILEN_KARTLAR = ['visa','mastercard','maestro','unionpay','american express','amex','birkart','tamkart','bolkart','ucard'];
   const KART_FORMATLARI = { 'visa':'Visa','mastercard':'Mastercard','maestro':'Maestro','unionpay':'UnionPay','american express':'American Express','amex':'American Express','birkart':'Birkart','tamkart':'Tamkart','bolkart':'Bolkart','ucard':'Ucard' };
@@ -1275,11 +1300,11 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CARD_TYPE', `Yanlış kart növü: "${kart_tipi}". Yalnız Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard icazəlidir.`);
 
   try {
-    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
-    if (userCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
     await executeQuery(
       `INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi) VALUES (:istifadeci_id, :ad, :kart_tipi, :son_dord_reqem, :kart_istifade_tarixi)`,
-      { istifadeci_id, ad, kart_tipi: KART_FORMATLARI[normalizedKartTipi], son_dord_reqem: son_dord_reqem || null, kart_istifade_tarixi: kart_istifade_tarixi || null }, { autoCommit: true }
+      { istifadeci_id: userId, ad, kart_tipi: KART_FORMATLARI[normalizedKartTipi], son_dord_reqem: son_dord_reqem || null, kart_istifade_tarixi: kart_istifade_tarixi || null }, { autoCommit: true }
     );
     return successResponse(res, 201, 'Created', { message: 'Ödəniş metodu uğurla əlavə edildi.' });
   } catch (err) {
@@ -1291,7 +1316,7 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  * @swagger
  * /api/odenis-metodlari/{id}:
  *   put:
- *     summary: Ödəniş metodunu yeniləyir
+ *     summary: Ödəniş metodunu yeniləyir (status bu endpointdə dəyişdirilmir)
  *     tags: [Ödəniş Metodları]
  *     parameters:
  *       - in: path
@@ -1322,16 +1347,13 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  *               kart_istifade_tarixi:
  *                 type: string
  *                 example: "12/28"
- *               status:
- *                 type: string
- *                 example: active
  *     responses:
  *       200:
  *         description: Yeniləndi
  */
 app.put('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
-  const { ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status } = req.body;
+  const { ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi } = req.body;
   if (!ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'ad və kart_tipi sahələri məcburidir.');
 
   const ICAZE_VERILEN_KARTLAR = ['visa','mastercard','maestro','unionpay','american express','amex','birkart','tamkart','bolkart','ucard'];
@@ -1342,8 +1364,8 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
 
   try {
     const result = await executeQuery(
-      `UPDATE odenis_metodlari SET ad=:ad, kart_tipi=:kart_tipi, son_dord_reqem=:son_dord_reqem, kart_istifade_tarixi=:kart_istifade_tarixi, status=:status WHERE id=:id`,
-      { ad, kart_tipi: KART_FORMATLARI[normalizedKartTipi], son_dord_reqem: son_dord_reqem || null, kart_istifade_tarixi: kart_istifade_tarixi || null, status: status || 'active', id }, { autoCommit: true }
+      `UPDATE odenis_metodlari SET ad=:ad, kart_tipi=:kart_tipi, son_dord_reqem=:son_dord_reqem, kart_istifade_tarixi=:kart_istifade_tarixi WHERE id=:id`,
+      { ad, kart_tipi: KART_FORMATLARI[normalizedKartTipi], son_dord_reqem: son_dord_reqem || null, kart_istifade_tarixi: kart_istifade_tarixi || null, id }, { autoCommit: true }
     );
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
     return successResponse(res, 200, 'Updated', { message: 'Ödəniş metodu uğurla yeniləndi.' });
@@ -1387,24 +1409,29 @@ app.delete('/api/odenis-metodlari/:id', async (req, res) => {
  * @swagger
  * /api/budceler:
  *   get:
- *     summary: İstifadəçinin büdcə limitlərini siyahılayır
+ *     summary: İstifadəçinin büdcə limitlərini siyahılayır (username ilə)
  *     tags: [Büdcələr]
  *     parameters:
  *       - in: query
- *         name: istifadeci_id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
  */
 app.get('/api/budceler', async (req, res) => {
-  const { istifadeci_id } = req.query;
-  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
+  const { username } = req.query;
+  if (!username) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
   try {
-    const sql = `SELECT istifadeci_id, limit_mebleq, valyuta, bildiris_faizi FROM budceler WHERE istifadeci_id = :istifadeci_id`;
-    const result = await executeQuery(sql, { istifadeci_id });
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    const sql = `SELECT b.istifadeci_id, u.username, b.limit_mebleq, b.valyuta, b.hesab_mebleqi
+                 FROM budceler b JOIN istifadeciler u ON b.istifadeci_id = u.id
+                 WHERE b.istifadeci_id = :istifadeci_id`;
+    const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No budget found', { budgets: [] });
     return successResponse(res, 200, 'Success', { budgets: result.rows });
   } catch (err) {
@@ -1416,7 +1443,7 @@ app.get('/api/budceler', async (req, res) => {
  * @swagger
  * /api/budceler:
  *   post:
- *     summary: Yeni büdcə limiti əlavə edir
+ *     summary: Yeni büdcə limiti əlavə edir (hesabdakı məbləğ limitdən çox ola bilməz)
  *     tags: [Büdcələr]
  *     requestBody:
  *       required: true
@@ -1425,34 +1452,49 @@ app.get('/api/budceler', async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - istifadeci_id
+ *               - username
  *               - limit_mebleq
  *             properties:
- *               istifadeci_id:
- *                 type: integer
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
  *               limit_mebleq:
  *                 type: number
  *                 example: 50.00
  *               valyuta:
  *                 type: string
  *                 example: AZN
- *               bildiris_faizi:
+ *               hesab_mebleqi:
  *                 type: number
- *                 example: 90.00
+ *                 example: 30.00
+ *                 description: Hesabda hazırda olan/xərclənmiş məbləğ. limit_mebleq-dən çox ola bilməz.
  *     responses:
  *       201:
  *         description: Yaradıldı
+ *       400:
+ *         description: hesab_mebleqi limit_mebleq-dən çoxdur
  */
 app.post('/api/budceler', async (req, res) => {
-  const { istifadeci_id, limit_mebleq, valyuta, bildiris_faizi } = req.body;
-  if (!istifadeci_id || limit_mebleq === undefined) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'istifadeci_id və limit_mebleq sahələri məcburidir.');
+  const { username, limit_mebleq, valyuta, hesab_mebleqi } = req.body;
+  if (!username || limit_mebleq === undefined || limit_mebleq === null) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username və limit_mebleq sahələri məcburidir.');
+
+  const parsedLimit = Number(limit_mebleq);
+  if (isNaN(parsedLimit) || parsedLimit <= 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
+
+  const parsedHesab = (hesab_mebleqi !== undefined && hesab_mebleqi !== null) ? Number(hesab_mebleqi) : 0;
+  if (isNaN(parsedHesab) || parsedHesab < 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
+
+  if (parsedHesab > parsedLimit)
+    return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED', 'Hesabdakı məbləğ limit məbləğdən çox ola bilməz.');
+
   if (valyuta && !isValidCurrency(valyuta)) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
+
   try {
-    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
-    if (userCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
     await executeQuery(
-      `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, bildiris_faizi) VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :bildiris_faizi)`,
-      { istifadeci_id, limit_mebleq, valyuta: getValidCurrency(valyuta), bildiris_faizi: bildiris_faizi || 90.00 }, { autoCommit: true }
+      `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, hesab_mebleqi) VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :hesab_mebleqi)`,
+      { istifadeci_id: userId, limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab }, { autoCommit: true }
     );
     return successResponse(res, 201, 'Created', { message: 'Büdcə limiti uğurla quraşdırıldı.' });
   } catch (err) {
@@ -1464,7 +1506,7 @@ app.post('/api/budceler', async (req, res) => {
  * @swagger
  * /api/budceler/{id}:
  *   put:
- *     summary: Büdcə limitini yeniləyir
+ *     summary: Büdcə limitini yeniləyir (hesabdakı məbləğ limitdən çox ola bilməz)
  *     tags: [Büdcələr]
  *     parameters:
  *       - in: path
@@ -1487,22 +1529,35 @@ app.post('/api/budceler', async (req, res) => {
  *               valyuta:
  *                 type: string
  *                 example: AZN
- *               bildiris_faizi:
+ *               hesab_mebleqi:
  *                 type: number
- *                 example: 95.00
+ *                 example: 40.00
  *     responses:
  *       200:
  *         description: Yeniləndi
+ *       400:
+ *         description: hesab_mebleqi limit_mebleq-dən çoxdur
  */
 app.put('/api/budceler/:id', async (req, res) => {
   const { id } = req.params;
-  const { limit_mebleq, valyuta, bildiris_faizi } = req.body;
+  const { limit_mebleq, valyuta, hesab_mebleqi } = req.body;
   if (limit_mebleq === undefined) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'limit_mebleq sahəsi məcburidir.');
+
+  const parsedLimit = Number(limit_mebleq);
+  if (isNaN(parsedLimit) || parsedLimit <= 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
+
+  const parsedHesab = (hesab_mebleqi !== undefined && hesab_mebleqi !== null) ? Number(hesab_mebleqi) : 0;
+  if (isNaN(parsedHesab) || parsedHesab < 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
+
+  if (parsedHesab > parsedLimit)
+    return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED', 'Hesabdakı məbləğ limit məbləğdən çox ola bilməz.');
+
   if (valyuta && !isValidCurrency(valyuta)) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
+
   try {
     const result = await executeQuery(
-      `UPDATE budceler SET limit_mebleq=:limit_mebleq, valyuta=:valyuta, bildiris_faizi=:bildiris_faizi WHERE id=:id`,
-      { limit_mebleq, valyuta: getValidCurrency(valyuta), bildiris_faizi: bildiris_faizi || 90.00, id }, { autoCommit: true }
+      `UPDATE budceler SET limit_mebleq=:limit_mebleq, valyuta=:valyuta, hesab_mebleqi=:hesab_mebleqi WHERE id=:id`,
+      { limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab, id }, { autoCommit: true }
     );
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'BUDGET_NOT_FOUND', 'Büdcə limiti tapılmadı.');
     return successResponse(res, 200, 'Updated', { message: 'Büdcə limiti uğurla yeniləndi.' });
@@ -1517,33 +1572,38 @@ app.put('/api/budceler/:id', async (req, res) => {
 
 /**
  * @swagger
- * /api/ayarlar/{istifadeci_id}:
+ * /api/ayarlar/{username}:
  *   get:
- *     summary: İstifadəçinin fərdi ayarlarını gətirir
+ *     summary: İstifadəçinin fərdi ayarlarını gətirir (username ilə)
  *     tags: [Ayarlar]
  *     parameters:
  *       - in: path
- *         name: istifadeci_id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
+ *       404:
+ *         description: İstifadəçi tapılmadı
  */
-app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
-  const { istifadeci_id } = req.params;
+app.get('/api/ayarlar/:username', async (req, res) => {
+  const { username } = req.params;
   try {
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
     const sql = `SELECT istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`;
-    const result = await executeQuery(sql, { istifadeci_id });
+    const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) {
       await executeQuery(
         `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema) VALUES (:istifadeci_id, 'AZN', 'email', 'az', 'dark')`,
-        { istifadeci_id }, { autoCommit: true }
+        { istifadeci_id: userId }, { autoCommit: true }
       );
-      return successResponse(res, 200, 'Success', { settings: { istifadeci_id: Number(istifadeci_id), esas_valyuta: 'AZN', bildiris_metodu: 'email', dil: 'az', tema: 'dark' } });
+      return successResponse(res, 200, 'Success', { settings: { istifadeci_id: userId, username, esas_valyuta: 'AZN', bildiris_metodu: 'email', dil: 'az', tema: 'dark' } });
     }
-    return successResponse(res, 200, 'Success', { settings: result.rows[0] });
+    return successResponse(res, 200, 'Success', { settings: { ...result.rows[0], USERNAME: username } });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
@@ -1551,16 +1611,16 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
 
 /**
  * @swagger
- * /api/ayarlar/{istifadeci_id}:
+ * /api/ayarlar/{username}:
  *   put:
- *     summary: İstifadəçinin fərdi ayarlarını yeniləyir
+ *     summary: İstifadəçinin fərdi ayarlarını yeniləyir (username ilə)
  *     tags: [Ayarlar]
  *     parameters:
  *       - in: path
- *         name: istifadeci_id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -1586,9 +1646,11 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
  *     responses:
  *       200:
  *         description: Ayarlar yeniləndi
+ *       404:
+ *         description: İstifadəçi tapılmadı
  */
-app.put('/api/ayarlar/:istifadeci_id', async (req, res) => {
-  const { istifadeci_id } = req.params;
+app.put('/api/ayarlar/:username', async (req, res) => {
+  const { username } = req.params;
   const { esas_valyuta, bildiris_metodu, dil, tema } = req.body;
   const ICAZE_VERILEN_VALYUTALAR_L = ['AZN', 'USD', 'EUR'];
   const ICAZE_VERILEN_BILDIRISLER  = ['email', 'telegram'];
@@ -1601,10 +1663,10 @@ app.put('/api/ayarlar/:istifadeci_id', async (req, res) => {
   if (dil && !ICAZE_VERILEN_DILLER.includes(dil.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_LANGUAGE', `Yanlış dil kodu: "${dil}". ISO 639-1 formatında olmalıdır.`);
 
   try {
-    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
-    if (userCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    const userId = await getUserIdByUsername(username);
+    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    const settingsCheck = await executeQuery(`SELECT istifadeci_id FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`, { istifadeci_id });
+    const settingsCheck = await executeQuery(`SELECT istifadeci_id FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`, { istifadeci_id: userId });
     let sql;
     if (settingsCheck.rows.length > 0) {
       sql = `UPDATE istifadeci_ayarlari SET esas_valyuta=:esas_valyuta, bildiris_metodu=:bildiris_metodu, dil=:dil, tema=:tema WHERE istifadeci_id=:istifadeci_id`;
@@ -1612,7 +1674,7 @@ app.put('/api/ayarlar/:istifadeci_id', async (req, res) => {
       sql = `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema) VALUES (:istifadeci_id, :esas_valyuta, :bildiris_metodu, :dil, :tema)`;
     }
     await executeQuery(sql, {
-      istifadeci_id,
+      istifadeci_id: userId,
       esas_valyuta: esas_valyuta ? esas_valyuta.toUpperCase() : 'AZN',
       bildiris_metodu: bildiris_metodu ? bildiris_metodu.toLowerCase() : 'email',
       dil: dil ? dil.toLowerCase() : 'az',
