@@ -1214,62 +1214,7 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/odenis-tarixcesi/{id}:
- *   put:
- *     summary: >
- *       Ödəniş tarixçəsi qeydini yeniləyir.
- *       Qeydin aid olduğu istifadəçi (username) və abunəlik (abunelik_id) dəyişdirilə bilməz.
- *       odenis_tarixi abunəliyin hazırkı novbeti_odenis_tarixi ilə eyni olmalıdır.
- *     tags: [Ödəniş Tarixçəsi]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - odenis_tarixi
- *               - mebleq
- *             properties:
- *               username:
- *                 type: string
- *                 description: >
- *                   İstəyə görə göndərilə bilər, lakin mövcud qeydin
- *                   username-i ilə eyni olmalıdır — dəyişdirilmir.
- *               abunelik_id:
- *                 type: integer
- *                 description: >
- *                   İstəyə görə göndərilə bilər, lakin mövcud qeydin
- *                   abunelik_id-si ilə eyni olmalıdır — dəyişdirilmir.
- *               odenis_tarixi:
- *                 type: string
- *                 format: date
- *                 example: "2026-07-01"
- *                 description: >
- *                   Abunəliyin novbeti_odenis_tarixi ilə eyni olmalıdır.
- *               mebleq:
- *                 type: number
- *                 example: 12.99
- *               status:
- *                 type: string
- *                 enum: [success, fail]
- *                 example: success
- *     responses:
- *       200:
- *         description: Yeniləndi
- *       400:
- *         description: username, abunelik_id uyğun gəlmir və ya tarix yanlışdır
- *       404:
- *         description: Tapılmadı
- */
+
 
 // DELETE — ödəniş tarixçəsi üçün DELETE əməliyyatı mövcud deyil (biznes qaydası).
 // /api/odenis-tarixcesi/:id DELETE → 405 Method Not Allowed
