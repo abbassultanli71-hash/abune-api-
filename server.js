@@ -160,13 +160,27 @@ function errorResponse(res, statusCode, message, errorCode, errorMessage) {
 }
 
 // Abunəlik yarananda avtomatik bildiriş əlavə edir
-async function addAutoNotification(userId, appAd, novbetiOdenisTarixi) {
+async function addAutoNotification(userId, appAd, novbetiOdenisTarixi, odenisTezliyi) {
   try {
+    const [y, m, d] = novbetiOdenisTarixi.split('-').map(Number);
+    const gonderilme = new Date(Date.UTC(y, m - 1, d));
+    switch (odenisTezliyi) {
+      case 'weekly':    gonderilme.setUTCDate(gonderilme.getUTCDate() - 2); break;
+      case 'monthly':   gonderilme.setUTCDate(gonderilme.getUTCDate() - 7); break;
+      case 'quarterly': gonderilme.setUTCDate(gonderilme.getUTCDate() - 7); break;
+      case 'yearly':    gonderilme.setUTCDate(gonderilme.getUTCDate() - 14); break;
+      default:          gonderilme.setUTCDate(gonderilme.getUTCDate() - 7); break;
+    }
+    const yyyy = gonderilme.getUTCFullYear();
+    const mm = String(gonderilme.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(gonderilme.getUTCDate()).padStart(2, '0');
+    const gonderilmeTarixiStr = `${yyyy}-${mm}-${dd}`;
     const basliq = `${appAd} abunəliyi aktivdir`;
     const mesaj = `${appAd} abunəliyiniz uğurla aktivləşdirildi. Növbəti ödəniş tarixi: ${novbetiOdenisTarixi}.`;
     await executeQuery(
-      `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`,
-      { istifadeci_id: userId, basliq, mesaj },
+      `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj, gonderilme_tarixi)
+       VALUES (:istifadeci_id, :basliq, :mesaj, :gonderilme_tarixi)`,
+      { istifadeci_id: userId, basliq, mesaj, gonderilme_tarixi: gonderilmeTarixiStr },
       { autoCommit: true }
     );
   } catch (err) {
@@ -583,7 +597,7 @@ app.post('/api/abunelikler', async (req, res) => {
     const newSubId = newSub.rows.length > 0 ? newSub.rows[0].ID : null;
 
     // Avtomatik bildiriş əlavə et
-    await addAutoNotification(userId, ad, novbetiOdenisTarixi);
+    await addAutoNotification(userId, ad, novbetiOdenisTarixi, odenisTezliyi);
 
     // Avtomatik ödəniş tarixçəsi əlavə et
     if (newSubId) {
