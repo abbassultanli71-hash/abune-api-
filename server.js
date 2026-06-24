@@ -999,7 +999,7 @@ app.post('/api/bildirisler', async (req, res) => {
  *       200:
  *         description: Bildiriş yeniləndi
  *       400:
- *         description: username və ya abunelik_id uyğun gəlmir
+ *         description: username, abunelik_id uyğun gəlmir, və ya basliq/mesaj-da app_adi düzgün deyil
  *       404:
  *         description: Bildiriş tapılmadı
  */
@@ -1016,11 +1016,12 @@ app.put('/api/bildirisler/:id', async (req, res) => {
     return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'basliq və mesaj boş ola bilməz.');
 
   try {
-    // Mövcud bildirişi yoxla
+    // Mövcud bildirişi və aid olduğu abunəliyin adını (app_adi) bir sorğuda gətir
     const checkResult = await executeQuery(
-      `SELECT b.id, b.abunelik_id, u.username
+      `SELECT b.id, b.abunelik_id, u.username, a.ad AS app_adi
        FROM bildirisler b
        JOIN istifadeciler u ON b.istifadeci_id = u.id
+       JOIN abunelikler   a ON b.abunelik_id   = a.id
        WHERE b.id = :id`,
       { id }
     );
@@ -1039,6 +1040,16 @@ app.put('/api/bildirisler/:id', async (req, res) => {
       return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_IMMUTABLE',
         `Bildirişin aid olduğu abunəlik (app) dəyişdirilə bilməz. Mövcud abunelik_id: ${current.ABUNELIK_ID}.`);
 
+    // basliq və mesaj daxilində app_adi TAM SÖZ kimi olmalıdır (məs. "Netflixsdfsdf" qəbul edilmir)
+    const appAdi = current.APP_ADI;
+    if (appAdi && !appAdiSozKimiVarmi(trimmedBasliq, appAdi))
+      return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
+        `Başlıqda "${appAdi}" adı tam söz şəklində olmalıdır. Məsələn: "${appAdi} - Yenilənmiş Xatırlatma".`);
+
+    if (appAdi && !appAdiSozKimiVarmi(trimmedMesaj, appAdi))
+      return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
+        `Mesajda "${appAdi}" adı tam söz şəklində olmalıdır.`);
+
     // Yalnız başlıq və mesajı yenilə
     await executeQuery(
       `UPDATE bildirisler SET basliq = :basliq, mesaj = :mesaj WHERE id = :id`,
@@ -1050,26 +1061,26 @@ app.put('/api/bildirisler/:id', async (req, res) => {
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
-// app_adi yoxlaması
-    const appAdiResult = await executeQuery(
-      `SELECT a.ad AS app_adi FROM abunelikler a WHERE a.id = :abunelik_id`,
-      { abunelik_id: current.ABUNELIK_ID }
-    );
-    const appAdi = appAdiResult.rows[0]?.APP_ADI || '';
+});
 
-    if (appAdi && !trimmedBasliq.startsWith(appAdi))
-      return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
-        `Başlıq "${appAdi}" app adı ilə başlamalıdır. Məsələn: "${appAdi} - Yenilənmiş Xatırlatma".`);
-
-    if (appAdi && !trimmedMesaj.includes(appAdi))
-      return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
-        `Mesaj içərisində "${appAdi}" app adı olmalıdır.`);
-
-    // Yalnız başlıq və mesajı yenilə
-    await executeQuery(
-      `UPDATE bildirisler SET basliq = :basliq, mesaj = :mesaj WHERE id = :id`,
-
-
+/**
+ * @swagger
+ * /api/bildirisler/{id}:
+ *   delete:
+ *     summary: Bildirişi silir
+ *     tags: [Bildirişlər]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Bildiriş silindi
+ *       404:
+ *         description: Bildiriş tapılmadı
+ */
 app.delete('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
   try {
