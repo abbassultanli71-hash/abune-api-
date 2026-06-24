@@ -476,25 +476,6 @@ app.get('/api/abunelikler', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/abunelikler/{id}:
- *   get:
- *     summary: ID-yə görə abunəliyi gətirir
- *     tags: [Abunəliklər]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *       404:
- *         description: Abunəlik tapılmadı
- */
-
 
 /**
  * @swagger
@@ -810,25 +791,7 @@ app.get('/api/bildirisler', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/bildirisler/{id}:
- *   get:
- *     summary: ID-yə görə bildirişi gətirir
- *     tags: [Bildirişlər]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Bildiriş ID-si
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *       404:
- *         description: Bildiriş tapılmadı
- */
+
 
 /**
  * @swagger
@@ -1106,25 +1069,7 @@ app.put('/api/bildirisler/:id', async (req, res) => {
     await executeQuery(
       `UPDATE bildirisler SET basliq = :basliq, mesaj = :mesaj WHERE id = :id`,
 
-/**
- * @swagger
- * /api/bildirisler/{id}:
- *   delete:
- *     summary: Bildirişi silir
- *     tags: [Bildirişlər]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Bildiriş ID-si
- *     responses:
- *       200:
- *         description: Bildiriş silindi
- *       404:
- *         description: Bildiriş tapılmadı
- */
+
 app.delete('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -1235,24 +1180,7 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/odenis-tarixcesi/{id}:
- *   get:
- *     summary: ID-yə görə ödəniş tarixçəsi qeydini gətirir
- *     tags: [Ödəniş Tarixçəsi]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *       404:
- *         description: Tapılmadı
- */
+
 
 
 /**
