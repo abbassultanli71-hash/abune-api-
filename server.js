@@ -810,27 +810,14 @@ app.get('/api/bildirisler', async (req, res) => {
     );
 
     // Aktiv abunəliklərə əsasən avtomatik bildirişlər
-    const abunelikler = await executeQuery(
-      `SELECT ad, TO_CHAR(novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi
-       FROM abunelikler WHERE istifadeci_id = :istifadeci_id AND status = 'active'`,
+   const result = await executeQuery(
+      `SELECT b.id AS bildiris_id, u.username, b.basliq, b.mesaj,
+              TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD HH24:MI:SS') as gonderilme_tarixi
+       FROM bildirisler b JOIN istifadeciler u ON b.istifadeci_id = u.id
+       WHERE b.istifadeci_id = :istifadeci_id ORDER BY b.id DESC`,
       { istifadeci_id: userId }
     );
-
-    const avtoBildirisler = abunelikler.rows.map(a => ({
-      bildiris_id: null,
-      username,
-      basliq: `${a.AD} abunəliyinin vaxtı yaxınlaşır`,
-      mesaj: `${a.AD} abunəliyinizin növbəti ödəniş tarixi: ${a.NOVBETI_ODENIS_TARIXI}.`,
-      gonderilme_tarixi: null,
-      tip: 'auto'
-    }));
-
-    const hamisi = [
-      ...avtoBildirisler,
-      ...dbBildirisler.rows.map(b => ({ ...b, tip: 'manual' }))
-    ];
-
-    return successResponse(res, 200, 'Success', { notifications: hamisi });
+    return successResponse(res, 200, 'Success', { notifications: result.rows });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
