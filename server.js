@@ -173,45 +173,6 @@ function errorResponse(res, statusCode, message, errorCode, errorMessage) {
 // =============================================
 // --- ISTIFADECILER (Users) ROUTES ---
 // =============================================
-
-/**
- * @swagger
- * /api/istifadeciler:
- *   get:
- *     summary: Bütün istifadəçiləri siyahılayır
- *     tags: [İstifadəçilər]
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: Success
- *                 data:
- *                   type: object
- *                   properties:
- *                     users:
- *                       type: array
- *                       items:
- *                         type: object
- */
-app.get('/api/istifadeciler', async (req, res) => {
-  try {
-    const sql = `SELECT id, username, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler ORDER BY id`;
-    const result = await executeQuery(sql);
-    return successResponse(res, 200, 'Success', { users: result.rows });
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
-});
-
 /**
  * @swagger
  * /api/istifadeciler/{username}:
