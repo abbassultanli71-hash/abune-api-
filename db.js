@@ -34,4 +34,24 @@ function convertNamedToPositional(sql, binds) {
 }
 
 async function executeQuery(sql, binds = {}, options = {}) {
-  const { sql: pgSql, binds: pgBinds } = convertNamedToPositional(sql
+  const { sql: pgSql, binds: pgBinds } = convertNamedToPositional(sql, binds);
+  try {
+    const result = await pool.query(pgSql, pgBinds);
+    let uppercaseRows = [];
+    if (result.rows && result.rows.length > 0) {
+      uppercaseRows = result.rows.map(row => {
+        const uppercaseRow = {};
+        for (const key of Object.keys(row)) {
+          uppercaseRow[key.toUpperCase()] = row[key];
+        }
+        return uppercaseRow;
+      });
+    }
+    return { rows: uppercaseRows, rowsAffected: result.rowCount };
+  } catch (err) {
+    console.error('Database Query Error:', err);
+    throw err;
+  }
+}
+
+module.exports = { executeQuery };
