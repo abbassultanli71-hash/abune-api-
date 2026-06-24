@@ -928,6 +928,7 @@ app.get('/api/bildirisler/:id', async (req, res) => {
  *         description: İstifadəçi tapılmadı
  */
 app.post('/api/bildirisler', async (req, res) => {
+  console.log('BODY:', req.body);
   const { username, abunelik_id } = req.body;
 
   if (!username || abunelik_id === undefined || abunelik_id === null)
