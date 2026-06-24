@@ -952,57 +952,7 @@ app.post('/api/bildirisler', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/bildirisler/{id}:
- *   put:
- *     summary: >
- *       Bildirişin başlıq və mesajını yeniləyir.
- *       Bildirişin aid olduğu istifadəçi (username) və abunəlik (abunelik_id / app adı) dəyişdirilə bilməz.
- *     tags: [Bildirişlər]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Bildiriş ID-si
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - basliq
- *               - mesaj
- *             properties:
- *               username:
- *                 type: string
- *                 description: >
- *                   İstəyə görə göndərilə bilər, lakin mövcud bildirişin
- *                   username-i ilə eyni olmalıdır — dəyişdirilmir.
- *                 example: abbas.abbasov
- *               abunelik_id:
- *                 type: integer
- *                 description: >
- *                   İstəyə görə göndərilə bilər, lakin mövcud bildirişin
- *                   abunelik_id-si ilə eyni olmalıdır — dəyişdirilmir.
- *                 example: 3
- *               basliq:
- *                 type: string
- *                 example: "Netflix - Yenilənmiş Xatırlatma"
- *               mesaj:
- *                 type: string
- *                 example: "Netflix abunəliyinizin ödənişi yaxınlaşır."
- *     responses:
- *       200:
- *         description: Bildiriş yeniləndi
- *       400:
- *         description: username, abunelik_id uyğun gəlmir, və ya basliq/mesaj-da app_adi düzgün deyil
- *       404:
- *         description: Bildiriş tapılmadı
- */
+
 
 /**
  * @swagger
