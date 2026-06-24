@@ -891,7 +891,7 @@ app.get('/api/bildirisler', async (req, res) => {
  *         description: İstifadəçi tapılmadı
  */
 app.post('/api/bildirisler', async (req, res) => {
-  console.log('BODY:', req.body);
+  
   const { username, abunelik_id } = req.body;
 
   if (!username || abunelik_id === undefined || abunelik_id === null)
@@ -1087,23 +1087,24 @@ app.put('/api/bildirisler/:id', async (req, res) => {
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
-  // app_adi yoxlaması — basliq və mesajda app adı uyğun olmalıdır
-const appAdiResult = await executeQuery(
-  `SELECT a.ad AS app_adi FROM abunelikler a WHERE a.id = :abunelik_id`,
-  { abunelik_id: current.ABUNELIK_ID }
-);
-const appAdi = appAdiResult.rows[0]?.APP_ADI || '';
+// app_adi yoxlaması
+    const appAdiResult = await executeQuery(
+      `SELECT a.ad AS app_adi FROM abunelikler a WHERE a.id = :abunelik_id`,
+      { abunelik_id: current.ABUNELIK_ID }
+    );
+    const appAdi = appAdiResult.rows[0]?.APP_ADI || '';
 
-if (appAdi && !trimmedBasliq.startsWith(appAdi)) {
-  return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
-    `Başlıq "${appAdi}" app adı ilə başlamalıdır. Məsələn: "${appAdi} - Yenilənmiş Xatırlatma".`);
-}
+    if (appAdi && !trimmedBasliq.startsWith(appAdi))
+      return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
+        `Başlıq "${appAdi}" app adı ilə başlamalıdır. Məsələn: "${appAdi} - Yenilənmiş Xatırlatma".`);
 
-if (appAdi && !trimmedMesaj.includes(appAdi)) {
-  return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
-    `Mesaj içərisində "${appAdi}" app adı olmalıdır.`);
-}
-});
+    if (appAdi && !trimmedMesaj.includes(appAdi))
+      return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
+        `Mesaj içərisində "${appAdi}" app adı olmalıdır.`);
+
+    // Yalnız başlıq və mesajı yenilə
+    await executeQuery(
+      `UPDATE bildirisler SET basliq = :basliq, mesaj = :mesaj WHERE id = :id`,
 
 /**
  * @swagger
