@@ -23,14 +23,11 @@ function lowercaseKeys(obj) {
 }
 
 app.use((req, res, next) => {
-  if (req.body) {
-    req.body = lowercaseKeys(req.body);
-  }
+  if (req.body) { req.body = lowercaseKeys(req.body); }
   next();
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
-
 const PORT = process.env.PORT || 3000;
 
 const authMiddleware = (req, res, next) => {
@@ -71,11 +68,7 @@ const swaggerOptions = {
     ],
     components: {
       securitySchemes: {
-        basicAuth: {
-          type: 'http',
-          scheme: 'basic',
-          description: 'API-ya giriş üçün istifadəçi adı və şifrə daxil edin.'
-        }
+        basicAuth: { type: 'http', scheme: 'basic', description: 'API-ya giriş üçün istifadəçi adı və şifrə daxil edin.' }
       }
     },
     security: [{ basicAuth: [] }]
@@ -87,14 +80,10 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', authMiddleware, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/api', authMiddleware);
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
+app.get('/app', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
 
-app.get('/app', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'app.html'));
-});
-
+// ── Helpers ──────────────────────────────────────────────────────────────────
 function isValidDate(dateStr) {
   if (typeof dateStr !== 'string') return false;
   const regex = /^\d{4}-\d{2}-\d{2}$/;
@@ -117,11 +106,11 @@ function isValidTimestamp(tsStr) {
 
 function isValidEmail(email) {
   if (typeof email !== 'string') return false;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 const ICAZE_VERILEN_VALYUTALAR = ['AZN', 'USD', 'EUR'];
+const ICAZE_VERILEN_ODENIS_TEZLIKLERI = ['monthly', 'yearly', 'quarterly', 'weekly'];
 
 function getValidCurrency(valyuta) {
   if (!valyuta) return 'AZN';
@@ -131,8 +120,21 @@ function getValidCurrency(valyuta) {
 }
 
 function isValidCurrency(valyuta) {
-  const v = getValidCurrency(valyuta);
-  return ICAZE_VERILEN_VALYUTALAR.includes(v);
+  return ICAZE_VERILEN_VALYUTALAR.includes(getValidCurrency(valyuta));
+}
+
+// Standard response helpers
+function successResponse(res, statusCode, message, data) {
+  return res.status(statusCode).json({ code: statusCode, message, data });
+}
+
+function errorResponse(res, statusCode, message, errorCode, errorMessage) {
+  return res.status(statusCode).json({
+    code: statusCode,
+    message,
+    data: null,
+    error: { code: errorCode, message: errorMessage }
+  });
 }
 
 // =============================================
@@ -148,14 +150,32 @@ function isValidCurrency(valyuta) {
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     users:
+ *                       type: array
+ *                       items:
+ *                         type: object
  */
 app.get('/api/istifadeciler', async (req, res) => {
   try {
     const sql = `SELECT id, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler ORDER BY id`;
     const result = await executeQuery(sql);
-    res.json(result.rows);
+    return successResponse(res, 200, 'Success', { users: result.rows });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -171,7 +191,6 @@ app.get('/api/istifadeciler', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: İstifadəçinin ID-si
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
@@ -180,14 +199,17 @@ app.get('/api/istifadeciler', async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
- *                 ID:
+ *                 code:
  *                   type: integer
- *                 AD:
+ *                   example: 200
+ *                 message:
  *                   type: string
- *                 EMAIL:
- *                   type: string
- *                 YARADILMA_TARIXI:
- *                   type: string
+ *                   example: Success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
  *       404:
  *         description: İstifadəçi tapılmadı
  */
@@ -197,11 +219,11 @@ app.get('/api/istifadeciler/:id', async (req, res) => {
     const sql = `SELECT id, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler WHERE id = :id`;
     const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'İstifadəçi tapılmadı.' });
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
     }
-    res.json(result.rows[0]);
+    return successResponse(res, 200, 'Success', { user: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -223,7 +245,6 @@ app.get('/api/istifadeciler/:id', async (req, res) => {
  *             properties:
  *               id:
  *                 type: integer
- *                 description: İstifadəçinin ID-si (isteğe bağlı)
  *                 example: 3
  *               ad:
  *                 type: string
@@ -238,51 +259,30 @@ app.get('/api/istifadeciler/:id', async (req, res) => {
 app.post('/api/istifadeciler', async (req, res) => {
   const { id, ad, email } = req.body;
 
-  if (!ad || !email) {
-    return res.status(400).json({ error: 'Ad və email sahələri məcburidir.' });
-  }
+  if (!ad || !email) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Ad və email sahələri məcburidir.');
 
   const trimmedAd = String(ad).trim();
   const trimmedEmail = String(email).trim();
 
-  if (trimmedAd.length === 0 || trimmedEmail.length === 0) {
-    return res.status(400).json({ error: 'Ad və email sahələri boş qoyula bilməz.' });
-  }
-
-  if (trimmedAd.length < 3 || trimmedAd.length > 100) {
-    return res.status(400).json({ error: 'Ad ən azı 3 və ən çoxu 100 simvoldan ibarət olmalıdır.' });
-  }
-
-  if (!isValidEmail(trimmedEmail)) {
-    return res.status(400).json({ error: 'Email ünvanının formatı yanlışdır (nümunə: ad@example.com).' });
-  }
-
-  if (trimmedEmail.length > 100) {
-    return res.status(400).json({ error: 'Email ən çoxu 100 simvoldan ibarət olmalıdır.' });
-  }
+  if (trimmedAd.length === 0 || trimmedEmail.length === 0) return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'Ad və email sahələri boş qoyula bilməz.');
+  if (trimmedAd.length < 3 || trimmedAd.length > 100) return errorResponse(res, 400, 'Bad Request', 'INVALID_NAME_LENGTH', 'Ad ən azı 3 və ən çoxu 100 simvoldan ibarət olmalıdır.');
+  if (!isValidEmail(trimmedEmail)) return errorResponse(res, 400, 'Bad Request', 'INVALID_EMAIL', 'Email ünvanının formatı yanlışdır (nümunə: ad@example.com).');
+  if (trimmedEmail.length > 100) return errorResponse(res, 400, 'Bad Request', 'EMAIL_TOO_LONG', 'Email ən çoxu 100 simvoldan ibarət olmalıdır.');
 
   if (id !== undefined && id !== null) {
     const parsedId = Number(id);
-    if (!Number.isInteger(parsedId) || parsedId <= 0) {
-      return res.status(400).json({ error: 'ID yalnız müsbət tam ədəd olmalıdır.' });
-    }
+    if (!Number.isInteger(parsedId) || parsedId <= 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_ID', 'ID yalnız müsbət tam ədəd olmalıdır.');
   }
 
   try {
     if (id) {
       const idCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :id`, { id });
-      if (idCheck.rows.length > 0) {
-        return res.status(400).json({ error: 'Bu ID ilə artıq istifadəçi mövcuddur.' });
-      }
+      if (idCheck.rows.length > 0) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ID', 'Bu ID ilə artıq istifadəçi mövcuddur.');
     }
-
     const emailCheck = await executeQuery(`SELECT email FROM istifadeciler WHERE email = :email`, { email: trimmedEmail });
-    if (emailCheck.rows.length > 0) {
-      return res.status(400).json({ error: 'Bu email ünvanı ilə artıq istifadəçi mövcuddur.' });
-    }
+    if (emailCheck.rows.length > 0) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_EMAIL', 'Bu email ünvanı ilə artıq istifadəçi mövcuddur.');
 
-    let sql;
-    let binds;
+    let sql, binds;
     if (id) {
       sql = `INSERT INTO istifadeciler (id, ad, email) VALUES (:id, :ad, :email)`;
       binds = { id, ad: trimmedAd, email: trimmedEmail };
@@ -294,18 +294,14 @@ app.post('/api/istifadeciler', async (req, res) => {
 
     const userResult = await executeQuery(`SELECT id FROM istifadeciler WHERE email = :email`, { email: trimmedEmail });
     const userId = userResult.rows[0].ID;
-
-    await executeQuery(`
-      INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema)
-      VALUES (:userId, 'AZN', 'email', 'az', 'dark')
-    `, { userId }, { autoCommit: true });
-
-    res.status(201).json({ message: 'İstifadəçi və onun ilkin ayarları uğurla yaradıldı.' });
+    await executeQuery(
+      `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema) VALUES (:userId, 'AZN', 'email', 'az', 'dark')`,
+      { userId }, { autoCommit: true }
+    );
+    return successResponse(res, 201, 'Created', { message: 'İstifadəçi və onun ilkin ayarları uğurla yaradıldı.' });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) {
-      return res.status(400).json({ error: 'Məlumatların unikallığı pozuldu (eyni ID və ya email artıq mövcuddur).' });
-    }
-    res.status(500).json({ error: err.message });
+    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Məlumatların unikallığı pozuldu (eyni ID və ya email artıq mövcuddur).');
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -321,7 +317,6 @@ app.post('/api/istifadeciler', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: İstifadəçinin ID-si
  *     requestBody:
  *       required: true
  *       content:
@@ -340,7 +335,6 @@ app.post('/api/istifadeciler', async (req, res) => {
  *                 example: abbas@example.com
  *               yaradilma_tarixi:
  *                 type: string
- *                 description: Yaradılma tarixi (YYYY-MM-DD HH24:MI:SS formatında)
  *                 example: "2026-06-19 12:00:00"
  *     responses:
  *       200:
@@ -351,41 +345,19 @@ app.post('/api/istifadeciler', async (req, res) => {
 app.put('/api/istifadeciler/:id', async (req, res) => {
   const { id } = req.params;
   const { ad, email, yaradilma_tarixi } = req.body;
-  if (!ad || !email) {
-    return res.status(400).json({ error: 'Ad və email sahələri məcburidir.' });
-  }
 
+  if (!ad || !email) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Ad və email sahələri məcburidir.');
   const trimmedAd = String(ad).trim();
   const trimmedEmail = String(email).trim();
-
-  if (trimmedAd.length === 0 || trimmedEmail.length === 0) {
-    return res.status(400).json({ error: 'Ad və email sahələri boş qoyula bilməz.' });
-  }
-
-  if (trimmedAd.length < 3 || trimmedAd.length > 100) {
-    return res.status(400).json({ error: 'Ad ən azı 3 və ən çoxu 100 simvoldan ibarət olmalıdır.' });
-  }
-
-  if (!isValidEmail(trimmedEmail)) {
-    return res.status(400).json({ error: 'Email ünvanının formatı yanlışdır (nümunə: ad@example.com).' });
-  }
-
-  if (trimmedEmail.length > 100) {
-    return res.status(400).json({ error: 'Email ən çoxu 100 simvoldan ibarət olmalıdır.' });
-  }
-
-  if (yaradilma_tarixi && !isValidTimestamp(yaradilma_tarixi)) {
-    return res.status(400).json({ error: `Yaradılma tarixi düzgün deyil: "${yaradilma_tarixi}" mövcud olmayan və ya yanlış formatda tarixdir (Format: YYYY-MM-DD HH24:MI:SS).` });
-  }
-
-  if (req.body.id !== undefined && Number(req.body.id) !== Number(id)) {
-    return res.status(400).json({ error: 'İstifadəçinin ID-si dəyişdirilə bilməz.' });
-  }
+  if (trimmedAd.length === 0 || trimmedEmail.length === 0) return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'Ad və email sahələri boş qoyula bilməz.');
+  if (trimmedAd.length < 3 || trimmedAd.length > 100) return errorResponse(res, 400, 'Bad Request', 'INVALID_NAME_LENGTH', 'Ad ən azı 3 və ən çoxu 100 simvoldan ibarət olmalıdır.');
+  if (!isValidEmail(trimmedEmail)) return errorResponse(res, 400, 'Bad Request', 'INVALID_EMAIL', 'Email ünvanının formatı yanlışdır.');
+  if (trimmedEmail.length > 100) return errorResponse(res, 400, 'Bad Request', 'EMAIL_TOO_LONG', 'Email ən çoxu 100 simvoldan ibarət olmalıdır.');
+  if (yaradilma_tarixi && !isValidTimestamp(yaradilma_tarixi)) return errorResponse(res, 400, 'Bad Request', 'INVALID_TIMESTAMP', `Yaradılma tarixi düzgün deyil: "${yaradilma_tarixi}" (Format: YYYY-MM-DD HH24:MI:SS).`);
+  if (req.body.id !== undefined && Number(req.body.id) !== Number(id)) return errorResponse(res, 400, 'Bad Request', 'ID_IMMUTABLE', 'İstifadəçinin ID-si dəyişdirilə bilməz.');
 
   try {
-    let sql;
-    let binds;
-
+    let sql, binds;
     if (yaradilma_tarixi) {
       sql = `UPDATE istifadeciler SET ad = :ad, email = :email, yaradilma_tarixi = TO_TIMESTAMP(:yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') WHERE id = :id`;
       binds = { ad: trimmedAd, email: trimmedEmail, yaradilma_tarixi, id };
@@ -393,31 +365,17 @@ app.put('/api/istifadeciler/:id', async (req, res) => {
       sql = `UPDATE istifadeciler SET ad = :ad, email = :email WHERE id = :id`;
       binds = { ad: trimmedAd, email: trimmedEmail, id };
     }
-
     const result = await executeQuery(sql, binds, { autoCommit: true });
-    if (result.rowsAffected === 0) {
-      return res.status(404).json({ error: 'İstifadəçi tapılmadı.' });
-    }
+    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
     const updated = await executeQuery(
-      `SELECT id, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler WHERE id = :id`,
-      { id }
+      `SELECT id, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler WHERE id = :id`, { id }
     );
-    res.json({ message: 'İstifadəçi uğurla yeniləndi.', istifadeci: updated.rows[0] });
+    return successResponse(res, 200, 'Updated', { user: updated.rows[0] });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) {
-      if (err.message.includes('ISTIFADECILER') && err.message.includes('ID') || err.message.includes('SYS_')) {
-        if (err.message.includes('EMAIL')) {
-          return res.status(400).json({ error: 'Bu email ünvanı ilə artıq istifadəçi mövcuddur.' });
-        }
-        return res.status(400).json({ error: 'Bu ID ilə artıq başqa bir istifadəçi mövcuddur.' });
-      }
-      return res.status(400).json({ error: 'Məlumatların unikallığı pozuldu (eyni ID və ya email artıq mövcuddur).' });
-    }
-    if (err.message && err.message.includes('ORA-02292')) {
-      return res.status(400).json({ error: 'İstifadəçinin abunəliyi və ya bildirişi olduğu üçün onun ID-sini dəyişmək olmaz (Foreign Key Constraint).' });
-    }
-    res.status(500).json({ error: err.message });
+    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Bu email və ya ID artıq mövcuddur.');
+    if (err.message && err.message.includes('ORA-02292')) return errorResponse(res, 400, 'Bad Request', 'FK_CONSTRAINT', 'İstifadəçinin abunəliyi və ya bildirişi olduğu üçün ID dəyişdirilə bilməz.');
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -433,7 +391,6 @@ app.put('/api/istifadeciler/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: İstifadəçinin ID-si
  *     responses:
  *       200:
  *         description: İstifadəçi silindi
@@ -443,14 +400,11 @@ app.put('/api/istifadeciler/:id', async (req, res) => {
 app.delete('/api/istifadeciler/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `DELETE FROM istifadeciler WHERE id = :id`;
-    const result = await executeQuery(sql, { id }, { autoCommit: true });
-    if (result.rowsAffected === 0) {
-      return res.status(404).json({ error: 'İstifadəçi tapılmadı.' });
-    }
-    res.json({ message: 'İstifadəçi uğurla silindi.' });
+    const result = await executeQuery(`DELETE FROM istifadeciler WHERE id = :id`, { id }, { autoCommit: true });
+    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    return successResponse(res, 200, 'Deleted', { message: 'İstifadəçi uğurla silindi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -462,7 +416,7 @@ app.delete('/api/istifadeciler/:id', async (req, res) => {
  * @swagger
  * /api/abunelikler:
  *   get:
- *     summary: İstifadəçinin abunəliklərini istifadeci_id ilə axtarır/siyahılayır
+ *     summary: İstifadəçinin abunəliklərini siyahılayır
  *     tags: [Abunəliklər]
  *     parameters:
  *       - in: query
@@ -470,69 +424,15 @@ app.delete('/api/istifadeciler/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: İstifadəçinin ID-si
  *     responses:
  *       200:
- *         description: Uğurlu əməliyyat (siyahı boş ola bilər)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: Success
- *                 data:
- *                   type: object
- *                   properties:
- *                     subscriptions:
- *                       type: array
- *                       items:
- *                         type: object
+ *         description: Uğurlu əməliyyat
  *       400:
  *         description: istifadeci_id göndərilmədi
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   example: 400
- *                 message:
- *                   type: string
- *                   example: Bad Request
- *                 data:
- *                   nullable: true
- *                   example: null
- *                 error:
- *                   type: object
- *                   properties:
- *                     code:
- *                       type: string
- *                       example: MISSING_PARAMETER
- *                     message:
- *                       type: string
- *                       example: istifadeci_id sorğu parametri məcburidir.
- *       500:
- *         description: Server xətası
  */
 app.get('/api/abunelikler', async (req, res) => {
   const { istifadeci_id } = req.query;
-  if (!istifadeci_id) {
-    return res.status(400).json({
-      code: 400,
-      message: 'Bad Request',
-      data: null,
-      error: {
-        code: 'MISSING_PARAMETER',
-        message: 'istifadeci_id sorğu parametri məcburidir.'
-      }
-    });
-  }
+  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
   try {
     const sql = `
       SELECT id AS abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi,
@@ -543,30 +443,47 @@ app.get('/api/abunelikler', async (req, res) => {
       FROM abunelikler WHERE istifadeci_id = :istifadeci_id ORDER BY id
     `;
     const result = await executeQuery(sql, { istifadeci_id });
-
-    if (result.rows.length === 0) {
-      return res.status(200).json({
-        code: 200,
-        message: 'No subscriptions found',
-        data: { subscriptions: [] }
-      });
-    }
-
-    res.status(200).json({
-      code: 200,
-      message: 'Success',
-      data: { subscriptions: result.rows }
-    });
+    if (result.rows.length === 0) return successResponse(res, 200, 'No subscriptions found', { subscriptions: [] });
+    return successResponse(res, 200, 'Success', { subscriptions: result.rows });
   } catch (err) {
-    res.status(500).json({
-      code: 500,
-      message: 'Internal Server Error',
-      data: null,
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: err.message
-      }
-    });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
+ * /api/abunelikler/{id}:
+ *   get:
+ *     summary: ID-yə görə abunəliyi gətirir
+ *     tags: [Abunəliklər]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ *       404:
+ *         description: Abunəlik tapılmadı
+ */
+app.get('/api/abunelikler/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const sql = `
+      SELECT id AS abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi,
+             TO_CHAR(baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
+             TO_CHAR(novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
+             kateqoriya, status,
+             TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
+      FROM abunelikler WHERE id = :id
+    `;
+    const result = await executeQuery(sql, { id });
+    if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
+    return successResponse(res, 200, 'Success', { subscription: result.rows[0] });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -591,7 +508,6 @@ app.get('/api/abunelikler', async (req, res) => {
  *             properties:
  *               abunelik_id:
  *                 type: integer
- *                 description: Abunəliyin ID-si (isteğe bağlı)
  *                 example: 3
  *               istifadeci_id:
  *                 type: integer
@@ -602,11 +518,14 @@ app.get('/api/abunelikler', async (req, res) => {
  *               qiymet:
  *                 type: number
  *                 example: 12.99
+ *                 description: 0-dan böyük olmalıdır
  *               valyuta:
  *                 type: string
+ *                 enum: [AZN, USD, EUR]
  *                 example: AZN
  *               odenis_tezliyi:
  *                 type: string
+ *                 enum: [monthly, yearly, quarterly, weekly]
  *                 example: monthly
  *               baslama_tarixi:
  *                 type: string
@@ -624,7 +543,6 @@ app.get('/api/abunelikler', async (req, res) => {
  *                 example: active
  *               yaradilma_tarixi:
  *                 type: string
- *                 description: Yaradılma tarixi (YYYY-MM-DD HH24:MI:SS formatında, isteğe bağlı)
  *                 example: "2026-06-19 10:00:00"
  *     responses:
  *       201:
@@ -632,71 +550,53 @@ app.get('/api/abunelikler', async (req, res) => {
  */
 app.post('/api/abunelikler', async (req, res) => {
   const { abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status, yaradilma_tarixi } = req.body;
-  if (!istifadeci_id || !ad || !qiymet || !baslama_tarixi || !novbeti_odenis_tarixi) {
-    return res.status(400).json({ error: 'Məcburi sahələri (istifadeci_id, ad, qiymet, baslama_tarixi, novbeti_odenis_tarixi) doldurun.' });
-  }
-  if (valyuta && !isValidCurrency(valyuta)) {
-    return res.status(400).json({ error: `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.` });
-  }
-  if (!isValidDate(baslama_tarixi)) {
-    return res.status(400).json({ error: `Başlama tarixi düzgün deyil: "${baslama_tarixi}" mövcud olmayan və ya yanlış formatda tarixdir (Format: YYYY-MM-DD).` });
-  }
-  if (!isValidDate(novbeti_odenis_tarixi)) {
-    return res.status(400).json({ error: `Növbəti ödəniş tarixi düzgün deyil: "${novbeti_odenis_tarixi}" mövcud olmayan və ya yanlış formatda tarixdir (Format: YYYY-MM-DD).` });
-  }
-  if (yaradilma_tarixi && !isValidTimestamp(yaradilma_tarixi)) {
-    return res.status(400).json({ error: `Yaradılma tarixi düzgün deyil: "${yaradilma_tarixi}" mövcud olmayan və ya yanlış formatda tarixdir (Format: YYYY-MM-DD HH24:MI:SS).` });
-  }
-  try {
-    const userCheckSql = `SELECT id FROM istifadeciler WHERE id = :istifadeci_id`;
-    const userCheckResult = await executeQuery(userCheckSql, { istifadeci_id });
-    if (userCheckResult.rows.length === 0) {
-      return res.status(400).json({ error: 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.' });
-    }
 
-    let sql;
-    let binds;
+  if (!istifadeci_id || !ad || qiymet === undefined || qiymet === null || !baslama_tarixi || !novbeti_odenis_tarixi)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (istifadeci_id, ad, qiymet, baslama_tarixi, novbeti_odenis_tarixi) doldurun.');
+
+  const parsedQiymet = Number(qiymet);
+  if (isNaN(parsedQiymet) || parsedQiymet <= 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_PRICE', 'Qiymət 0-dan böyük olmalıdır.');
+
+  if (valyuta && !isValidCurrency(valyuta))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
+
+  const odenisTezliyi = odenis_tezliyi || 'monthly';
+  if (!ICAZE_VERILEN_ODENIS_TEZLIKLERI.includes(odenisTezliyi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_FREQUENCY', `Yanlış ödəniş tezliyi: "${odenis_tezliyi}". Yalnız ${ICAZE_VERILEN_ODENIS_TEZLIKLERI.join(', ')} daxil edilə bilər.`);
+
+  if (!isValidDate(baslama_tarixi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Başlama tarixi düzgün deyil: "${baslama_tarixi}" (Format: YYYY-MM-DD).`);
+
+  if (!isValidDate(novbeti_odenis_tarixi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Növbəti ödəniş tarixi düzgün deyil: "${novbeti_odenis_tarixi}" (Format: YYYY-MM-DD).`);
+
+  if (yaradilma_tarixi && !isValidTimestamp(yaradilma_tarixi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_TIMESTAMP', `Yaradılma tarixi düzgün deyil: "${yaradilma_tarixi}" (Format: YYYY-MM-DD HH24:MI:SS).`);
+
+  try {
+    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
+    if (userCheck.rows.length === 0) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.');
 
     const yaradilmaCol = yaradilma_tarixi ? ', yaradilma_tarixi' : '';
     const yaradilmaVal = yaradilma_tarixi ? `, TO_TIMESTAMP(:yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS')` : '';
 
+    let sql, binds;
     if (abunelik_id) {
-      sql = `
-        INSERT INTO abunelikler (id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status${yaradilmaCol})
-        VALUES (:abunelik_id, :istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :status${yaradilmaVal})
-      `;
-      binds = {
-        abunelik_id, istifadeci_id, ad, qiymet,
-        valyuta: getValidCurrency(valyuta),
-        odenis_tezliyi: odenis_tezliyi || 'monthly',
-        baslama_tarixi, novbeti_odenis_tarixi,
-        kateqoriya: kateqoriya || null,
-        status: status || 'active',
-        ...(yaradilma_tarixi && { yaradilma_tarixi })
-      };
+      sql = `INSERT INTO abunelikler (id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status${yaradilmaCol})
+             VALUES (:abunelik_id, :istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :status${yaradilmaVal})`;
+      binds = { abunelik_id, istifadeci_id, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya: kateqoriya || null, status: status || 'active', ...(yaradilma_tarixi && { yaradilma_tarixi }) };
     } else {
-      sql = `
-        INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status${yaradilmaCol})
-        VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :status${yaradilmaVal})
-      `;
-      binds = {
-        istifadeci_id, ad, qiymet,
-        valyuta: getValidCurrency(valyuta),
-        odenis_tezliyi: odenis_tezliyi || 'monthly',
-        baslama_tarixi, novbeti_odenis_tarixi,
-        kateqoriya: kateqoriya || null,
-        status: status || 'active',
-        ...(yaradilma_tarixi && { yaradilma_tarixi })
-      };
+      sql = `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status${yaradilmaCol})
+             VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :status${yaradilmaVal})`;
+      binds = { istifadeci_id, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya: kateqoriya || null, status: status || 'active', ...(yaradilma_tarixi && { yaradilma_tarixi }) };
     }
 
     await executeQuery(sql, binds, { autoCommit: true });
-    res.status(201).json({ message: 'Abunəlik uğurla əlavə edildi.' });
+    return successResponse(res, 201, 'Created', { message: 'Abunəlik uğurla əlavə edildi.' });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) {
-      return res.status(400).json({ error: 'Bu abunəlik ID-si artıq mövcuddur.' });
-    }
-    res.status(500).json({ error: err.message });
+    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ID', 'Bu abunəlik ID-si artıq mövcuddur.');
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -712,7 +612,6 @@ app.post('/api/abunelikler', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: Abunəliyin ID-si
  *     requestBody:
  *       required: true
  *       content:
@@ -731,11 +630,14 @@ app.post('/api/abunelikler', async (req, res) => {
  *               qiymet:
  *                 type: number
  *                 example: 12.99
+ *                 description: 0-dan böyük olmalıdır
  *               valyuta:
  *                 type: string
+ *                 enum: [AZN, USD, EUR]
  *                 example: AZN
  *               odenis_tezliyi:
  *                 type: string
+ *                 enum: [monthly, yearly, quarterly, weekly]
  *                 example: monthly
  *               baslama_tarixi:
  *                 type: string
@@ -761,60 +663,43 @@ app.put('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
   const { abunelik_id, istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status } = req.body;
 
-  if (!ad || !qiymet || !baslama_tarixi || !novbeti_odenis_tarixi) {
-    return res.status(400).json({ error: 'Məcburi sahələri (ad, qiymet, baslama_tarixi, novbeti_odenis_tarixi) doldurun.' });
-  }
+  if (!ad || qiymet === undefined || qiymet === null || !baslama_tarixi || !novbeti_odenis_tarixi)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (ad, qiymet, baslama_tarixi, novbeti_odenis_tarixi) doldurun.');
 
-  if (abunelik_id && Number(abunelik_id) !== Number(id)) {
-    return res.status(400).json({ error: 'Abunəliyin ID-si dəyişdirilə bilməz.' });
-  }
+  if (abunelik_id && Number(abunelik_id) !== Number(id))
+    return errorResponse(res, 400, 'Bad Request', 'ID_IMMUTABLE', 'Abunəliyin ID-si dəyişdirilə bilməz.');
 
-  if (valyuta && !isValidCurrency(valyuta)) {
-    return res.status(400).json({ error: `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.` });
-  }
+  const parsedQiymet = Number(qiymet);
+  if (isNaN(parsedQiymet) || parsedQiymet <= 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_PRICE', 'Qiymət 0-dan böyük olmalıdır.');
 
-  if (!isValidDate(baslama_tarixi)) {
-    return res.status(400).json({ error: `Başlama tarixi düzgün deyil: "${baslama_tarixi}" mövcud olmayan və ya yanlış formatda tarixdir (Format: YYYY-MM-DD).` });
-  }
+  if (valyuta && !isValidCurrency(valyuta))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
 
-  if (!isValidDate(novbeti_odenis_tarixi)) {
-    return res.status(400).json({ error: `Növbəti ödəniş tarixi düzgün deyil: "${novbeti_odenis_tarixi}" mövcud olmayan və ya yanlış formatda tarixdir (Format: YYYY-MM-DD).` });
-  }
+  const odenisTezliyi = odenis_tezliyi || 'monthly';
+  if (!ICAZE_VERILEN_ODENIS_TEZLIKLERI.includes(odenisTezliyi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_FREQUENCY', `Yanlış ödəniş tezliyi: "${odenis_tezliyi}". Yalnız ${ICAZE_VERILEN_ODENIS_TEZLIKLERI.join(', ')} daxil edilə bilər.`);
+
+  if (!isValidDate(baslama_tarixi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Başlama tarixi düzgün deyil: "${baslama_tarixi}" (Format: YYYY-MM-DD).`);
+
+  if (!isValidDate(novbeti_odenis_tarixi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Növbəti ödəniş tarixi düzgün deyil: "${novbeti_odenis_tarixi}" (Format: YYYY-MM-DD).`);
 
   try {
-    const subCheckSql = `SELECT id, istifadeci_id FROM abunelikler WHERE id = :id`;
-    const subCheckResult = await executeQuery(subCheckSql, { id });
-    if (subCheckResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Abunəlik tapılmadı.' });
-    }
-    const currentSub = subCheckResult.rows[0];
+    const subCheck = await executeQuery(`SELECT id, istifadeci_id FROM abunelikler WHERE id = :id`, { id });
+    if (subCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
 
-    if (istifadeci_id !== undefined && Number(istifadeci_id) !== Number(currentSub.ISTIFADECI_ID)) {
-      return res.status(400).json({ error: 'Abunəliyin aid olduğu istifadəçi (istifadeci_id) dəyişdirilə bilməz.' });
-    }
+    if (istifadeci_id !== undefined && Number(istifadeci_id) !== Number(subCheck.rows[0].ISTIFADECI_ID))
+      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Abunəliyin aid olduğu istifadəçi (istifadeci_id) dəyişdirilə bilməz.');
 
-    const sql = `
-      UPDATE abunelikler SET
-        ad = :ad, qiymet = :qiymet, valyuta = :valyuta,
-        odenis_tezliyi = :odenis_tezliyi, baslama_tarixi = TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'),
-        novbeti_odenis_tarixi = TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'),
-        kateqoriya = :kateqoriya, status = :status
-      WHERE id = :id
-    `;
-    const binds = {
-      ad, qiymet,
-      valyuta: getValidCurrency(valyuta),
-      odenis_tezliyi: odenis_tezliyi || 'monthly',
-      baslama_tarixi, novbeti_odenis_tarixi,
-      kateqoriya: kateqoriya || null,
-      status: status || 'active',
-      id
-    };
-
-    await executeQuery(sql, binds, { autoCommit: true });
-    res.json({ message: 'Abunəlik uğurla yeniləndi.' });
+    const sql = `UPDATE abunelikler SET ad=:ad, qiymet=:qiymet, valyuta=:valyuta, odenis_tezliyi=:odenis_tezliyi,
+                 baslama_tarixi=TO_DATE(:baslama_tarixi,'YYYY-MM-DD'), novbeti_odenis_tarixi=TO_DATE(:novbeti_odenis_tarixi,'YYYY-MM-DD'),
+                 kateqoriya=:kateqoriya, status=:status WHERE id=:id`;
+    await executeQuery(sql, { ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya: kateqoriya || null, status: status || 'active', id }, { autoCommit: true });
+    return successResponse(res, 200, 'Updated', { message: 'Abunəlik uğurla yeniləndi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -830,7 +715,6 @@ app.put('/api/abunelikler/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: Abunəliyin ID-si
  *     responses:
  *       200:
  *         description: Abunəlik silindi
@@ -840,14 +724,11 @@ app.put('/api/abunelikler/:id', async (req, res) => {
 app.delete('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `DELETE FROM abunelikler WHERE id = :id`;
-    const result = await executeQuery(sql, { id }, { autoCommit: true });
-    if (result.rowsAffected === 0) {
-      return res.status(404).json({ error: 'Abunəlik tapılmadı.' });
-    }
-    res.json({ message: 'Abunəlik uğurla silindi.' });
+    const result = await executeQuery(`DELETE FROM abunelikler WHERE id = :id`, { id }, { autoCommit: true });
+    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
+    return successResponse(res, 200, 'Deleted', { message: 'Abunəlik uğurla silindi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -859,7 +740,7 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
  * @swagger
  * /api/bildirisler:
  *   get:
- *     summary: İstifadəçinin bildirişlərini istifadeci_id ilə axtarır/siyahılayır
+ *     summary: İstifadəçinin bildirişlərini siyahılayır
  *     tags: [Bildirişlər]
  *     parameters:
  *       - in: query
@@ -867,100 +748,52 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: İstifadəçinin ID-si
  *     responses:
  *       200:
- *         description: Uğurlu əməliyyat (siyahı boş ola bilər)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: Success
- *                 data:
- *                   type: object
- *                   properties:
- *                     notifications:
- *                       type: array
- *                       items:
- *                         type: object
+ *         description: Uğurlu əməliyyat
  *       400:
  *         description: istifadeci_id göndərilmədi
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   example: 400
- *                 message:
- *                   type: string
- *                   example: Bad Request
- *                 data:
- *                   nullable: true
- *                   example: null
- *                 error:
- *                   type: object
- *                   properties:
- *                     code:
- *                       type: string
- *                       example: MISSING_PARAMETER
- *                     message:
- *                       type: string
- *                       example: istifadeci_id sorğu parametri məcburidir.
- *       500:
- *         description: Server xətası
  */
 app.get('/api/bildirisler', async (req, res) => {
   const { istifadeci_id } = req.query;
-  if (!istifadeci_id) {
-    return res.status(400).json({
-      code: 400,
-      message: 'Bad Request',
-      data: null,
-      error: {
-        code: 'MISSING_PARAMETER',
-        message: 'istifadeci_id sorğu parametri məcburidir.'
-      }
-    });
-  }
+  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
   try {
-    const sql = `
-      SELECT id AS bildiris_id, istifadeci_id, basliq, mesaj,
-             TO_CHAR(gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi
-      FROM bildirisler WHERE istifadeci_id = :istifadeci_id ORDER BY id DESC
-    `;
+    const sql = `SELECT id AS bildiris_id, istifadeci_id, basliq, mesaj, TO_CHAR(gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi FROM bildirisler WHERE istifadeci_id = :istifadeci_id ORDER BY id DESC`;
     const result = await executeQuery(sql, { istifadeci_id });
-
-    if (result.rows.length === 0) {
-      return res.status(200).json({
-        code: 200,
-        message: 'No notifications found',
-        data: { notifications: [] }
-      });
-    }
-
-    res.status(200).json({
-      code: 200,
-      message: 'Success',
-      data: { notifications: result.rows }
-    });
+    if (result.rows.length === 0) return successResponse(res, 200, 'No notifications found', { notifications: [] });
+    return successResponse(res, 200, 'Success', { notifications: result.rows });
   } catch (err) {
-    res.status(500).json({
-      code: 500,
-      message: 'Internal Server Error',
-      data: null,
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: err.message
-      }
-    });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
+ * /api/bildirisler/{id}:
+ *   get:
+ *     summary: ID-yə görə bildirişi gətirir
+ *     tags: [Bildirişlər]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ *       404:
+ *         description: Bildiriş tapılmadı
+ */
+app.get('/api/bildirisler/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const sql = `SELECT id AS bildiris_id, istifadeci_id, basliq, mesaj, TO_CHAR(gonderilme_tarixi, 'YYYY-MM-DD') as gonderilme_tarixi FROM bildirisler WHERE id = :id`;
+    const result = await executeQuery(sql, { id });
+    if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
+    return successResponse(res, 200, 'Success', { notification: result.rows[0] });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -983,7 +816,6 @@ app.get('/api/bildirisler', async (req, res) => {
  *             properties:
  *               bildiris_id:
  *                 type: integer
- *                 description: Bildirişin ID-si (isteğe bağlı)
  *                 example: 5
  *               istifadeci_id:
  *                 type: integer
@@ -1000,18 +832,12 @@ app.get('/api/bildirisler', async (req, res) => {
  */
 app.post('/api/bildirisler', async (req, res) => {
   const { bildiris_id, istifadeci_id, basliq, mesaj } = req.body;
-  if (!istifadeci_id || !basliq || !mesaj) {
-    return res.status(400).json({ error: 'Məcburi sahələri (istifadeci_id, basliq, mesaj) doldurun.' });
-  }
+  if (!istifadeci_id || !basliq || !mesaj) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (istifadeci_id, basliq, mesaj) doldurun.');
   try {
-    const userCheckSql = `SELECT id FROM istifadeciler WHERE id = :istifadeci_id`;
-    const userCheckResult = await executeQuery(userCheckSql, { istifadeci_id });
-    if (userCheckResult.rows.length === 0) {
-      return res.status(400).json({ error: 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.' });
-    }
+    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
+    if (userCheck.rows.length === 0) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.');
 
-    let sql;
-    let binds;
+    let sql, binds;
     if (bildiris_id) {
       sql = `INSERT INTO bildirisler (id, istifadeci_id, basliq, mesaj) VALUES (:bildiris_id, :istifadeci_id, :basliq, :mesaj)`;
       binds = { bildiris_id, istifadeci_id, basliq, mesaj };
@@ -1019,14 +845,11 @@ app.post('/api/bildirisler', async (req, res) => {
       sql = `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`;
       binds = { istifadeci_id, basliq, mesaj };
     }
-
     await executeQuery(sql, binds, { autoCommit: true });
-    res.status(201).json({ message: 'Bildiriş uğurla göndərildi.' });
+    return successResponse(res, 201, 'Created', { message: 'Bildiriş uğurla göndərildi.' });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) {
-      return res.status(400).json({ error: 'Bu bildiriş ID-si artıq mövcuddur.' });
-    }
-    res.status(500).json({ error: err.message });
+    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ID', 'Bu bildiriş ID-si artıq mövcuddur.');
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1042,7 +865,6 @@ app.post('/api/bildirisler', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: Bildirişin ID-si
  *     requestBody:
  *       required: true
  *       content:
@@ -1068,33 +890,17 @@ app.post('/api/bildirisler', async (req, res) => {
 app.put('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
   const { basliq, mesaj } = req.body;
-  if (!basliq || !mesaj) {
-    return res.status(400).json({ error: 'Məcburi sahələri (basliq, mesaj) doldurun.' });
-  }
-
-  if (req.body.bildiris_id !== undefined && Number(req.body.bildiris_id) !== Number(id)) {
-    return res.status(400).json({ error: 'Bildirişin ID-si dəyişdirilə bilməz.' });
-  }
-
+  if (!basliq || !mesaj) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (basliq, mesaj) doldurun.');
+  if (req.body.bildiris_id !== undefined && Number(req.body.bildiris_id) !== Number(id)) return errorResponse(res, 400, 'Bad Request', 'ID_IMMUTABLE', 'Bildirişin ID-si dəyişdirilə bilməz.');
   try {
-    const checkSql = `SELECT id, istifadeci_id FROM bildirisler WHERE id = :id`;
-    const checkResult = await executeQuery(checkSql, { id });
-    if (checkResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Bildiriş tapılmadı.' });
-    }
-    const currentNotification = checkResult.rows[0];
-
-    if (req.body.istifadeci_id !== undefined && Number(req.body.istifadeci_id) !== Number(currentNotification.ISTIFADECI_ID)) {
-      return res.status(400).json({ error: 'Bildirişin aid olduğu istifadəçi (istifadeci_id) dəyişdirilə bilməz.' });
-    }
-
-    const sql = `UPDATE bildirisler SET basliq = :basliq, mesaj = :mesaj WHERE id = :id`;
-    const binds = { basliq, mesaj, id };
-
-    await executeQuery(sql, binds, { autoCommit: true });
-    res.json({ message: 'Bildiriş uğurla yeniləndi.' });
+    const checkResult = await executeQuery(`SELECT id, istifadeci_id FROM bildirisler WHERE id = :id`, { id });
+    if (checkResult.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
+    if (req.body.istifadeci_id !== undefined && Number(req.body.istifadeci_id) !== Number(checkResult.rows[0].ISTIFADECI_ID))
+      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Bildirişin aid olduğu istifadəçi dəyişdirilə bilməz.');
+    await executeQuery(`UPDATE bildirisler SET basliq=:basliq, mesaj=:mesaj WHERE id=:id`, { basliq, mesaj, id }, { autoCommit: true });
+    return successResponse(res, 200, 'Updated', { message: 'Bildiriş uğurla yeniləndi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1110,7 +916,6 @@ app.put('/api/bildirisler/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: Bildirişin ID-si
  *     responses:
  *       200:
  *         description: Bildiriş silindi
@@ -1120,14 +925,11 @@ app.put('/api/bildirisler/:id', async (req, res) => {
 app.delete('/api/bildirisler/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `DELETE FROM bildirisler WHERE id = :id`;
-    const result = await executeQuery(sql, { id }, { autoCommit: true });
-    if (result.rowsAffected === 0) {
-      return res.status(404).json({ error: 'Bildiriş tapılmadı.' });
-    }
-    res.json({ message: 'Bildiriş uğurla silindi.' });
+    const result = await executeQuery(`DELETE FROM bildirisler WHERE id = :id`, { id }, { autoCommit: true });
+    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'NOTIFICATION_NOT_FOUND', 'Bildiriş tapılmadı.');
+    return successResponse(res, 200, 'Deleted', { message: 'Bildiriş uğurla silindi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1139,7 +941,7 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  * @swagger
  * /api/odenis-tarixcesi:
  *   get:
- *     summary: İstifadəçinin ödəniş tarixçəsini istifadeci_id ilə axtarır/siyahılayır
+ *     summary: İstifadəçinin ödəniş tarixçəsini siyahılayır
  *     tags: [Ödəniş Tarixçəsi]
  *     parameters:
  *       - in: query
@@ -1147,101 +949,52 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: İstifadəçinin ID-si
  *     responses:
  *       200:
- *         description: Uğurlu əməliyyat (siyahı boş ola bilər)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: Success
- *                 data:
- *                   type: object
- *                   properties:
- *                     paymentHistory:
- *                       type: array
- *                       items:
- *                         type: object
+ *         description: Uğurlu əməliyyat
  *       400:
  *         description: istifadeci_id göndərilmədi
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   example: 400
- *                 message:
- *                   type: string
- *                   example: Bad Request
- *                 data:
- *                   nullable: true
- *                   example: null
- *                 error:
- *                   type: object
- *                   properties:
- *                     code:
- *                       type: string
- *                       example: MISSING_PARAMETER
- *                     message:
- *                       type: string
- *                       example: istifadeci_id sorğu parametri məcburidir.
- *       500:
- *         description: Server xətası
  */
 app.get('/api/odenis-tarixcesi', async (req, res) => {
   const { istifadeci_id } = req.query;
-  if (!istifadeci_id) {
-    return res.status(400).json({
-      code: 400,
-      message: 'Bad Request',
-      data: null,
-      error: {
-        code: 'MISSING_PARAMETER',
-        message: 'istifadeci_id sorğu parametri məcburidir.'
-      }
-    });
-  }
+  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
   try {
-    const sql = `
-      SELECT id AS odenis_tarixcesi_id, abunelik_id, istifadeci_id,
-             TO_CHAR(odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi,
-             mebleq, status
-      FROM odenis_tarixcesi WHERE istifadeci_id = :istifadeci_id ORDER BY odenis_tarixi DESC
-    `;
+    const sql = `SELECT id AS odenis_tarixcesi_id, abunelik_id, istifadeci_id, TO_CHAR(odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi, mebleq, status FROM odenis_tarixcesi WHERE istifadeci_id = :istifadeci_id ORDER BY odenis_tarixi DESC`;
     const result = await executeQuery(sql, { istifadeci_id });
-
-    if (result.rows.length === 0) {
-      return res.status(200).json({
-        code: 200,
-        message: 'No payment history found',
-        data: { paymentHistory: [] }
-      });
-    }
-
-    res.status(200).json({
-      code: 200,
-      message: 'Success',
-      data: { paymentHistory: result.rows }
-    });
+    if (result.rows.length === 0) return successResponse(res, 200, 'No payment history found', { paymentHistory: [] });
+    return successResponse(res, 200, 'Success', { paymentHistory: result.rows });
   } catch (err) {
-    res.status(500).json({
-      code: 500,
-      message: 'Internal Server Error',
-      data: null,
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: err.message
-      }
-    });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
+ * /api/odenis-tarixcesi/{id}:
+ *   get:
+ *     summary: ID-yə görə ödəniş tarixçəsini gətirir
+ *     tags: [Ödəniş Tarixçəsi]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ *       404:
+ *         description: Tapılmadı
+ */
+app.get('/api/odenis-tarixcesi/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const sql = `SELECT id AS odenis_tarixcesi_id, abunelik_id, istifadeci_id, TO_CHAR(odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi, mebleq, status FROM odenis_tarixcesi WHERE id = :id`;
+    const result = await executeQuery(sql, { id });
+    if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
+    return successResponse(res, 200, 'Success', { paymentHistory: result.rows[0] });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1265,7 +1018,6 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
  *             properties:
  *               odenis_tarixcesi_id:
  *                 type: integer
- *                 description: Ödəniş tarixçəsinin ID-si (isteğe bağlı)
  *                 example: 5
  *               abunelik_id:
  *                 type: integer
@@ -1286,59 +1038,37 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
  *                 example: success
  *     responses:
  *       201:
- *         description: Ödəniş tarixçəsi qeydi əlavə edildi
+ *         description: Əlavə edildi
  */
 app.post('/api/odenis-tarixcesi', async (req, res) => {
   const { odenis_tarixcesi_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status } = req.body;
-  if (!abunelik_id || !istifadeci_id || !odenis_tarixi || !mebleq) {
-    return res.status(400).json({ error: 'Məcburi sahələri (abunelik_id, istifadeci_id, odenis_tarixi, mebleq) doldurun.' });
-  }
-  if (!isValidDate(odenis_tarixi)) {
-    return res.status(400).json({ error: `Ödəniş tarixi düzgün deyil: "${odenis_tarixi}" mövcud olmayan və ya yanlış formatda tarixdir (Format: YYYY-MM-DD).` });
-  }
+  if (!abunelik_id || !istifadeci_id || !odenis_tarixi || mebleq === undefined || mebleq === null)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (abunelik_id, istifadeci_id, odenis_tarixi, mebleq) doldurun.');
+  if (!isValidDate(odenis_tarixi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Ödəniş tarixi düzgün deyil: "${odenis_tarixi}" (Format: YYYY-MM-DD).`);
   const statusValue = status || 'success';
-  if (statusValue !== 'success' && statusValue !== 'fail') {
-    return res.status(400).json({ error: 'Status yalnız "success" və ya "fail" ola bilər.' });
-  }
+  if (statusValue !== 'success' && statusValue !== 'fail')
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS', 'Status yalnız "success" və ya "fail" ola bilər.');
   try {
-    const userCheckSql = `SELECT id FROM istifadeciler WHERE id = :istifadeci_id`;
-    const userCheckResult = await executeQuery(userCheckSql, { istifadeci_id });
-    if (userCheckResult.rows.length === 0) {
-      return res.status(400).json({ error: 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.' });
-    }
+    const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
+    if (userCheck.rows.length === 0) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (istifadeci_id) mövcud deyil.');
+    const subCheck = await executeQuery(`SELECT id, istifadeci_id FROM abunelikler WHERE id = :abunelik_id`, { abunelik_id });
+    if (subCheck.rows.length === 0) return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_NOT_FOUND', 'Qeyd olunan abunəlik (abunelik_id) mövcud deyil.');
+    if (Number(subCheck.rows[0].ISTIFADECI_ID) !== Number(istifadeci_id)) return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_USER_MISMATCH', 'Qeyd olunan abunəlik daxil etdiyiniz istifadəçiyə məxsus deyil.');
 
-    const subCheckSql = `SELECT id, istifadeci_id FROM abunelikler WHERE id = :abunelik_id`;
-    const subCheckResult = await executeQuery(subCheckSql, { abunelik_id });
-    if (subCheckResult.rows.length === 0) {
-      return res.status(400).json({ error: 'Qeyd olunan abunəlik (abunelik_id) mövcud deyil.' });
-    }
-    if (Number(subCheckResult.rows[0].ISTIFADECI_ID) !== Number(istifadeci_id)) {
-      return res.status(400).json({ error: 'Qeyd olunan abunəlik daxil etdiyiniz istifadəçiyə məxsus deyil.' });
-    }
-
-    let sql;
-    let binds;
+    let sql, binds;
     if (odenis_tarixcesi_id) {
-      sql = `
-        INSERT INTO odenis_tarixcesi (id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
-        VALUES (:odenis_tarixcesi_id, :abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi, 'YYYY-MM-DD'), :mebleq, :status)
-      `;
+      sql = `INSERT INTO odenis_tarixcesi (id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status) VALUES (:odenis_tarixcesi_id, :abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi,'YYYY-MM-DD'), :mebleq, :status)`;
       binds = { odenis_tarixcesi_id, abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status: statusValue };
     } else {
-      sql = `
-        INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
-        VALUES (:abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi, 'YYYY-MM-DD'), :mebleq, :status)
-      `;
+      sql = `INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status) VALUES (:abunelik_id, :istifadeci_id, TO_DATE(:odenis_tarixi,'YYYY-MM-DD'), :mebleq, :status)`;
       binds = { abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status: statusValue };
     }
-
     await executeQuery(sql, binds, { autoCommit: true });
-    res.status(201).json({ message: 'Ödəniş tarixçəsi qeydi uğurla əlavə edildi.' });
+    return successResponse(res, 201, 'Created', { message: 'Ödəniş tarixçəsi qeydi uğurla əlavə edildi.' });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) {
-      return res.status(400).json({ error: 'Bu ödəniş tarixçəsi ID-si artıq mövcuddur.' });
-    }
-    res.status(500).json({ error: err.message });
+    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ID', 'Bu ödəniş tarixçəsi ID-si artıq mövcuddur.');
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1354,7 +1084,6 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: Ödəniş tarixçəsinin ID-si
  *     requestBody:
  *       required: true
  *       content:
@@ -1378,60 +1107,32 @@ app.post('/api/odenis-tarixcesi', async (req, res) => {
  *                 example: success
  *     responses:
  *       200:
- *         description: Ödəniş tarixçəsi yeniləndi
+ *         description: Yeniləndi
  *       404:
- *         description: Ödəniş tarixçəsi tapılmadı
+ *         description: Tapılmadı
  */
 app.put('/api/odenis-tarixcesi/:id', async (req, res) => {
   const { id } = req.params;
   const { odenis_tarixi, mebleq, status } = req.body;
-  if (!odenis_tarixi || !mebleq) {
-    return res.status(400).json({ error: 'Məcburi sahələri (odenis_tarixi, mebleq) doldurun.' });
-  }
-  if (!isValidDate(odenis_tarixi)) {
-    return res.status(400).json({ error: `Ödəniş tarixi düzgün deyil: "${odenis_tarixi}" mövcud olmayan və ya yanlış formatda tarixdir (Format: YYYY-MM-DD).` });
-  }
+  if (!odenis_tarixi || mebleq === undefined || mebleq === null)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (odenis_tarixi, mebleq) doldurun.');
+  if (!isValidDate(odenis_tarixi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Ödəniş tarixi düzgün deyil: "${odenis_tarixi}" (Format: YYYY-MM-DD).`);
   const statusValue = status || 'success';
-  if (statusValue !== 'success' && statusValue !== 'fail') {
-    return res.status(400).json({ error: 'Status yalnız "success" və ya "fail" ola bilər.' });
-  }
+  if (statusValue !== 'success' && statusValue !== 'fail')
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS', 'Status yalnız "success" və ya "fail" ola bilər.');
   try {
-    const historyCheckSql = `SELECT id, abunelik_id, istifadeci_id FROM odenis_tarixcesi WHERE id = :id`;
-    const historyCheckResult = await executeQuery(historyCheckSql, { id });
-    if (historyCheckResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Ödəniş tarixçəsi tapılmadı.' });
-    }
-    const currentHistory = historyCheckResult.rows[0];
-    const currentAbunelikId = currentHistory.ABUNELIK_ID;
-    const currentIstifadeciId = currentHistory.ISTIFADECI_ID;
-
-    if (req.body.odenis_tarixcesi_id !== undefined && Number(req.body.odenis_tarixcesi_id) !== Number(id)) {
-      return res.status(400).json({ error: 'Ödəniş tarixçəsinin ID-si dəyişdirilə bilməz.' });
-    }
-
-    if (req.body.istifadeci_id !== undefined && Number(req.body.istifadeci_id) !== Number(currentIstifadeciId)) {
-      return res.status(400).json({ error: 'Ödəniş tarixçəsinin aid olduğu istifadəçi (istifadeci_id) dəyişdirilə bilməz.' });
-    }
-
-    if (req.body.abunelik_id !== undefined && Number(req.body.abunelik_id) !== Number(currentAbunelikId)) {
-      return res.status(400).json({ error: 'Ödəniş tarixçəsinin aid olduğu abunəlik (abunelik_id) dəyişdirilə bilməz.' });
-    }
-
-    const sql = `
-      UPDATE odenis_tarixcesi SET
-        abunelik_id = :abunelik_id,
-        odenis_tarixi = TO_DATE(:odenis_tarixi, 'YYYY-MM-DD'),
-        mebleq = :mebleq,
-        status = :status
-      WHERE id = :id
-    `;
-    const result = await executeQuery(sql, { abunelik_id: currentAbunelikId, odenis_tarixi, mebleq, status: statusValue, id }, { autoCommit: true });
-    if (result.rowsAffected === 0) {
-      return res.status(404).json({ error: 'Ödəniş tarixçəsi tapılmadı.' });
-    }
-    res.json({ message: 'Ödəniş tarixçəsi uğurla yeniləndi.' });
+    const historyCheck = await executeQuery(`SELECT id, abunelik_id, istifadeci_id FROM odenis_tarixcesi WHERE id = :id`, { id });
+    if (historyCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
+    const { ABUNELIK_ID: currentAbunelikId, ISTIFADECI_ID: currentIstifadeciId } = historyCheck.rows[0];
+    if (req.body.odenis_tarixcesi_id !== undefined && Number(req.body.odenis_tarixcesi_id) !== Number(id)) return errorResponse(res, 400, 'Bad Request', 'ID_IMMUTABLE', 'Ödəniş tarixçəsinin ID-si dəyişdirilə bilməz.');
+    if (req.body.istifadeci_id !== undefined && Number(req.body.istifadeci_id) !== Number(currentIstifadeciId)) return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Ödəniş tarixçəsinin aid olduğu istifadəçi dəyişdirilə bilməz.');
+    if (req.body.abunelik_id !== undefined && Number(req.body.abunelik_id) !== Number(currentAbunelikId)) return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_IMMUTABLE', 'Ödəniş tarixçəsinin aid olduğu abunəlik dəyişdirilə bilməz.');
+    await executeQuery(`UPDATE odenis_tarixcesi SET abunelik_id=:abunelik_id, odenis_tarixi=TO_DATE(:odenis_tarixi,'YYYY-MM-DD'), mebleq=:mebleq, status=:status WHERE id=:id`,
+      { abunelik_id: currentAbunelikId, odenis_tarixi, mebleq, status: statusValue, id }, { autoCommit: true });
+    return successResponse(res, 200, 'Updated', { message: 'Ödəniş tarixçəsi uğurla yeniləndi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1447,24 +1148,20 @@ app.put('/api/odenis-tarixcesi/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: Ödəniş tarixçəsinin ID-si
  *     responses:
  *       200:
- *         description: Ödəniş tarixçəsi silindi
+ *         description: Silindi
  *       404:
- *         description: Ödəniş tarixçəsi tapılmadı
+ *         description: Tapılmadı
  */
 app.delete('/api/odenis-tarixcesi/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `DELETE FROM odenis_tarixcesi WHERE id = :id`;
-    const result = await executeQuery(sql, { id }, { autoCommit: true });
-    if (result.rowsAffected === 0) {
-      return res.status(404).json({ error: 'Ödəniş tarixçəsi tapılmadı.' });
-    }
-    res.json({ message: 'Ödəniş tarixçəsi uğurla silindi.' });
+    const result = await executeQuery(`DELETE FROM odenis_tarixcesi WHERE id = :id`, { id }, { autoCommit: true });
+    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'PAYMENT_NOT_FOUND', 'Ödəniş tarixçəsi tapılmadı.');
+    return successResponse(res, 200, 'Deleted', { message: 'Ödəniş tarixçəsi uğurla silindi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1476,7 +1173,7 @@ app.delete('/api/odenis-tarixcesi/:id', async (req, res) => {
  * @swagger
  * /api/odenis-metodlari:
  *   get:
- *     summary: İstifadəçinin ödəniş metodlarını (kartlarını) siyahılayır
+ *     summary: İstifadəçinin ödəniş metodlarını siyahılayır
  *     tags: [Ödəniş Metodları]
  *     parameters:
  *       - in: query
@@ -1484,22 +1181,50 @@ app.delete('/api/odenis-tarixcesi/:id', async (req, res) => {
  *         required: true
  *         schema:
  *           type: integer
- *         description: İstifadəçinin ID-si
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
  */
 app.get('/api/odenis-metodlari', async (req, res) => {
   const { istifadeci_id } = req.query;
-  if (!istifadeci_id) {
-    return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
-  }
+  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
   try {
     const sql = `SELECT id AS card_id, istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status FROM odenis_metodlari WHERE istifadeci_id = :istifadeci_id`;
     const result = await executeQuery(sql, { istifadeci_id });
-    res.json(result.rows);
+    if (result.rows.length === 0) return successResponse(res, 200, 'No payment methods found', { cards: [] });
+    return successResponse(res, 200, 'Success', { cards: result.rows });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
+ * /api/odenis-metodlari/{id}:
+ *   get:
+ *     summary: ID-yə görə ödəniş metodunu gətirir
+ *     tags: [Ödəniş Metodları]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ *       404:
+ *         description: Tapılmadı
+ */
+app.get('/api/odenis-metodlari/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const sql = `SELECT id AS card_id, istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status FROM odenis_metodlari WHERE id = :id`;
+    const result = await executeQuery(sql, { id });
+    if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
+    return successResponse(res, 200, 'Success', { card: result.rows[0] });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1529,7 +1254,6 @@ app.get('/api/odenis-metodlari', async (req, res) => {
  *                 type: string
  *                 enum: [Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard]
  *                 example: Visa
- *                 description: Azərbaycanda istifadə olunan populyar kart növləri
  *               son_dord_reqem:
  *                 type: string
  *                 example: "1234"
@@ -1542,99 +1266,24 @@ app.get('/api/odenis-metodlari', async (req, res) => {
  */
 app.post('/api/odenis-metodlari', async (req, res) => {
   const { istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi } = req.body;
-  if (!istifadeci_id || !ad || !kart_tipi) {
-    return res.status(400).json({ error: 'istifadeci_id, ad və kart_tipi sahələri məcburidir.' });
-  }
+  if (!istifadeci_id || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'istifadeci_id, ad və kart_tipi sahələri məcburidir.');
 
-  const ICAZE_VERILEN_KARTLAR = [
-    'visa', 'mastercard', 'maestro', 'unionpay', 'american express', 'amex',
-    'birkart', 'tamkart', 'bolkart', 'ucard'
-  ];
-  const KART_FORMATLARI = {
-    'visa': 'Visa', 'mastercard': 'Mastercard', 'maestro': 'Maestro',
-    'unionpay': 'UnionPay', 'american express': 'American Express',
-    'amex': 'American Express', 'birkart': 'Birkart', 'tamkart': 'Tamkart',
-    'bolkart': 'Bolkart', 'ucard': 'Ucard'
-  };
-
+  const ICAZE_VERILEN_KARTLAR = ['visa','mastercard','maestro','unionpay','american express','amex','birkart','tamkart','bolkart','ucard'];
+  const KART_FORMATLARI = { 'visa':'Visa','mastercard':'Mastercard','maestro':'Maestro','unionpay':'UnionPay','american express':'American Express','amex':'American Express','birkart':'Birkart','tamkart':'Tamkart','bolkart':'Bolkart','ucard':'Ucard' };
   const normalizedKartTipi = kart_tipi.trim().toLowerCase();
-  if (!ICAZE_VERILEN_KARTLAR.includes(normalizedKartTipi)) {
-    return res.status(400).json({
-      error: `Yanlış kart növü: "${kart_tipi}". Yalnız aşağıdakı kart növləri icazəlidir: Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard.`
-    });
-  }
-  const formattedKartTipi = KART_FORMATLARI[normalizedKartTipi];
+  if (!ICAZE_VERILEN_KARTLAR.includes(normalizedKartTipi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CARD_TYPE', `Yanlış kart növü: "${kart_tipi}". Yalnız Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard icazəlidir.`);
 
   try {
     const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
-    if (userCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'İstifadəçi tapılmadı.' });
-    }
-
-    const sql = `
-      INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi)
-      VALUES (:istifadeci_id, :ad, :kart_tipi, :son_dord_reqem, :kart_istifade_tarixi)
-    `;
-    await executeQuery(sql, {
-      istifadeci_id, ad,
-      kart_tipi: formattedKartTipi,
-      son_dord_reqem: son_dord_reqem || null,
-      kart_istifade_tarixi: kart_istifade_tarixi || null
-    }, { autoCommit: true });
-    res.status(201).json({ message: 'Ödəniş metodu uğurla əlavə edildi.' });
+    if (userCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    await executeQuery(
+      `INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi) VALUES (:istifadeci_id, :ad, :kart_tipi, :son_dord_reqem, :kart_istifade_tarixi)`,
+      { istifadeci_id, ad, kart_tipi: KART_FORMATLARI[normalizedKartTipi], son_dord_reqem: son_dord_reqem || null, kart_istifade_tarixi: kart_istifade_tarixi || null }, { autoCommit: true }
+    );
+    return successResponse(res, 201, 'Created', { message: 'Ödəniş metodu uğurla əlavə edildi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-/**
- * @swagger
- * /api/odenis-metodlari/{id}:
- *   get:
- *     summary: ID-yə görə ödəniş metodunu gətirir
- *     tags: [Ödəniş Metodları]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 CARD_ID:
- *                   type: integer
- *                 ISTIFADECI_ID:
- *                   type: integer
- *                 AD:
- *                   type: string
- *                 KART_TIPI:
- *                   type: string
- *                 SON_DORD_REQEM:
- *                   type: string
- *                 KART_ISTIFADE_TARIXI:
- *                   type: string
- *                 STATUS:
- *                   type: string
- *       404:
- *         description: Tapılmadı
- */
-app.get('/api/odenis-metodlari/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const sql = `SELECT id AS card_id, istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status FROM odenis_metodlari WHERE id = :id`;
-    const result = await executeQuery(sql, { id });
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Ödəniş metodu tapılmadı.' });
-    }
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1642,7 +1291,7 @@ app.get('/api/odenis-metodlari/:id', async (req, res) => {
  * @swagger
  * /api/odenis-metodlari/{id}:
  *   put:
- *     summary: Ödəniş metodunu (kartı) yeniləyir
+ *     summary: Ödəniş metodunu yeniləyir
  *     tags: [Ödəniş Metodları]
  *     parameters:
  *       - in: path
@@ -1683,50 +1332,23 @@ app.get('/api/odenis-metodlari/:id', async (req, res) => {
 app.put('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
   const { ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi, status } = req.body;
-  if (!ad || !kart_tipi) {
-    return res.status(400).json({ error: 'ad və kart_tipi sahələri məcburidir.' });
-  }
+  if (!ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'ad və kart_tipi sahələri məcburidir.');
 
-  const ICAZE_VERILEN_KARTLAR = [
-    'visa', 'mastercard', 'maestro', 'unionpay', 'american express', 'amex',
-    'birkart', 'tamkart', 'bolkart', 'ucard'
-  ];
-  const KART_FORMATLARI = {
-    'visa': 'Visa', 'mastercard': 'Mastercard', 'maestro': 'Maestro',
-    'unionpay': 'UnionPay', 'american express': 'American Express',
-    'amex': 'American Express', 'birkart': 'Birkart', 'tamkart': 'Tamkart',
-    'bolkart': 'Bolkart', 'ucard': 'Ucard'
-  };
-
+  const ICAZE_VERILEN_KARTLAR = ['visa','mastercard','maestro','unionpay','american express','amex','birkart','tamkart','bolkart','ucard'];
+  const KART_FORMATLARI = { 'visa':'Visa','mastercard':'Mastercard','maestro':'Maestro','unionpay':'UnionPay','american express':'American Express','amex':'American Express','birkart':'Birkart','tamkart':'Tamkart','bolkart':'Bolkart','ucard':'Ucard' };
   const normalizedKartTipi = kart_tipi.trim().toLowerCase();
-  if (!ICAZE_VERILEN_KARTLAR.includes(normalizedKartTipi)) {
-    return res.status(400).json({
-      error: `Yanlış kart növü: "${kart_tipi}". Yalnız aşağıdakı kart növləri icazəlidir: Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard.`
-    });
-  }
-  const formattedKartTipi = KART_FORMATLARI[normalizedKartTipi];
+  if (!ICAZE_VERILEN_KARTLAR.includes(normalizedKartTipi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CARD_TYPE', `Yanlış kart növü: "${kart_tipi}". Yalnız Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard icazəlidir.`);
 
   try {
-    const sql = `
-      UPDATE odenis_metodlari SET
-        ad = :ad, kart_tipi = :kart_tipi,
-        son_dord_reqem = :son_dord_reqem,
-        kart_istifade_tarixi = :kart_istifade_tarixi,
-        status = :status
-      WHERE id = :id
-    `;
-    const result = await executeQuery(sql, {
-      ad, kart_tipi: formattedKartTipi,
-      son_dord_reqem: son_dord_reqem || null,
-      kart_istifade_tarixi: kart_istifade_tarixi || null,
-      status: status || 'active', id
-    }, { autoCommit: true });
-    if (result.rowsAffected === 0) {
-      return res.status(404).json({ error: 'Ödəniş metodu tapılmadı.' });
-    }
-    res.json({ message: 'Ödəniş metodu uğurla yeniləndi.' });
+    const result = await executeQuery(
+      `UPDATE odenis_metodlari SET ad=:ad, kart_tipi=:kart_tipi, son_dord_reqem=:son_dord_reqem, kart_istifade_tarixi=:kart_istifade_tarixi, status=:status WHERE id=:id`,
+      { ad, kart_tipi: KART_FORMATLARI[normalizedKartTipi], son_dord_reqem: son_dord_reqem || null, kart_istifade_tarixi: kart_istifade_tarixi || null, status: status || 'active', id }, { autoCommit: true }
+    );
+    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
+    return successResponse(res, 200, 'Updated', { message: 'Ödəniş metodu uğurla yeniləndi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1749,14 +1371,11 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
 app.delete('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `DELETE FROM odenis_metodlari WHERE id = :id`;
-    const result = await executeQuery(sql, { id }, { autoCommit: true });
-    if (result.rowsAffected === 0) {
-      return res.status(404).json({ error: 'Ödəniş metodu tapılmadı.' });
-    }
-    res.json({ message: 'Ödəniş metodu uğurla silindi.' });
+    const result = await executeQuery(`DELETE FROM odenis_metodlari WHERE id = :id`, { id }, { autoCommit: true });
+    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
+    return successResponse(res, 200, 'Deleted', { message: 'Ödəniş metodu uğurla silindi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1782,15 +1401,14 @@ app.delete('/api/odenis-metodlari/:id', async (req, res) => {
  */
 app.get('/api/budceler', async (req, res) => {
   const { istifadeci_id } = req.query;
-  if (!istifadeci_id) {
-    return res.status(400).json({ error: 'istifadeci_id sorğu parametri məcburidir.' });
-  }
+  if (!istifadeci_id) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'istifadeci_id sorğu parametri məcburidir.');
   try {
     const sql = `SELECT istifadeci_id, limit_mebleq, valyuta, bildiris_faizi FROM budceler WHERE istifadeci_id = :istifadeci_id`;
     const result = await executeQuery(sql, { istifadeci_id });
-    res.json(result.rows);
+    if (result.rows.length === 0) return successResponse(res, 200, 'No budget found', { budgets: [] });
+    return successResponse(res, 200, 'Success', { budgets: result.rows });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1827,30 +1445,18 @@ app.get('/api/budceler', async (req, res) => {
  */
 app.post('/api/budceler', async (req, res) => {
   const { istifadeci_id, limit_mebleq, valyuta, bildiris_faizi } = req.body;
-  if (!istifadeci_id || limit_mebleq === undefined) {
-    return res.status(400).json({ error: 'istifadeci_id və limit_mebleq sahələri məcburidir.' });
-  }
-  if (valyuta && !isValidCurrency(valyuta)) {
-    return res.status(400).json({ error: `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.` });
-  }
+  if (!istifadeci_id || limit_mebleq === undefined) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'istifadeci_id və limit_mebleq sahələri məcburidir.');
+  if (valyuta && !isValidCurrency(valyuta)) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
   try {
     const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
-    if (userCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'İstifadəçi tapılmadı.' });
-    }
-
-    const sql = `
-      INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, bildiris_faizi)
-      VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :bildiris_faizi)
-    `;
-    await executeQuery(sql, {
-      istifadeci_id, limit_mebleq,
-      valyuta: getValidCurrency(valyuta),
-      bildiris_faizi: bildiris_faizi || 90.00
-    }, { autoCommit: true });
-    res.status(201).json({ message: 'Büdcə limiti uğurla quraşdırıldı.' });
+    if (userCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    await executeQuery(
+      `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, bildiris_faizi) VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :bildiris_faizi)`,
+      { istifadeci_id, limit_mebleq, valyuta: getValidCurrency(valyuta), bildiris_faizi: bildiris_faizi || 90.00 }, { autoCommit: true }
+    );
+    return successResponse(res, 201, 'Created', { message: 'Büdcə limiti uğurla quraşdırıldı.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1891,32 +1497,17 @@ app.post('/api/budceler', async (req, res) => {
 app.put('/api/budceler/:id', async (req, res) => {
   const { id } = req.params;
   const { limit_mebleq, valyuta, bildiris_faizi } = req.body;
-  if (limit_mebleq === undefined) {
-    return res.status(400).json({ error: 'limit_mebleq sahəsi məcburidir.' });
-  }
-  if (valyuta && !isValidCurrency(valyuta)) {
-    return res.status(400).json({ error: `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.` });
-  }
+  if (limit_mebleq === undefined) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'limit_mebleq sahəsi məcburidir.');
+  if (valyuta && !isValidCurrency(valyuta)) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
   try {
-    const sql = `
-      UPDATE budceler SET
-        limit_mebleq = :limit_mebleq,
-        valyuta = :valyuta,
-        bildiris_faizi = :bildiris_faizi
-      WHERE id = :id
-    `;
-    const result = await executeQuery(sql, {
-      limit_mebleq,
-      valyuta: getValidCurrency(valyuta),
-      bildiris_faizi: bildiris_faizi || 90.00,
-      id
-    }, { autoCommit: true });
-    if (result.rowsAffected === 0) {
-      return res.status(404).json({ error: 'Büdcə limiti tapılmadı.' });
-    }
-    res.json({ message: 'Büdcə limiti uğurla yeniləndi.' });
+    const result = await executeQuery(
+      `UPDATE budceler SET limit_mebleq=:limit_mebleq, valyuta=:valyuta, bildiris_faizi=:bildiris_faizi WHERE id=:id`,
+      { limit_mebleq, valyuta: getValidCurrency(valyuta), bildiris_faizi: bildiris_faizi || 90.00, id }, { autoCommit: true }
+    );
+    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'BUDGET_NOT_FOUND', 'Büdcə limiti tapılmadı.');
+    return successResponse(res, 200, 'Updated', { message: 'Büdcə limiti uğurla yeniləndi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1939,21 +1530,6 @@ app.put('/api/budceler/:id', async (req, res) => {
  *     responses:
  *       200:
  *         description: Uğurlu əməliyyat
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 ISTIFADECI_ID:
- *                   type: integer
- *                 ESAS_VALYUTA:
- *                   type: string
- *                 BILDIRIS_METODU:
- *                   type: string
- *                 DIL:
- *                   type: string
- *                 TEMA:
- *                   type: string
  */
 app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
   const { istifadeci_id } = req.params;
@@ -1962,22 +1538,14 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
     const result = await executeQuery(sql, { istifadeci_id });
     if (result.rows.length === 0) {
       await executeQuery(
-        `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema)
-         VALUES (:istifadeci_id, 'AZN', 'email', 'az', 'dark')`,
-        { istifadeci_id },
-        { autoCommit: true }
+        `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema) VALUES (:istifadeci_id, 'AZN', 'email', 'az', 'dark')`,
+        { istifadeci_id }, { autoCommit: true }
       );
-      return res.json({
-        istifadeci_id: Number(istifadeci_id),
-        esas_valyuta: 'AZN',
-        bildiris_metodu: 'email',
-        dil: 'az',
-        tema: 'dark'
-      });
+      return successResponse(res, 200, 'Success', { settings: { istifadeci_id: Number(istifadeci_id), esas_valyuta: 'AZN', bildiris_metodu: 'email', dil: 'az', tema: 'dark' } });
     }
-    res.json(result.rows[0]);
+    return successResponse(res, 200, 'Success', { settings: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
@@ -1985,7 +1553,7 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
  * @swagger
  * /api/ayarlar/{istifadeci_id}:
  *   put:
- *     summary: İstifadəçinin fərdi ayarlarını yeniləyir və ya yaradır
+ *     summary: İstifadəçinin fərdi ayarlarını yeniləyir
  *     tags: [Ayarlar]
  *     parameters:
  *       - in: path
@@ -2010,7 +1578,6 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
  *                 example: email
  *               dil:
  *                 type: string
- *                 enum: [az, en, ru, tr, de, fr, es, it, pt, ar, zh, ja, ko, hi, nl, pl, sv, no, da, fi, cs, sk, ro, hu, uk, ka, kk, uz, hy, fa, he, id, ms, th, vi, el, bg, hr, sr, lt, lv, et, sl, sq, mk, bs, is, ga, cy, eu, ca, gl, mt, af, sw, tl, bn, ur, ta, te, kn, ml, si, my, km, lo, mn, ne, ps, so, am, ha, yo, ig]
  *                 example: az
  *               tema:
  *                 type: string
@@ -2023,67 +1590,37 @@ app.get('/api/ayarlar/:istifadeci_id', async (req, res) => {
 app.put('/api/ayarlar/:istifadeci_id', async (req, res) => {
   const { istifadeci_id } = req.params;
   const { esas_valyuta, bildiris_metodu, dil, tema } = req.body;
+  const ICAZE_VERILEN_VALYUTALAR_L = ['AZN', 'USD', 'EUR'];
+  const ICAZE_VERILEN_BILDIRISLER  = ['email', 'telegram'];
+  const ICAZE_VERILEN_TEMALAR      = ['light', 'dark'];
+  const ICAZE_VERILEN_DILLER = ['az','en','ru','tr','de','fr','es','it','pt','ar','zh','ja','ko','hi','nl','pl','sv','no','da','fi','cs','sk','ro','hu','uk','ka','kk','uz','hy','fa','he','id','ms','th','vi','el','bg','hr','sr','lt','lv','et','sl','sq','mk','bs','is','ga','cy','eu','ca','gl','mt','af','sw','tl','bn','ur','ta','te','kn','ml','si','my','km','lo','mn','ne','ps','so','am','ha','yo','ig'];
+
+  if (esas_valyuta && !ICAZE_VERILEN_VALYUTALAR_L.includes(esas_valyuta.toUpperCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${esas_valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR_L.join(', ')} daxil edilə bilər.`);
+  if (bildiris_metodu && !ICAZE_VERILEN_BILDIRISLER.includes(bildiris_metodu.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_NOTIFICATION_METHOD', `Yanlış bildiriş metodu: "${bildiris_metodu}". Yalnız ${ICAZE_VERILEN_BILDIRISLER.join(', ')} daxil edilə bilər.`);
+  if (tema && !ICAZE_VERILEN_TEMALAR.includes(tema.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_THEME', `Yanlış tema: "${tema}". Yalnız ${ICAZE_VERILEN_TEMALAR.join(', ')} daxil edilə bilər.`);
+  if (dil && !ICAZE_VERILEN_DILLER.includes(dil.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_LANGUAGE', `Yanlış dil kodu: "${dil}". ISO 639-1 formatında olmalıdır.`);
+
   try {
-    const ICAZE_VERILEN_VALYUTALAR   = ['AZN', 'USD', 'EUR'];
-    const ICAZE_VERILEN_BILDIRISLER  = ['email', 'telegram'];
-    const ICAZE_VERILEN_TEMALAR      = ['light', 'dark'];
-    const ICAZE_VERILEN_DILLER = [
-      'az','en','ru','tr','de','fr','es','it','pt','ar','zh','ja','ko','hi',
-      'nl','pl','sv','no','da','fi','cs','sk','ro','hu','uk','ka','kk','uz',
-      'hy','fa','he','id','ms','th','vi','el','bg','hr','sr','lt','lv','et',
-      'sl','sq','mk','bs','is','ga','cy','eu','ca','gl','mt','af','sw','tl',
-      'bn','ur','ta','te','kn','ml','si','my','km','lo','mn','ne','ps','so',
-      'am','ha','yo','ig'
-    ];
-
-    if (esas_valyuta && !ICAZE_VERILEN_VALYUTALAR.includes(esas_valyuta.toUpperCase())) {
-      return res.status(400).json({ error: `Yanlış valyuta: "${esas_valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.` });
-    }
-    if (bildiris_metodu && !ICAZE_VERILEN_BILDIRISLER.includes(bildiris_metodu.toLowerCase())) {
-      return res.status(400).json({ error: `Yanlış bildiriş metodu: "${bildiris_metodu}". Yalnız ${ICAZE_VERILEN_BILDIRISLER.join(', ')} daxil edilə bilər.` });
-    }
-    if (tema && !ICAZE_VERILEN_TEMALAR.includes(tema.toLowerCase())) {
-      return res.status(400).json({ error: `Yanlış tema: "${tema}". Yalnız ${ICAZE_VERILEN_TEMALAR.join(', ')} daxil edilə bilər.` });
-    }
-    if (dil && !ICAZE_VERILEN_DILLER.includes(dil.toLowerCase())) {
-      return res.status(400).json({ error: `Yanlış dil kodu: "${dil}". ISO 639-1 formatında dünya dillərindən biri olmalıdır (məs: az, en, ru, tr, de...).` });
-    }
-
     const userCheck = await executeQuery(`SELECT id FROM istifadeciler WHERE id = :istifadeci_id`, { istifadeci_id });
-    if (userCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'İstifadəçi tapılmadı.' });
-    }
+    if (userCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
     const settingsCheck = await executeQuery(`SELECT istifadeci_id FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`, { istifadeci_id });
-
     let sql;
     if (settingsCheck.rows.length > 0) {
-      sql = `
-        UPDATE istifadeci_ayarlari SET
-          esas_valyuta = :esas_valyuta,
-          bildiris_metodu = :bildiris_metodu,
-          dil = :dil,
-          tema = :tema
-        WHERE istifadeci_id = :istifadeci_id
-      `;
+      sql = `UPDATE istifadeci_ayarlari SET esas_valyuta=:esas_valyuta, bildiris_metodu=:bildiris_metodu, dil=:dil, tema=:tema WHERE istifadeci_id=:istifadeci_id`;
     } else {
-      sql = `
-        INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema)
-        VALUES (:istifadeci_id, :esas_valyuta, :bildiris_metodu, :dil, :tema)
-      `;
+      sql = `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema) VALUES (:istifadeci_id, :esas_valyuta, :bildiris_metodu, :dil, :tema)`;
     }
-
     await executeQuery(sql, {
       istifadeci_id,
-      esas_valyuta:    (esas_valyuta    ? esas_valyuta.toUpperCase()    : 'AZN'),
-      bildiris_metodu: (bildiris_metodu ? bildiris_metodu.toLowerCase() : 'email'),
-      dil:             (dil             ? dil.toLowerCase()             : 'az'),
-      tema:            (tema            ? tema.toLowerCase()            : 'dark')
+      esas_valyuta: esas_valyuta ? esas_valyuta.toUpperCase() : 'AZN',
+      bildiris_metodu: bildiris_metodu ? bildiris_metodu.toLowerCase() : 'email',
+      dil: dil ? dil.toLowerCase() : 'az',
+      tema: tema ? tema.toLowerCase() : 'dark'
     }, { autoCommit: true });
-
-    res.json({ message: 'Ayarlar uğurla yeniləndi.' });
+    return successResponse(res, 200, 'Updated', { message: 'Ayarlar uğurla yeniləndi.' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
