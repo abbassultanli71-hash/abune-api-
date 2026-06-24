@@ -1038,20 +1038,25 @@ app.put('/api/bildirisler/:id', async (req, res) => {
         `Bildirişin aid olduğu abunəlik (app) dəyişdirilə bilməz. Mövcud abunelik_id: ${current.ABUNELIK_ID}.`);
 
     // basliq və mesaj daxilində app_adi TAM SÖZ kimi olmalıdır (məs. "Netflixsdfsdf" qəbul edilmir)
-function appAdiSozKimiVarmi(metin, appAdi) {
-  const escaped = appAdi.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const regex = new RegExp(`\\b${escaped}\\b`, 'i');
-  return regex.test(metin);
-}
-    
-    const appAdi = current.APP_ADI;
-    if (appAdi && !appAdiSozKimiVarmi(trimmedBasliq, appAdi))
-      return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
-        `Başlıqda "${appAdi}" adı tam söz şəklində olmalıdır. Məsələn: "${appAdi} - Yenilənmiş Xatırlatma".`);
+const escaped = appAdi.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    if (appAdi && !appAdiSozKimiVarmi(trimmedMesaj, appAdi))
-      return errorResponse(res, 400, 'Bad Request', 'APP_NAME_MISMATCH',
-        `Mesajda "${appAdi}" adı tam söz şəklində olmalıdır.`);
+if (appAdi && !new RegExp(`\\b${escaped}\\b`, 'i').test(trimmedBasliq))
+  return errorResponse(
+    res,
+    400,
+    'Bad Request',
+    'APP_NAME_MISMATCH',
+    `Başlıqda "${appAdi}" adı tam söz şəklində olmalıdır.`
+  );
+
+if (appAdi && !new RegExp(`\\b${escaped}\\b`, 'i').test(trimmedMesaj))
+  return errorResponse(
+    res,
+    400,
+    'Bad Request',
+    'APP_NAME_MISMATCH',
+    `Mesajda "${appAdi}" adı tam söz şəklində olmalıdır.`
+  );
 
     // Yalnız başlıq və mesajı yenilə
     await executeQuery(
