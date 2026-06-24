@@ -1979,13 +1979,4 @@ app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
   console.log(`Swagger documentation is available on http://localhost:${PORT}/api-docs`);
   Remove ID GET endpoints and add notification validation;
-  const appAdiSozKimiVarmi = mesajRegex.test(trimmedMesaj);
-if (!mesajRegex.test(trimmedMesaj)) {
-  return errorResponse(
-    res,
-    400,
-    'Bad Request',
-    'APP_NAME_MISMATCH',
-    `Mesaj daxilində "${appAdi}" adı olmalıdır.`
-  );
-}});
+});
