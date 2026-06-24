@@ -159,19 +159,19 @@ function errorResponse(res, statusCode, message, errorCode, errorMessage) {
   });
 }
 
-// 🔥 TƏZƏLƏNƏN BÖLMƏ: Abunəlik adına görə default vaxt hesablayan bildiriş mexanizmi
+// Abunəlik adına görə default günlərlə avtomatik bildiriş yaradan funksiya
 async function addAutoNotification(userId, appAd, novbetiOdenisTarixi, odenisTezliyi) {
   try {
     const [y, m, d] = novbetiOdenisTarixi.split('-').map(Number);
     const gonderilme = new Date(Date.UTC(y, m - 1, d));
     
-    // Biznes məntiqi: Ödəniş tezliyinə görə neçə gün əvvəl göndəriləcəyini təyin edirik
+    // Biznes məntiqi: Ödəniş tezliyinə görə neçə gün əvvəl bildiriş göndəriləcəyini tənzimləyirik
     switch (odenisTezliyi) {
       case 'weekly':    
         gonderilme.setUTCDate(gonderilme.getUTCDate() - 2); // Həftəlik abunəliyə 2 gün qalmış
         break;
       case 'monthly':   
-        gonderilme.setUTCDate(gonderilme.getUTCDate() - 3); // Aylıq abunəliyə vəziyyətə görə 3 gün qalmış (Default)
+        gonderilme.setUTCDate(gonderilme.getUTCDate() - 3); // Aylıq abunəliyə vəziyyətə görə 3 gün qalmış
         break;
       case 'quarterly': 
         gonderilme.setUTCDate(gonderilme.getUTCDate() - 7); // Rüblük abunəliyə 7 gün qalmış
@@ -189,19 +189,20 @@ async function addAutoNotification(userId, appAd, novbetiOdenisTarixi, odenisTez
     const dd = String(gonderilme.getUTCDate()).padStart(2, '0');
     const gonderilmeTarixiStr = `${yyyy}-${mm}-${dd}`;
 
-    // Abunəlik adına görə dinamik başlıq və mesaj (Netflix, Spotify və s. birbaxışda görsənəcək)
+    // Abunəlik adına görə dinamik mətn
     const basliq = `${appAd} Abunəlik Ödəniş Xəbərdarlığı`;
     const mesaj = `Hörmətli istifadəçi, ${appAd} abunəliyiniz üçün növbəti xidmət haqqı ödəniş tarixi yaxınlaşır. Növbəti ödəniş tarixi: ${novbetiOdenisTarixi}.`;
 
-    // bildiris_id verilənlər bazası səviyyəsində avtomatik (Auto-increment) yaradılır.
+    // bildiris_id bazada default (Auto-increment) yarandığı üçün INSERT-ə yazmırıq. Tarixi zəmanətli formata salırıq.
     await executeQuery(
       `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj, gonderilme_tarixi)
        VALUES (:istifadeci_id, :basliq, :mesaj, TO_DATE(:gonderilme_tarixi, 'YYYY-MM-DD'))`,
       { istifadeci_id: userId, basliq, mesaj, gonderilme_tarixi: gonderilmeTarixiStr },
       { autoCommit: true }
     );
+    console.log(`[OK] ${appAd} üçün bildiriş bazaya uğurla yazıldı! Tarix: ${gonderilmeTarixiStr}`);
   } catch (err) {
-    console.error('Avtomatik bildiriş xətası:', err.message);
+    console.error('Avtomatik bildiriş yazılma xətası:', err.message);
   }
 }
 
@@ -456,7 +457,7 @@ app.post('/api/abunelikler', async (req, res) => {
     );
     const newSubId = newSub.rows.length > 0 ? newSub.rows[0].ID : null;
 
-    // Burada abunəlik adına görə bildiriş tənzimlənir
+    // Abunəliyin öz adına görə dinamik bildiriş göndəririk
     await addAutoNotification(userId, ad, novbetiOdenisTarixi, odenisTezliyi);
 
     if (newSubId) {
@@ -575,7 +576,6 @@ app.get('/api/bildirisler', async (req, res) => {
     if (userId === null)
       return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    // Bu sorğu hər abunəlik üzrə (Netflix, Spotify və s.) bildirişləri təmiz, bir-bir sıralayır
     const result = await executeQuery(
       `SELECT b.id AS bildiris_id, u.username, b.basliq, b.mesaj,
               TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD HH24:MI:SS') as gonderilme_tarixi
