@@ -530,109 +530,6 @@ app.post('/api/abunelikler', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/abunelikler/{id}:
- *   put:
- *     summary: Abunəlik məlumatlarını yeniləyir (novbeti_odenis_tarixi avtomatik yenidən hesablanır)
- *     tags: [Abunəliklər]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - qiymet
- *               - baslama_tarixi
- *             properties:
- *               qiymet:
- *                 type: number
- *                 example: 12.99
- *               valyuta:
- *                 type: string
- *                 enum: [AZN, USD, EUR]
- *                 example: AZN
- *               odenis_tezliyi:
- *                 type: string
- *                 enum: [monthly, yearly, quarterly, weekly]
- *                 example: monthly
- *               baslama_tarixi:
- *                 type: string
- *                 format: date
- *                 example: "2026-01-01"
- *               kateqoriya:
- *                 type: string
- *                 enum: [Entertainment, Music, Education, "Health & Fitness", Productivity, Gaming, "Cloud Storage", News, "Food & Delivery", Shopping, Finance, Other]
- *                 example: Entertainment
- *               status:
- *                 type: string
- *                 enum: [active, deactive]
- *                 example: active
- *     responses:
- *       200:
- *         description: Abunəlik yeniləndi
- *       404:
- *         description: Abunəlik tapılmadı
- */
-app.put('/api/abunelikler/:id', async (req, res) => {
-  const { id } = req.params;
-  const { username,  qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, status } = req.body;
-
-  if (!ad || qiymet === undefined || qiymet === null || !baslama_tarixi)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (ad, qiymet, baslama_tarixi) doldurun.');
-
-  const parsedQiymet = Number(qiymet);
-  if (isNaN(parsedQiymet) || parsedQiymet <= 0)
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_PRICE', 'Qiymət 0-dan böyük olmalıdır.');
-
-  if (valyuta && !isValidCurrency(valyuta))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
-
-  const odenisTezliyi = odenis_tezliyi || 'monthly';
-  if (!ICAZE_VERILEN_ODENIS_TEZLIKLERI.includes(odenisTezliyi))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_FREQUENCY', `Yanlış ödəniş tezliyi: "${odenis_tezliyi}". Yalnız ${ICAZE_VERILEN_ODENIS_TEZLIKLERI.join(', ')} daxil edilə bilər.`);
-
-  if (!isValidDate(baslama_tarixi))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Başlama tarixi düzgün deyil: "${baslama_tarixi}" (Format: YYYY-MM-DD).`);
-
-  if (kateqoriya && !ICAZE_VERILEN_KATEQORIYALAR.includes(kateqoriya))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_CATEGORY', `Yanlış kateqoriya: "${kateqoriya}". Yalnız ${ICAZE_VERILEN_KATEQORIYALAR.join(', ')} daxil edilə bilər.`);
-
-  const statusValue = status || 'active';
-  if (!ICAZE_VERILEN_STATUSLAR.includes(statusValue))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS', `Yanlış status: "${status}". Yalnız ${ICAZE_VERILEN_STATUSLAR.join(', ')} daxil edilə bilər.`);
-
-  const novbetiOdenisTarixi = hesablaNovbetiOdenisTarixi(baslama_tarixi, odenisTezliyi);
-
-  try {
-    const subCheck = await executeQuery(
-      `SELECT a.id, u.username FROM abunelikler a JOIN istifadeciler u ON a.istifadeci_id = u.id WHERE a.id = :id`, { id }
-    );
-    if (subCheck.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
-
-    if (username !== undefined && username !== null && username !== subCheck.rows[0].USERNAME)
-      return errorResponse(res, 400, 'Bad Request', 'USER_IMMUTABLE', 'Abunəliyin aid olduğu istifadəçi (username) dəyişdirilə bilməz.');
-
-    const sql = `UPDATE abunelikler SET ad=:ad, qiymet=:qiymet, valyuta=:valyuta, odenis_tezliyi=:odenis_tezliyi,
-                 baslama_tarixi=TO_DATE(:baslama_tarixi,'YYYY-MM-DD'), novbeti_odenis_tarixi=TO_DATE(:novbeti_odenis_tarixi,'YYYY-MM-DD'),
-                 kateqoriya=:kateqoriya, status=:status WHERE id=:id`;
-    await executeQuery(sql, {
-      ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi,
-      baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi, kateqoriya: kateqoriya || null,
-      status: statusValue, id
-    }, { autoCommit: true });
-    return successResponse(res, 200, 'Updated', { message: 'Abunəlik uğurla yeniləndi.', novbeti_odenis_tarixi: novbetiOdenisTarixi });
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
-});
 
 /**
  * @swagger
@@ -1484,44 +1381,70 @@ app.get('/api/budceler', async (req, res) => {
  */
 app.post('/api/budceler', async (req, res) => {
   const { username, limit_mebleq, valyuta, hesab_mebleqi } = req.body;
-  if (!username || limit_mebleq === undefined || limit_mebleq === null) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username və limit_mebleq sahələri məcburidir.');
+  if (!username || limit_mebleq === undefined || limit_mebleq === null)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username və limit_mebleq sahələri məcburidir.');
 
   const parsedLimit = Number(limit_mebleq);
-  if (isNaN(parsedLimit) || parsedLimit <= 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
+  if (isNaN(parsedLimit) || parsedLimit <= 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
 
   const parsedHesab = (hesab_mebleqi !== undefined && hesab_mebleqi !== null) ? Number(hesab_mebleqi) : 0;
-  if (isNaN(parsedHesab) || parsedHesab < 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
+  if (isNaN(parsedHesab) || parsedHesab < 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
 
   if (parsedHesab > parsedLimit)
     return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED', 'Hesabdakı məbləğ limit məbləğdən çox ola bilməz.');
 
-  if (valyuta && !isValidCurrency(valyuta)) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
+  if (valyuta && !isValidCurrency(valyuta))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
 
   try {
     const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    // Eyni username ilə artıq büdcə varsa bloklayır
+    const existingBudget = await executeQuery(
+      `SELECT id FROM budceler WHERE istifadeci_id = :istifadeci_id`,
+      { istifadeci_id: userId }
+    );
+    if (existingBudget.rows.length > 0)
+      return errorResponse(res, 400, 'Bad Request', 'BUDGET_ALREADY_EXISTS',
+        `"${username}" istifadəçisinin artıq büdcəsi mövcuddur (ID: ${existingBudget.rows[0].ID}). Mövcud büdcəni yeniləyin.`);
+
     await executeQuery(
       `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, hesab_mebleqi) VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :hesab_mebleqi)`,
-      { istifadeci_id: userId, limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab }, { autoCommit: true }
+      { istifadeci_id: userId, limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab },
+      { autoCommit: true }
     );
-    return successResponse(res, 201, 'Created', { message: 'Büdcə limiti uğurla quraşdırıldı.' });
+
+    // Yeni yaranan büdcənin ID-sini qaytarır
+    const newBudget = await executeQuery(
+      `SELECT id FROM budceler WHERE istifadeci_id = :istifadeci_id`,
+      { istifadeci_id: userId }
+    );
+
+    return successResponse(res, 201, 'Created', {
+      message: 'Büdcə limiti uğurla quraşdırıldı.',
+      id: newBudget.rows[0].ID
+    });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
-
+/**
 /**
  * @swagger
- * /api/budceler/{id}:
+ * /api/budceler/{username}:
  *   put:
- *     summary: Büdcə limitini yeniləyir (hesabdakı məbləğ limitdən çox ola bilməz)
  *     tags: [Büdcələr]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ */
  *     requestBody:
  *       required: true
  *       content:
@@ -1546,34 +1469,47 @@ app.post('/api/budceler', async (req, res) => {
  *       400:
  *         description: hesab_mebleqi limit_mebleq-dən çoxdur
  */
-app.put('/api/budceler/:id', async (req, res) => {
-  const { id } = req.params;
+// swagger-da da dəyiş: /api/budceler/{username}
+app.put('/api/budceler/:username', async (req, res) => {
+  const { username } = req.params;
   const { limit_mebleq, valyuta, hesab_mebleqi } = req.body;
-  if (limit_mebleq === undefined) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'limit_mebleq sahəsi məcburidir.');
+
+  if (limit_mebleq === undefined)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'limit_mebleq sahəsi məcburidir.');
 
   const parsedLimit = Number(limit_mebleq);
-  if (isNaN(parsedLimit) || parsedLimit <= 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
+  if (isNaN(parsedLimit) || parsedLimit <= 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
 
   const parsedHesab = (hesab_mebleqi !== undefined && hesab_mebleqi !== null) ? Number(hesab_mebleqi) : 0;
-  if (isNaN(parsedHesab) || parsedHesab < 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
+  if (isNaN(parsedHesab) || parsedHesab < 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
 
   if (parsedHesab > parsedLimit)
     return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED', 'Hesabdakı məbləğ limit məbləğdən çox ola bilməz.');
 
-  if (valyuta && !isValidCurrency(valyuta)) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
+  if (valyuta && !isValidCurrency(valyuta))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
 
   try {
+    const userId = await getUserIdByUsername(username);
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
     const result = await executeQuery(
-      `UPDATE budceler SET limit_mebleq=:limit_mebleq, valyuta=:valyuta, hesab_mebleqi=:hesab_mebleqi WHERE id=:id`,
-      { limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab, id }, { autoCommit: true }
+      `UPDATE budceler SET limit_mebleq=:limit_mebleq, valyuta=:valyuta, hesab_mebleqi=:hesab_mebleqi
+       WHERE istifadeci_id=:istifadeci_id`,
+      { limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab, istifadeci_id: userId },
+      { autoCommit: true }
     );
-    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'BUDGET_NOT_FOUND', 'Büdcə limiti tapılmadı.');
+    if (result.rowsAffected === 0)
+      return errorResponse(res, 404, 'Not Found', 'BUDGET_NOT_FOUND', 'Bu istifadəçi üçün büdcə tapılmadı.');
+
     return successResponse(res, 200, 'Updated', { message: 'Büdcə limiti uğurla yeniləndi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
-
 // =============================================
 // --- AYARLAR (Settings) ROUTES ---
 // =============================================
