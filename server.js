@@ -552,9 +552,13 @@ app.post('/api/abunelikler', async (req, res) => {
 app.delete('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
   try {
+    // Əvvəlcə həmin abunəliyə aid bildirişləri sil
+    await executeQuery(`DELETE FROM bildirisler WHERE abunelik_id = :id`, { id });
+    
+    // Sonra abunəliyin özünü sil
     const result = await executeQuery(`DELETE FROM abunelikler WHERE id = :id`, { id }, { autoCommit: true });
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
-    return successResponse(res, 200, 'Deleted', { message: 'Abunəlik uğurla silindi.' });
+    return successResponse(res, 200, 'Deleted', { message: 'Abunəlik və əlaqəli bildirişlər uğurla silindi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
