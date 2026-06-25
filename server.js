@@ -1249,10 +1249,17 @@ const sql = `SELECT c.id AS card_id,
 app.get('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `SELECT c.id AS card_id, u.username, c.ad, c.kart_tipi, c.c.pan,
-c.cvv, c.kart_istifade_tarixi, c.status
-                 FROM odenis_metodlari c JOIN istifadeciler u ON c.istifadeci_id = u.id
-                 WHERE c.id = :id`;
+   const sql = `SELECT c.id AS card_id,
+                    u.username,
+                    c.ad,
+                    c.kart_tipi,
+                    c.pan,
+                    c.cvv,
+                    c.kart_istifade_tarixi,
+                    c.status
+             FROM odenis_metodlari c
+             JOIN istifadeciler u ON c.istifadeci_id = u.id
+             WHERE c.id = :id`;
     const result = await executeQuery(sql, { id });
     if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
     return successResponse(res, 200, 'Success', { card: result.rows[0] });
@@ -1289,12 +1296,11 @@ c.cvv, c.kart_istifade_tarixi, c.status
  *                 enum: [Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard]
  *                 example: Visa
  *               pan:
-  type: string
-  example: "4169739000001234"
-
-cvv:
-  type: string
-  example: "123"
+ *                 type: string
+ *                 example: "4169739000001234"
+ *                 cvv:
+ *                 type: string
+ *                 example: "123"
  *               kart_istifade_tarixi:
  *                 type: string
  *                 example: "12/28"
@@ -1330,7 +1336,7 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     kart_istifade_tarixi: kart_istifade_tarixi || null
   },
   { autoCommit: true }
-);;
+);
     return successResponse(res, 201, 'Created', { message: 'Ödəniş metodu uğurla əlavə edildi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
@@ -1362,6 +1368,15 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  *               ad:
  *                 type: string
  *                 example: Maaş Kartı
+ *               pan:
+ *                 type: string
+ *                 example: "4169739000001234"
+ *               cvv:
+ *                 type: string
+ *                 example: "123"
+ *               kart_istifade_tarixi:
+ *                 type: string
+ *                 example: "12/28"
  *               kart_tipi:
  *                 type: string
  *                 enum: [Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard]
@@ -1393,7 +1408,6 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
 
   try {
     const result = await executeQuery(
-      await executeQuery(
   `UPDATE odenis_metodlari
    SET ad=:ad,
        kart_tipi=:kart_tipi,
