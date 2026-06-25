@@ -1228,45 +1228,6 @@ const sql = `SELECT c.id AS card_id,
   }
 });
 
-/**
- * @swagger
- * /api/odenis-metodlari/{id}:
- *   get:
- *     summary: ID-yə görə ödəniş metodunu gətirir
- *     tags: [Ödəniş Metodları]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *       404:
- *         description: Tapılmadı
- */
-app.get('/api/odenis-metodlari/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-   const sql = `SELECT c.id AS card_id,
-                    u.username,
-                    c.ad,
-                    c.kart_tipi,
-                    c.pan,
-                    c.cvv,
-                    c.kart_istifade_tarixi,
-                    c.status
-             FROM odenis_metodlari c
-             JOIN istifadeciler u ON c.istifadeci_id = u.id
-             WHERE c.id = :id`;
-    const result = await executeQuery(sql, { id });
-    if (result.rows.length === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
-    return successResponse(res, 200, 'Success', { card: result.rows[0] });
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
-});
 
 /**
  * @swagger
