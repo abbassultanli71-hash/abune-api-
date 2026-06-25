@@ -1540,6 +1540,7 @@ app.post('/api/budceler', async (req, res) => {
  * @swagger
  * /api/budceler/{username}:
  *   put:
+  *     tags: [Büdcələr]
  *     parameters:
  *       - in: path
  *         name: username
