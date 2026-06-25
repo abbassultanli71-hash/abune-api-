@@ -1241,7 +1241,8 @@ app.get('/api/odenis-metodlari', async (req, res) => {
 app.get('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const sql = `SELECT c.id AS card_id, u.username, c.ad, c.kart_tipi, c.son_dord_reqem, c.kart_istifade_tarixi, c.status
+    const sql = `SELECT c.id AS card_id, u.username, c.ad, c.kart_tipi, c.c.pan,
+c.cvv, c.kart_istifade_tarixi, c.status
                  FROM odenis_metodlari c JOIN istifadeciler u ON c.istifadeci_id = u.id
                  WHERE c.id = :id`;
     const result = await executeQuery(sql, { id });
@@ -1279,9 +1280,13 @@ app.get('/api/odenis-metodlari/:id', async (req, res) => {
  *                 type: string
  *                 enum: [Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard]
  *                 example: Visa
- *               son_dord_reqem:
- *                 type: string
- *                 example: "1234"
+ *               pan:
+  type: string
+  example: "4169739000001234"
+
+cvv:
+  type: string
+  example: "123"
  *               kart_istifade_tarixi:
  *                 type: string
  *                 example: "12/28"
@@ -1290,7 +1295,7 @@ app.get('/api/odenis-metodlari/:id', async (req, res) => {
  *         description: Ödəniş metodu yaradıldı
  */
 app.post('/api/odenis-metodlari', async (req, res) => {
-  const { username, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi } = req.body;
+  const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!username || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və kart_tipi sahələri məcburidir.');
 
   const ICAZE_VERILEN_KARTLAR = ['visa','mastercard','maestro','unionpay','american express','amex','birkart','tamkart','bolkart','ucard'];
@@ -1303,8 +1308,18 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
     await executeQuery(
-      `INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi) VALUES (:istifadeci_id, :ad, :kart_tipi, :son_dord_reqem, :kart_istifade_tarixi)`,
-      { istifadeci_id: userId, ad, kart_tipi: KART_FORMATLARI[normalizedKartTipi], son_dord_reqem: son_dord_reqem || null, kart_istifade_tarixi: kart_istifade_tarixi || null }, { autoCommit: true }
+      INSERT INTO odenis_metodlari
+(istifadeci_id, ad, kart_tipi, pan, cvv, kart_istifade_tarixi)
+VALUES
+(:istifadeci_id, :ad, :kart_tipi, :pan, :cvv, :kart_istifade_tarixi),
+      {
+  istifadeci_id: userId,
+  ad,
+  kart_tipi: KART_FORMATLARI[normalizedKartTipi],
+  pan,
+  cvv,
+  kart_istifade_tarixi: kart_istifade_tarixi || null
+}, { autoCommit: true }
     );
     return successResponse(res, 201, 'Created', { message: 'Ödəniş metodu uğurla əlavə edildi.' });
   } catch (err) {
@@ -1341,9 +1356,13 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  *                 type: string
  *                 enum: [Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard]
  *                 example: Visa
- *               son_dord_reqem:
- *                 type: string
- *                 example: "1234"
+pan:
+  type: string
+  example: "4169739000001234"
+
+cvv:
+  type: string
+  example: "123"
  *               kart_istifade_tarixi:
  *                 type: string
  *                 example: "12/28"
@@ -1353,7 +1372,7 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  */
 app.put('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
-  const { ad, kart_tipi, son_dord_reqem, kart_istifade_tarixi } = req.body;
+  const { ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'ad və kart_tipi sahələri məcburidir.');
 
   const ICAZE_VERILEN_KARTLAR = ['visa','mastercard','maestro','unionpay','american express','amex','birkart','tamkart','bolkart','ucard'];
@@ -1364,8 +1383,21 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
 
   try {
     const result = await executeQuery(
-      `UPDATE odenis_metodlari SET ad=:ad, kart_tipi=:kart_tipi, son_dord_reqem=:son_dord_reqem, kart_istifade_tarixi=:kart_istifade_tarixi WHERE id=:id`,
-      { ad, kart_tipi: KART_FORMATLARI[normalizedKartTipi], son_dord_reqem: son_dord_reqem || null, kart_istifade_tarixi: kart_istifade_tarixi || null, id }, { autoCommit: true }
+      UPDATE odenis_metodlari
+SET ad=:ad,
+    kart_tipi=:kart_tipi,
+    pan=:pan,
+    cvv=:cvv,
+    kart_istifade_tarixi=:kart_istifade_tarixi
+WHERE id=:id,
+      {
+  ad,
+  kart_tipi: KART_FORMATLARI[normalizedKartTipi],
+  pan,
+  cvv,
+  kart_istifade_tarixi: kart_istifade_tarixi || null,
+  id
+}, { autoCommit: true }
     );
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
     return successResponse(res, 200, 'Updated', { message: 'Ödəniş metodu uğurla yeniləndi.' });
