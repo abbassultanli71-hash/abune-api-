@@ -1219,7 +1219,7 @@ const sql = `SELECT c.id AS card_id,
                     c.status
              FROM odenis_metodlari c
              JOIN istifadeciler u ON c.istifadeci_id = u.id
-             WHERE c.id = :id`;
+             WHERE c.istifadeci_id = :istifadeci_id`;
     const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No payment methods found', { cards: [] });
     return successResponse(res, 200, 'Success', { cards: result.rows });
@@ -1321,8 +1321,7 @@ app.post('/api/odenis-metodlari', async (req, res) => {
   try {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
-    await executeQuery(
-      await executeQuery(
+ await executeQuery(
   `INSERT INTO odenis_metodlari
    (istifadeci_id, ad, kart_tipi, pan, cvv, kart_istifade_tarixi)
    VALUES
