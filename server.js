@@ -1393,22 +1393,24 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
 
   try {
     const result = await executeQuery(
-      UPDATE odenis_metodlari
-SET ad=:ad,
-    kart_tipi=:kart_tipi,
-    pan=:pan,
-    cvv=:cvv,
-    kart_istifade_tarixi=:kart_istifade_tarixi
-WHERE id=:id,
-      {
-  ad,
-  kart_tipi: KART_FORMATLARI[normalizedKartTipi],
-  pan,
-  cvv,
-  kart_istifade_tarixi: kart_istifade_tarixi || null,
-  id
-}, { autoCommit: true }
-    );
+      await executeQuery(
+  `UPDATE odenis_metodlari
+   SET ad=:ad,
+       kart_tipi=:kart_tipi,
+       pan=:pan,
+       cvv=:cvv,
+       kart_istifade_tarixi=:kart_istifade_tarixi
+   WHERE id=:id`,
+  {
+    ad,
+    kart_tipi: KART_FORMATLARI[normalizedKartTipi],
+    pan,
+    cvv,
+    kart_istifade_tarixi: kart_istifade_tarixi || null,
+    id
+  },
+  { autoCommit: true }
+);
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
     return successResponse(res, 200, 'Updated', { message: 'Ödəniş metodu uğurla yeniləndi.' });
   } catch (err) {
