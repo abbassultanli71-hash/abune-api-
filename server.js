@@ -1432,7 +1432,7 @@ app.post('/api/budceler', async (req, res) => {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
-/**
+
 /**
  * @swagger
  * /api/budceler/{username}:
@@ -1444,7 +1444,6 @@ app.post('/api/budceler', async (req, res) => {
  *         required: true
  *         schema:
  *           type: string
- */
  *     requestBody:
  *       required: true
  *       content:
