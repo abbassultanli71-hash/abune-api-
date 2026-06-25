@@ -1538,16 +1538,14 @@ app.post('/api/budceler', async (req, res) => {
 
 /**
  * @swagger
- * /api/budceler/{id}:
+ * /api/budceler/{username}:
  *   put:
- *     summary: Büdcə limitini yeniləyir (hesabdakı məbləğ limitdən çox ola bilməz)
- *     tags: [Büdcələr]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
