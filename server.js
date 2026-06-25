@@ -1572,34 +1572,47 @@ app.post('/api/budceler', async (req, res) => {
  *       400:
  *         description: hesab_mebleqi limit_mebleq-dən çoxdur
  */
-app.put('/api/budceler/:id', async (req, res) => {
+// swagger-da da dəyiş: /api/budceler/{username}
+app.put('/api/budceler/:username', async (req, res) => {
   const { username } = req.params;
   const { limit_mebleq, valyuta, hesab_mebleqi } = req.body;
-  if (limit_mebleq === undefined) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'limit_mebleq sahəsi məcburidir.');
+
+  if (limit_mebleq === undefined)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'limit_mebleq sahəsi məcburidir.');
 
   const parsedLimit = Number(limit_mebleq);
-  if (isNaN(parsedLimit) || parsedLimit <= 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
+  if (isNaN(parsedLimit) || parsedLimit <= 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
 
   const parsedHesab = (hesab_mebleqi !== undefined && hesab_mebleqi !== null) ? Number(hesab_mebleqi) : 0;
-  if (isNaN(parsedHesab) || parsedHesab < 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
+  if (isNaN(parsedHesab) || parsedHesab < 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
 
   if (parsedHesab > parsedLimit)
     return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED', 'Hesabdakı məbləğ limit məbləğdən çox ola bilməz.');
 
-  if (valyuta && !isValidCurrency(valyuta)) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
+  if (valyuta && !isValidCurrency(valyuta))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
 
   try {
+    const userId = await getUserIdByUsername(username);
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
     const result = await executeQuery(
-      `UPDATE budceler SET limit_mebleq=:limit_mebleq, valyuta=:valyuta, hesab_mebleqi=:hesab_mebleqi WHERE id=:id`,
-      { limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab, id }, { autoCommit: true }
+      `UPDATE budceler SET limit_mebleq=:limit_mebleq, valyuta=:valyuta, hesab_mebleqi=:hesab_mebleqi
+       WHERE istifadeci_id=:istifadeci_id`,
+      { limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab, istifadeci_id: userId },
+      { autoCommit: true }
     );
-    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'BUDGET_NOT_FOUND', 'Büdcə limiti tapılmadı.');
+    if (result.rowsAffected === 0)
+      return errorResponse(res, 404, 'Not Found', 'BUDGET_NOT_FOUND', 'Bu istifadəçi üçün büdcə tapılmadı.');
+
     return successResponse(res, 200, 'Updated', { message: 'Büdcə limiti uğurla yeniləndi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
-
 // =============================================
 // --- AYARLAR (Settings) ROUTES ---
 // =============================================
