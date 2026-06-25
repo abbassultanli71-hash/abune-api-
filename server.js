@@ -1380,9 +1380,6 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  *                 type: string
  *                 enum: [Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard]
  *                 example: Visa
- *               kart_istifade_tarixi:
- *                 type: string
- *                 example: "12/28"
  *     responses:
  *       200:
  *         description: Yeniləndi
