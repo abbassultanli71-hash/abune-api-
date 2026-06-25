@@ -1316,19 +1316,21 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
     await executeQuery(
-      INSERT INTO odenis_metodlari
-(istifadeci_id, ad, kart_tipi, pan, cvv, kart_istifade_tarixi)
-VALUES
-(:istifadeci_id, :ad, :kart_tipi, :pan, :cvv, :kart_istifade_tarixi),
-      {
-  istifadeci_id: userId,
-  ad,
-  kart_tipi: KART_FORMATLARI[normalizedKartTipi],
-  pan,
-  cvv,
-  kart_istifade_tarixi: kart_istifade_tarixi || null
-}, { autoCommit: true }
-    );
+      await executeQuery(
+  `INSERT INTO odenis_metodlari
+   (istifadeci_id, ad, kart_tipi, pan, cvv, kart_istifade_tarixi)
+   VALUES
+   (:istifadeci_id, :ad, :kart_tipi, :pan, :cvv, :kart_istifade_tarixi)`,
+  {
+    istifadeci_id: userId,
+    ad,
+    kart_tipi: KART_FORMATLARI[normalizedKartTipi],
+    pan,
+    cvv,
+    kart_istifade_tarixi: kart_istifade_tarixi || null
+  },
+  { autoCommit: true }
+);;
     return successResponse(res, 201, 'Created', { message: 'Ödəniş metodu uğurla əlavə edildi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
