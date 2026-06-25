@@ -995,10 +995,7 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  *                             type: string
  *                           odenis_tarixi:
  *                             type: string
- *                             format: date
- *                           novbeti_odenis_tarixi:
- *                             type: string
- *                             format: date
+ *                             format: datee
  *                           mebleq:
  *                             type: number
  *                           status:
