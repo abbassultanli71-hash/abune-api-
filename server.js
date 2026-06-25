@@ -1484,27 +1484,53 @@ app.get('/api/budceler', async (req, res) => {
  */
 app.post('/api/budceler', async (req, res) => {
   const { username, limit_mebleq, valyuta, hesab_mebleqi } = req.body;
-  if (!username || limit_mebleq === undefined || limit_mebleq === null) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username və limit_mebleq sahələri məcburidir.');
+  if (!username || limit_mebleq === undefined || limit_mebleq === null)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username və limit_mebleq sahələri məcburidir.');
 
   const parsedLimit = Number(limit_mebleq);
-  if (isNaN(parsedLimit) || parsedLimit <= 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
+  if (isNaN(parsedLimit) || parsedLimit <= 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'limit_mebleq 0-dan böyük olmalıdır.');
 
   const parsedHesab = (hesab_mebleqi !== undefined && hesab_mebleqi !== null) ? Number(hesab_mebleqi) : 0;
-  if (isNaN(parsedHesab) || parsedHesab < 0) return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
+  if (isNaN(parsedHesab) || parsedHesab < 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_AMOUNT', 'hesab_mebleqi mənfi ola bilməz.');
 
   if (parsedHesab > parsedLimit)
     return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED', 'Hesabdakı məbləğ limit məbləğdən çox ola bilməz.');
 
-  if (valyuta && !isValidCurrency(valyuta)) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
+  if (valyuta && !isValidCurrency(valyuta))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
 
   try {
     const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    // Eyni username ilə artıq büdcə varsa bloklayır
+    const existingBudget = await executeQuery(
+      `SELECT id FROM budceler WHERE istifadeci_id = :istifadeci_id`,
+      { istifadeci_id: userId }
+    );
+    if (existingBudget.rows.length > 0)
+      return errorResponse(res, 400, 'Bad Request', 'BUDGET_ALREADY_EXISTS',
+        `"${username}" istifadəçisinin artıq büdcəsi mövcuddur (ID: ${existingBudget.rows[0].ID}). Mövcud büdcəni yeniləyin.`);
+
     await executeQuery(
       `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, hesab_mebleqi) VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :hesab_mebleqi)`,
-      { istifadeci_id: userId, limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab }, { autoCommit: true }
+      { istifadeci_id: userId, limit_mebleq: parsedLimit, valyuta: getValidCurrency(valyuta), hesab_mebleqi: parsedHesab },
+      { autoCommit: true }
     );
-    return successResponse(res, 201, 'Created', { message: 'Büdcə limiti uğurla quraşdırıldı.' });
+
+    // Yeni yaranan büdcənin ID-sini qaytarır
+    const newBudget = await executeQuery(
+      `SELECT id FROM budceler WHERE istifadeci_id = :istifadeci_id`,
+      { istifadeci_id: userId }
+    );
+
+    return successResponse(res, 201, 'Created', {
+      message: 'Büdcə limiti uğurla quraşdırıldı.',
+      id: newBudget.rows[0].ID
+    });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
@@ -1547,7 +1573,7 @@ app.post('/api/budceler', async (req, res) => {
  *         description: hesab_mebleqi limit_mebleq-dən çoxdur
  */
 app.put('/api/budceler/:id', async (req, res) => {
-  const { id } = req.params;
+  const { username } = req.params;
   const { limit_mebleq, valyuta, hesab_mebleqi } = req.body;
   if (limit_mebleq === undefined) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'limit_mebleq sahəsi məcburidir.');
 
