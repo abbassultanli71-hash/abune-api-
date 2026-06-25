@@ -585,9 +585,6 @@ app.put('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
   const { username, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, status } = req.body;
 
-  if (!ad || qiymet === undefined || qiymet === null || !baslama_tarixi)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (ad, qiymet, baslama_tarixi) doldurun.');
-
   const parsedQiymet = Number(qiymet);
   if (isNaN(parsedQiymet) || parsedQiymet <= 0)
     return errorResponse(res, 400, 'Bad Request', 'INVALID_PRICE', 'Qiymət 0-dan böyük olmalıdır.');
