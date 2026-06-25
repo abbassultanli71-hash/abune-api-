@@ -1298,7 +1298,7 @@ app.get('/api/odenis-metodlari/:id', async (req, res) => {
  *               pan:
  *                 type: string
  *                 example: "4169739000001234"
- *                 cvv:
+ *               cvv:
  *                 type: string
  *                 example: "123"
  *               kart_istifade_tarixi:
@@ -1380,13 +1380,6 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  *                 type: string
  *                 enum: [Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard]
  *                 example: Visa
-pan:
-  type: string
-  example: "4169739000001234"
-
-cvv:
-  type: string
-  example: "123"
  *               kart_istifade_tarixi:
  *                 type: string
  *                 example: "12/28"
