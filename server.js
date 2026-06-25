@@ -1022,7 +1022,7 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
              a.ad AS app_adi,
              u.username,
              TO_CHAR(o.odenis_tarixi,          'YYYY-MM-DD') AS odenis_tarixi,
-             TO_CHAR(a.novbeti_odenis_tarixi,   'YYYY-MM-DD') AS novbeti_odenis_tarixi,
+             
              o.mebleq,
              o.status
       FROM odenis_tarixcesi o
