@@ -1612,6 +1612,44 @@ app.put('/api/budceler/:username', async (req, res) => {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
+/**
+ * @swagger
+ * /api/budceler/{username}:
+ *   delete:
+ *     summary: İstifadəçinin büdcəsini silir (username ilə)
+ *     tags: [Büdcələr]
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Büdcə silindi
+ *       404:
+ *         description: İstifadəçi və ya büdcə tapılmadı
+ */
+app.delete('/api/budceler/:username', async (req, res) => {
+  const { username } = req.params;
+  try {
+    const userId = await getUserIdByUsername(username);
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    const result = await executeQuery(
+      `DELETE FROM budceler WHERE istifadeci_id = :istifadeci_id`,
+      { istifadeci_id: userId },
+      { autoCommit: true }
+    );
+    if (result.rowsAffected === 0)
+      return errorResponse(res, 404, 'Not Found', 'BUDGET_NOT_FOUND', 'Bu istifadəçi üçün büdcə tapılmadı.');
+
+    return successResponse(res, 200, 'Deleted', { message: 'Büdcə uğurla silindi.' });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
 // =============================================
 // --- AYARLAR (Settings) ROUTES ---
 // =============================================
