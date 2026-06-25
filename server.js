@@ -549,13 +549,9 @@ app.post('/api/abunelikler', async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - ad
  *               - qiymet
  *               - baslama_tarixi
  *             properties:
- *               ad:
- *                 type: string
- *                 example: Netflix
  *               qiymet:
  *                 type: number
  *                 example: 12.99
@@ -587,7 +583,7 @@ app.post('/api/abunelikler', async (req, res) => {
  */
 app.put('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
-  const { username, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, status } = req.body;
+  const { username,  qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, status } = req.body;
 
   if (!ad || qiymet === undefined || qiymet === null || !baslama_tarixi)
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (ad, qiymet, baslama_tarixi) doldurun.');
@@ -960,8 +956,7 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  *   get:
  *     summary: >
  *       İstifadəçinin bütün ödəniş tarixçəsini siyahılayır (username ilə).
- *       Hər qeydin aid olduğu abunəlik adı (app_adi) və növbəti ödəniş tarixi
- *       (novbeti_odenis_tarixi) da qaytarılır.
+ *       Hər qeydin aid olduğu abunəlik adı (app_adi) 
  *     tags: [Ödəniş Tarixçəsi]
  *     parameters:
  *       - in: query
