@@ -1209,9 +1209,17 @@ app.get('/api/odenis-metodlari', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    const sql = `SELECT c.id AS card_id, u.username, c.ad, c.kart_tipi, c.son_dord_reqem, c.kart_istifade_tarixi, c.status
-                 FROM odenis_metodlari c JOIN istifadeciler u ON c.istifadeci_id = u.id
-                 WHERE c.istifadeci_id = :istifadeci_id`;
+const sql = `SELECT c.id AS card_id,
+                    u.username,
+                    c.ad,
+                    c.kart_tipi,
+                    c.pan,
+                    c.cvv,
+                    c.kart_istifade_tarixi,
+                    c.status
+             FROM odenis_metodlari c
+             JOIN istifadeciler u ON c.istifadeci_id = u.id
+             WHERE c.id = :id`;
     const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No payment methods found', { cards: [] });
     return successResponse(res, 200, 'Success', { cards: result.rows });
