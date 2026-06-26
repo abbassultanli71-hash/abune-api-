@@ -773,6 +773,7 @@ app.post('/api/bildirisler', async (req, res) => {
     const gonderilmeDate = new Date(novbetiDate);
     gonderilmeDate.setUTCDate(gonderilmeDate.getUTCDate() - heddiGun);
     const gonderilmeTarixiStr = gonderilmeDate.toISOString().slice(0, 10);
+    const gonderilmeTarixiLabel = `${gonderilmeTarixiStr} (${heddiGun} gün qalıb)`;
 
     // 7. Avtomatik başlıq və mesaj generasiyası
     let basliq, mesaj;
@@ -803,7 +804,7 @@ app.post('/api/bildirisler', async (req, res) => {
       message: 'Bildiriş uğurla yaradıldı.',
       basliq,
       mesaj,
-      gonderilme_tarixi: gonderilmeTarixiStr,
+      gonderilme_tarixi: gonderilmeTarixiLabel,
       app_adi: appAdi,
       qalan_gun: qalanGun
     });
