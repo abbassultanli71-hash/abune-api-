@@ -749,9 +749,9 @@ app.post('/api/bildirisler', async (req, res) => {
       return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_INACTIVE',
         `"${sub.AD}" abunəliyi aktiv deyil (status: ${sub.STATUS}). Yalnız aktiv abunəliklər üçün bildiriş yaradıla bilər.`);
 
-    // 5. Neçə gün qaldığını hesabla
+   // 5. Neçə gün qaldığını hesabla
     const appAdi = sub.AD;
-    const novbetiTarix = sub.NOVBETI_ODENIS_TARIXI; // 'YYYY-MM-DD'
+    const novbetiTarix = sub.NOVBETI_ODENIS_TARIXI;
     const odenisTezliyi = sub.ODENIS_TEZLIYI;
 
     const bugun = new Date();
@@ -761,7 +761,6 @@ app.post('/api/bildirisler', async (req, res) => {
     const qalanGun = Math.ceil((novbetiDate - bugun) / (1000 * 60 * 60 * 24));
 
     // 6. Ödəniş tezliyinə görə xəbərdarlıq həddi
-    // weekly: 2 gün, monthly: 7 gün, quarterly: 14 gün, yearly: 30 gün
     const xeberdarliqHeddi = {
       weekly: 2,
       monthly: 7,
@@ -769,6 +768,11 @@ app.post('/api/bildirisler', async (req, res) => {
       yearly: 30
     };
     const heddiGun = xeberdarliqHeddi[odenisTezliyi] || 7;
+
+    // 6b. Bildirişin göndərilmə tarixi = novbeti_odenis_tarixi - heddiGun
+    const gonderilmeDate = new Date(novbetiDate);
+    gonderilmeDate.setUTCDate(gonderilmeDate.getUTCDate() - heddiGun);
+    const gonderilmeTarixiStr = gonderilmeDate.toISOString().slice(0, 10);
 
     // 7. Avtomatik başlıq və mesaj generasiyası
     let basliq, mesaj;
@@ -786,25 +790,23 @@ app.post('/api/bildirisler', async (req, res) => {
       mesaj = `"${appAdi}" abunəliyinizin növbəti ödənişi ${novbetiTarix} tarixindədir (${qalanGun} gün qalıb).`;
     }
 
-    // 8. Bildirişi DB-yə yaz — gonderilme_tarixi server tərəfindən SYSDATE ilə avtomatik qoyulur
+    // 8. Bildirişi DB-yə yaz — gonderilme_tarixi hesablanmış tarix ilə yazılır
     await executeQuery(
-      `INSERT INTO bildirisler (istifadeci_id, abunelik_id, basliq, mesaj)
-       VALUES (:istifadeci_id, :abunelik_id, :basliq, :mesaj)`,
-      { istifadeci_id: userId, abunelik_id, basliq, mesaj },
+      `INSERT INTO bildirisler (istifadeci_id, abunelik_id, basliq, mesaj, gonderilme_tarixi)
+       VALUES (:istifadeci_id, :abunelik_id, :basliq, :mesaj, TO_DATE(:gonderilme_tarixi, 'YYYY-MM-DD'))`,
+      { istifadeci_id: userId, abunelik_id, basliq, mesaj, gonderilme_tarixi: gonderilmeTarixiStr },
       { autoCommit: true }
     );
 
-    // 9. Uğurlu cavab — generasiya olunmuş məlumatları göndər
-    const bugunStr = bugun.toISOString().slice(0, 10);
+    // 9. Uğurlu cavab
     return successResponse(res, 201, 'Created', {
       message: 'Bildiriş uğurla yaradıldı.',
       basliq,
       mesaj,
-      gonderilme_tarixi: bugunStr,
+      gonderilme_tarixi: gonderilmeTarixiStr,
       app_adi: appAdi,
       qalan_gun: qalanGun
     });
-
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
