@@ -98,6 +98,7 @@ function isValidEmail(email) {
   if (typeof email !== 'string') return false;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+// YENİ - BU İLƏ ƏVƏZLƏ
 function isValidKartTarixi(tarixi) {
   if (!tarixi) return true;
   const regex = /^(0[1-9]|1[0-2])\/(2[8-9]|[3-6][0-9]|70)$/;
@@ -105,12 +106,10 @@ function isValidKartTarixi(tarixi) {
 
   const [mm, yy] = tarixi.split('/').map(Number);
   const now = new Date();
-  const bugunAy = now.getMonth() + 1;   // 1-12
-  const bugunIl = now.getFullYear() % 100; // məs: 2026 → 26
+  const bugunAy = now.getMonth() + 1;
+  const bugunIl = now.getFullYear() % 100;
 
-  // Kartın ili bugündən kiçikdirsə rədd et
   if (yy < bugunIl) return false;
-  // İl eynidir amma ayı keçibsə rədd et
   if (yy === bugunIl && mm < bugunAy) return false;
 
   return true;
