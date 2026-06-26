@@ -98,6 +98,13 @@ function isValidEmail(email) {
   if (typeof email !== 'string') return false;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+function isValidKartTarixi(tarixi) {
+  if (!tarixi) return true; // optional sahədir
+  const regex = /^(0[1-9]|1[0-2])\/([2-6][0-9]|70)$/;
+  if (!regex.test(tarixi)) return false;
+  const yy = Number(tarixi.split('/')[1]);
+  return yy >= 26 && yy <= 70;
+}
 
 function isValidUsername(username) {
   if (typeof username !== 'string') return false;
@@ -1176,6 +1183,9 @@ const sql = `SELECT c.id AS card_id,
 app.post('/api/odenis-metodlari', async (req, res) => {
   const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!username || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və kart_tipi sahələri məcburidir.');
+  if (kart_istifade_tarixi && !isValidKartTarixi(kart_istifade_tarixi))
+  return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_DATE',
+    'Kartın istifadə tarixi MM/YY formatında olmalıdır. Ay: 01-12, İl: 26-70 (məs: 06/28, 12/70).');
 
   const ICAZE_VERILEN_KARTLAR = ['visa','mastercard'];
   const KART_FORMATLARI = { 'visa':'Visa','mastercard':'Mastercard'};
@@ -1253,6 +1263,9 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
   const { ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'ad və kart_tipi sahələri məcburidir.');
+  if (kart_istifade_tarixi && !isValidKartTarixi(kart_istifade_tarixi))
+  return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_DATE',
+    'Kartın istifadə tarixi MM/YY formatında olmalıdır. Ay: 01-12, İl: 26-70 (məs: 06/28, 12/70).');
 
   const ICAZE_VERILEN_KARTLAR = ['visa','mastercard','maestro','unionpay','american express','amex','birkart','tamkart','bolkart','ucard'];
   const KART_FORMATLARI = { 'visa':'Visa','mastercard':'Mastercard','maestro':'Maestro','unionpay':'UnionPay','american express':'American Express','amex':'American Express','birkart':'Birkart','tamkart':'Tamkart','bolkart':'Bolkart','ucard':'Ucard' };
