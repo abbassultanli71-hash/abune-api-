@@ -1181,7 +1181,7 @@ app.post('/api/odenis-metodlari', async (req, res) => {
   const KART_FORMATLARI = { 'visa':'Visa','mastercard':'Mastercard'};
   const normalizedKartTipi = kart_tipi.trim().toLowerCase();
   if (!ICAZE_VERILEN_KARTLAR.includes(normalizedKartTipi))
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_CARD_TYPE', `Yanlış kart növü: "${kart_tipi}". Yalnız Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard icazəlidir.`);
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CARD_TYPE', `Yanlış kart növü: "${kart_tipi}". Yalnız Visa, Mastercard`);
 
   try {
     const userId = await getUserIdByUsername(username);
