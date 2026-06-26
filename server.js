@@ -99,11 +99,21 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 function isValidKartTarixi(tarixi) {
-  if (!tarixi) return true; // optional sahədir
-  const regex = /^(0[1-9]|1[0-2])\/([2-6][0-9]|70)$/;
+  if (!tarixi) return true;
+  const regex = /^(0[1-9]|1[0-2])\/(2[8-9]|[3-6][0-9]|70)$/;
   if (!regex.test(tarixi)) return false;
-  const yy = Number(tarixi.split('/')[1]);
-  return yy >= 26 && yy <= 70;
+
+  const [mm, yy] = tarixi.split('/').map(Number);
+  const now = new Date();
+  const bugunAy = now.getMonth() + 1;   // 1-12
+  const bugunIl = now.getFullYear() % 100; // məs: 2026 → 26
+
+  // Kartın ili bugündən kiçikdirsə rədd et
+  if (yy < bugunIl) return false;
+  // İl eynidir amma ayı keçibsə rədd et
+  if (yy === bugunIl && mm < bugunAy) return false;
+
+  return true;
 }
 
 function isValidUsername(username) {
