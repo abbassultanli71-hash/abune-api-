@@ -1197,7 +1197,7 @@ if (kart_istifade_tarixi) {
   const regex = /^(0[1-9]|1[0-2])\/(2[8-9]|[3-6][0-9]|70)$/;
   if (!regex.test(kart_istifade_tarixi)) {
     return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_FORMAT',
-      'Kartın istifadə tarixi MM/YY formatında olmalıdır. Ay: 01-12, İl: 28-70 (məs: 06/28, 12/70).');
+      'Kartın istifadə tarixinin formatı səfdir və ya kartın isitfadə müddəti bitib. Ay: 01-12, İl: 28-70 (məs: 06/28, 12/70).');
   }
   const [mm, yy] = kart_istifade_tarixi.split('/').map(Number);
   const now = new Date();
