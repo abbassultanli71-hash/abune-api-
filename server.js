@@ -98,21 +98,31 @@ function isValidEmail(email) {
   if (typeof email !== 'string') return false;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-// YENİ - BU İLƏ ƏVƏZLƏ
-function isValidKartTarixi(tarixi) {
-  if (!tarixi) return true;
-  const regex = /^(0[1-9]|1[0-2])\/(2[8-9]|[3-6][0-9]|70)$/;
-  if (!regex.test(tarixi)) return false;
 
+// Kartın istifadə tarixini (MM/YY) yoxlayır.
+// Format və "müddət bitib" yoxlamaları AYRI nəticələrlə qaytarılır ki,
+// hansı xəta mesajının göstəriləcəyi dəqiq müəyyən olunsun.
+// İl aralığı 26-70 olaraq saxlanılır (cari il 2026-dır), 28-70 bug-ı düzəldilib.
+function isValidKartTarixi(tarixi) {
+  if (!tarixi) return { valid: true };
+
+  // 1) Format yoxlanışı — Ay: 01-12, İl: 26-70
+  const formatRegex = /^(0[1-9]|1[0-2])\/(2[6-9]|[3-6][0-9]|70)$/;
+  if (!formatRegex.test(tarixi)) {
+    return { valid: false, reason: 'FORMAT' };
+  }
+
+  // 2) Format düzgündürsə, müddətin bitib-bitmədiyini yoxla
   const [mm, yy] = tarixi.split('/').map(Number);
   const now = new Date();
   const bugunAy = now.getMonth() + 1;
   const bugunIl = now.getFullYear() % 100;
 
-  if (yy < bugunIl) return false;
-  if (yy === bugunIl && mm < bugunAy) return false;
+  if (yy < bugunIl || (yy === bugunIl && mm < bugunAy)) {
+    return { valid: false, reason: 'EXPIRED' };
+  }
 
-  return true;
+  return { valid: true };
 }
 
 function isValidUsername(username) {
@@ -570,7 +580,7 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
   try {
     // Əvvəlcə həmin abunəliyə aid bildirişləri sil
     await executeQuery(`DELETE FROM bildirisler WHERE abunelik_id = :id`, { id });
-    
+
     // Sonra abunəliyin özünü sil
     const result = await executeQuery(`DELETE FROM abunelikler WHERE id = :id`, { id }, { autoCommit: true });
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
@@ -728,7 +738,7 @@ app.get('/api/bildirisler', async (req, res) => {
  *         description: İstifadəçi tapılmadı
  */
 app.post('/api/bildirisler', async (req, res) => {
-  
+
   const { username, abunelik_id } = req.body;
 
   if (!username || abunelik_id === undefined || abunelik_id === null)
@@ -876,7 +886,7 @@ app.delete('/api/bildirisler/:id', async (req, res) => {
  *   get:
  *     summary: >
  *       İstifadəçinin bütün ödəniş tarixçəsini siyahılayır (username ilə).
- *       Hər qeydin aid olduğu abunəlik adı (app_adi) 
+ *       Hər qeydin aid olduğu abunəlik adı (app_adi)
  *     tags: [Ödəniş Tarixçəsi]
  *     parameters:
  *       - in: query
@@ -937,7 +947,7 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
              a.ad AS app_adi,
              u.username,
              TO_CHAR(o.odenis_tarixi,          'YYYY-MM-DD') AS odenis_tarixi,
-             
+
              o.mebleq,
              o.status
       FROM odenis_tarixcesi o
@@ -1192,22 +1202,22 @@ const sql = `SELECT c.id AS card_id,
 app.post('/api/odenis-metodlari', async (req, res) => {
   const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!username || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və kart_tipi sahələri məcburidir.');
-// YENİ - BU İLƏ ƏVƏZLƏ
-if (kart_istifade_tarixi) {
-  const regex = /^(0[1-9]|1[0-2])\/(2[8-9]|[3-6][0-9]|70)$/;
-  if (!regex.test(kart_istifade_tarixi)) {
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_FORMAT',
-      'Kartın istifadə tarixinin formatı səfdir və ya kartın isitfadə müddəti bitib. Ay: 01-12, İl: 28-70 (məs: 06/28, 12/70).');
+
+  // Kartın istifadə tarixi: əvvəlcə format, sonra (format düzgündürsə) müddət yoxlanılır.
+  // İki ayrı xəta nəticəsi (FORMAT / EXPIRED) qarışdırılmadan göstərilir.
+  if (kart_istifade_tarixi) {
+    const tarixCheck = isValidKartTarixi(kart_istifade_tarixi);
+    if (!tarixCheck.valid) {
+      if (tarixCheck.reason === 'FORMAT') {
+        return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_FORMAT',
+          'Kartın istifadə tarixinin formatı yanlışdır. Format: AA/İİ olmalıdır (Ay: 01-12, İl: 26-70, məs: 06/28, 12/70).');
+      }
+      if (tarixCheck.reason === 'EXPIRED') {
+        return errorResponse(res, 400, 'Bad Request', 'EXPIRED_CARD',
+          'Kartın istifadə müddəti bitib. Zəhmət olmasa etibarlı bir kart tarixi daxil edin.');
+      }
+    }
   }
-  const [mm, yy] = kart_istifade_tarixi.split('/').map(Number);
-  const now = new Date();
-  const bugunAy = now.getMonth() + 1;
-  const bugunIl = now.getFullYear() % 100;
-  if (yy < bugunIl || (yy === bugunIl && mm < bugunAy)) {
-    return errorResponse(res, 400, 'Bad Request', 'EXPIRED_CARD',
-      'Kartın istifadə müddəti bitib. Zəhmət olmasa etibarlı bir kart tarixi daxil edin.');
-  }
-}
 
   const ICAZE_VERILEN_KARTLAR = ['visa','mastercard'];
   const KART_FORMATLARI = { 'visa':'Visa','mastercard':'Mastercard'};
@@ -1285,22 +1295,22 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
   const { ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'ad və kart_tipi sahələri məcburidir.');
-// YENİ - BU İLƏ ƏVƏZLƏ
-if (kart_istifade_tarixi) {
-  const regex = /^(0[1-9]|1[0-2])\/(2[8-9]|[3-6][0-9]|70)$/;
-  if (!regex.test(kart_istifade_tarixi)) {
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_FORMAT',
-      'Kartın istifadə tarixinin formatı səfdir və ya kartın isitfadə müddəti bitib. Ay: 01-12, İl: 28-70 (məs: 06/28, 12/70).');
+
+  // Kartın istifadə tarixi: əvvəlcə format, sonra (format düzgündürsə) müddət yoxlanılır.
+  // İki ayrı xəta nəticəsi (FORMAT / EXPIRED) qarışdırılmadan göstərilir.
+  if (kart_istifade_tarixi) {
+    const tarixCheck = isValidKartTarixi(kart_istifade_tarixi);
+    if (!tarixCheck.valid) {
+      if (tarixCheck.reason === 'FORMAT') {
+        return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_FORMAT',
+          'Kartın istifadə tarixinin formatı yanlışdır. Format: AA/İİ olmalıdır (Ay: 01-12, İl: 26-70, məs: 06/28, 12/70).');
+      }
+      if (tarixCheck.reason === 'EXPIRED') {
+        return errorResponse(res, 400, 'Bad Request', 'EXPIRED_CARD',
+          'Kartın istifadə müddəti bitib. Zəhmət olmasa etibarlı bir kart tarixi daxil edin.');
+      }
+    }
   }
-  const [mm, yy] = kart_istifade_tarixi.split('/').map(Number);
-  const now = new Date();
-  const bugunAy = now.getMonth() + 1;
-  const bugunIl = now.getFullYear() % 100;
-  if (yy < bugunIl || (yy === bugunIl && mm < bugunAy)) {
-    return errorResponse(res, 400, 'Bad Request', 'EXPIRED_CARD',
-      'Kartın istifadə müddəti bitib. Zəhmət olmasa etibarlı bir kart tarixi daxil edin.');
-  }
-}
 
   const ICAZE_VERILEN_KARTLAR = ['visa','mastercard','maestro','unionpay','american express','amex','birkart','tamkart','bolkart','ucard'];
   const KART_FORMATLARI = { 'visa':'Visa','mastercard':'Mastercard','maestro':'Maestro','unionpay':'UnionPay','american express':'American Express','amex':'American Express','birkart':'Birkart','tamkart':'Tamkart','bolkart':'Bolkart','ucard':'Ucard' };
