@@ -102,12 +102,14 @@ function isValidEmail(email) {
 // Kartın istifadə tarixini (MM/YY) yoxlayır.
 // Format və "müddət bitib" yoxlamaları AYRI nəticələrlə qaytarılır ki,
 // hansı xəta mesajının göstəriləcəyi dəqiq müəyyən olunsun.
-// İl aralığı 26-70 olaraq saxlanılır (cari il 2026-dır), 28-70 bug-ı düzəldilib.
+// Format yoxlanışı il üçün heç bir aralıq tətbiq etmir (00-99 hamısı format
+// baxımından düzgündür) — ilin keçmiş olub-olmaması yalnız aşağıdaki
+// "müddət bitib" addımında həll olunur, formatla qarışdırılmır.
 function isValidKartTarixi(tarixi) {
   if (!tarixi) return { valid: true };
 
-  // 1) Format yoxlanışı — Ay: 01-12, İl: 26-70
-  const formatRegex = /^(0[1-9]|1[0-2])\/(2[6-9]|[3-6][0-9]|70)$/;
+  // 1) Format yoxlanışı — Ay: 01-12, İl: hər iki rəqəm (00-99)
+  const formatRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
   if (!formatRegex.test(tarixi)) {
     return { valid: false, reason: 'FORMAT' };
   }
@@ -1210,7 +1212,7 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     if (!tarixCheck.valid) {
       if (tarixCheck.reason === 'FORMAT') {
         return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_FORMAT',
-          'Kartın istifadə tarixinin formatı yanlışdır. Format: AA/İİ olmalıdır (Ay: 01-12, İl: 26-70, məs: 06/28, 12/70).');
+          'Kartın istifadə tarixinin formatı yanlışdır. Format: AA/İİ olmalıdır (Ay: 01-12, İl: 2 rəqəm, məs: 06/28, 12/30).');
       }
       if (tarixCheck.reason === 'EXPIRED') {
         return errorResponse(res, 400, 'Bad Request', 'EXPIRED_CARD',
@@ -1303,7 +1305,7 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
     if (!tarixCheck.valid) {
       if (tarixCheck.reason === 'FORMAT') {
         return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_FORMAT',
-          'Kartın istifadə tarixinin formatı yanlışdır. Format: AA/İİ olmalıdır (Ay: 01-12, İl: 26-70, məs: 06/28, 12/70).');
+          'Kartın istifadə tarixinin formatı yanlışdır. Format: AA/İİ olmalıdır (Ay: 01-12, İl: 2 rəqəm, məs: 06/28, 12/30).');
       }
       if (tarixCheck.reason === 'EXPIRED') {
         return errorResponse(res, 400, 'Bad Request', 'EXPIRED_CARD',
