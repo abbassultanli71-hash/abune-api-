@@ -519,9 +519,18 @@ app.post('/api/abunelikler', async (req, res) => {
 
   if (!username || !ad || qiymet === undefined || qiymet === null || !baslama_tarixi)
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (username, ad, qiymet, baslama_tarixi) doldurun.');
-    try {
+  //istifadeci tapilmayanda
     const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+if (userId === null) {
+    return errorResponse(
+        res,
+        404,
+        'Not Found',
+        'USER_NOT_FOUND',
+        'Qeyd olunan istifadəçi (username) mövcud deyil.'
+    );
+}
 
   const parsedQiymet = Number(qiymet);
   if (isNaN(parsedQiymet) || parsedQiymet <= 0)
