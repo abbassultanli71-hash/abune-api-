@@ -133,6 +133,13 @@ function isValidUsername(username) {
   return /^[a-zA-Z0-9_.]{3,50}$/.test(trimmed);
 }
 
+// PAN-i cavablarda gostermek ucun maskalayir - yalniz son 4 reqem qalir.
+function maskPan(pan) {
+  if (!pan || String(pan).length < 4) return null;
+  const last4 = String(pan).slice(-4);
+  return `**** **** **** ${last4}`;
+}
+
 const ICAZE_VERILEN_VALYUTALAR = ['AZN', 'USD', 'EUR'];
 const ICAZE_VERILEN_ODENIS_TEZLIKLERI = ['monthly', 'yearly', 'quarterly', 'weekly'];
 const ICAZE_VERILEN_KATEQORIYALAR = ['Entertainment', 'Music', 'Education', 'Health & Fitness', 'Productivity', 'Gaming', 'Cloud Storage', 'News', 'Food & Delivery', 'Shopping', 'Finance', 'Other'];
@@ -519,18 +526,6 @@ app.post('/api/abunelikler', async (req, res) => {
 
   if (!username || !ad || qiymet === undefined || qiymet === null || !baslama_tarixi)
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (username, ad, qiymet, baslama_tarixi) doldurun.');
-  //istifadeci tapilmayanda
-    const userId = await getUserIdByUsername(username);
-
-if (userId === null) {
-    return errorResponse(
-        res,
-        404,
-        'Not Found',
-        'USER_NOT_FOUND',
-        'Qeyd olunan istifadəçi (username) mövcud deyil.'
-    );
-}
 
   const parsedQiymet = Number(qiymet);
   if (isNaN(parsedQiymet) || parsedQiymet <= 0)
@@ -1158,7 +1153,6 @@ const sql = `SELECT c.id AS card_id,
                     c.ad,
                     c.kart_tipi,
                     c.pan,
-                    c.cvv,
                     c.kart_istifade_tarixi,
                     c.status
              FROM odenis_metodlari c
@@ -1166,7 +1160,8 @@ const sql = `SELECT c.id AS card_id,
              WHERE c.istifadeci_id = :istifadeci_id`;
     const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No payment methods found', { cards: [] });
-    return successResponse(res, 200, 'Success', { cards: result.rows });
+    const maskedCards = result.rows.map(row => ({ ...row, PAN: maskPan(row.PAN) }));
+    return successResponse(res, 200, 'Success', { cards: maskedCards });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
@@ -1203,9 +1198,6 @@ const sql = `SELECT c.id AS card_id,
  *               pan:
  *                 type: string
  *                 example: "4169739000001234"
- *               cvv:
- *                 type: string
- *                 example: "123"
  *               kart_istifade_tarixi:
  *                 type: string
  *                 example: "12/28"
@@ -1214,7 +1206,7 @@ const sql = `SELECT c.id AS card_id,
  *         description: Ödəniş metodu yaradıldı
  */
 app.post('/api/odenis-metodlari', async (req, res) => {
-  const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
+  const { username, ad, kart_tipi, pan, kart_istifade_tarixi } = req.body;
   if (!username || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və kart_tipi sahələri məcburidir.');
 
   // Kartın istifadə tarixi: əvvəlcə format, sonra (format düzgündürsə) müddət yoxlanılır.
@@ -1244,15 +1236,14 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
  await executeQuery(
   `INSERT INTO odenis_metodlari
-   (istifadeci_id, ad, kart_tipi, pan, cvv, kart_istifade_tarixi)
+   (istifadeci_id, ad, kart_tipi, pan, kart_istifade_tarixi)
    VALUES
-   (:istifadeci_id, :ad, :kart_tipi, :pan, :cvv, :kart_istifade_tarixi)`,
+   (:istifadeci_id, :ad, :kart_tipi, :pan, :kart_istifade_tarixi)`,
   {
     istifadeci_id: userId,
     ad,
     kart_tipi: KART_FORMATLARI[normalizedKartTipi],
     pan,
-    cvv,
     kart_istifade_tarixi: kart_istifade_tarixi || null
   },
   { autoCommit: true }
@@ -1291,9 +1282,6 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  *               pan:
  *                 type: string
  *                 example: "4169739000001234"
- *               cvv:
- *                 type: string
- *                 example: "123"
  *               kart_istifade_tarixi:
  *                 type: string
  *                 example: "12/28"
@@ -1307,7 +1295,7 @@ app.post('/api/odenis-metodlari', async (req, res) => {
  */
 app.put('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
-  const { ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
+  const { ad, kart_tipi, pan, kart_istifade_tarixi } = req.body;
   if (!ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'ad və kart_tipi sahələri məcburidir.');
 
   // Kartın istifadə tarixi: əvvəlcə format, sonra (format düzgündürsə) müddət yoxlanılır.
@@ -1338,14 +1326,12 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
    SET ad=:ad,
        kart_tipi=:kart_tipi,
        pan=:pan,
-       cvv=:cvv,
        kart_istifade_tarixi=:kart_istifade_tarixi
    WHERE id=:id`,
   {
     ad,
     kart_tipi: KART_FORMATLARI[normalizedKartTipi],
     pan,
-    cvv,
     kart_istifade_tarixi: kart_istifade_tarixi || null,
     id
   },
