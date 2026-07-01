@@ -1211,6 +1211,11 @@ const sql = `SELECT c.id AS card_id,
 app.post('/api/odenis-metodlari', async (req, res) => {
   const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!username || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və kart_tipi sahələri məcburidir.');
+  if (cvv !== undefined && cvv !== null && cvv !== '') {
+  if (!/^\d{3}$/.test(String(cvv))) {
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CVV', 'cvv yalnız 3 rəqəmdən ibarət olmalıdır (məs: 123).');
+  }
+}
 
   // Kartın istifadə tarixi: əvvəlcə format, sonra (format düzgündürsə) müddət yoxlanılır.
   // İki ayrı xəta nəticəsi (FORMAT / EXPIRED) qarışdırılmadan göstərilir.
@@ -1303,6 +1308,11 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
   const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'ad və kart_tipi sahələri məcburidir.');
+  if (cvv !== undefined && cvv !== null && cvv !== '') {
+  if (!/^\d{3}$/.test(String(cvv))) {
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CVV', 'cvv yalnız 3 rəqəmdən ibarət olmalıdır (məs: 123).');
+  }
+}
 
   // Kartın istifadə tarixi: əvvəlcə format, sonra (format düzgündürsə) müddət yoxlanılır.
   // İki ayrı xəta nəticəsi (FORMAT / EXPIRED) qarışdırılmadan göstərilir.
