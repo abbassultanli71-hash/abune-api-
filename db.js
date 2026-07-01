@@ -1,11 +1,11 @@
 const { Pool } = require('pg');
 require('dotenv').config();
-
 let pool;
 if (process.env.DATABASE_URL) {
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: { rejectUnauthorized: false },
+    options: '-c timezone=Asia/Baku'
   });
 } else {
   pool = new Pool({
@@ -13,10 +13,10 @@ if (process.env.DATABASE_URL) {
     password: process.env.DB_PASSWORD || 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'subscription_db'
+    database: process.env.DB_NAME || 'subscription_db',
+    options: '-c timezone=Asia/Baku'
   });
 }
-
 function convertNamedToPositional(sql, binds) {
   if (!binds || typeof binds !== 'object' || Array.isArray(binds)) {
     return { sql, binds };
@@ -32,7 +32,6 @@ function convertNamedToPositional(sql, binds) {
   });
   return { sql: pgSql, binds: pgBinds };
 }
-
 async function executeQuery(sql, binds = {}, options = {}) {
   const { sql: pgSql, binds: pgBinds } = convertNamedToPositional(sql, binds);
   try {
@@ -53,5 +52,4 @@ async function executeQuery(sql, binds = {}, options = {}) {
     throw err;
   }
 }
-
 module.exports = { executeQuery };
