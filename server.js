@@ -855,8 +855,6 @@ app.get('/api/bildirisler', async (req, res) => {
     const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No notifications found', { notifications: [] });
 
-    const bugun = new Date();
-    bugun.setUTCHours(0, 0, 0, 0);
 
     const XEBERDARLIQ_GUNLERI = { weekly: 2, monthly: 7, quarterly: 14, yearly: 30 };
 
@@ -882,9 +880,15 @@ app.get('/api/bildirisler', async (req, res) => {
         };
       }
 
-      const [ny, nm, nd] = row.NOVBETI_ODENIS_TARIXI.split('-').map(Number);
-      const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
-      const qalanGun = Math.ceil((novbetiDate - bugun) / (1000 * 60 * 60 * 24));
+const [ny, nm, nd] = row.NOVBETI_ODENIS_TARIXI.split('-').map(Number);
+const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
+
+const [gy, gm, gd] = row.GONDERILME_TARIXI.split('-').map(Number);
+const gonderilmeDate = new Date(Date.UTC(gy, gm - 1, gd));
+
+const qalanGun = Math.ceil(
+  (novbetiDate - gonderilmeDate) / (1000 * 60 * 60 * 24)
+);
 
       const { basliq, mesaj } = generateDueMessage(row.APP_ADI, row.NOVBETI_ODENIS_TARIXI, qalanGun);
       const hesablananGonderilmeTarixi = xeberdarlıqTarixi(row.NOVBETI_ODENIS_TARIXI, row.ODENIS_TEZLIYI);
