@@ -6,6 +6,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const { executeQuery } = require('./db');
 require('dotenv').config();
 const { startDueSubscriptionNotifierJob } = require('./jobs/dueSubscriptionNotifier');
+const { generateDueMessage } = require('./services/notificationService');
 
 const app = express();
 app.use(cors());
@@ -233,8 +234,14 @@ function errorResponse(res, statusCode, message, errorCode, errorMessage) {
 // Abunəlik yarananda avtomatik bildiriş əlavə edir
 async function addAutoNotification(userId, appAd, novbetiOdenisTarixi) {
   try {
-    const basliq = `${appAd} abunəliyi aktivdir`;
-    const mesaj = `${appAd} abunəliyiniz uğurla aktivləşdirildi. Növbəti ödəniş tarixi: ${novbetiOdenisTarixi}.`;
+    const bugun = new Date();
+    bugun.setUTCHours(0, 0, 0, 0);
+    const [ny, nm, nd] = novbetiOdenisTarixi.split('-').map(Number);
+    const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
+    const qalanGun = Math.ceil((novbetiDate - bugun) / (1000 * 60 * 60 * 24));
+
+    const { basliq, mesaj } = generateDueMessage(appAd, novbetiOdenisTarixi, qalanGun);
+
     await executeQuery(
       `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`,
       { istifadeci_id: userId, basliq, mesaj },
