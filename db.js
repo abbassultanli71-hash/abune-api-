@@ -34,6 +34,7 @@ function convertNamedToPositional(sql, binds) {
   });
   return { sql: pgSql, binds: pgBinds };
 }
+
 async function executeQuery(sql, binds = {}, options = {}) {
   const { sql: pgSql, binds: pgBinds } = convertNamedToPositional(sql, binds);
   try {
@@ -54,4 +55,5 @@ async function executeQuery(sql, binds = {}, options = {}) {
     throw err;
   }
 }
+
 module.exports = { executeQuery };
