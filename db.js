@@ -1,5 +1,6 @@
 const { Pool } = require('pg');
 require('dotenv').config();
+
 let pool;
 if (process.env.DATABASE_URL) {
   pool = new Pool({
@@ -17,6 +18,7 @@ if (process.env.DATABASE_URL) {
     options: '-c timezone=Asia/Baku'
   });
 }
+
 function convertNamedToPositional(sql, binds) {
   if (!binds || typeof binds !== 'object' || Array.isArray(binds)) {
     return { sql, binds };
