@@ -880,25 +880,38 @@ app.get('/api/bildirisler', async (req, res) => {
         };
       }
 
-const [ny, nm, nd] = row.NOVBETI_ODENIS_TARIXI.split('-').map(Number);
-const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
+      const [ny, nm, nd] = row.NOVBETI_ODENIS_TARIXI.split('-').map(Number);
+      const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
 
-const [gy, gm, gd] = row.GONDERILME_TARIXI.split('-').map(Number);
-const gonderilmeDate = new Date(Date.UTC(gy, gm - 1, gd));
+      const [gy, gm, gd] = row.GONDERILME_TARIXI.split('-').map(Number);
+      const gonderilmeDate = new Date(Date.UTC(gy, gm - 1, gd));
 
-const qalanGun = Math.ceil(
-  (novbetiDate - gonderilmeDate) / (1000 * 60 * 60 * 24)
-);
+      const dbQalanGun = Math.ceil(
+        (novbetiDate - gonderilmeDate) / (1000 * 60 * 60 * 24)
+      );
 
-      const { basliq, mesaj } = generateDueMessage(row.APP_ADI, row.NOVBETI_ODENIS_TARIXI, qalanGun);
-      const hesablananGonderilmeTarixi = xeberdarlıqTarixi(row.NOVBETI_ODENIS_TARIXI, row.ODENIS_TEZLIYI);
+      let finalGonderilmeTarixi = row.GONDERILME_TARIXI;
+      let finalQalanGun = dbQalanGun;
+
+      const isReminder = dbQalanGun > 0 && (row.BASLIQ.includes('Xatırlatması') || row.BASLIQ.includes('Məlumatı') || row.BASLIQ.includes('Yaxınlaşan'));
+
+      if (isReminder) {
+        finalGonderilmeTarixi = xeberdarlıqTarixi(row.NOVBETI_ODENIS_TARIXI, row.ODENIS_TEZLIYI);
+        const [hy, hm, hd] = finalGonderilmeTarixi.split('-').map(Number);
+        const warningDate = new Date(Date.UTC(hy, hm - 1, hd));
+        finalQalanGun = Math.ceil(
+          (novbetiDate - warningDate) / (1000 * 60 * 60 * 24)
+        );
+      }
+
+      const { basliq, mesaj } = generateDueMessage(row.APP_ADI, row.NOVBETI_ODENIS_TARIXI, finalQalanGun);
 
       return {
         bildiris_id: row.BILDIRIS_ID,
         username: row.USERNAME,
         basliq,
         mesaj,
-        gonderilme_tarixi: hesablananGonderilmeTarixi
+        gonderilme_tarixi: finalGonderilmeTarixi
       };
     });
 
