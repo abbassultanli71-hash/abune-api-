@@ -812,10 +812,6 @@ app.delete('/api/abunelikler', async (req, res) => {
  *                             type: integer
  *                           username:
  *                             type: string
- *                           abunelik_id:
- *                             type: integer
- *                           app_adi:
- *                             type: string
  *                           basliq:
  *                             type: string
  *                           mesaj:
