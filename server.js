@@ -4,8 +4,8 @@ const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const { executeQuery } = require('./db');
-const { createSubscriptionNotification } = require('./services/notificationService');
 require('dotenv').config();
+const { startDueSubscriptionNotifierJob } = require('./jobs/dueSubscriptionNotifier');
 
 const app = express();
 app.use(cors());
@@ -707,94 +707,6 @@ app.get('/api/bildirisler', async (req, res) => {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
-
-
-
-/**
- * @swagger
- * /api/bildirisler:
- *   post:
- *     summary: >
- *       Yeni bildiriş yaradır. Başlıq və mesaj server tərəfindən avtomatik
- *       generasiya olunur — ödəmə tezliyinə görə neçə gün qaldığı hesablanır.
- *       App adı (abunelik.ad) yalnız həmin istifadəçiyə aid abunəlikdən götürülür.
- *     tags: [Bildirişlər]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - username
- *               - abunelik_id
- *             properties:
- *               username:
- *                 type: string
- *                 example: abbas.abbasov
- *               abunelik_id:
- *                 type: integer
- *                 example: 3
- *                 description: >
- *                   Bildiriş yaradılacaq abunəliyin ID-si.
- *                   Bu abunəlik mütləq həmin username-ə aid olmalıdır.
- *     responses:
- *       201:
- *         description: >
- *           Bildiriş yaradıldı. Cavabda avtomatik generasiya olunmuş
- *           başlıq, mesaj və gonderilme_tarixi (bu günün tarixi) qaytarılır.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   example: 201
- *                 data:
- *                   type: object
- *                   properties:
- *                     basliq:
- *                       type: string
- *                       example: "Netflix - Ödəniş Xatırlatması"
- *                     mesaj:
- *                       type: string
- *                       example: "Netflix abunəliyinizin növbəti ödənişinə 7 gün qalmışdır (2026-07-01)."
- *                     gonderilme_tarixi:
- *                       type: string
- *                       example: "2026-06-24"
- *       400:
- *         description: >
- *           Xəta halları — abunelik_id həmin user-ə aid deyil,
- *           abunəlik tapılmadı, və ya abunəlik deaktivdir.
- *       404:
- *         description: İstifadəçi tapılmadı
- */
-// GET /api/bildirisler (dəyişməyib)
-app.get('/api/bildirisler', async (req, res) => {
-  // ...
-});
-
-// POST /api/bildirisler (YENİ, qısaldılmış versiya)
-app.post('/api/bildirisler', async (req, res) => {
-  const { username, abunelik_id } = req.body;
-  if (!username || abunelik_id === undefined || abunelik_id === null)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (username, abunelik_id) doldurun.');
-  try {
-    const userId = await getUserIdByUsername(username);
-    if (userId === null)
-      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
-    const result = await createSubscriptionNotification(userId, username, abunelik_id);
-    if (!result.success) {
-      return errorResponse(res, result.status, 'Bad Request', result.code, result.message);
-    }
-    return successResponse(res, result.status, 'Created', result.data);
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
-});
-
-
 
 
 /**
@@ -1702,9 +1614,7 @@ app.put('/api/ayarlar/:username', async (req, res) => {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
-const { startDueSubscriptionNotifierJob } = require('./jobs/dueSubscriptionNotifier');
 startDueSubscriptionNotifierJob();
-
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
   console.log(`Swagger documentation is available on http://localhost:${PORT}/api-docs`);
