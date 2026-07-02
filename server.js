@@ -819,10 +819,6 @@ app.delete('/api/abunelikler', async (req, res) => {
  *                             type: integer
  *                           username:
  *                             type: string
- *                           abunelik_id:
- *                             type: integer
- *                           app_adi:
- *                             type: string
  *                           basliq:
  *                             type: string
  *                           mesaj:
@@ -844,7 +840,7 @@ app.get('/api/bildirisler', async (req, res) => {
 
     // abunelik_id və app_adi (abunəlik adı) də qaytarılır
     const sql = `
-      SELECT b.id AS bildiris_id, u.username, b.abunelik_id, a.ad AS app_adi,
+      SELECT b.id AS bildiris_id, u.username,
              b.basliq, b.mesaj,
              TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') AS gonderilme_tarixi
       FROM bildirisler b
