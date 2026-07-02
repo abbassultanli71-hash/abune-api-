@@ -4,6 +4,7 @@ const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const { executeQuery } = require('./db');
+const { createSubscriptionNotification } = require('./services/notificationService');
 require('dotenv').config();
 
 const app = express();
@@ -769,107 +770,30 @@ app.get('/api/bildirisler', async (req, res) => {
  *       404:
  *         description: İstifadəçi tapılmadı
  */
+// GET /api/bildirisler (dəyişməyib)
+app.get('/api/bildirisler', async (req, res) => {
+  // ...
+});
+
+// POST /api/bildirisler (YENİ, qısaldılmış versiya)
 app.post('/api/bildirisler', async (req, res) => {
-
   const { username, abunelik_id } = req.body;
-
   if (!username || abunelik_id === undefined || abunelik_id === null)
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (username, abunelik_id) doldurun.');
-
   try {
-    // 1. İstifadəçini tap
     const userId = await getUserIdByUsername(username);
     if (userId === null)
       return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
-
-    // 2. Abunəliyi tap — mütləq həmin istifadəçiyə aid olmalıdır
-    const subResult = await executeQuery(
-      `SELECT a.id, a.ad, a.odenis_tezliyi,
-              TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') AS novbeti_odenis_tarixi,
-              a.status, a.istifadeci_id
-       FROM abunelikler a
-       WHERE a.id = :abunelik_id`,
-      { abunelik_id }
-    );
-
-    if (subResult.rows.length === 0)
-      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_NOT_FOUND', 'Göstərilən abunelik_id ilə abunəlik tapılmadı.');
-
-    const sub = subResult.rows[0];
-
-    // 3. Abunəlik bu istifadəçiyə aidmi?
-    if (Number(sub.ISTIFADECI_ID) !== Number(userId))
-      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_USER_MISMATCH',
-        `Bu abunəlik (ID: ${abunelik_id}) "${username}" istifadəçisinə aid deyil. Yalnız öz abunəlikləriniz üçün bildiriş yarada bilərsiniz.`);
-
-    // 4. Abunəlik aktiv olmalıdır
-    if (sub.STATUS !== 'active')
-      return errorResponse(res, 400, 'Bad Request', 'SUBSCRIPTION_INACTIVE',
-        `"${sub.AD}" abunəliyi aktiv deyil (status: ${sub.STATUS}). Yalnız aktiv abunəliklər üçün bildiriş yaradıla bilər.`);
-
-   // 5. Neçə gün qaldığını hesabla
-    const appAdi = sub.AD;
-    const novbetiTarix = sub.NOVBETI_ODENIS_TARIXI;
-    const odenisTezliyi = sub.ODENIS_TEZLIYI;
-
-    const bugun = new Date();
-    bugun.setUTCHours(0, 0, 0, 0);
-    const [ny, nm, nd] = novbetiTarix.split('-').map(Number);
-    const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
-    const qalanGun = Math.ceil((novbetiDate - bugun) / (1000 * 60 * 60 * 24));
-
-    // 6. Ödəniş tezliyinə görə xəbərdarlıq həddi
-    const xeberdarliqHeddi = {
-      weekly: 2,
-      monthly: 7,
-      quarterly: 14,
-      yearly: 30
-    };
-    const heddiGun = xeberdarliqHeddi[odenisTezliyi] || 7;
-
-    // 6b. Bildirişin göndərilmə tarixi = novbeti_odenis_tarixi - heddiGun
-    const gonderilmeDate = new Date(novbetiDate);
-    gonderilmeDate.setUTCDate(gonderilmeDate.getUTCDate() - heddiGun);
-    const gonderilmeTarixiStr = gonderilmeDate.toISOString().slice(0, 10);
-    const gonderilmeTarixiLabel = `${gonderilmeTarixiStr} (${heddiGun} gün qalıb)`;
-
-    // 7. Avtomatik başlıq və mesaj generasiyası
-    let basliq, mesaj;
-    if (qalanGun < 0) {
-      basliq = `${appAdi} - Gecikmiş Ödəniş`;
-      mesaj = `"${appAdi}" abunəliyinizin ödənişi ${Math.abs(qalanGun)} gün gecikib (son tarix: ${novbetiTarix}). Zəhmət olmasa ödənişi tamamlayın.`;
-    } else if (qalanGun === 0) {
-      basliq = `${appAdi} - Bu Gün Ödəniş Günüdür`;
-      mesaj = `"${appAdi}" abunəliyinizin ödəniş tarixi bu gündür (${novbetiTarix}). Ödənişi tamamlamağı unutmayın.`;
-    } else if (qalanGun <= heddiGun) {
-      basliq = `${appAdi} - Ödəniş Xatırlatması`;
-      mesaj = `"${appAdi}" abunəliyinizin növbəti ödənişinə ${qalanGun} gün qalmışdır (${novbetiTarix}).`;
-    } else {
-      basliq = `${appAdi} - Ödəniş Məlumatı`;
-      mesaj = `"${appAdi}" abunəliyinizin növbəti ödənişi ${novbetiTarix} tarixindədir (${qalanGun} gün qalıb).`;
+    const result = await createSubscriptionNotification(userId, username, abunelik_id);
+    if (!result.success) {
+      return errorResponse(res, result.status, 'Bad Request', result.code, result.message);
     }
-
-    // 8. Bildirişi DB-yə yaz — gonderilme_tarixi hesablanmış tarix ilə yazılır
-    await executeQuery(
-      `INSERT INTO bildirisler (istifadeci_id, abunelik_id, basliq, mesaj, gonderilme_tarixi)
-       VALUES (:istifadeci_id, :abunelik_id, :basliq, :mesaj, TO_DATE(:gonderilme_tarixi, 'YYYY-MM-DD'))`,
-      { istifadeci_id: userId, abunelik_id, basliq, mesaj, gonderilme_tarixi: gonderilmeTarixiStr },
-      { autoCommit: true }
-    );
-
-    // 9. Uğurlu cavab
-    return successResponse(res, 201, 'Created', {
-      message: 'Bildiriş uğurla yaradıldı.',
-      basliq,
-      mesaj,
-      gonderilme_tarixi: gonderilmeTarixiLabel,
-      app_adi: appAdi,
-      qalan_gun: qalanGun
-    });
+    return successResponse(res, result.status, 'Created', result.data);
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
+
 
 
 
@@ -1778,6 +1702,8 @@ app.put('/api/ayarlar/:username', async (req, res) => {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
+const { startDueSubscriptionNotifierJob } = require('./jobs/dueSubscriptionNotifier');
+startDueSubscriptionNotifierJob();
 
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
