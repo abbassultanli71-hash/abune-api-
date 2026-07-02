@@ -1,23 +1,12 @@
 const { Pool } = require('pg');
 require('dotenv').config();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> checkpoint
-=======
-
->>>>>>> f4812fb547f38e41583e5244336e35370bcb9215
 let pool;
 if (process.env.DATABASE_URL) {
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-<<<<<<< HEAD
     ssl: { rejectUnauthorized: false },
     options: '-c timezone=Asia/Baku'
-=======
-    ssl: { rejectUnauthorized: false }
->>>>>>> checkpoint
   });
 } else {
   pool = new Pool({
@@ -29,14 +18,7 @@ if (process.env.DATABASE_URL) {
     options: '-c timezone=Asia/Baku'
   });
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> checkpoint
-=======
-
->>>>>>> f4812fb547f38e41583e5244336e35370bcb9215
 function convertNamedToPositional(sql, binds) {
   if (!binds || typeof binds !== 'object' || Array.isArray(binds)) {
     return { sql, binds };
@@ -52,14 +34,7 @@ function convertNamedToPositional(sql, binds) {
   });
   return { sql: pgSql, binds: pgBinds };
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> checkpoint
-=======
-
->>>>>>> f4812fb547f38e41583e5244336e35370bcb9215
 async function executeQuery(sql, binds = {}, options = {}) {
   const { sql: pgSql, binds: pgBinds } = convertNamedToPositional(sql, binds);
   try {
@@ -80,12 +55,5 @@ async function executeQuery(sql, binds = {}, options = {}) {
     throw err;
   }
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
->>>>>>> checkpoint
-=======
-
->>>>>>> f4812fb547f38e41583e5244336e35370bcb9215
 module.exports = { executeQuery };
