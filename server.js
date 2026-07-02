@@ -743,13 +743,13 @@ app.put('/api/abunelikler', async (req, res) => {
 
 /**
  * @swagger
- * /api/abunelikler:
+ * /api/abunelikler/{id}:
  *   delete:
- *     summary: Abunəliyi username və abunəlik adına görə silir
+ *     summary: Abunəliyi ID-yə görə silir
  *     tags: [Abunəliklər]
  *     parameters:
- *       - in: query
- *         name: username
+ *       - in: path
+ *         name: id
  *         required: true
  *         schema:
  *           type: integer
@@ -759,11 +759,13 @@ app.put('/api/abunelikler', async (req, res) => {
  *       404:
  *         description: Tapılmadı
  */
-app.delete('/api/abunelikler', async (req, res) => {
-  const { username, ad } = req.query;
-  if (!username || !ad)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username və ad query parametrləri məcburidir.');
+app.delete('/api/abunelikler/:id', async (req, res) => {
+  const { id } = req.params;
   try {
+    const subCheck = await executeQuery(`SELECT id FROM abunelikler WHERE id = :id`, { id });
+    if (subCheck.rows.length === 0)
+      return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
+
     // Əvvəlcə həmin abunəliyə aid bildirişləri sil
     await executeQuery(`DELETE FROM bildirisler WHERE abunelik_id = :id`, { id });
 
@@ -838,10 +840,11 @@ app.get('/api/bildirisler', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    // abunelik_id və app_adi (abunəlik adı) də qaytarılır
     const sql = `
       SELECT b.id AS bildiris_id, u.username,
              b.basliq, b.mesaj,
+             b.abunelik_id, a.ad AS app_adi,
+             TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') AS novbeti_odenis_tarixi,
              TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') AS gonderilme_tarixi
       FROM bildirisler b
       JOIN istifadeciler u ON b.istifadeci_id = u.id
@@ -851,7 +854,38 @@ app.get('/api/bildirisler', async (req, res) => {
     `;
     const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) return successResponse(res, 200, 'No notifications found', { notifications: [] });
-    return successResponse(res, 200, 'Success', { notifications: result.rows });
+
+    const bugun = new Date();
+    bugun.setUTCHours(0, 0, 0, 0);
+
+    const notifications = result.rows.map(row => {
+      // Əlaqəli abunəlik silinibsə (LEFT JOIN NULL), DB-dəki statik mesajı olduğu kimi saxla
+      if (!row.NOVBETI_ODENIS_TARIXI) {
+        return {
+          bildiris_id: row.BILDIRIS_ID,
+          username: row.USERNAME,
+          basliq: row.BASLIQ,
+          mesaj: row.MESAJ,
+          gonderilme_tarixi: row.GONDERILME_TARIXI
+        };
+      }
+
+      const [ny, nm, nd] = row.NOVBETI_ODENIS_TARIXI.split('-').map(Number);
+      const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
+      const qalanGun = Math.ceil((novbetiDate - bugun) / (1000 * 60 * 60 * 24));
+
+      const { basliq, mesaj } = generateDueMessage(row.APP_ADI, row.NOVBETI_ODENIS_TARIXI, qalanGun);
+
+      return {
+        bildiris_id: row.BILDIRIS_ID,
+        username: row.USERNAME,
+        basliq,
+        mesaj,
+        gonderilme_tarixi: row.GONDERILME_TARIXI
+      };
+    });
+
+    return successResponse(res, 200, 'Success', { notifications });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
