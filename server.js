@@ -91,7 +91,8 @@ function isValidDate(dateStr) {
   if (!regex.test(dateStr)) return false;
   const [year, month, day] = dateStr.split('-').map(Number);
   if (month < 1 || month > 12) return false;
-  const daysInMonth = [31, (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const daysInMonth = [31, (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 29 : 28,
+    31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   return day >= 1 && day <= daysInMonth[month - 1];
 }
 
@@ -229,6 +230,40 @@ function errorResponse(res, statusCode, message, errorCode, errorMessage) {
   });
 }
 
+// Abunəlik yarananda avtomatik bildiriş əlavə edir
+async function addAutoNotification(userId, appAd, novbetiOdenisTarixi) {
+  try {
+    const basliq = `${appAd} abunəliyi aktivdir`;
+    const mesaj = `${appAd} abunəliyiniz uğurla aktivləşdirildi. Növbəti ödəniş tarixi: ${novbetiOdenisTarixi}.`;
+    await executeQuery(
+      `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`,
+      { istifadeci_id: userId, basliq, mesaj },
+      { autoCommit: true }
+    );
+  } catch (err) {
+    console.error('Auto notification error:', err.message);
+  }
+}
+
+// Abunəlik yarananda avtomatik ödəniş tarixçəsi əlavə edir
+async function addAutoPaymentHistory(userId, abunelikId, qiymet, baslamaTarixi) {
+  try {
+    await executeQuery(
+      `INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
+       VALUES (:abunelik_id, :istifadeci_id, :odenis_tarixi, :mebleq, 'success')`,
+      {
+        abunelik_id: abunelikId,
+        istifadeci_id: userId,
+        odenis_tarixi: baslamaTarixi,
+        mebleq: qiymet
+      },
+      { autoCommit: true }
+    );
+  } catch (err) {
+    console.error('Auto payment history error:', err.message);
+  }
+}
+
 // =============================================
 // --- ISTIFADECILER (Users) ROUTES ---
 // =============================================
@@ -353,13 +388,10 @@ app.post('/api/istifadeciler', async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - ad
- *               - email
+ *             required: [ad, email]
  *             properties:
  *               ad:
  *                 type: string
- *                 example: Abbas Abbasov
  *               email:
  *                 type: string
  *                 example: abbas@example.com
@@ -369,9 +401,9 @@ app.post('/api/istifadeciler', async (req, res) => {
  *                 example: abbas.new
  *     responses:
  *       200:
- *         description: İstifadəçi yeniləndi
+ *         description: Yeniləndi
  *       404:
- *         description: İstifadəçi tapılmadı
+ *         description: Tapılmadı
  */
 app.put('/api/istifadeciler/:username', async (req, res) => {
   const { username } = req.params;
@@ -433,9 +465,9 @@ app.put('/api/istifadeciler/:username', async (req, res) => {
  *           type: string
  *     responses:
  *       200:
- *         description: İstifadəçi silindi
+ *         description: Silindi
  *       404:
- *         description: İstifadəçi tapılmadı
+ *         description: Tapılmadı
  */
 app.delete('/api/istifadeciler/:username', async (req, res) => {
   const { username } = req.params;
@@ -583,33 +615,147 @@ app.post('/api/abunelikler', async (req, res) => {
     };
 
     await executeQuery(sql, binds, { autoCommit: true });
-    return successResponse(res, 201, 'Created', { message: 'Abunəlik uğurla əlavə edildi.', novbeti_odenis_tarixi: novbetiOdenisTarixi });
+
+    // Yeni yaranan abunəliyin ID-sini tap
+    const newSub = await executeQuery(
+      `SELECT id FROM abunelikler
+       WHERE istifadeci_id = :istifadeci_id AND ad = :ad
+       ORDER BY id DESC LIMIT 1`,
+      { istifadeci_id: userId, ad }
+    );
+    const newSubId = newSub.rows.length > 0 ? newSub.rows[0].ID : null;
+
+    // Avtomatik bildiriş əlavə et
+    await addAutoNotification(userId, ad, novbetiOdenisTarixi);
+
+    // Avtomatik ödəniş tarixçəsi əlavə et
+    if (newSubId) {
+      await addAutoPaymentHistory(userId, newSubId, parsedQiymet, baslama_tarixi);
+    }
+
+    return successResponse(res, 201, 'Created', {
+      message: 'Abunəlik uğurla əlavə edildi. Bildiriş və ödəniş tarixçəsi avtomatik yaradıldı.',
+      novbeti_odenis_tarixi: novbetiOdenisTarixi
+    });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
 
+/**
+ * @swagger
+ * /api/abunelikler:
+ *   put:
+ *     summary: Abunəliyi username və mövcud abunəlik adına görə yeniləyir
+ *     tags: [Abunəliklər]
+ *     parameters:
+ *       - in: query
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: ad
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Yenilənəcək abunəliyin HAZIRKI adı
+ *     responses:
+ *       200:
+ *         description: Yeniləndi
+ *       404:
+ *         description: Tapılmadı
+ */
+app.put('/api/abunelikler', async (req, res) => {
+  const { username, ad: queryAd } = req.query;
+  if (!username || !queryAd)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username və ad query parametrləri məcburidir.');
+
+  const { ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, status } = req.body;
+
+  if (qiymet === undefined || qiymet === null || !baslama_tarixi)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'qiymet və baslama_tarixi məcburidir.');
+
+  const parsedQiymet = Number(qiymet);
+  if (isNaN(parsedQiymet) || parsedQiymet <= 0)
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_PRICE', 'Qiymət 0-dan böyük olmalıdır.');
+
+  if (valyuta && !isValidCurrency(valyuta))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
+
+  const odenisTezliyi = odenis_tezliyi || 'monthly';
+  if (!ICAZE_VERILEN_ODENIS_TEZLIKLERI.includes(odenisTezliyi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_FREQUENCY', `Yanlış ödəniş tezliyi: "${odenis_tezliyi}". Yalnız ${ICAZE_VERILEN_ODENIS_TEZLIKLERI.join(', ')} daxil edilə bilər.`);
+
+  if (!isValidDate(baslama_tarixi))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_DATE', `Tarix formatı yanlışdır: "${baslama_tarixi}" (Format: YYYY-MM-DD).`);
+
+  if (kateqoriya && !ICAZE_VERILEN_KATEQORIYALAR.includes(kateqoriya))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_CATEGORY', `Yanlış kateqoriya: "${kateqoriya}". Yalnız ${ICAZE_VERILEN_KATEQORIYALAR.join(', ')} daxil edilə bilər.`);
+
+  const statusValue = status || 'active';
+  if (!ICAZE_VERILEN_STATUSLAR.includes(statusValue))
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_STATUS', `Status yalnız "active" və ya "deactive" ola bilər.`);
+
+  const novbetiOdenisTarixi = hesablaNovbetiOdenisTarixi(baslama_tarixi, odenisTezliyi);
+
+  try {
+    const userId = await getUserIdByUsername(username);
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    const subCheck = await executeQuery(
+      `SELECT id FROM abunelikler WHERE istifadeci_id = :istifadeci_id AND ad = :ad`,
+      { istifadeci_id: userId, ad: queryAd }
+    );
+    if (subCheck.rows.length === 0)
+      return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
+
+    const finalAd = ad || queryAd;
+    await executeQuery(
+      `UPDATE abunelikler SET ad=:ad, qiymet=:qiymet, valyuta=:valyuta, odenis_tezliyi=:odenis_tezliyi,
+       baslama_tarixi=TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), novbeti_odenis_tarixi=TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'),
+       kateqoriya=:kateqoriya, status=:status
+       WHERE istifadeci_id=:istifadeci_id AND ad=:queryAd`,
+      {
+        ad: finalAd, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
+        odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
+        kateqoriya: kateqoriya || null, status: statusValue,
+        istifadeci_id: userId, queryAd
+      },
+      { autoCommit: true }
+    );
+    return successResponse(res, 200, 'Updated', {
+      message: 'Abunəlik uğurla yeniləndi.',
+      novbeti_odenis_tarixi: novbetiOdenisTarixi
+    });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
 
 /**
  * @swagger
- * /api/abunelikler/{id}:
+ * /api/abunelikler:
  *   delete:
- *     summary: Abunəliyi silir
+ *     summary: Abunəliyi username və abunəlik adına görə silir
  *     tags: [Abunəliklər]
  *     parameters:
- *       - in: path
- *         name: id
+ *       - in: query
+ *         name: username
  *         required: true
  *         schema:
  *           type: integer
  *     responses:
  *       200:
- *         description: Abunəlik silindi
+ *         description: Silindi
  *       404:
- *         description: Abunəlik tapılmadı
+ *         description: Tapılmadı
  */
-app.delete('/api/abunelikler/:id', async (req, res) => {
-  const { id } = req.params;
+app.delete('/api/abunelikler', async (req, res) => {
+  const { username, ad } = req.query;
+  if (!username || !ad)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username və ad query parametrləri məcburidir.');
   try {
     // Əvvəlcə həmin abunəliyə aid bildirişləri sil
     await executeQuery(`DELETE FROM bildirisler WHERE abunelik_id = :id`, { id });
@@ -1049,7 +1195,6 @@ const sql = `SELECT c.id AS card_id,
  *                 example: abbas.abbasov
  *               ad:
  *                 type: string
- *                 example: Maaş Kartı
  *               kart_tipi:
  *                 type: string
  *                 enum: [Visa, Mastercard, Maestro, UnionPay, American Express, Birkart, Tamkart, Bolkart, Ucard]
@@ -1062,10 +1207,9 @@ const sql = `SELECT c.id AS card_id,
  *                 example: "123"
  *               kart_istifade_tarixi:
  *                 type: string
- *                 example: "12/28"
  *     responses:
  *       201:
- *         description: Ödəniş metodu yaradıldı
+ *         description: Əlavə edildi
  */
 app.post('/api/odenis-metodlari', async (req, res) => {
   const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
@@ -1231,22 +1375,38 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
  * @swagger
  * /api/odenis-metodlari/{id}:
  *   delete:
- *     summary: Ödəniş metodunu silir
+ *     summary: Ödəniş metodunu username və kart adına görə silir
  *     tags: [Ödəniş Metodları]
  *     parameters:
- *       - in: path
- *         name: id
+ *       - in: query
+ *         name: username
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *       - in: query
+ *         name: ad
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: Silindi
+ *       404:
+ *         description: Tapılmadı
  */
-app.delete('/api/odenis-metodlari/:id', async (req, res) => {
-  const { id } = req.params;
+app.delete('/api/odenis-metodlari', async (req, res) => {
+  const { username, ad } = req.query;
+  if (!username || !ad)
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username və ad query parametrləri məcburidir.');
   try {
-    const result = await executeQuery(`DELETE FROM odenis_metodlari WHERE id = :id`, { id }, { autoCommit: true });
+    const userId = await getUserIdByUsername(username);
+    if (userId === null)
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    const result = await executeQuery(
+      `DELETE FROM odenis_metodlari WHERE istifadeci_id = :istifadeci_id AND ad = :ad`,
+      { istifadeci_id: userId, ad },
+      { autoCommit: true }
+    );
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
     return successResponse(res, 200, 'Deleted', { message: 'Ödəniş metodu uğurla silindi.' });
   } catch (err) {
@@ -1313,7 +1473,6 @@ app.get('/api/budceler', async (req, res) => {
  *                 example: abbas.abbasov
  *               limit_mebleq:
  *                 type: number
- *                 example: 50.00
  *               valyuta:
  *                 type: string
  *                 example: AZN
@@ -1398,12 +1557,10 @@ app.post('/api/budceler', async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - limit_mebleq
+ *             required: [limit_mebleq]
  *             properties:
  *               limit_mebleq:
  *                 type: number
- *                 example: 75.00
  *               valyuta:
  *                 type: string
  *                 example: AZN
@@ -1495,6 +1652,10 @@ app.delete('/api/budceler/:username', async (req, res) => {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
+// =============================================
+// --- AYARLAR (Settings) ROUTES ---
+// =============================================
+
 // =============================================
 // --- AYARLAR (Settings) ROUTES ---
 // =============================================
