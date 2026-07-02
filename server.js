@@ -232,7 +232,7 @@ function errorResponse(res, statusCode, message, errorCode, errorMessage) {
 }
 
 // Abunəlik yarananda avtomatik bildiriş əlavə edir
-async function addAutoNotification(userId, appAd, novbetiOdenisTarixi) {
+async function addAutoNotification(userId, abunelikId, appAd, novbetiOdenisTarixi) {
   try {
     const bugun = new Date();
     bugun.setUTCHours(0, 0, 0, 0);
@@ -242,16 +242,15 @@ async function addAutoNotification(userId, appAd, novbetiOdenisTarixi) {
 
     const { basliq, mesaj } = generateDueMessage(appAd, novbetiOdenisTarixi, qalanGun);
 
-    await executeQuery(
-      `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`,
-      { istifadeci_id: userId, basliq, mesaj },
+      await executeQuery(
+      `INSERT INTO bildirisler (istifadeci_id, abunelik_id, basliq, mesaj) VALUES (:istifadeci_id, :abunelik_id, :basliq, :mesaj)`,
+      { istifadeci_id: userId, abunelik_id: abunelikId, basliq, mesaj },
       { autoCommit: true }
     );
   } catch (err) {
     console.error('Auto notification error:', err.message);
   }
 }
-
 // Abunəlik yarananda avtomatik ödəniş tarixçəsi əlavə edir
 async function addAutoPaymentHistory(userId, abunelikId, qiymet, baslamaTarixi) {
   try {
@@ -633,7 +632,8 @@ app.post('/api/abunelikler', async (req, res) => {
     const newSubId = newSub.rows.length > 0 ? newSub.rows[0].ID : null;
 
     // Avtomatik bildiriş əlavə et
-    await addAutoNotification(userId, ad, novbetiOdenisTarixi);
+    // Avtomatik bildiriş əlavə et
+    await addAutoNotification(userId, newSubId, ad, novbetiOdenisTarixi);
 
     // Avtomatik ödəniş tarixçəsi əlavə et
     if (newSubId) {
