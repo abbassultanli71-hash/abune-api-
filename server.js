@@ -843,7 +843,7 @@ app.get('/api/bildirisler', async (req, res) => {
     const sql = `
       SELECT b.id AS bildiris_id, u.username,
              b.basliq, b.mesaj,
-             b.abunelik_id, a.ad AS app_adi,
+             b.abunelik_id, a.ad AS app_adi, a.odenis_tezliyi,
              TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') AS novbeti_odenis_tarixi,
              TO_CHAR(b.gonderilme_tarixi, 'YYYY-MM-DD') AS gonderilme_tarixi
       FROM bildirisler b
@@ -858,8 +858,28 @@ app.get('/api/bildirisler', async (req, res) => {
     const bugun = new Date();
     bugun.setUTCHours(0, 0, 0, 0);
 
+    // odenis_tezliyi-ne gore bildirisin nece gun evvel gonderilecegini teyin edir
+    const XEBERDARLIQ_GUNLERI = {
+      weekly: 2,
+      monthly: 7,
+      quarterly: 14,
+      yearly: 30
+    };
+
+    // novbeti_odenis_tarixi-dən müvafiq gün sayı qədər əvvəlini "YYYY-MM-DD" formatında qaytarır
+    function xeberdarlıqTarixi(novbetiOdenisTarixiStr, odenisTezliyi) {
+      const gunSayi = XEBERDARLIQ_GUNLERI[odenisTezliyi] ?? XEBERDARLIQ_GUNLERI.monthly;
+      const [ny, nm, nd] = novbetiOdenisTarixiStr.split('-').map(Number);
+      const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
+      novbetiDate.setUTCDate(novbetiDate.getUTCDate() - gunSayi);
+      const yyyy = novbetiDate.getUTCFullYear();
+      const mm = String(novbetiDate.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(novbetiDate.getUTCDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
     const notifications = result.rows.map(row => {
-      // Əlaqəli abunəlik silinibsə (LEFT JOIN NULL), DB-dəki statik mesajı olduğu kimi saxla
+      // Əlaqəli abunəlik silinibsə (LEFT JOIN NULL), DB-dəki statik dəyərləri olduğu kimi saxla
       if (!row.NOVBETI_ODENIS_TARIXI) {
         return {
           bildiris_id: row.BILDIRIS_ID,
@@ -875,13 +895,14 @@ app.get('/api/bildirisler', async (req, res) => {
       const qalanGun = Math.ceil((novbetiDate - bugun) / (1000 * 60 * 60 * 24));
 
       const { basliq, mesaj } = generateDueMessage(row.APP_ADI, row.NOVBETI_ODENIS_TARIXI, qalanGun);
+      const hesablananGonderilmeTarixi = xeberdarlıqTarixi(row.NOVBETI_ODENIS_TARIXI, row.ODENIS_TEZLIYI);
 
       return {
         bildiris_id: row.BILDIRIS_ID,
         username: row.USERNAME,
         basliq,
         mesaj,
-        gonderilme_tarixi: row.GONDERILME_TARIXI
+        gonderilme_tarixi: hesablananGonderilmeTarixi
       };
     });
 
