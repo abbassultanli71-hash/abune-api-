@@ -4,13 +4,27 @@ const { createDueDateNotification } = require('../services/notificationService')
 
 const CRON_SCHEDULE = '0 * * * *';
 
+/**
+ * Ödəniş tezliyinə görə fərqli xəbərdarlıq həddi tətbiq edir:
+ * weekly -> 2 gün, monthly -> 7 gün, quarterly -> 14 gün, yearly -> 30 gün.
+ * Yəni "1 gün qalıb" bütün abunəliklərə eyni tətbiq olunmur.
+ */
 async function findDueSubscriptions() {
   const sql = `
-    SELECT a.id AS abunelik_id, a.istifadeci_id, a.ad,
+    SELECT a.id AS abunelik_id, a.istifadeci_id, a.ad, a.odenis_tezliyi,
            TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') AS novbeti_odenis_tarixi
     FROM abunelikler a
     WHERE a.status = 'active'
-      AND a.novbeti_odenis_tarixi <= (TRUNC(SYSDATE) + 1)
+      AND a.novbeti_odenis_tarixi <= (
+        TRUNC(SYSDATE) +
+        CASE a.odenis_tezliyi
+          WHEN 'weekly'    THEN 2
+          WHEN 'monthly'   THEN 7
+          WHEN 'quarterly' THEN 14
+          WHEN 'yearly'    THEN 30
+          ELSE 7
+        END
+      )
       AND NOT EXISTS (
         SELECT 1 FROM bildirisler b
         WHERE b.istifadeci_id = a.istifadeci_id
@@ -33,7 +47,7 @@ async function runDueSubscriptionCheck() {
     return;
   }
 
-  console.log(`[subscription-notifier] ${dueSubs.length} abunəlik tapıldı (1 gün və ya az qalıb / gecikib).`);
+  console.log(`[subscription-notifier] ${dueSubs.length} abunəlik tapıldı (öz tezlik həddinə görə).`);
 
   const bugun = new Date();
   bugun.setUTCHours(0, 0, 0, 0);
