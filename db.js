@@ -1,11 +1,19 @@
 const { Pool } = require('pg');
 require('dotenv').config();
+<<<<<<< HEAD
+=======
+
+>>>>>>> checkpoint
 let pool;
 if (process.env.DATABASE_URL) {
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+<<<<<<< HEAD
     ssl: { rejectUnauthorized: false },
     options: '-c timezone=Asia/Baku'
+=======
+    ssl: { rejectUnauthorized: false }
+>>>>>>> checkpoint
   });
 } else {
   pool = new Pool({
@@ -17,6 +25,10 @@ if (process.env.DATABASE_URL) {
     options: '-c timezone=Asia/Baku'
   });
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> checkpoint
 function convertNamedToPositional(sql, binds) {
   if (!binds || typeof binds !== 'object' || Array.isArray(binds)) {
     return { sql, binds };
@@ -32,6 +44,10 @@ function convertNamedToPositional(sql, binds) {
   });
   return { sql: pgSql, binds: pgBinds };
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> checkpoint
 async function executeQuery(sql, binds = {}, options = {}) {
   const { sql: pgSql, binds: pgBinds } = convertNamedToPositional(sql, binds);
   try {
@@ -52,4 +68,8 @@ async function executeQuery(sql, binds = {}, options = {}) {
     throw err;
   }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> checkpoint
 module.exports = { executeQuery };
