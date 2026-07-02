@@ -99,6 +99,29 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+
+// Luhn alqoritmi ilə kart nömrəsinin (PAN) düzgünlüyünü yoxlayır.
+function isValidPanLuhn(pan) {
+  if (typeof pan !== 'string') return false;
+  const cleaned = pan.replace(/\s+/g, '');
+  if (!/^\d{12,19}$/.test(cleaned)) return false; // əsas format yoxlanışı
+
+  let sum = 0;
+  let shouldDouble = false;
+
+  for (let i = cleaned.length - 1; i >= 0; i--) {
+    let digit = parseInt(cleaned[i], 10);
+    if (shouldDouble) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
+    }
+    sum += digit;
+    shouldDouble = !shouldDouble;
+  }
+
+  return sum % 10 === 0;
+}
+
 // Kartın istifadə tarixini (MM/YY) yoxlayır.
 // Format və "müddət bitib" yoxlamaları AYRI nəticələrlə qaytarılır ki,
 // hansı xəta mesajının göstəriləcəyi dəqiq müəyyən olunsun.
@@ -1211,6 +1234,10 @@ const sql = `SELECT c.id AS card_id,
 app.post('/api/odenis-metodlari', async (req, res) => {
   const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!username || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və kart_tipi sahələri məcburidir.');
+  if (pan && !isValidPanLuhn(pan)) {
+  return errorResponse(res, 400, 'Bad Request', 'INVALID_PAN',
+    'Kart nömrəsi (pan) düzgün deyil (Luhn yoxlamasından keçmədi).');
+  }
   if (cvv !== undefined && cvv !== null && cvv !== '') {
   if (!/^\d{3}$/.test(String(cvv))) {
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CVV', 'cvv yalnız 3 rəqəmdən ibarət olmalıdır (məs: 123).');
@@ -1308,6 +1335,10 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
   const { id } = req.params;
   const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'ad və kart_tipi sahələri məcburidir.');
+  if (pan && !isValidPanLuhn(pan)) {
+  return errorResponse(res, 400, 'Bad Request', 'INVALID_PAN',
+    'Kart nömrəsi (pan) düzgün deyil (Luhn yoxlamasından keçmədi).');
+  }
   if (cvv !== undefined && cvv !== null && cvv !== '') {
   if (!/^\d{3}$/.test(String(cvv))) {
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CVV', 'cvv yalnız 3 rəqəmdən ibarət olmalıdır (məs: 123).');
