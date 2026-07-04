@@ -82,8 +82,9 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', authMiddleware, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/api', authMiddleware);
 
-app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
+app.get('/', (req, res) => { res.redirect('/app'); });
 app.get('/app', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
+app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function isValidDate(dateStr) {
