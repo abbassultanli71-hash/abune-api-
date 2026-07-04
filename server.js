@@ -62,7 +62,7 @@ const swaggerOptions = {
     info: {
       title: 'Abunəlik İdarəetmə Platforması API',
       version: '1.1.0',
-      description: 'Oracle verilənlər bazası ilə inteqrasiya olunmuş abunəlik idarəetmə platformasının API-ı. Bütün istifadəçi-aid endpointlər "username" üzərindən işləyir.',
+      description: 'PostgreSQL verilənlər bazası ilə inteqrasiya olunmuş abunəlik idarəetmə platformasının API-ı. Bütün istifadəçi-aid endpointlər "username" üzərindən işləyir.',
     },
     servers: [
       { url: '/', description: 'Cari Server (Lokal və ya Tunel)' },
@@ -182,7 +182,7 @@ function isValidCurrency(valyuta) {
   return ICAZE_VERILEN_VALYUTALAR.includes(getValidCurrency(valyuta));
 }
 
-// İstifadəçinin username-inə görə daxili (Oracle) ID-sini tapır.
+// İstifadəçinin username-inə görə daxili (PostgreSQL) ID-sini tapır.
 // Bütün API endpointləri istifadəçini "username" ilə qəbul edir, daxili sorğularda isə FK üçün bu ID istifadə olunur.
 async function getUserIdByUsername(username) {
   if (!username) return null;
@@ -291,6 +291,26 @@ async function addAutoPaymentHistory(userId, abunelikId, qiymet, baslamaTarixi) 
  *       404:
  *         description: İstifadəçi tapılmadı
  */
+/**
+ * @swagger
+ * /api/istifadeciler:
+ *   get:
+ *     summary: Bütün istifadəçiləri siyahılayır
+ *     tags: [İstifadəçilər]
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ */
+app.get('/api/istifadeciler', async (req, res) => {
+  try {
+    const sql = `SELECT id, username, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler ORDER BY id`;
+    const result = await executeQuery(sql);
+    return res.status(200).json(result.rows);
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
 app.get('/api/istifadeciler/:username', async (req, res) => {
   const { username } = req.params;
   try {

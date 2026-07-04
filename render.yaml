@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: abunelik-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: API_USER
+        sync: false
+      - key: API_PASSWORD
+        sync: false
+      - key: PORT
+        value: 3000

@@ -1,378 +1,1821 @@
 <!DOCTYPE html>
-<html lang="az">
+<html lang="az" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SubTrack — Abunəlik İdarəetmə</title>
-  <meta name="description" content="Bütün abunəliklərinizi bir yerdə idarə edin. Netflix, Spotify, və daha çoxu.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="app.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Abunəm — Mobil App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14151a;
+    --surface: #1c1e25;
+    --surface-2: #23252e;
+    --surface-3: #2a2d38;
+    --border: rgba(242,240,234,0.09);
+    --border-strong: rgba(242,240,234,0.16);
+    --ink: #f2f0ea;
+    --ink-muted: #9a9dab;
+    --ink-faint: #64677a;
+    --gold: #e8b54d;
+    --teal: #4fbdba;
+    --coral: #e2685a;
+    --gold-soft: rgba(232,181,77,0.14);
+    --teal-soft: rgba(79,189,186,0.14);
+    --coral-soft: rgba(226,104,90,0.16);
+    --shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  [data-theme="light"] {
+    --bg: #f4f2ec;
+    --surface: #ffffff;
+    --surface-2: #faf9f5;
+    --surface-3: #f0eee6;
+    --border: rgba(27,29,36,0.08);
+    --border-strong: rgba(27,29,36,0.14);
+    --ink: #1b1d24;
+    --ink-muted: #6b6e7a;
+    --ink-faint: #9799a3;
+    --gold-soft: rgba(184,131,20,0.14);
+    --teal-soft: rgba(28,140,137,0.12);
+    --coral-soft: rgba(197,63,49,0.12);
+    --shadow: 0 20px 50px -25px rgba(27,29,36,0.25);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { text-decoration: none; color: inherit; }
+  button, select, input { font-family: inherit; }
+
+  /* ---- Phone frame (for desktop preview only) ---- */
+  .device-stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(232,181,77,0.06), transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(79,189,186,0.05), transparent 45%),
+      #0b0c10;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 46px;
+    border: 10px solid #05060a;
+    box-shadow: 0 40px 90px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .notch {
+    position: absolute;
+    top: 10px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 26px;
+    background: #05060a;
+    border-radius: 20px;
+    z-index: 30;
+  }
+  .statusbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 26px 4px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 20;
+  }
+  .statusbar .icons { display: flex; gap: 5px; align-items: center; }
+
+  /* ---- Screens ---- */
+  .screens { position: relative; flex: 1; overflow: hidden; }
+  .screen {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+    -ms-overflow-style: none; scrollbar-width: none;
+    padding-bottom: 100px;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen.active { display: flex; animation: fadein 0.28s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(6px);} to {opacity: 1; transform: translateY(0);} }
+
+  .scr-header { padding: 8px 20px 16px; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-faint);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+  }
+  h1.page-title { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin: 0; letter-spacing: -0.01em; line-height: 1.2; }
+  .page-sub { color: var(--ink-muted); font-size: 12.5px; margin-top: 4px; }
+
+  .h-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .icon-round {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--surface-2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink);
+    flex-shrink: 0;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+  }
+  .icon-round svg { width: 17px; height: 17px; }
+
+  /* ---- Horizontal scroll stat cards ---- */
+  .stat-scroll {
+    display: flex; gap: 10px; padding: 0 20px 4px;
+    overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .stat-scroll::-webkit-scrollbar { display: none; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    padding: 14px 16px; min-width: 148px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .stat-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .stat-icon svg { width: 14px; height: 14px; }
+  .stat-icon.teal { background: var(--teal-soft); color: var(--teal); }
+  .stat-icon.gold { background: var(--gold-soft); color: var(--gold); }
+  .stat-icon.coral { background: var(--coral-soft); color: var(--coral); }
+  .stat-label { font-size: 11px; color: var(--ink-muted); font-weight: 500; }
+  .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; }
+  .stat-value small { font-size: 12px; color: var(--ink-faint); font-weight: 500; }
+
+  /* ---- Signature: payment ruler ---- */
+  .ruler-card {
+    margin: 18px 20px 6px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 18px 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .ruler-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
+  .ruler-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+  .ruler-month { font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint); letter-spacing: 0.04em; }
+  .ruler-track-wrap { position: relative; padding-top: 26px; padding-bottom: 22px; }
+  .ruler-track { position: relative; height: 2px; background: var(--border-strong); border-radius: 2px; }
+  .ruler-today-line {
+    position: absolute; top: -12px; bottom: -12px; width: 1px;
+    background: repeating-linear-gradient(to bottom, var(--gold) 0 4px, transparent 4px 8px);
+  }
+  .ruler-today-label {
+    position: absolute; top: -26px; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--gold);
+    background: var(--gold-soft); padding: 2px 6px; border-radius: 20px; white-space: nowrap;
+  }
+  .ruler-chip {
+    position: absolute; top: -5px; transform: translateX(-50%);
+    width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--surface);
+  }
+  .ruler-chip.urgent { background: var(--coral); }
+  .ruler-chip.soon { background: var(--gold); }
+  .ruler-chip.normal { background: var(--teal); }
+  .ruler-ticks { display: flex; justify-content: space-between; margin-top: 2px; }
+  .ruler-ticks span { font-family: var(--font-mono); font-size: 9px; color: var(--ink-faint); }
+  .ruler-legend { display: flex; gap: 14px; margin-top: 4px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: var(--ink-muted); }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* ---- Section blocks ---- */
+  .section { padding: 18px 20px 4px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .section-title { font-family: var(--font-display); font-size: 15.5px; font-weight: 600; }
+  .section-link { font-size: 11.5px; color: var(--ink-muted); font-weight: 600; cursor: pointer; }
+
+  /* ---- Subscription rows ---- */
+  .sub-list { display: flex; flex-direction: column; gap: 2px; }
+  .sub-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .sub-row:active { background: var(--surface-2); }
+  .sub-icon {
+    width: 40px; height: 40px; border-radius: 12px; background: var(--surface-3);
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); flex-shrink: 0;
+  }
+  .sub-icon svg { width: 19px; height: 19px; }
+  .sub-icon.teal { background: var(--teal-soft); color: var(--teal); border-color: transparent; }
+  .sub-icon.gold { background: var(--gold-soft); color: var(--gold); border-color: transparent; }
+  .sub-icon.coral { background: var(--coral-soft); color: var(--coral); border-color: transparent; }
+  .sub-icon.neutral { background: var(--surface-3); color: var(--ink-faint); }
+  .sub-info { flex: 1; min-width: 0; }
+  .sub-name { font-weight: 600; font-size: 13.5px; }
+  .sub-meta { font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
+  .sub-meta .sep { margin: 0 4px; }
+  .sub-right { text-align: right; flex-shrink: 0; }
+  .sub-price { font-family: var(--font-mono); font-weight: 600; font-size: 13.5px; }
+  .sub-badge {
+    display: inline-block; margin-top: 4px; font-family: var(--font-mono);
+    font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px;
+  }
+  .sub-badge.urgent { background: var(--coral-soft); color: var(--coral); }
+  .sub-badge.soon { background: var(--gold-soft); color: var(--gold); }
+  .sub-badge.normal { background: var(--teal-soft); color: var(--teal); }
+  .sub-badge.paused { background: var(--surface-3); color: var(--ink-faint); }
+
+  /* ---- Notifications ---- */
+  .notif-item {
+    display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 13px 14px; margin-bottom: 8px;
+  }
+  .notif-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .notif-title { font-size: 12.5px; font-weight: 600; }
+  .notif-msg { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
+  .notif-time { font-size: 10px; color: var(--ink-faint); margin-top: 4px; font-family: var(--font-mono); }
+
+  /* ---- Budget card ---- */
+  .budget-card {
+    margin: 0 20px 16px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 18px; padding: 18px 18px 20px;
+  }
+  .budget-nums { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .budget-spent { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
+  .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); }
+  .budget-bar-track { height: 8px; background: var(--surface-3); border-radius: 20px; overflow: hidden; }
+  .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--gold)); }
+  .budget-note { font-size: 11px; color: var(--ink-faint); margin-top: 10px; }
+
+  /* ---- FAB ---- */
+  .fab {
+    position: absolute; right: 20px; bottom: 96px; z-index: 25;
+    width: 54px; height: 54px; border-radius: 50%;
+    background: var(--gold); color: #221a08;
+    display: flex; align-items: center; justify-content: center;
+    border: none; box-shadow: 0 12px 26px -8px rgba(232,181,77,0.55);
+    cursor: pointer;
+  }
+  .fab svg { width: 22px; height: 22px; }
+
+  /* ---- Bottom tab bar ---- */
+  .tabbar {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 20;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 8px 6px calc(10px + var(--safe-bottom));
+  }
+  .tab-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 4px 0;
+    border-radius: 12px; position: relative;
+    cursor: pointer;
+  }
+  .tab-item svg { width: 20px; height: 20px; }
+  .tab-item.active { color: var(--gold); }
+  .tab-dot {
+    position: absolute; top: 0px; right: 26%;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--coral);
+    border: 1.5px solid var(--surface);
+    display: none;
+  }
+
+  /* ---- Toolbar / filters ---- */
+  .chip-row { display: flex; gap: 8px; padding: 0 20px 14px; overflow-x: auto; -ms-overflow-style:none; scrollbar-width:none; }
+  .chip-row::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    flex-shrink: 0; padding: 7px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600;
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--ink-muted);
+    cursor: pointer;
+  }
+  .filter-chip.selected { background: var(--gold-soft); color: var(--gold); border-color: transparent; }
+  .search-bar {
+    margin: 0 20px 14px; display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 11px 14px;
+  }
+  .search-bar svg { width: 16px; height: 16px; color: var(--ink-faint); flex-shrink: 0; }
+  .search-bar input { flex: 1; background: none; border: none; color: var(--ink); font-size: 13px; outline: none; }
+  .search-bar input::placeholder { color: var(--ink-faint); }
+
+  /* ---- Settings ---- */
+  .settings-group { margin: 0 20px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row-label { font-size: 13px; font-weight: 500; }
+  .settings-row-sub { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+  .settings-value { font-size: 12.5px; color: var(--ink-muted); font-family: var(--font-mono); display: flex; align-items: center; gap: 5px; }
+  .settings-value svg { width: 14px; height: 14px; color: var(--ink-faint); }
+  .select-wrap { position: relative; }
+  .select-wrap select {
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    background: none; border: none; color: var(--ink-muted);
+    font-family: var(--font-mono); font-size: 12.5px; font-weight: 500;
+    padding-right: 14px; cursor: pointer; text-align: right;
+  }
+  .select-wrap select:focus { outline: none; color: var(--ink); }
+  .select-wrap::after {
+    content: '›'; position: absolute; right: -3px; top: 50%;
+    transform: translateY(-50%); color: var(--ink-faint); pointer-events: none; font-size: 13px;
+  }
+  .profile-card {
+    margin: 4px 20px 18px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 12px;
+  }
+  .avatar-lg {
+    width: 48px; height: 48px; border-radius: 50%; background: var(--surface-3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--gold);
+    border: 1px solid var(--border-strong); flex-shrink: 0;
+  }
+  .profile-name { font-weight: 600; font-size: 14.5px; }
+  .profile-sub { font-size: 11.5px; color: var(--ink-faint); margin-top: 1px; }
+
+  .theme-row { display: flex; gap: 8px; padding: 14px 16px; }
+  .theme-opt { flex: 1; text-align: center; padding: 9px; border-radius: 10px; font-size: 12px; font-weight: 600; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink-muted); cursor: pointer; }
+  .theme-opt.selected { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+
+  /* ---- Modal (bottom sheet) ---- */
+  .sheet-overlay {
+    position: absolute; inset: 0; background: rgba(6,6,8,0.55);
+    display: none; align-items: flex-end; z-index: 40;
+  }
+  .sheet-overlay.open { display: flex; }
+  .sheet {
+    width: 100%; background: var(--surface); border-radius: 24px 24px 0 0;
+    padding: 10px 20px calc(22px + var(--safe-bottom));
+    max-height: 82%; overflow-y: auto;
+    border-top: 1px solid var(--border-strong);
+  }
+  .sheet-handle { width: 36px; height: 4px; border-radius: 4px; background: var(--border-strong); margin: 6px auto 14px; }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .sheet-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
+  .sheet-close { background: none; border: none; color: var(--ink-faint); font-size: 16px; cursor: pointer; }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 13px; }
+  .field label { font-size: 11.5px; font-weight: 600; color: var(--ink-muted); }
+  .field select, .field input {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 11px 12px; color: var(--ink); font-size: 14px;
+    outline: none;
+  }
+  .field input.invalid { border-color: var(--coral); }
+  .field-error {
+    display: none; font-size: 10.5px; color: var(--coral); font-weight: 500;
+  }
+  .field-error.show { display: block; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sheet-actions { display: flex; gap: 10px; margin-top: 8px; }
+  .btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 13px; border-radius: 12px; border: 1px solid var(--border-strong);
+    background: var(--surface-2); color: var(--ink); font-size: 13.5px; font-weight: 600;
+    cursor: pointer;
+    outline: none;
+  }
+  .btn-primary { background: var(--gold); color: #221a08; border-color: transparent; }
+  .btn svg { width: 15px; height: 15px; }
+
+  .hint {
+    font-size: 10.5px; text-align: center; color: var(--ink-faint); margin: 18px auto 0;
+    max-width: 300px; line-height: 1.5;
+  }
+
+  /* ---- Auth Screen Styles ---- */
+  .auth-container {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+    gap: 20px;
+  }
+  .auth-logo-area {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .auth-logo-area svg {
+    width: 44px;
+    height: 44px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .auth-logo-area h2 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    margin: 0;
+  }
+  .auth-logo-area p {
+    color: var(--ink-muted);
+    font-size: 12.5px;
+    margin-top: 4px;
+  }
+  .auth-tabs {
+    display: flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+  }
+  .auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--ink-muted);
+    transition: all 0.2s ease;
+  }
+  .auth-tab.active {
+    background: var(--surface-3);
+    color: var(--ink);
+    border: 1px solid var(--border-strong);
+  }
+  .auth-form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  /* ---- Real mobil ekranlarda: telefon çərçivəsini ləğv et, tam ekran ol ---- */
+  @media (max-width: 480px) {
+    .device-stage { padding: 0; align-items: stretch; background: var(--bg); }
+    .phone {
+      width: 100%; height: 100vh; height: 100dvh;
+      border: none; border-radius: 0; box-shadow: none;
+    }
+    .notch { display: none; }
+  }
+</style>
 </head>
 <body>
 
-<!-- ===================== SCREENS ===================== -->
-
-<!-- SCREEN: Landing / Welcome -->
-<div id="screen-landing" class="screen active">
-  <div class="landing-bg">
-    <div class="landing-orb orb1"></div>
-    <div class="landing-orb orb2"></div>
-    <div class="landing-orb orb3"></div>
-  </div>
-  <nav class="landing-nav">
-    <div class="nav-logo">
-      <div class="logo-mark"><i data-lucide="layers"></i></div>
-      <span>SubTrack</span>
-    </div>
-    <div class="nav-btns">
-      <button class="btn btn-ghost" onclick="showScreen('screen-login')">Giriş Et</button>
-      <button class="btn btn-primary" onclick="showScreen('screen-register')">Başla</button>
-    </div>
-  </nav>
-
-  <main class="landing-hero">
-    <div class="hero-badge"><i data-lucide="zap"></i> Bütün abunəliklərin bir yerdə</div>
-    <h1 class="hero-title">Abunəliklərini<br><span class="gradient-text">nəzarət altına al</span></h1>
-    <p class="hero-subtitle">Netflix, Spotify, YouTube Premium və daha çox — hamısını izlə, xərclərini bil, vaxtında xatır.</p>
-    <div class="hero-actions">
-      <button class="btn btn-primary btn-lg" onclick="showScreen('screen-register')">
-        <i data-lucide="user-plus"></i>
-        Pulsuz Qeydiyyat
-      </button>
-      <button class="btn btn-outline btn-lg" onclick="showScreen('screen-login')">
-        Hesabım var
-        <i data-lucide="arrow-right"></i>
-      </button>
-    </div>
-
-    <div class="hero-cards">
-      <div class="hero-card">
-        <div class="hc-icon" style="background:linear-gradient(135deg,#e50914,#b30710);">N</div>
-        <div class="hc-info"><span>Netflix</span><small>13.99 AZN/ay</small></div>
-        <span class="hc-badge active">Aktiv</span>
-      </div>
-      <div class="hero-card">
-        <div class="hc-icon" style="background:linear-gradient(135deg,#1db954,#158a3e);">S</div>
-        <div class="hc-info"><span>Spotify</span><small>6.99 AZN/ay</small></div>
-        <span class="hc-badge active">Aktiv</span>
-      </div>
-      <div class="hero-card">
-        <div class="hc-icon" style="background:linear-gradient(135deg,#ff0000,#cc0000);">Y</div>
-        <div class="hc-info"><span>YouTube Premium</span><small>9.99 AZN/ay</small></div>
-        <span class="hc-badge active">Aktiv</span>
+<div class="device-stage">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="statusbar">
+      <span>9:41</span>
+      <div class="icons">
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><rect x="0" y="6" width="3" height="5" rx="0.5" fill="currentColor"/><rect x="4.5" y="4" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="9" y="2" width="3" height="9" rx="0.5" fill="currentColor"/><rect x="13" y="0" width="3" height="11" rx="0.5" fill="currentColor"/></svg>
+        <svg width="14" height="11" viewBox="0 0 14 11" fill="none"><path d="M7 11 0 4.5C3 1 11 1 14 4.5Z" fill="currentColor"/></svg>
+        <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="0.5" y="0.5" width="18" height="10" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="20" y="3.2" width="1.5" height="4.5" rx="0.7" fill="currentColor"/></svg>
       </div>
     </div>
-  </main>
-</div>
 
-<!-- SCREEN: Register -->
-<div id="screen-register" class="screen">
-  <div class="auth-wrapper">
-    <div class="auth-card">
-      <button class="back-btn" onclick="showScreen('screen-landing')"><i data-lucide="arrow-left"></i></button>
-      <div class="auth-header">
-        <div class="auth-logo"><i data-lucide="layers"></i></div>
-        <h2>Hesab Yarat</h2>
-        <p>Bütün abunəliklərini izləməyə başla</p>
-      </div>
-      <form id="register-form">
-        <div class="form-group">
-          <label>Ad Soyad</label>
-          <div class="input-icon-wrap">
-            <i data-lucide="user"></i>
-            <input type="text" id="reg-name" placeholder="Adınızı daxil edin" required minlength="3">
+    <div class="screens">
+
+      <!-- ============ AUTHENTICATION SCREEN ============ -->
+      <div class="screen active" id="scr-auth">
+        <div class="auth-container">
+          <div class="auth-logo-area">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="logo-mark"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <h2>Abunəm</h2>
+            <p data-i18n="auth_subtitle">Abunəliklərinizi asanlıqla idarə edin</p>
           </div>
-          <span class="field-err" id="err-reg-name"></span>
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <div class="input-icon-wrap">
-            <i data-lucide="mail"></i>
-            <input type="email" id="reg-email" placeholder="email@example.com" required>
+          
+          <div class="auth-tabs">
+            <div class="auth-tab active" id="tab-login-btn" onclick="toggleAuthTab('login')">Daxil Ol</div>
+            <div class="auth-tab" id="tab-register-btn" onclick="toggleAuthTab('register')">Qeydiyyat</div>
           </div>
-          <span class="field-err" id="err-reg-email"></span>
-        </div>
-        <div class="field-err form-general-err" id="err-reg-general"></div>
-        <button type="submit" class="btn btn-primary btn-block btn-lg" id="reg-submit">
-          <span>Qeydiyyatdan Keç</span>
-          <i data-lucide="arrow-right"></i>
-        </button>
-      </form>
-      <p class="auth-switch">Artıq hesabın var? <a onclick="showScreen('screen-login')">Giriş et</a></p>
-    </div>
-  </div>
-</div>
-
-<!-- SCREEN: Login -->
-<div id="screen-login" class="screen">
-  <div class="auth-wrapper">
-    <div class="auth-card">
-      <button class="back-btn" onclick="showScreen('screen-landing')"><i data-lucide="arrow-left"></i></button>
-      <div class="auth-header">
-        <div class="auth-logo"><i data-lucide="layers"></i></div>
-        <h2>Xoş Gəldin</h2>
-        <p>Email ünvanınla daxil ol</p>
-      </div>
-      <form id="login-form">
-        <div class="form-group">
-          <label>Email</label>
-          <div class="input-icon-wrap">
-            <i data-lucide="mail"></i>
-            <input type="email" id="login-email" placeholder="email@example.com" required>
-          </div>
-          <span class="field-err" id="err-login-email"></span>
-        </div>
-        <div class="field-err form-general-err" id="err-login-general"></div>
-        <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-submit">
-          <span>Daxil Ol</span>
-          <i data-lucide="arrow-right"></i>
-        </button>
-      </form>
-      <p class="auth-switch">Hesabın yoxdur? <a onclick="showScreen('screen-register')">Qeydiyyat</a></p>
-    </div>
-  </div>
-</div>
-
-<!-- SCREEN: Main App (after login) -->
-<div id="screen-app" class="screen">
-  <!-- Bottom Navigation (mobile-first) -->
-  <nav class="bottom-nav">
-    <button class="bnav-item active" data-page="home" onclick="switchPage('home')">
-      <i data-lucide="home"></i><span>Ana Səhifə</span>
-    </button>
-    <button class="bnav-item" data-page="subscriptions" onclick="switchPage('subscriptions')">
-      <i data-lucide="credit-card"></i><span>Abunəliklər</span>
-    </button>
-    <button class="bnav-item" data-page="payments" onclick="switchPage('payments')">
-      <i data-lucide="history"></i><span>Ödənişlər</span>
-    </button>
-    <button class="bnav-item" data-page="notifications" onclick="switchPage('notifications')">
-      <i data-lucide="bell"></i><span>Bildirişlər</span>
-    </button>
-    <button class="bnav-item" data-page="profile" onclick="switchPage('profile')">
-      <i data-lucide="user"></i><span>Profil</span>
-    </button>
-  </nav>
-
-  <div class="app-content">
-
-    <!-- PAGE: Home -->
-    <div id="page-home" class="page active">
-      <div class="page-header">
-        <div>
-          <p class="greeting-small">Xoş gəldin 👋</p>
-          <h2 id="home-username">İstifadəçi</h2>
-        </div>
-        <div class="header-avatar" id="home-avatar">U</div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-item">
-          <span class="s-label">Bu ay xərc</span>
-          <span class="s-value" id="home-monthly-cost">0.00 AZN</span>
-        </div>
-        <div class="summary-divider"></div>
-        <div class="summary-item">
-          <span class="s-label">Aktiv abunəlik</span>
-          <span class="s-value" id="home-active-count">0</span>
-        </div>
-        <div class="summary-divider"></div>
-        <div class="summary-item">
-          <span class="s-label">İllik xərc</span>
-          <span class="s-value" id="home-yearly-cost">0.00 AZN</span>
-        </div>
-      </div>
-
-      <div class="section-title">
-        <h3>Növbəti Ödənişlər</h3>
-        <button class="btn-text" onclick="switchPage('subscriptions')">Hamısı <i data-lucide="chevron-right"></i></button>
-      </div>
-      <div id="home-upcoming" class="upcoming-list">
-        <div class="skeleton-list"></div>
-      </div>
-
-      <div class="section-title">
-        <h3>Son Bildirişlər</h3>
-        <button class="btn-text" onclick="switchPage('notifications')">Hamısı <i data-lucide="chevron-right"></i></button>
-      </div>
-      <div id="home-notifs" class="notif-preview-list">
-        <div class="skeleton-list"></div>
-      </div>
-    </div>
-
-    <!-- PAGE: Subscriptions -->
-    <div id="page-subscriptions" class="page">
-      <div class="page-header">
-        <h2>Abunəliklər</h2>
-        <button class="btn btn-primary btn-sm" onclick="openSubModal()">
-          <i data-lucide="plus"></i> Əlavə Et
-        </button>
-      </div>
-
-      <div class="filter-tabs" id="sub-filter-tabs">
-        <button class="ftab active" data-filter="all" onclick="filterSubs('all', this)">Hamısı</button>
-        <button class="ftab" data-filter="active" onclick="filterSubs('active', this)">Aktiv</button>
-        <button class="ftab" data-filter="inactive" onclick="filterSubs('inactive', this)">Deaktiv</button>
-      </div>
-
-      <div id="subs-list" class="subs-grid">
-        <div class="loading-pulse"></div>
-      </div>
-    </div>
-
-    <!-- PAGE: Payments -->
-    <div id="page-payments" class="page">
-      <div class="page-header">
-        <h2>Ödəniş Tarixçəsi</h2>
-      </div>
-      <div id="payments-list" class="payments-list">
-        <div class="loading-pulse"></div>
-      </div>
-    </div>
-
-    <!-- PAGE: Notifications -->
-    <div id="page-notifications" class="page">
-      <div class="page-header">
-        <h2>Bildirişlər</h2>
-      </div>
-      <div id="notifs-list" class="notifs-list">
-        <div class="loading-pulse"></div>
-      </div>
-    </div>
-
-    <!-- PAGE: Profile -->
-    <div id="page-profile" class="page">
-      <div class="page-header">
-        <h2>Profilim</h2>
-      </div>
-      <div class="profile-card">
-        <div class="profile-avatar" id="profile-avatar-big">U</div>
-        <h3 id="profile-name-display">-</h3>
-        <p id="profile-email-display" style="color:var(--text-muted); font-size:14px;">-</p>
-      </div>
-
-      <div class="settings-section">
-        <h4>Məlumatları Yenilə</h4>
-        <form id="profile-form">
-          <div class="form-group">
-            <label>Ad Soyad</label>
-            <div class="input-icon-wrap">
-              <i data-lucide="user"></i>
-              <input type="text" id="profile-name" placeholder="Ad Soyad" required minlength="3">
+          
+          <!-- LOGIN VIEW -->
+          <div class="auth-form-card" id="auth-login-view">
+            <div class="field">
+              <label data-i18n="auth_select_user">Mövcud istifadəçi seçin</label>
+              <select id="auth-username-select" onchange="onSelectUserChange()">
+                <option value="">-- Seçin --</option>
+              </select>
             </div>
-            <span class="field-err" id="err-profile-name"></span>
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <div class="input-icon-wrap">
-              <i data-lucide="mail"></i>
-              <input type="email" id="profile-email" placeholder="email@example.com" required>
+            <div class="field" style="text-align: center; color: var(--ink-faint); font-size: 11px; margin: 4px 0;">
+              - və ya username daxil edin -
             </div>
-            <span class="field-err" id="err-profile-email"></span>
+            <div class="field">
+              <label>Username</label>
+              <input type="text" id="auth-username-input" placeholder="məs. abbas.abbasov">
+            </div>
+            <div class="field-error" id="auth-login-error" style="margin-bottom: 8px;"></div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">Daxil Ol</button>
           </div>
-          <div class="field-err form-general-err" id="err-profile-general"></div>
-          <button type="submit" class="btn btn-primary btn-block">Yadda Saxla</button>
-        </form>
+          
+          <!-- REGISTER VIEW -->
+          <div class="auth-form-card" id="auth-register-view" style="display: none;">
+            <div class="field">
+              <label>Username</label>
+              <input type="text" id="reg-username" placeholder="məs. abbas.abbasov">
+            </div>
+            <div class="field">
+              <label>Ad Soyad</label>
+              <input type="text" id="reg-ad" placeholder="məs. Abbas Abbasov">
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input type="email" id="reg-email" placeholder="məs. abbas@example.com">
+            </div>
+            <div class="field-error" id="auth-register-error" style="margin-bottom: 8px;"></div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="handleRegister()">Qeydiyyatdan Keç</button>
+          </div>
+        </div>
       </div>
 
-      <button class="btn btn-danger-outline btn-block" onclick="logout()">
-        <i data-lucide="log-out"></i> Çıxış Et
-      </button>
-    </div>
-
-  </div><!-- /app-content -->
-</div><!-- /screen-app -->
-
-<!-- ===================== MODALS ===================== -->
-
-<!-- Add/Edit Subscription Modal -->
-<div id="sub-modal" class="modal-overlay">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <h3 id="sub-modal-title">Yeni Abunəlik</h3>
-      <button class="modal-close-btn" onclick="closeSubModal()"><i data-lucide="x"></i></button>
-    </div>
-    <form id="sub-modal-form">
-      <input type="hidden" id="sub-modal-id">
-      <div class="form-group">
-        <label>Abunəlik Adı *</label>
-        <div class="input-icon-wrap">
-          <i data-lucide="tag"></i>
-          <input type="text" id="sm-name" placeholder="Netflix, Spotify..." required>
+      <!-- ============ DASHBOARD ============ -->
+      <div class="screen" id="scr-dashboard">
+        <div class="scr-header">
+          <div class="h-row">
+            <div>
+              <div class="eyebrow" id="dashboard-date">4 İyul, Cümə axşamı</div>
+              <h1 class="page-title" data-i18n="dashboard_title">Xoş gördük</h1>
+              <div class="page-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
+            </div>
+            <div class="icon-round"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          </div>
         </div>
-        <span class="field-err" id="err-sm-name"></span>
+
+        <div class="stat-scroll">
+          <div class="stat-card">
+            <div class="stat-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <div class="stat-label" data-i18n="stat_active">Aktiv abunəlik</div>
+            <div class="stat-value" id="dashboard-active-count">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div class="stat-label" data-i18n="stat_monthly">Aylıq xərc</div>
+            <div class="stat-value" id="dashboard-monthly-spend">₼0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+            <div class="stat-label" data-i18n="stat_next">Növbəti ödəniş</div>
+            <div class="stat-value" id="dashboard-next-payment">-</div>
+          </div>
+        </div>
+
+        <div class="ruler-card">
+          <div class="ruler-head">
+            <div class="ruler-title" data-i18n="ruler_title">Ödəniş cədvəli</div>
+            <div class="ruler-month" id="ruler-month-title">İYUL · 31 GÜN</div>
+          </div>
+          <div class="ruler-track-wrap">
+            <div class="ruler-track" id="ruler-track"></div>
+            <div class="ruler-ticks"><span>1</span><span>15</span><span>31</span></div>
+          </div>
+          <div class="ruler-legend">
+            <div class="legend-item"><span class="legend-dot" style="background:var(--coral)"></span><span data-i18n="legend_urgent">≤2 gün</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span><span data-i18n="legend_soon">≤7 gün</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span><span data-i18n="legend_normal">normal</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title" data-i18n="section_upcoming">Yaxınlaşan ödənişlər</div>
+            <a class="section-link" onclick="switchScreen('subs')" data-i18n="section_all_link">Hamısı →</a>
+          </div>
+          <div class="sub-list" id="subs-preview-list"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title" data-i18n="section_notifications">Bildirişlər</div>
+            <a class="section-link" onclick="switchScreen('notifications')" data-i18n="section_all_link">Hamısı →</a>
+          </div>
+          <div id="notif-preview-list"></div>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Qiymət *</label>
-          <input type="number" id="sm-price" step="0.01" min="0.01" placeholder="12.99" required>
-          <span class="field-err" id="err-sm-price"></span>
+
+      <!-- ============ ABUNƏLİKLƏR ============ -->
+      <div class="screen" id="scr-subs">
+        <div class="scr-header">
+          <div class="h-row">
+            <div>
+              <div class="eyebrow" data-i18n="subs_eyebrow">Abunəlikdir</div>
+              <h1 class="page-title" data-i18n="subs_title">Hamısı</h1>
+              <div class="page-sub" id="subs-screen-sub">0 abunəlik</div>
+            </div>
+            <div class="icon-round" onclick="openSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Valyuta</label>
-          <select id="sm-currency">
-            <option value="AZN">AZN</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="sub-search-input" placeholder="Abunəlik axtar…" data-i18n-placeholder="search_placeholder" oninput="filterSubscriptionsList()">
+        </div>
+        <div class="chip-row" id="category-filter-row">
+          <div class="filter-chip selected" data-category="All" onclick="filterCategory('All')" data-i18n="filter_all">Hamısı</div>
+          <div class="filter-chip" data-category="Entertainment" onclick="filterCategory('Entertainment')">Entertainment</div>
+          <div class="filter-chip" data-category="Music" onclick="filterCategory('Music')">Music</div>
+          <div class="filter-chip" data-category="Productivity" onclick="filterCategory('Productivity')">Productivity</div>
+          <div class="filter-chip" data-category="Health & Fitness" onclick="filterCategory('Health & Fitness')">Health & Fitness</div>
+          <div class="filter-chip" data-category="Cloud Storage" onclick="filterCategory('Cloud Storage')">Cloud Storage</div>
+        </div>
+        <div class="section" style="padding-top:0;">
+          <div class="sub-list" id="subs-full-list"></div>
+        </div>
+      </div>
+
+      <!-- ============ BİLDİRİŞLƏR ============ -->
+      <div class="screen" id="scr-notifications">
+        <div class="scr-header">
+          <div class="h-row">
+            <div>
+              <div class="eyebrow" data-i18n="notif_eyebrow">Bildirişlər</div>
+              <h1 class="page-title" data-i18n="notif_title">Xəbərdarlıqlar</h1>
+              <div class="page-sub" data-i18n="notif_sub">Ödənişdən əvvəl xəbərdarlıq gəlir</div>
+            </div>
+          </div>
+        </div>
+        <div class="section" style="padding-top:6px;">
+          <div id="notif-full-list"></div>
+        </div>
+      </div>
+
+      <!-- ============ BÜDCƏ ============ -->
+      <div class="screen" id="scr-budget">
+        <div class="scr-header">
+          <div class="h-row">
+            <div>
+              <div class="eyebrow" data-i18n="budget_eyebrow">Büdcə</div>
+              <h1 class="page-title" data-i18n="budget_title">Aylıq limit</h1>
+              <div class="page-sub" data-i18n="budget_sub">İstifadəçi başına 1 aktiv limit</div>
+            </div>
+          </div>
+        </div>
+        <div class="budget-card">
+          <div class="budget-nums">
+            <span class="budget-spent">₼0.00</span>
+            <span class="budget-limit">/ ₼0.00</span>
+          </div>
+          <div class="budget-bar-track" style="height:10px;"><div class="budget-bar-fill" style="width:0%"></div></div>
+          <div class="budget-note">Limitin <strong style="color:var(--ink)">%0</strong>-ı istifadə olunub · ₼0.00 sərbəst qalıb.</div>
+        </div>
+        <div class="settings-group" id="budget-view">
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label" data-i18n="budget_limit_label">Limit məbləği</div>
+              <div class="settings-row-sub">limit_mebleq</div>
+            </div>
+            <div class="settings-value" id="budget-limit-display">₼0.00</div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-label" data-i18n="budget_currency_label">Valyuta</div>
+            </div>
+            <div class="settings-value" id="budget-currency-display">AZN</div>
+          </div>
+        </div>
+        <div style="padding:0 20px;" id="budget-update-wrap">
+          <button class="btn btn-primary" style="width:100%;" onclick="openBudgetEdit()" data-i18n="budget_update_btn">Limiti yenilə</button>
+        </div>
+
+        <div class="settings-group" id="budget-edit" style="display:none;">
+          <div class="field" style="padding:14px 16px 0;">
+            <label data-i18n="budget_limit_label">Limit məbləği</label>
+            <input type="number" id="budget-limit-input" step="0.01" placeholder="300.00">
+          </div>
+          <div class="field" style="padding:0 16px;">
+            <label data-i18n="budget_spent_label">Xərclənib (hesab_mebleqi)</label>
+            <input type="number" id="budget-spent-input" step="0.01" placeholder="0.00" readonly>
+          </div>
+          <div class="field" style="padding:0 16px 14px;">
+            <label data-i18n="budget_currency_label">Valyuta</label>
+            <select id="budget-currency-input">
+              <option value="AZN">AZN</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+          <div class="field-error" id="budget-error" style="padding:0 16px 14px;"></div>
+        </div>
+        <div class="sheet-actions" id="budget-edit-actions" style="display:none; padding:0 20px 8px;">
+          <button class="btn" onclick="closeBudgetEdit()" data-i18n="budget_cancel_btn">İmtina et</button>
+          <button class="btn btn-primary" onclick="saveBudget()" data-i18n="budget_save_btn">Yadda saxla</button>
+        </div>
+      </div>
+
+      <!-- ============ AYARLAR ============ -->
+      <div class="screen" id="scr-settings">
+        <div class="scr-header">
+          <div class="eyebrow" data-i18n="settings_eyebrow">Ayarlar</div>
+          <h1 class="page-title" data-i18n="settings_title">Hesabım</h1>
+        </div>
+        <div class="profile-card">
+          <div class="avatar-lg" id="profile-initials">U.U</div>
+          <div>
+            <div class="profile-name" id="profile-fullname">User</div>
+            <div class="profile-sub" id="profile-username">@username</div>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-row-label" data-i18n="settings_currency">Əsas valyuta</div>
+            <div class="select-wrap">
+              <select id="setting-currency" onchange="onSettingChange('esas_valyuta', this.value)">
+                <option value="AZN">AZN</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-label" data-i18n="settings_notif">Bildiriş metodu</div>
+            <div class="select-wrap">
+              <select id="setting-notif" onchange="onSettingChange('bildiris_metodu', this.value)">
+                <option value="email">Email</option>
+                <option value="telegram">Telegram</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-label" data-i18n="settings_lang">Dil</div>
+            <div class="select-wrap">
+              <select id="setting-lang" onchange="onSettingChange('dil', this.value)">
+                <option value="az">Azərbaycan</option>
+                <option value="en">English</option>
+                <option value="ru">Русский</option>
+                <option value="tr">Türkçe</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-row" style="border-bottom:none; flex-direction:column; align-items:stretch; gap:8px;">
+            <div class="settings-row-label" data-i18n="settings_theme">Görünüş</div>
+            <div class="theme-row" style="padding:0;">
+              <div class="theme-opt" id="theme-dark-opt" onclick="setTheme('dark')" data-i18n="theme_dark">Tünd</div>
+              <div class="theme-opt" id="theme-light-opt" onclick="setTheme('light')" data-i18n="theme_light">Açıq</div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-group" style="cursor:pointer;" onclick="handleLogout()">
+          <div class="settings-row">
+            <div class="settings-row-label" style="color:var(--coral);" data-i18n="settings_logout">Çıxış et</div>
+            <div class="settings-value" style="color:var(--coral);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px; height:15px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+          </div>
+        </div>
+        <div class="hint" data-i18n="hint">Abunəm v1.1 · Bütün məlumatlar username üzərindən sinxronlaşdırılır</div>
+      </div>
+
+    </div>
+
+    <!-- FAB (hidden by default on auth screen) -->
+    <button class="fab" onclick="openSheet()" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+
+    <!-- Bottom tab bar (hidden by default on auth screen) -->
+    <div class="tabbar" id="app-tabbar" style="display:none;">
+      <div class="tab-item active" data-screen="dashboard" onclick="switchScreen('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span data-i18n="tab_overview">İcmal</span>
+      </div>
+      <div class="tab-item" data-screen="subs" onclick="switchScreen('subs')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/><path d="M7 14h4"/></svg>
+        <span data-i18n="tab_subs">Abunəlik</span>
+      </div>
+      <div class="tab-item" data-screen="notifications" onclick="switchScreen('notifications')" style="position:relative;">
+        <span class="tab-dot" id="notif-badge"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span data-i18n="tab_notif">Bildiriş</span>
+      </div>
+      <div class="tab-item" data-screen="budget" onclick="switchScreen('budget')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span data-i18n="tab_budget">Büdcə</span>
+      </div>
+      <div class="tab-item" data-screen="settings" onclick="switchScreen('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="tab_settings">Ayarlar</span>
+      </div>
+    </div>
+
+    <!-- Bottom sheet: Add subscription -->
+    <div class="sheet-overlay" id="sheet-overlay">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head">
+          <div class="sheet-title" data-i18n="sheet_title">Yeni abunəlik</div>
+          <button class="sheet-close" onclick="closeSheet()">✕</button>
+        </div>
+        <div class="field"><label data-i18n="field_name">Ad</label><input type="text" id="new-sub-name" placeholder="məs. Netflix"></div>
+        <div class="field-row">
+          <div class="field">
+            <label data-i18n="field_price">Qiymət</label>
+            <input type="number" id="new-sub-price" placeholder="12.99" step="0.01" oninput="clearPriceError()">
+            <div class="field-error" id="price-error" data-i18n="price_error">Qiymət 0-dan böyük olmalıdır.</div>
+          </div>
+          <div class="field">
+            <label data-i18n="field_currency">Valyuta</label>
+            <select id="new-sub-currency">
+              <option value="AZN">AZN</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label data-i18n="field_freq">Tezlik</label>
+            <select id="new-sub-freq">
+              <option value="weekly" data-i18n="freq_weekly">Həftəlik</option>
+              <option value="monthly" data-i18n="freq_monthly">Aylıq</option>
+              <option value="quarterly" data-i18n="freq_quarterly">Rüblük</option>
+              <option value="yearly" data-i18n="freq_yearly">İllik</option>
+            </select>
+          </div>
+          <div class="field"><label data-i18n="field_start">Başlama tarixi</label><input type="date" id="new-sub-start"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="field_category">Kateqoriya</label>
+          <select id="new-sub-category">
+            <option value="Entertainment">Entertainment</option>
+            <option value="Music">Music</option>
+            <option value="Education">Education</option>
+            <option value="Health & Fitness">Health & Fitness</option>
+            <option value="Productivity">Productivity</option>
+            <option value="Gaming">Gaming</option>
+            <option value="Cloud Storage">Cloud Storage</option>
+            <option value="News">News</option>
+            <option value="Food & Delivery">Food & Delivery</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Finance">Finance</option>
+            <option value="Other">Other</option>
           </select>
         </div>
-      </div>
-      <div class="form-group">
-        <label>Ödəniş Tezliyi</label>
-        <div class="freq-tabs" id="freq-tabs">
-          <button type="button" class="ftab active" data-val="monthly" onclick="selectFreq('monthly',this)">Aylıq</button>
-          <button type="button" class="ftab" data-val="yearly" onclick="selectFreq('yearly',this)">İllik</button>
-          <button type="button" class="ftab" data-val="weekly" onclick="selectFreq('weekly',this)">Həftəlik</button>
-        </div>
-        <input type="hidden" id="sm-freq" value="monthly">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Başlama Tarixi *</label>
-          <input type="date" id="sm-start" required>
-          <span class="field-err" id="err-sm-start"></span>
-        </div>
-        <div class="form-group">
-          <label>Növbəti Ödəniş *</label>
-          <input type="date" id="sm-next" required>
-          <span class="field-err" id="err-sm-next"></span>
+        <div class="sheet-actions">
+          <button class="btn" onclick="closeSheet()" data-i18n="btn_cancel">İmtina et</button>
+          <button class="btn btn-primary" onclick="handleAddSubscription()" data-i18n="btn_add">Əlavə et</button>
         </div>
       </div>
-      <div class="form-group">
-        <label>Kateqoriya</label>
-        <div class="cat-chips" id="cat-chips">
-          <button type="button" class="chip" onclick="selectCat('Entertainment',this)">🎬 Əyləncə</button>
-          <button type="button" class="chip" onclick="selectCat('Music',this)">🎵 Musiqi</button>
-          <button type="button" class="chip" onclick="selectCat('Software',this)">💻 Proqram</button>
-          <button type="button" class="chip" onclick="selectCat('Gaming',this)">🎮 Oyun</button>
-          <button type="button" class="chip" onclick="selectCat('Education',this)">📚 Təhsil</button>
-          <button type="button" class="chip" onclick="selectCat('Other',this)">📦 Digər</button>
+    </div>
+
+    <!-- Bottom sheet: Manage subscription -->
+    <div class="sheet-overlay" id="sub-manage-overlay">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head">
+          <div class="sheet-title" data-i18n="sheet_title">Abunəliyi İdarə Et</div>
+          <button class="sheet-close" onclick="closeManageSheet()">✕</button>
         </div>
-        <input type="hidden" id="sm-category" value="">
-      </div>
-      <div class="form-group">
-        <label>Status</label>
-        <div class="toggle-row">
-          <span>Aktiv</span>
-          <label class="toggle">
-            <input type="checkbox" id="sm-active" checked>
-            <span class="toggle-slider"></span>
-          </label>
+        <input type="hidden" id="manage-sub-id">
+        <input type="hidden" id="manage-sub-orig-name">
+        <div class="field"><label data-i18n="field_name">Ad</label><input type="text" id="manage-sub-name"></div>
+        <div class="field-row">
+          <div class="field">
+            <label data-i18n="field_price">Qiymət</label>
+            <input type="number" id="manage-sub-price" step="0.01" oninput="clearManagePriceError()">
+            <div class="field-error" id="manage-price-error" data-i18n="price_error">Qiymət 0-dan böyük olmalıdır.</div>
+          </div>
+          <div class="field">
+            <label data-i18n="field_currency">Valyuta</label>
+            <select id="manage-sub-currency">
+              <option value="AZN">AZN</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label data-i18n="field_freq">Tezlik</label>
+            <select id="manage-sub-freq">
+              <option value="weekly" data-i18n="freq_weekly">Həftəlik</option>
+              <option value="monthly" data-i18n="freq_monthly">Aylıq</option>
+              <option value="quarterly" data-i18n="freq_quarterly">Rüblük</option>
+              <option value="yearly" data-i18n="freq_yearly">İllik</option>
+            </select>
+          </div>
+          <div class="field"><label data-i18n="field_start">Başlama tarixi</label><input type="date" id="manage-sub-start"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="field_category">Kateqoriya</label>
+          <select id="manage-sub-category">
+            <option value="Entertainment">Entertainment</option>
+            <option value="Music">Music</option>
+            <option value="Education">Education</option>
+            <option value="Health & Fitness">Health & Fitness</option>
+            <option value="Productivity">Productivity</option>
+            <option value="Gaming">Gaming</option>
+            <option value="Cloud Storage">Cloud Storage</option>
+            <option value="News">News</option>
+            <option value="Food & Delivery">Food & Delivery</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Finance">Finance</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="field_status">Status</label>
+          <select id="manage-sub-status">
+            <option value="active" data-i18n="status_active">Aktiv</option>
+            <option value="deactive" data-i18n="status_deactive">Dayandırılıb</option>
+          </select>
+        </div>
+        <div class="sheet-actions" style="flex-direction:column; gap:8px;">
+          <div style="display:flex; gap:10px; width:100%;">
+            <button class="btn btn-primary" onclick="handleUpdateSubscription()" data-i18n="budget_save_btn">Yadda saxla</button>
+            <button class="btn" onclick="closeManageSheet()" data-i18n="btn_cancel">İmtina et</button>
+          </div>
+          <button class="btn" style="width:100%; border-color:var(--coral); color:var(--coral); background:var(--coral-soft);" onclick="handleDeleteSubscription()" data-i18n="btn_delete">Abunəliyi Sil</button>
         </div>
       </div>
-      <div class="field-err form-general-err" id="err-sm-general"></div>
-      <button type="submit" class="btn btn-primary btn-block btn-lg" id="sm-submit-btn">Yadda Saxla</button>
-    </form>
+    </div>
+
   </div>
 </div>
 
-<!-- Toast Container -->
-<div id="toast-container"></div>
+<script>
+  const API_BASE = '';
+  const API_AUTH = 'Basic ' + btoa('admin:admin123');
 
-<script src="app-main.js"></script>
+  let currentUser = null; // { id, username, ad, email }
+  let subscriptions = [];
+  let notifications = [];
+  let budgetState = { limit: 300.00, spent: 0.00, currency: 'AZN', exists: false };
+  let currentSettings = { esas_valyuta: 'AZN', bildiris_metodu: 'email', dil: 'az', tema: 'dark' };
+  
+  let selectedCategoryFilter = 'All';
+  const TODAY = new Date();
+
+  // Helper to normalize uppercase columns from database
+  function normalizeKeys(obj) {
+    if (Array.isArray(obj)) return obj.map(normalizeKeys);
+    if (obj !== null && typeof obj === 'object') {
+      const normal = {};
+      for (const key of Object.keys(obj)) {
+        normal[key.toLowerCase()] = normalizeKeys(obj[key]);
+      }
+      return normal;
+    }
+    return obj;
+  }
+
+  // API Request Wrapper
+  async function apiFetch(method, endpoint, body = null) {
+    const options = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': API_AUTH
+      }
+    };
+    if (body) options.body = JSON.stringify(body);
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, options);
+      const data = await response.json();
+      return { ok: response.ok, status: response.status, data: normalizeKeys(data) };
+    } catch (e) {
+      console.error('API Fetch error:', e);
+      return { ok: false, status: 0, data: { error: 'Server ilə əlaqə qurulmadı.' } };
+    }
+  }
+
+  // Handle Auth tab switching
+  function toggleAuthTab(mode) {
+    document.getElementById('tab-login-btn').classList.toggle('active', mode === 'login');
+    document.getElementById('tab-register-btn').classList.toggle('active', mode === 'register');
+    document.getElementById('auth-login-view').style.display = mode === 'login' ? 'block' : 'none';
+    document.getElementById('auth-register-view').style.display = mode === 'register' ? 'block' : 'none';
+    document.getElementById('auth-login-error').classList.remove('show');
+    document.getElementById('auth-register-error').classList.remove('show');
+  }
+
+  // Fetch users list for login select
+  async function loadUsersSelect() {
+    const select = document.getElementById('auth-username-select');
+    select.innerHTML = '<option value="">-- Seçin --</option>';
+    const res = await apiFetch('GET', '/api/istifadeciler');
+    if (res.ok && Array.isArray(res.data)) {
+      res.data.forEach(user => {
+        const opt = document.createElement('option');
+        opt.value = user.username;
+        opt.textContent = `${user.ad} (@${user.username})`;
+        select.appendChild(opt);
+      });
+    }
+  }
+
+  function onSelectUserChange() {
+    const val = document.getElementById('auth-username-select').value;
+    if (val) {
+      document.getElementById('auth-username-input').value = val;
+    }
+  }
+
+  // Login handler
+  async function handleLogin() {
+    const usernameInput = document.getElementById('auth-username-input').value.trim();
+    const errorEl = document.getElementById('auth-login-error');
+    if (!usernameInput) {
+      errorEl.textContent = 'İstifadəçi adı daxil edilməlidir.';
+      errorEl.classList.add('show');
+      return;
+    }
+
+    const res = await apiFetch('GET', `/api/istifadeciler/${usernameInput}`);
+    if (res.ok && res.data && res.data.data && res.data.data.user) {
+      currentUser = res.data.data.user;
+      localStorage.setItem('abunelik_user', JSON.stringify(currentUser));
+      showApp();
+    } else {
+      errorEl.textContent = res.data?.error?.message || 'İstifadəçi tapılmadı.';
+      errorEl.classList.add('show');
+    }
+  }
+
+  // Register handler
+  async function handleRegister() {
+    const username = document.getElementById('reg-username').value.trim();
+    const ad = document.getElementById('reg-ad').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const errorEl = document.getElementById('auth-register-error');
+
+    if (!username || !ad || !email) {
+      errorEl.textContent = 'Bütün sahələr doldurulmalıdır.';
+      errorEl.classList.add('show');
+      return;
+    }
+
+    const res = await apiFetch('POST', '/api/istifadeciler', { username, ad, email });
+    if (res.ok) {
+      const loginRes = await apiFetch('GET', `/api/istifadeciler/${username}`);
+      if (loginRes.ok && loginRes.data && loginRes.data.data && loginRes.data.data.user) {
+        currentUser = loginRes.data.data.user;
+        localStorage.setItem('abunelik_user', JSON.stringify(currentUser));
+        showApp();
+      } else {
+        toggleAuthTab('login');
+      }
+    } else {
+      errorEl.textContent = res.data?.error?.message || 'Qeydiyyat zamanı xəta baş verdi.';
+      errorEl.classList.add('show');
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('abunelik_user');
+    currentUser = null;
+    hideApp();
+    loadUsersSelect();
+  }
+
+  function showApp() {
+    document.getElementById('scr-auth').classList.remove('active');
+    document.getElementById('app-tabbar').style.display = 'flex';
+    document.querySelector('.fab').style.display = 'flex';
+    
+    // Set profile names
+    document.getElementById('profile-fullname').textContent = currentUser.ad;
+    document.getElementById('profile-username').textContent = '@' + currentUser.username;
+    document.getElementById('profile-initials').textContent = initials(currentUser.ad);
+    
+    // Update date on dashboard
+    const monthsAz = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
+    const daysAz = ['Bazar', 'Bazar ertəsi', 'Çərşənbə axşamı', 'Çərşənbə', 'Cümə axşamı', 'Cümə', 'Şənbə'];
+    document.getElementById('dashboard-date').textContent = `${TODAY.getDate()} ${monthsAz[TODAY.getMonth()]}, ${daysAz[TODAY.getDay()]}`;
+
+    switchScreen('dashboard');
+    loadAllData();
+  }
+
+  function hideApp() {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('scr-auth').classList.add('active');
+    document.getElementById('app-tabbar').style.display = 'none';
+    document.querySelector('.fab').style.display = 'none';
+    document.getElementById('auth-username-input').value = '';
+    document.getElementById('auth-username-select').value = '';
+  }
+
+  // Load all user data from API
+  async function loadAllData() {
+    if (!currentUser) return;
+
+    // 1. Settings
+    const settingsRes = await apiFetch('GET', `/api/ayarlar/${currentUser.username}`);
+    if (settingsRes.ok && settingsRes.data && settingsRes.data.data && settingsRes.data.data.settings) {
+      currentSettings = settingsRes.data.data.settings;
+      setTheme(currentSettings.tema || 'dark');
+      applyLanguage(currentSettings.dil || 'az');
+      document.getElementById('setting-currency').value = currentSettings.esas_valyuta || 'AZN';
+      document.getElementById('setting-notif').value = currentSettings.bildiris_metodu || 'email';
+      document.getElementById('setting-lang').value = currentSettings.dil || 'az';
+    }
+
+    // 2. Subscriptions
+    const subsRes = await apiFetch('GET', `/api/abunelikler?username=${currentUser.username}`);
+    if (subsRes.ok && subsRes.data && subsRes.data.data && subsRes.data.data.subscriptions) {
+      // Map API fields to UI models
+      subscriptions = subsRes.data.data.subscriptions.map(s => ({
+        id: s.abunelik_id,
+        name: s.ad,
+        category: s.kateqoriya || 'Other',
+        price: parseFloat(s.qiymet),
+        currency: s.valyuta,
+        freq: s.odenis_tezliyi === 'yearly' ? 'İllik' : s.odenis_tezliyi === 'quarterly' ? 'Rüblük' : s.odenis_tezliyi === 'weekly' ? 'Həftəlik' : 'Aylıq',
+        freqRaw: s.odenis_tezliyi,
+        start: s.baslama_tarixi,
+        next: s.novbeti_odenis_tarixi,
+        status: s.status
+      }));
+    } else {
+      subscriptions = [];
+    }
+
+    // 3. Notifications
+    const notifsRes = await apiFetch('GET', `/api/bildirisler?username=${currentUser.username}`);
+    if (notifsRes.ok && notifsRes.data && notifsRes.data.data && notifsRes.data.data.notifications) {
+      notifications = notifsRes.data.data.notifications.map(n => ({
+        id: n.bildiris_id,
+        title: n.basliq,
+        msg: n.mesaj,
+        urgency: getUrgency(n.basliq, n.mesaj),
+        time: n.gonderilme_tarixi
+      }));
+    } else {
+      notifications = [];
+    }
+
+    // 4. Budget
+    const budgetRes = await apiFetch('GET', `/api/budceler?username=${currentUser.username}`);
+    const activeSubs = subscriptions.filter(s => s.status === 'active');
+    
+    // Calculate total spend (converting to AZN or keep as is? Let's just sum raw values for now as simple presentation)
+    let totalSpend = 0;
+    activeSubs.forEach(s => {
+      totalSpend += s.price;
+    });
+
+    if (budgetRes.ok && budgetRes.data && budgetRes.data.data && budgetRes.data.data.budgets && budgetRes.data.data.budgets.length > 0) {
+      const b = budgetRes.data.data.budgets[0];
+      budgetState = {
+        limit: parseFloat(b.limit_mebleq),
+        spent: totalSpend, // dynamically count spent
+        currency: b.valyuta || 'AZN',
+        exists: true
+      };
+      // update backend spent count if different
+      if (parseFloat(b.hesab_mebleqi) !== totalSpend) {
+        apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
+          limit_mebleq: budgetState.limit,
+          valyuta: budgetState.currency,
+          hesab_mebleqi: totalSpend
+        });
+      }
+    } else {
+      budgetState = {
+        limit: 300.00,
+        spent: totalSpend,
+        currency: 'AZN',
+        exists: false
+      };
+    }
+
+    // Render components
+    renderSubs();
+    renderNotifs();
+    renderRuler();
+    renderBudgetCard();
+  }
+
+  function getUrgency(basliq, mesaj) {
+    if (basliq.includes('Gecikmiş') || basliq.includes('gecikmiş') || basliq.includes('Gecikib')) return 'urgent';
+    if (basliq.includes('Bu Gün') || basliq.includes('bu gün')) return 'urgent';
+    const match = mesaj.match(/(\d+)\s+gün/);
+    if (match) {
+      const days = parseInt(match[1]);
+      return days <= 2 ? 'urgent' : days <= 7 ? 'soon' : 'normal';
+    }
+    return 'normal';
+  }
+
+  function daysUntil(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const targetDate = new Date(Date.UTC(y, m - 1, d));
+    const cleanToday = new Date(Date.UTC(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate()));
+    return Math.round((targetDate - cleanToday) / 86400000);
+  }
+  function urgencyFor(days) { return days <= 2 ? 'urgent' : days <= 7 ? 'soon' : 'normal'; }
+  function badgeLabel(days) {
+    if (days < 0) return 'gecikib';
+    if (days === 0) return 'bu gün';
+    if (days === 1) return 'sabah';
+    return days + ' gün';
+  }
+  function initials(name) { return name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase(); }
+
+  const CATEGORY_ICONS = {
+    'Entertainment': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"/></svg>',
+    'Music': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    'Education': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12.5V17c0 1.1 2.7 3 6 3s6-1.9 6-3v-4.5"/></svg>',
+    'Health & Fitness': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 7v10M18 7v10M2 10.5v3M22 10.5v3M6 12h12"/></svg>',
+    'Productivity': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>',
+    'Gaming': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="10" rx="4"/><path d="M7 10v4M5 12h4"/><circle cx="15.8" cy="10.3" r="1" fill="currentColor" stroke="none"/><circle cx="18.3" cy="12.8" r="1" fill="currentColor" stroke="none"/></svg>',
+    'Cloud Storage': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.4 1.8A4 4 0 0 0 6.5 19h11Z"/></svg>',
+    'News': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h13v14a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2V4Z"/><path d="M19 8h1.5v10a2 2 0 0 1-2 2"/><path d="M8 8.5h6M8 12h6M8 15.5h4"/></svg>',
+    'Food & Delivery': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2v7a2 2 0 0 0 4 0V2M8 11v11M17 2c-1.7 0-3 2-3 5v3a2 2 0 0 0 2 2h1v9"/></svg>',
+    'Shopping': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.5 8h11l1 13h-13l1-13Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>',
+    'Finance': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M15 9.5c0-1.4-1.5-2.3-3-2.3s-3 .9-3 2.3 1.5 1.9 3 2.3 3 .9 3 2.3-1.5 2.4-3 2.4-3-1-3-2.4"/></svg>',
+    'Other': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg>'
+  };
+  const CATEGORY_COLORS = {
+    'Entertainment': 'coral', 'Music': 'gold', 'Education': 'teal',
+    'Health & Fitness': 'coral', 'Productivity': 'teal', 'Gaming': 'gold',
+    'Cloud Storage': 'teal', 'News': 'gold', 'Food & Delivery': 'coral',
+    'Shopping': 'gold', 'Finance': 'teal', 'Other': 'neutral'
+  };
+  function categoryIconHTML(category) {
+    const icon = CATEGORY_ICONS[category] || CATEGORY_ICONS['Other'];
+    const color = CATEGORY_COLORS[category] || 'neutral';
+    return `<div class="sub-icon ${color}">${icon}</div>`;
+  }
+
+  function currencySymbol(code) {
+    return code === 'USD' ? '$' : code === 'EUR' ? '€' : '₼';
+  }
+
+  function subRowHTML(s) {
+    const days = daysUntil(s.next);
+    const urg = s.status === 'deactive' ? 'paused' : urgencyFor(days);
+    const badgeText = s.status === 'deactive' ? 'dayandırılıb' : badgeLabel(days);
+    const dateFmt = s.next.split('-').reverse().join('.');
+    const sym = currencySymbol(s.currency);
+    return `
+      <div class="sub-row" onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+        ${categoryIconHTML(s.category)}
+        <div class="sub-info">
+          <div class="sub-name">${s.name}</div>
+          <div class="sub-meta">${s.category}<span class="sep">·</span>${dateFmt}</div>
+        </div>
+        <div class="sub-right">
+          <div class="sub-price">${sym}${s.price.toFixed(2)}</div>
+          <span class="sub-badge ${urg}">${badgeText}</span>
+        </div>
+      </div>`;
+  }
+
+  function renderSubs() {
+    const activeSubs = subscriptions.filter(s => s.status === 'active');
+    
+    // Sort upcoming by days remaining
+    const preview = [...activeSubs]
+      .sort((a,b) => daysUntil(a.next) - daysUntil(b.next)).slice(0,4);
+    
+    document.getElementById('subs-preview-list').innerHTML = preview.length > 0 ? 
+      preview.map(subRowHTML).join('') : '<div class="hint">Yaxınlaşan ödəniş yoxdur.</div>';
+    
+    // Update sub title counts
+    document.querySelector('.page-sub[data-i18n="dashboard_sub"]').textContent = `${activeSubs.length} aktiv abunəlik izlənilir`;
+    document.getElementById('subs-screen-sub').textContent = `${subscriptions.length} abunəlik · ${activeSubs.length} aktiv`;
+
+    // Render full list with filter
+    filterSubscriptionsList();
+  }
+
+  function filterSubscriptionsList() {
+    const query = document.getElementById('sub-search-input').value.toLowerCase().trim();
+    let filtered = subscriptions;
+
+    if (selectedCategoryFilter !== 'All') {
+      filtered = filtered.filter(s => s.category === selectedCategoryFilter);
+    }
+
+    if (query) {
+      filtered = filtered.filter(s => s.name.toLowerCase().includes(query) || s.category.toLowerCase().includes(query));
+    }
+
+    document.getElementById('subs-full-list').innerHTML = filtered.length > 0 ?
+      filtered.sort((a,b) => daysUntil(a.next) - daysUntil(b.next)).map(subRowHTML).join('') :
+      '<div class="hint">Abunəlik tapılmadı.</div>';
+  }
+
+  function filterCategory(cat) {
+    selectedCategoryFilter = cat;
+    document.querySelectorAll('#category-filter-row .filter-chip').forEach(chip => {
+      chip.classList.toggle('selected', chip.getAttribute('data-category') === cat);
+    });
+    filterSubscriptionsList();
+  }
+
+  function notifRowHTML(n) {
+    const color = n.urgency === 'urgent' ? 'var(--coral)' : n.urgency === 'soon' ? 'var(--gold)' : 'var(--teal)';
+    return `
+      <div class="notif-item">
+        <span class="notif-dot" style="background:${color}"></span>
+        <div style="flex: 1;">
+          <div class="notif-title">${n.title}</div>
+          <div class="notif-msg">${n.msg}</div>
+          <div class="notif-time">${n.time}</div>
+        </div>
+        <button class="sheet-close" style="font-size:12px; padding: 2px 6px;" onclick="handleDeleteNotification(${n.id})">✕</button>
+      </div>`;
+  }
+  
+  function renderNotifs() {
+    document.getElementById('notif-preview-list').innerHTML = notifications.slice(0,2).map(notifRowHTML).join('');
+    document.getElementById('notif-full-list').innerHTML = notifications.map(notifRowHTML).join('');
+    
+    // Toggle tab badge dot
+    document.getElementById('notif-badge').style.display = notifications.length > 0 ? 'block' : 'none';
+  }
+
+  async function handleDeleteNotification(id) {
+    const res = await apiFetch('DELETE', `/api/bildirisler/${id}`);
+    if (res.ok) {
+      notifications = notifications.filter(n => n.id !== id);
+      renderNotifs();
+    }
+  }
+
+  function renderRuler() {
+    const track = document.getElementById('ruler-track');
+    const daysInMonth = 31;
+    const todayDay = TODAY.getDate();
+    let html = '';
+    const todayPct = ((todayDay - 1) / (daysInMonth - 1)) * 100;
+    
+    const monthsAzShort = ['YAN', 'FEV', 'MAR', 'APR', 'MAY', 'İYN', 'İYL', 'AVQ', 'SEN', 'OKT', 'NOY', 'DEK'];
+    document.getElementById('ruler-month-title').textContent = `${monthsAzShort[TODAY.getMonth()]} · 31 GÜN`;
+
+    html += `<div class="ruler-today-line" style="left:${todayPct}%"></div>`;
+    html += `<div class="ruler-today-label" style="left:${todayPct}%">BUGÜN</div>`;
+    
+    const currentMonthPrefix = `${TODAY.getFullYear()}-${String(TODAY.getMonth() + 1).padStart(2, '0')}`;
+    
+    const activeSubs = subscriptions.filter(s => s.status === 'active' && s.next.startsWith(currentMonthPrefix));
+    
+    activeSubs.forEach(s => {
+      const day = Number(s.next.split('-')[2]);
+      const pct = ((day - 1) / (daysInMonth - 1)) * 100;
+      const urg = urgencyFor(daysUntil(s.next));
+      html += `<div class="ruler-chip ${urg}" style="left:${pct}%" title="${s.name}"></div>`;
+    });
+    track.innerHTML = html;
+
+    // Also update "Next Payment" stat card
+    const nextPayStat = document.getElementById('dashboard-next-payment');
+    if (activeSubs.length > 0) {
+      const sorted = [...activeSubs].sort((a,b) => daysUntil(a.next) - daysUntil(b.next));
+      const nearest = sorted[0];
+      const days = daysUntil(nearest.next);
+      const daysLabel = days === 0 ? 'bu gün' : days === 1 ? 'sabah' : `${days} gün`;
+      nextPayStat.innerHTML = `${nearest.name} <small>${daysLabel}</small>`;
+    } else {
+      nextPayStat.textContent = '-';
+    }
+  }
+
+  function switchScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('scr-' + name).classList.add('active');
+    
+    if (name !== 'auth') {
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      const activeTab = document.querySelector(`.tab-item[data-screen="${name}"]`);
+      if (activeTab) activeTab.classList.add('active');
+      document.getElementById('scr-' + name).scrollTop = 0;
+    }
+  }
+
+  function openSheet() { 
+    // Set start date to today's date formatted as YYYY-MM-DD
+    const yyyy = TODAY.getFullYear();
+    const mm = String(TODAY.getMonth() + 1).padStart(2, '0');
+    const dd = String(TODAY.getDate()).padStart(2, '0');
+    document.getElementById('new-sub-start').value = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('sheet-overlay').classList.add('open'); 
+  }
+  function closeSheet() { document.getElementById('sheet-overlay').classList.remove('open'); }
+  document.getElementById('sheet-overlay').addEventListener('click', e => {
+    if (e.target.id === 'sheet-overlay') closeSheet();
+  });
+
+  function clearPriceError() {
+    document.getElementById('price-error').classList.remove('show');
+    document.getElementById('new-sub-price').classList.remove('invalid');
+  }
+
+  // Handle Add subscription to API
+  async function handleAddSubscription() {
+    const nameInput = document.getElementById('new-sub-name');
+    const priceInput = document.getElementById('new-sub-price');
+    const currencyInput = document.getElementById('new-sub-currency');
+    const freqInput = document.getElementById('new-sub-freq');
+    const startInput = document.getElementById('new-sub-start');
+    const catInput = document.getElementById('new-sub-category');
+    
+    const name = nameInput.value.trim();
+    const price = Number(priceInput.value);
+    const currency = currencyInput.value;
+    const freq = freqInput.value;
+    const start = startInput.value;
+    const category = catInput.value;
+
+    if (!name) {
+      nameInput.focus();
+      return;
+    }
+
+    if (!priceInput.value || isNaN(price) || price <= 0) {
+      document.getElementById('price-error').classList.add('show');
+      priceInput.classList.add('invalid');
+      priceInput.focus();
+      return;
+    }
+
+    clearPriceError();
+
+    const res = await apiFetch('POST', '/api/abunelikler', {
+      username: currentUser.username,
+      ad: name,
+      qiymet: price,
+      valyuta: currency,
+      odenis_tezliyi: freq,
+      baslama_tarixi: start,
+      kateqoriya: category
+    });
+
+    if (res.ok) {
+      closeSheet();
+      nameInput.value = '';
+      priceInput.value = '';
+      loadAllData();
+    } else {
+      alert(res.data?.error?.message || 'Abunəlik yaradıla bilmədi.');
+    }
+  }
+
+  // Manage Subscription Modal
+  function openManageSheet(sub) {
+    document.getElementById('manage-sub-id').value = sub.id;
+    document.getElementById('manage-sub-orig-name').value = sub.name;
+    document.getElementById('manage-sub-name').value = sub.name;
+    document.getElementById('manage-sub-price').value = sub.price;
+    document.getElementById('manage-sub-currency').value = sub.currency;
+    document.getElementById('manage-sub-freq').value = sub.freqRaw;
+    document.getElementById('manage-sub-start').value = sub.start;
+    document.getElementById('manage-sub-category').value = sub.category;
+    document.getElementById('manage-sub-status').value = sub.status;
+    
+    clearManagePriceError();
+    document.getElementById('sub-manage-overlay').classList.add('open');
+  }
+
+  function closeManageSheet() {
+    document.getElementById('sub-manage-overlay').classList.remove('open');
+  }
+  document.getElementById('sub-manage-overlay').addEventListener('click', e => {
+    if (e.target.id === 'sub-manage-overlay') closeManageSheet();
+  });
+
+  function clearManagePriceError() {
+    document.getElementById('manage-price-error').classList.remove('show');
+    document.getElementById('manage-sub-price').classList.remove('invalid');
+  }
+
+  // Handle Edit subscription API
+  async function handleUpdateSubscription() {
+    const id = document.getElementById('manage-sub-id').value;
+    const origName = document.getElementById('manage-sub-orig-name').value;
+    const name = document.getElementById('manage-sub-name').value.trim();
+    const priceInput = document.getElementById('manage-sub-price');
+    const price = Number(priceInput.value);
+    const currency = document.getElementById('manage-sub-currency').value;
+    const freq = document.getElementById('manage-sub-freq').value;
+    const start = document.getElementById('manage-sub-start').value;
+    const category = document.getElementById('manage-sub-category').value;
+    const status = document.getElementById('manage-sub-status').value;
+
+    if (!name) {
+      document.getElementById('manage-sub-name').focus();
+      return;
+    }
+
+    if (!priceInput.value || isNaN(price) || price <= 0) {
+      document.getElementById('manage-price-error').classList.add('show');
+      priceInput.classList.add('invalid');
+      priceInput.focus();
+      return;
+    }
+
+    clearManagePriceError();
+
+    const res = await apiFetch('PUT', `/api/abunelikler?username=${currentUser.username}&ad=${origName}`, {
+      ad: name,
+      qiymet: price,
+      valyuta: currency,
+      odenis_tezliyi: freq,
+      baslama_tarixi: start,
+      kateqoriya: category,
+      status: status
+    });
+
+    if (res.ok) {
+      closeManageSheet();
+      loadAllData();
+    } else {
+      alert(res.data?.error?.message || 'Abunəlik yenilənmədi.');
+    }
+  }
+
+  // Handle Delete subscription API
+  async function handleDeleteSubscription() {
+    const id = document.getElementById('manage-sub-id').value;
+    if (confirm('Bu abunəliyi silmək istədiyinizdən əminsiniz?')) {
+      const res = await apiFetch('DELETE', `/api/abunelikler/${id}`);
+      if (res.ok) {
+        closeManageSheet();
+        loadAllData();
+      } else {
+        alert(res.data?.error?.message || 'Silinmə zamanı xəta baş verdi.');
+      }
+    }
+  }
+
+  // Handle Setting updates
+  async function onSettingChange(key, value) {
+    currentSettings[key] = value;
+    const res = await apiFetch('PUT', `/api/ayarlar/${currentUser.username}`, currentSettings);
+    if (res.ok) {
+      if (key === 'dil') applyLanguage(value);
+    } else {
+      console.error('Settings save failed:', res.data?.error?.message);
+    }
+  }
+
+  function setTheme(mode) {
+    document.documentElement.setAttribute('data-theme', mode);
+    document.getElementById('theme-dark-opt').classList.toggle('selected', mode === 'dark');
+    document.getElementById('theme-light-opt').classList.toggle('selected', mode === 'light');
+    if (currentUser) {
+      currentSettings.tema = mode;
+      onSettingChange('tema', mode);
+    }
+  }
+
+  // Budget
+  function renderBudgetCard() {
+    const sym = currencySymbol(budgetState.currency);
+    const pct = budgetState.limit > 0 ? Math.min(100, Math.round((budgetState.spent / budgetState.limit) * 100)) : 0;
+    const free = Math.max(0, budgetState.limit - budgetState.spent);
+    
+    document.querySelector('.budget-spent').textContent = sym + budgetState.spent.toFixed(2);
+    document.querySelector('.budget-limit').textContent = '/ ' + sym + budgetState.limit.toFixed(2);
+    document.querySelector('.budget-bar-fill').style.width = pct + '%';
+    
+    // Update stats cards in dashboard
+    document.getElementById('dashboard-monthly-spend').textContent = sym + budgetState.spent.toFixed(2);
+    
+    document.querySelector('.budget-note').innerHTML =
+      `Limitin <strong style="color:var(--ink)">%${pct}</strong>-i istifadə olunub · ${sym}${free.toFixed(2)} sərbəst qalıb.`;
+    document.getElementById('budget-limit-display').textContent = sym + budgetState.limit.toFixed(2);
+    document.getElementById('budget-currency-display').textContent = budgetState.currency;
+  }
+
+  function openBudgetEdit() {
+    document.getElementById('budget-view').style.display = 'none';
+    document.getElementById('budget-update-wrap').style.display = 'none';
+    document.getElementById('budget-edit').style.display = 'block';
+    document.getElementById('budget-edit-actions').style.display = 'flex';
+    document.getElementById('budget-limit-input').value = budgetState.limit;
+    document.getElementById('budget-spent-input').value = budgetState.spent;
+    document.getElementById('budget-currency-input').value = budgetState.currency;
+    clearBudgetError();
+  }
+
+  function closeBudgetEdit() {
+    document.getElementById('budget-edit').style.display = 'none';
+    document.getElementById('budget-edit-actions').style.display = 'none';
+    document.getElementById('budget-view').style.display = 'block';
+    document.getElementById('budget-update-wrap').style.display = 'block';
+    clearBudgetError();
+  }
+
+  function clearBudgetError() {
+    const err = document.getElementById('budget-error');
+    err.classList.remove('show');
+    err.textContent = '';
+  }
+
+  function showBudgetError(msg) {
+    const err = document.getElementById('budget-error');
+    err.textContent = msg;
+    err.classList.add('show');
+  }
+
+  async function saveBudget() {
+    const limitRaw = document.getElementById('budget-limit-input').value;
+    const spentRaw = document.getElementById('budget-spent-input').value;
+    const currency = document.getElementById('budget-currency-input').value;
+
+    if (limitRaw === '' || limitRaw === null || limitRaw === undefined) {
+      showBudgetError('limit_mebleq sahəsi məcburidir.');
+      return;
+    }
+    const limit = Number(limitRaw);
+    if (isNaN(limit) || limit <= 0) {
+      showBudgetError('limit_mebleq 0-dan böyük olmalıdır.');
+      return;
+    }
+    const spent = (spentRaw === '' || spentRaw === null) ? 0 : Number(spentRaw);
+    if (isNaN(spent) || spent < 0) {
+      showBudgetError('hesab_mebleqi mənfi ola bilməz.');
+      return;
+    }
+
+    clearBudgetError();
+
+    // Check if budget needs to be POSTed (new) or PUTted (update)
+    let res;
+    if (budgetState.exists) {
+      res = await apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
+        limit_mebleq: limit,
+        valyuta: currency,
+        hesab_mebleqi: spent
+      });
+    } else {
+      res = await apiFetch('POST', '/api/budceler', {
+        username: currentUser.username,
+        limit_mebleq: limit,
+        valyuta: currency,
+        hesab_mebleqi: spent
+      });
+    }
+
+    if (res.ok) {
+      budgetState = { limit, spent, currency, exists: true };
+      renderBudgetCard();
+      closeBudgetEdit();
+    } else {
+      showBudgetError(res.data?.error?.message || 'Büdcə yadda saxlanılmadı.');
+    }
+  }
+
+  // i18n
+  const translations = {
+    az: {
+      tab_overview: 'İcmal', tab_subs: 'Abunəlik', tab_notif: 'Bildiriş', tab_budget: 'Büdcə', tab_settings: 'Ayarlar',
+      dashboard_title: 'Xoş gördük', dashboard_sub: 'Aktiv abunəlik izlənilir',
+      stat_active: 'Aktiv abunəlik', stat_monthly: 'Aylıq xərc', stat_next: 'Növbəti ödəniş', today_label: 'bu gün',
+      ruler_title: 'Ödəniş cədvəli', legend_urgent: '≤2 gün', legend_soon: '≤7 gün', legend_normal: 'normal',
+      section_upcoming: 'Yaxınlaşan ödənişlər', section_notifications: 'Bildirişlər', section_all_link: 'Hamısı →',
+      subs_eyebrow: 'Abunəliklər', subs_title: 'Hamısı', subs_sub: '0 abunəlik',
+      search_placeholder: 'Abunəlik axtar…', filter_all: 'Hamısı',
+      notif_eyebrow: 'Bildirişlər', notif_title: 'Xəbərdarlıqlar', notif_sub: 'Ödənişdən əvvəl xəbərdarlıq gəlir',
+      budget_eyebrow: 'Büdcə', budget_title: 'Aylıq limit', budget_sub: 'İstifadəçi başına 1 aktiv limit',
+      budget_limit_label: 'Limit məbləği', budget_currency_label: 'Valyuta', budget_spent_label: 'Xərclənib (hesab_mebleqi)',
+      budget_update_btn: 'Limiti yenilə', budget_save_btn: 'Yadda saxla', budget_cancel_btn: 'İmtina et',
+      settings_eyebrow: 'Ayarlar', settings_title: 'Hesabım',
+      settings_currency: 'Əsas valyuta', settings_notif: 'Bildiriş metodu', settings_lang: 'Dil',
+      settings_theme: 'Görünüş', theme_dark: 'Tünd', theme_light: 'Açıq',
+      sheet_title: 'Yeni abunəlik', field_name: 'Ad', field_price: 'Qiymət', field_currency: 'Valyuta',
+      field_freq: 'Tezlik', field_start: 'Başlama tarixi', field_category: 'Kateqoriya',
+      freq_monthly: 'Aylıq', freq_yearly: 'İllik', freq_quarterly: 'Rüblük', freq_weekly: 'Həftəlik',
+      btn_cancel: 'İmtina et', btn_add: 'Əlavə et', price_error: 'Qiymət 0-dan böyük olmalıdır.',
+      hint: 'Abunəm v1.1 · Bütün məlumatlar username üzərindən sinxronlaşdırılır',
+      auth_subtitle: 'Abunəliklərinizi asanlıqla idarə edin',
+      auth_select_user: 'Mövcud istifadəçi seçin',
+      settings_logout: 'Çıxış et',
+      field_status: 'Status',
+      status_active: 'Aktiv',
+      status_deactive: 'Dayandırılıb',
+      btn_delete: 'Abunəlik Sil'
+    },
+    en: {
+      tab_overview: 'Overview', tab_subs: 'Subs', tab_notif: 'Alerts', tab_budget: 'Budget', tab_settings: 'Settings',
+      dashboard_title: 'Welcome back', dashboard_sub: 'Active subscriptions tracked',
+      stat_active: 'Active subs', stat_monthly: 'Monthly spend', stat_next: 'Next payment', today_label: 'today',
+      ruler_title: 'Payment schedule', legend_urgent: '≤2 days', legend_soon: '≤7 days', legend_normal: 'normal',
+      section_upcoming: 'Upcoming payments', section_notifications: 'Notifications', section_all_link: 'See all →',
+      subs_eyebrow: 'Subscriptions', subs_title: 'All', subs_sub: '0 subscriptions',
+      search_placeholder: 'Search subscriptions…', filter_all: 'All',
+      notif_eyebrow: 'Notifications', notif_title: 'Alerts', notif_sub: 'You get alerted before each payment',
+      budget_eyebrow: 'Budget', budget_title: 'Monthly limit', budget_sub: '1 active limit per user',
+      budget_limit_label: 'Limit amount', budget_currency_label: 'Currency', budget_spent_label: 'Spent (hesab_mebleqi)',
+      budget_update_btn: 'Update limit', budget_save_btn: 'Save', budget_cancel_btn: 'Cancel',
+      settings_eyebrow: 'Settings', settings_title: 'My account',
+      settings_currency: 'Base currency', settings_notif: 'Notification method', settings_lang: 'Language',
+      settings_theme: 'Appearance', theme_dark: 'Dark', theme_light: 'Light',
+      sheet_title: 'New subscription', field_name: 'Name', field_price: 'Price', field_currency: 'Currency',
+      field_freq: 'Frequency', field_start: 'Start date', field_category: 'Category',
+      freq_monthly: 'Monthly', freq_yearly: 'Yearly', freq_quarterly: 'Quarterly', freq_weekly: 'Weekly',
+      btn_cancel: 'Cancel', btn_add: 'Add', price_error: 'Price must be greater than 0.',
+      hint: 'Abunəm v1.1 · All data is synced via username',
+      auth_subtitle: 'Manage your subscriptions easily',
+      auth_select_user: 'Select existing user',
+      settings_logout: 'Log out',
+      field_status: 'Status',
+      status_active: 'Active',
+      status_deactive: 'Paused',
+      btn_delete: 'Delete Subscription'
+    },
+    ru: {
+      tab_overview: 'Обзор', tab_subs: 'Подписки', tab_notif: 'Уведомления', tab_budget: 'Бюджет', tab_settings: 'Настройки',
+      dashboard_title: 'С возвращением', dashboard_sub: 'Активные подписки',
+      stat_active: 'Активные подписки', stat_monthly: 'Расход в месяц', stat_next: 'Следующий платёж', today_label: 'сегодня',
+      ruler_title: 'График платежей', legend_urgent: '≤2 дн', legend_soon: '≤7 дн', legend_normal: 'обычно',
+      section_upcoming: 'Ближайшие платежи', section_notifications: 'Уведомления', section_all_link: 'Все →',
+      subs_eyebrow: 'Подписки', subs_title: 'Все', subs_sub: '0 подписок',
+      search_placeholder: 'Поиск подписок…', filter_all: 'Все',
+      notif_eyebrow: 'Уведомления', notif_title: 'Оповещения', notif_sub: 'Уведомление приходит до платежа',
+      budget_eyebrow: 'Бюджет', budget_title: 'Месячный лимит', budget_sub: '1 активный лимит на пользователя',
+      budget_limit_label: 'Сумма лимита', budget_currency_label: 'Валюта', budget_spent_label: 'Потрачено (hesab_mebleqi)',
+      budget_update_btn: 'Обновить лимит', budget_save_btn: 'Сохранить', budget_cancel_btn: 'Отмена',
+      settings_eyebrow: 'Настройки', settings_title: 'Мой аккаунт',
+      settings_currency: 'Основная валюта', settings_notif: 'Способ уведомления', settings_lang: 'Язык',
+      settings_theme: 'Внешний вид', theme_dark: 'Тёмная', theme_light: 'Светлая',
+      sheet_title: 'Новая подписка', field_name: 'Название', field_price: 'Цена', field_currency: 'Валюта',
+      field_freq: 'Периодичность', field_start: 'Дата начала', field_category: 'Категория',
+      freq_monthly: 'Ежемесячно', freq_yearly: 'Ежегодно', freq_quarterly: 'Ежеквартально', freq_weekly: 'Еженедельно',
+      btn_cancel: 'Отмена', btn_add: 'Добавить', price_error: 'Цена должна быть больше 0.',
+      hint: 'Abunəm v1.1 · Все данные синхронизируются по username',
+      auth_subtitle: 'Легко управляйте подписками',
+      auth_select_user: 'Выберите пользователя',
+      settings_logout: 'Выйти',
+      field_status: 'Статус',
+      status_active: 'Активно',
+      status_deactive: 'Приостановлено',
+      btn_delete: 'Удалить подписку'
+    },
+    tr: {
+      tab_overview: 'Genel', tab_subs: 'Abonelik', tab_notif: 'Bildirim', tab_budget: 'Bütçe', tab_settings: 'Ayarlar',
+      dashboard_title: 'Tekrar hoş geldin', dashboard_sub: 'Aktif abonelik izleniyor',
+      stat_active: 'Aktif abonelik', stat_monthly: 'Aylık harcama', stat_next: 'Sıradaki ödeme', today_label: 'bugün',
+      ruler_title: 'Ödeme takvimi', legend_urgent: '≤2 gün', legend_soon: '≤7 gün', legend_normal: 'normal',
+      section_upcoming: 'Yaklaşan ödemeler', section_notifications: 'Bildirimler', section_all_link: 'Tümü →',
+      subs_eyebrow: 'Abonelikler', subs_title: 'Tümü', subs_sub: '0 abonelik',
+      search_placeholder: 'Abonelik ara…', filter_all: 'Tümü',
+      notif_eyebrow: 'Bildirimler', notif_title: 'Uyarılar', notif_sub: 'Ödemeden önce uyarı gelir',
+      budget_eyebrow: 'Bütçe', budget_title: 'Aylıq limit', budget_sub: 'Kullanıcı başına 1 aktif limit',
+      budget_limit_label: 'Limit tutarı', budget_currency_label: 'Para birimi', budget_spent_label: 'Harcanan (hesab_mebleqi)',
+      budget_update_btn: 'Limiti güncelle', budget_save_btn: 'Kaydet', budget_cancel_btn: 'Vazgeç',
+      settings_eyebrow: 'Ayarlar', settings_title: 'Hesabım',
+      settings_currency: 'Ana para birimi', settings_notif: 'Bildirim yöntemi', settings_lang: 'Dil',
+      settings_theme: 'Görünüm', theme_dark: 'Koyu', theme_light: 'Açık',
+      sheet_title: 'Yeni abonelik', field_name: 'Ad', field_price: 'Fiyat', field_currency: 'Para birimi',
+      field_freq: 'Sıklık', field_start: 'Başlangıç tarihi', field_category: 'Kategori',
+      freq_monthly: 'Aylık', freq_yearly: 'Yıllık', freq_quarterly: 'Üç aylık', freq_weekly: 'Haftalık',
+      btn_cancel: 'Vazgeç', btn_add: 'Ekle', price_error: 'Fiyat 0\'dan büyük olmalıdır.',
+      hint: 'Abunəm v1.1 · Tüm veriler username üzerinden senkronize edilir',
+      auth_subtitle: 'Aboneliklerinizi kolayca yönetin',
+      auth_select_user: 'Mevcut kullanıcı seç',
+      settings_logout: 'Çıkış yap',
+      field_status: 'Durum',
+      status_active: 'Aktif',
+      status_deactive: 'Durduruldu',
+      btn_delete: 'Aboneliği Sil'
+    }
+  };
+
+  function applyLanguage(lang) {
+    const dict = translations[lang] || translations.az;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) {
+        if (key === 'dashboard_title' && currentUser) {
+          el.textContent = dict[key] + ', ' + currentUser.ad.split(' ')[0];
+        } else {
+          el.textContent = dict[key];
+        }
+      }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (dict[key] !== undefined) el.placeholder = dict[key];
+    });
+    document.documentElement.lang = lang;
+    const langSelect = document.getElementById('setting-lang');
+    if (langSelect) langSelect.value = lang;
+  }
+
+  // On page load
+  window.addEventListener('DOMContentLoaded', () => {
+    // Read local storage for logged user
+    const storedUser = localStorage.getItem('abunelik_user');
+    if (storedUser) {
+      try {
+        currentUser = JSON.parse(storedUser);
+        showApp();
+      } catch (e) {
+        hideApp();
+        loadUsersSelect();
+      }
+    } else {
+      hideApp();
+      loadUsersSelect();
+    }
+  });
+</script>
+
 </body>
 </html>
