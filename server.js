@@ -291,26 +291,6 @@ async function addAutoPaymentHistory(userId, abunelikId, qiymet, baslamaTarixi) 
  *       404:
  *         description: İstifadəçi tapılmadı
  */
-/**
- * @swagger
- * /api/istifadeciler:
- *   get:
- *     summary: Bütün istifadəçiləri siyahılayır
- *     tags: [İstifadəçilər]
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- */
-app.get('/api/istifadeciler', async (req, res) => {
-  try {
-    const sql = `SELECT id, username, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler ORDER BY id`;
-    const result = await executeQuery(sql);
-    return res.status(200).json(result.rows);
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
-});
-
 app.get('/api/istifadeciler/:username', async (req, res) => {
   const { username } = req.params;
   try {
