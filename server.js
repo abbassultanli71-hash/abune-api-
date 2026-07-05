@@ -79,12 +79,14 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', authMiddleware, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-app.use('/api', authMiddleware);
-
+// Public routes - no auth needed
 app.get('/', (req, res) => { res.redirect('/app'); });
 app.get('/app', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
 app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
+
+// Protected routes
+app.use('/api-docs', authMiddleware, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/api', authMiddleware);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function isValidDate(dateStr) {
@@ -522,7 +524,7 @@ app.get('/api/abunelikler', async (req, res) => {
       SELECT a.id AS abunelik_id, u.username, a.ad, a.qiymet, a.valyuta, a.odenis_tezliyi,
              TO_CHAR(a.baslama_tarixi, 'YYYY-MM-DD') as baslama_tarixi,
              TO_CHAR(a.novbeti_odenis_tarixi, 'YYYY-MM-DD') as novbeti_odenis_tarixi,
-             a.kateqoriya, a.status,
+             a.kateqoriya, a.status, a.odenis_metodu_id,
              TO_CHAR(a.yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
       FROM abunelikler a JOIN istifadeciler u ON a.istifadeci_id = u.id
       WHERE a.istifadeci_id = :istifadeci_id ORDER BY a.id
@@ -585,7 +587,7 @@ app.get('/api/abunelikler', async (req, res) => {
  *         description: Abunəlik əlavə edildi (status avtomatik "active", novbeti_odenis_tarixi avtomatik hesablanır)
  */
 app.post('/api/abunelikler', async (req, res) => {
-  const { username, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya } = req.body;
+  const { username, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, odenis_metodu_id } = req.body;
 
   if (!username || !ad || qiymet === undefined || qiymet === null || !baslama_tarixi)
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'Məcburi sahələri (username, ad, qiymet, baslama_tarixi) doldurun.');
@@ -613,12 +615,27 @@ app.post('/api/abunelikler', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
 
-    const sql = `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status)
-                 VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, 'active')`;
+    let finalOdenisMetoduId = null;
+    if (odenis_metodu_id !== undefined && odenis_metodu_id !== null && odenis_metodu_id !== '') {
+      finalOdenisMetoduId = Number(odenis_metodu_id);
+      if (isNaN(finalOdenisMetoduId)) {
+        return errorResponse(res, 400, 'Bad Request', 'INVALID_PAYMENT_METHOD', 'Ödəniş metodu ID-si rəqəm olmalıdır.');
+      }
+      const cardCheck = await executeQuery(
+        `SELECT id FROM odenis_metodlari WHERE id = :id AND istifadeci_id = :userId`,
+        { id: finalOdenisMetoduId, userId }
+      );
+      if (cardCheck.rows.length === 0) {
+        return errorResponse(res, 400, 'Bad Request', 'PAYMENT_METHOD_NOT_FOUND', 'Ödəniş metodu tapılmadı və ya istifadəçiyə məxsus deyil.');
+      }
+    }
+
+    const sql = `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, odenis_metodu_id, status)
+                 VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :odenis_metodu_id, 'active')`;
     const binds = {
       istifadeci_id: userId, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
       odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
-      kateqoriya: kateqoriya || null
+      kateqoriya: kateqoriya || null, odenis_metodu_id: finalOdenisMetoduId
     };
 
     await executeQuery(sql, binds, { autoCommit: true });
@@ -679,7 +696,7 @@ app.put('/api/abunelikler', async (req, res) => {
   if (!username || !queryAd)
     return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username və ad query parametrləri məcburidir.');
 
-  const { ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, status } = req.body;
+  const { ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, status, odenis_metodu_id } = req.body;
 
   if (qiymet === undefined || qiymet === null || !baslama_tarixi)
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'qiymet və baslama_tarixi məcburidir.');
@@ -719,16 +736,31 @@ app.put('/api/abunelikler', async (req, res) => {
     if (subCheck.rows.length === 0)
       return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
 
+    let finalOdenisMetoduId = null;
+    if (odenis_metodu_id !== undefined && odenis_metodu_id !== null && odenis_metodu_id !== '') {
+      finalOdenisMetoduId = Number(odenis_metodu_id);
+      if (isNaN(finalOdenisMetoduId)) {
+        return errorResponse(res, 400, 'Bad Request', 'INVALID_PAYMENT_METHOD', 'Ödəniş metodu ID-si rəqəm olmalıdır.');
+      }
+      const cardCheck = await executeQuery(
+        `SELECT id FROM odenis_metodlari WHERE id = :id AND istifadeci_id = :userId`,
+        { id: finalOdenisMetoduId, userId }
+      );
+      if (cardCheck.rows.length === 0) {
+        return errorResponse(res, 400, 'Bad Request', 'PAYMENT_METHOD_NOT_FOUND', 'Ödəniş metodu tapılmadı və ya istifadəçiyə məxsus deyil.');
+      }
+    }
+
     const finalAd = ad || queryAd;
     await executeQuery(
       `UPDATE abunelikler SET ad=:ad, qiymet=:qiymet, valyuta=:valyuta, odenis_tezliyi=:odenis_tezliyi,
        baslama_tarixi=TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), novbeti_odenis_tarixi=TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'),
-       kateqoriya=:kateqoriya, status=:status
+       kateqoriya=:kateqoriya, status=:status, odenis_metodu_id=:odenis_metodu_id
        WHERE istifadeci_id=:istifadeci_id AND ad=:queryAd`,
       {
         ad: finalAd, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
         odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
-        kateqoriya: kateqoriya || null, status: statusValue,
+        kateqoriya: kateqoriya || null, status: statusValue, odenis_metodu_id: finalOdenisMetoduId,
         istifadeci_id: userId, queryAd
       },
       { autoCommit: true }
@@ -1026,6 +1058,8 @@ app.get('/api/odenis-tarixcesi', async (req, res) => {
       SELECT o.id AS odenis_tarixcesi_id,
              o.abunelik_id,
              a.ad AS app_adi,
+             a.kateqoriya,
+             a.valyuta,
              u.username,
              TO_CHAR(o.odenis_tarixi,          'YYYY-MM-DD') AS odenis_tarixi,
 
@@ -1334,6 +1368,22 @@ app.put('/api/odenis-metodlari/:id', async (req, res) => {
  *       404:
  *         description: Tapılmadı
  */
+app.delete('/api/odenis-metodlari/:id', async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) return errorResponse(res, 400, 'Bad Request', 'INVALID_ID', 'id düzgün deyil.');
+  try {
+    const result = await executeQuery(
+      `DELETE FROM odenis_metodlari WHERE id = :id`,
+      { id },
+      { autoCommit: true }
+    );
+    if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'CARD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
+    return successResponse(res, 200, 'Deleted', { message: 'Ödəniş metodu uğurla silindi.' });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
 app.delete('/api/odenis-metodlari', async (req, res) => {
   const { username, ad } = req.query;
   if (!username || !ad)

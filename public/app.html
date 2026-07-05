@@ -233,6 +233,34 @@
   .sub-badge.normal { background: var(--teal-soft); color: var(--teal); }
   .sub-badge.paused { background: var(--surface-3); color: var(--ink-faint); }
 
+  /* ---- Card and History rows ---- */
+  .card-row, .history-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
+    transition: background 0.2s ease;
+  }
+  .card-icon, .history-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); flex-shrink: 0;
+  }
+  .card-icon.visa { background: var(--teal-soft); color: var(--teal); border-color: transparent; }
+  .card-icon.mastercard { background: var(--gold-soft); color: var(--gold); border-color: transparent; }
+  .card-info, .history-info { flex: 1; min-width: 0; }
+  .card-name, .history-name { font-weight: 600; font-size: 13.5px; }
+  .card-meta, .history-meta { font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
+  .card-right, .history-right { text-align: right; flex-shrink: 0; }
+  .card-delete {
+    background: none; border: none; color: var(--ink-faint); cursor: pointer; padding: 4px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; width: 28px; height: 28px;
+    transition: all 0.2s ease;
+  }
+  .card-delete:hover { background: var(--coral-soft); color: var(--coral); }
+  .badge-success { background: var(--teal-soft); color: var(--teal); font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
+  .badge-fail { background: var(--coral-soft); color: var(--coral); font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
+
   /* ---- Notifications ---- */
   .notif-item {
     display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border);
@@ -784,18 +812,18 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/><path d="M7 14h4"/></svg>
         <span data-i18n="tab_subs">Abunəlik</span>
       </div>
+      <div class="tab-item" data-screen="history" onclick="switchScreen('history')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span data-i18n="tab_history">Tarixçə</span>
+      </div>
+      <div class="tab-item" data-screen="cards" onclick="switchScreen('cards')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+        <span data-i18n="tab_cards">Kartlar</span>
+      </div>
       <div class="tab-item" data-screen="notifications" onclick="switchScreen('notifications')" style="position:relative;">
         <span class="tab-dot" id="notif-badge"></span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span data-i18n="tab_notif">Bildiriş</span>
-      </div>
-      <div class="tab-item" data-screen="budget" onclick="switchScreen('budget')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-        <span data-i18n="tab_budget">Büdcə</span>
-      </div>
-      <div class="tab-item" data-screen="settings" onclick="switchScreen('settings')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        <span data-i18n="tab_settings">Ayarlar</span>
       </div>
     </div>
 
@@ -850,6 +878,12 @@
             <option value="Shopping">Shopping</option>
             <option value="Finance">Finance</option>
             <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="field_card">Ödəniş kartı</label>
+          <select id="new-sub-card">
+            <option value="">-- Kart seçilməyib --</option>
           </select>
         </div>
         <div class="sheet-actions">
@@ -921,6 +955,12 @@
             <option value="deactive" data-i18n="status_deactive">Dayandırılıb</option>
           </select>
         </div>
+        <div class="field">
+          <label data-i18n="field_card">Ödəniş kartı</label>
+          <select id="manage-sub-card">
+            <option value="">-- Kart seçilməyib --</option>
+          </select>
+        </div>
         <div class="sheet-actions" style="flex-direction:column; gap:8px;">
           <div style="display:flex; gap:10px; width:100%;">
             <button class="btn btn-primary" onclick="handleUpdateSubscription()" data-i18n="budget_save_btn">Yadda saxla</button>
@@ -931,6 +971,72 @@
       </div>
     </div>
 
+      <!-- ============ ÖDƏNİŞ TARİXÇƏSİ ============ -->
+      <div class="screen" id="scr-history">
+        <div class="scr-header">
+          <div class="h-row">
+            <div>
+              <div class="eyebrow">Ödənişlər</div>
+              <h1 class="page-title">Tarixçə</h1>
+              <div class="page-sub" id="history-sub">Yüklənir...</div>
+            </div>
+          </div>
+        </div>
+        <div class="section" style="padding-top:6px;">
+          <div id="history-list"><div class="hint">Yüklənir...</div></div>
+        </div>
+      </div>
+
+      <!-- ============ KARTLAR ============ -->
+      <div class="screen" id="scr-cards">
+        <div class="scr-header">
+          <div class="h-row">
+            <div>
+              <div class="eyebrow">Ödəniş</div>
+              <h1 class="page-title">Kartlarım</h1>
+              <div class="page-sub" id="cards-sub">Ödəniş metodları</div>
+            </div>
+            <div class="icon-round" onclick="openCardSheet()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="section" style="padding-top:6px;">
+          <div id="cards-list"><div class="hint">Yüklənir...</div></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom sheet: Add card -->
+<div class="sheet-overlay" id="card-sheet-overlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Yeni Kart</div>
+      <button class="sheet-close" onclick="closeCardSheet()">✕</button>
+    </div>
+    <div class="field"><label>Kart adı</label><input type="text" id="card-name" placeholder="məs. Kapital Bank"></div>
+    <div class="field">
+      <label>Kart növü</label>
+      <select id="card-type">
+        <option value="visa">Visa</option>
+        <option value="mastercard">Mastercard</option>
+      </select>
+    </div>
+    <div class="field"><label>Kart nömrəsi (PAN)</label><input type="text" id="card-pan" placeholder="4111 1111 1111 1111" maxlength="19" oninput="formatCardNum(this)"></div>
+    <div class="field-row">
+      <div class="field"><label>Son tarix (AA/İİ)</label><input type="text" id="card-expiry" placeholder="12/28" maxlength="5"></div>
+      <div class="field"><label>CVV</label><input type="password" id="card-cvv" placeholder="•••" maxlength="4"></div>
+    </div>
+    <div class="field-error" id="card-error"></div>
+    <div class="sheet-actions">
+      <button class="btn" onclick="closeCardSheet()">İmtina</button>
+      <button class="btn btn-primary" onclick="handleAddCard()">Əlavə et</button>
+    </div>
   </div>
 </div>
 
@@ -940,6 +1046,8 @@
 
   let currentUser = null; // { id, username, ad, email }
   let subscriptions = [];
+  let cards = [];
+  let paymentHistory = [];
   let notifications = [];
   let budgetState = { limit: 300.00, spent: 0.00, currency: 'AZN', exists: false };
   let currentSettings = { esas_valyuta: 'AZN', bildiris_metodu: 'email', dil: 'az', tema: 'dark' };
@@ -1126,7 +1234,8 @@
         freqRaw: s.odenis_tezliyi,
         start: s.baslama_tarixi,
         next: s.novbeti_odenis_tarixi,
-        status: s.status
+        status: s.status,
+        odenis_metodu_id: s.odenis_metodu_id
       }));
     } else {
       subscriptions = [];
@@ -1186,6 +1295,10 @@
     renderNotifs();
     renderRuler();
     renderBudgetCard();
+
+    // 5. Cards & Payment History
+    await loadCards();
+    await loadPaymentHistory();
   }
 
   function getUrgency(basliq, mesaj) {
@@ -1413,13 +1526,15 @@
     const freqInput = document.getElementById('new-sub-freq');
     const startInput = document.getElementById('new-sub-start');
     const catInput = document.getElementById('new-sub-category');
-    
+    const cardInput = document.getElementById('new-sub-card');
+
     const name = nameInput.value.trim();
     const price = Number(priceInput.value);
     const currency = currencyInput.value;
     const freq = freqInput.value;
     const start = startInput.value;
     const category = catInput.value;
+    const cardId = cardInput.value || null;
 
     if (!name) {
       nameInput.focus();
@@ -1435,7 +1550,7 @@
 
     clearPriceError();
 
-    const res = await apiFetch('POST', '/api/abunelikler', {
+    const payload = {
       username: currentUser.username,
       ad: name,
       qiymet: price,
@@ -1443,7 +1558,10 @@
       odenis_tezliyi: freq,
       baslama_tarixi: start,
       kateqoriya: category
-    });
+    };
+    if (cardId) payload.odenis_metodu_id = cardId;
+
+    const res = await apiFetch('POST', '/api/abunelikler', payload);
 
     if (res.ok) {
       closeSheet();
@@ -1466,7 +1584,8 @@
     document.getElementById('manage-sub-start').value = sub.start;
     document.getElementById('manage-sub-category').value = sub.category;
     document.getElementById('manage-sub-status').value = sub.status;
-    
+    document.getElementById('manage-sub-card').value = sub.odenis_metodu_id || '';
+
     clearManagePriceError();
     document.getElementById('sub-manage-overlay').classList.add('open');
   }
@@ -1495,6 +1614,7 @@
     const start = document.getElementById('manage-sub-start').value;
     const category = document.getElementById('manage-sub-category').value;
     const status = document.getElementById('manage-sub-status').value;
+    const cardId = document.getElementById('manage-sub-card').value || null;
 
     if (!name) {
       document.getElementById('manage-sub-name').focus();
@@ -1510,15 +1630,18 @@
 
     clearManagePriceError();
 
-    const res = await apiFetch('PUT', `/api/abunelikler?username=${currentUser.username}&ad=${origName}`, {
+    const updatePayload = {
       ad: name,
       qiymet: price,
       valyuta: currency,
       odenis_tezliyi: freq,
       baslama_tarixi: start,
       kateqoriya: category,
-      status: status
-    });
+      status: status,
+      odenis_metodu_id: cardId
+    };
+
+    const res = await apiFetch('PUT', `/api/abunelikler?username=${currentUser.username}&ad=${origName}`, updatePayload);
 
     if (res.ok) {
       closeManageSheet();
@@ -1539,6 +1662,183 @@
       } else {
         alert(res.data?.error?.message || 'Silinmə zamanı xəta baş verdi.');
       }
+    }
+  }
+
+  // ---- Cards (Ödəniş Metodları) ----
+  function cardIconHTML(kart_tipi) {
+    const t = (kart_tipi || '').toLowerCase();
+    if (t === 'visa') return `<div class="card-icon visa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></div>`;
+    return `<div class="card-icon mastercard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>`;
+  }
+
+  function cardRowHTML(c) {
+    return `
+      <div class="card-row">
+        ${cardIconHTML(c.kart_tipi)}
+        <div class="card-info">
+          <div class="card-name">${c.ad}</div>
+          <div class="card-meta">${c.kart_tipi} · ${c.pan || '····'}</div>
+        </div>
+        <div class="card-right">
+          ${c.kart_istifade_tarixi ? `<div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);">${c.kart_istifade_tarixi}</div>` : ''}
+          <button class="card-delete" onclick="handleDeleteCard(${c.card_id})" title="Sil">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </div>`;
+  }
+
+  async function loadCards() {
+    const res = await apiFetch('GET', `/api/odenis-metodlari?username=${currentUser.username}`);
+    if (res.ok && res.data && res.data.data && res.data.data.cards) {
+      cards = res.data.data.cards;
+    } else {
+      cards = [];
+    }
+    renderCards();
+    updateCardDropdowns();
+  }
+
+  function renderCards() {
+    const list = document.getElementById('cards-list');
+    const sub = document.getElementById('cards-sub');
+    if (cards.length === 0) {
+      list.innerHTML = '<div class="hint">Hələ kart əlavə edilməyib. + düyməsini istifadə edin.</div>';
+      if (sub) sub.textContent = '0 ödəniş metodu';
+    } else {
+      list.innerHTML = cards.map(cardRowHTML).join('');
+      if (sub) sub.textContent = `${cards.length} ödəniş metodu`;
+    }
+  }
+
+  function updateCardDropdowns() {
+    ['new-sub-card', 'manage-sub-card'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      const currentVal = sel.value;
+      sel.innerHTML = '<option value="">-- Kart seçilməyib --</option>';
+      cards.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.card_id;
+        opt.textContent = `${c.ad} (${c.kart_tipi} ${c.pan || ''})`;
+        sel.appendChild(opt);
+      });
+      if (currentVal) sel.value = currentVal;
+    });
+  }
+
+  async function handleDeleteCard(id) {
+    if (!confirm('Bu kartı silmək istəyirsiniz?')) return;
+    const res = await apiFetch('DELETE', `/api/odenis-metodlari/${id}`);
+    if (res.ok) {
+      await loadCards();
+    } else {
+      alert(res.data?.error?.message || 'Kart silinə bilmədi.');
+    }
+  }
+
+  function openCardSheet() {
+    document.getElementById('card-name').value = '';
+    document.getElementById('card-type').value = 'visa';
+    document.getElementById('card-pan').value = '';
+    document.getElementById('card-expiry').value = '';
+    document.getElementById('card-cvv').value = '';
+    document.getElementById('card-error').textContent = '';
+    document.getElementById('card-error').classList.remove('show');
+    document.getElementById('card-sheet-overlay').classList.add('open');
+  }
+  function closeCardSheet() { document.getElementById('card-sheet-overlay').classList.remove('open'); }
+  document.getElementById('card-sheet-overlay').addEventListener('click', e => {
+    if (e.target.id === 'card-sheet-overlay') closeCardSheet();
+  });
+
+  function formatCardNum(input) {
+    let v = input.value.replace(/\D/g, '').slice(0, 16);
+    input.value = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+  }
+
+  async function handleAddCard() {
+    const name = document.getElementById('card-name').value.trim();
+    const kart_tipi = document.getElementById('card-type').value;
+    const panRaw = document.getElementById('card-pan').value.replace(/\s/g, '');
+    const expiry = document.getElementById('card-expiry').value.trim();
+    const cvv = document.getElementById('card-cvv').value.trim();
+    const errEl = document.getElementById('card-error');
+
+    if (!name || !kart_tipi) {
+      errEl.textContent = 'Kart adı məcburidir.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    errEl.classList.remove('show');
+
+    const payload = {
+      username: currentUser.username,
+      ad: name,
+      kart_tipi: kart_tipi
+    };
+    if (panRaw) payload.pan = panRaw;
+    if (expiry) payload.kart_istifade_tarixi = expiry;
+    if (cvv) payload.cvv = cvv;
+
+    const res = await apiFetch('POST', '/api/odenis-metodlari', payload);
+    if (res.ok) {
+      closeCardSheet();
+      await loadCards();
+    } else {
+      errEl.textContent = res.data?.error?.message || 'Kart əlavə edilə bilmədi.';
+      errEl.classList.add('show');
+    }
+  }
+
+  // ---- Payment History ----
+  function historyIconHTML(category) {
+    const icon = CATEGORY_ICONS[category] || CATEGORY_ICONS['Other'];
+    const color = CATEGORY_COLORS[category] || 'neutral';
+    return `<div class="history-icon sub-icon ${color}">${icon}</div>`;
+  }
+
+  function historyRowHTML(h) {
+    const sym = h.valyuta === 'USD' ? '$' : h.valyuta === 'EUR' ? '€' : '₼';
+    const dateStr = h.odenis_tarixi ? h.odenis_tarixi.substring(0, 10) : '-';
+    const dateFmt = dateStr.split('-').reverse().join('.');
+    const badgeCls = h.status === 'success' ? 'badge-success' : 'badge-fail';
+    const badgeTxt = h.status === 'success' ? '✓ uğurlu' : '✗ uğursuz';
+    return `
+      <div class="history-row">
+        ${historyIconHTML(h.kateqoriya || 'Other')}
+        <div class="history-info">
+          <div class="history-name">${h.app_adi}</div>
+          <div class="history-meta">${dateFmt}</div>
+        </div>
+        <div class="history-right">
+          <div style="font-family:var(--font-mono);font-weight:600;font-size:13.5px;">${sym}${parseFloat(h.mebleq).toFixed(2)}</div>
+          <span class="${badgeCls}">${badgeTxt}</span>
+        </div>
+      </div>`;
+  }
+
+  async function loadPaymentHistory() {
+    const res = await apiFetch('GET', `/api/odenis-tarixcesi?username=${currentUser.username}`);
+    if (res.ok && res.data && res.data.data && res.data.data.paymenthistory) {
+      paymentHistory = res.data.data.paymenthistory;
+    } else {
+      paymentHistory = [];
+    }
+    renderPaymentHistory();
+  }
+
+  function renderPaymentHistory() {
+    const list = document.getElementById('history-list');
+    const sub = document.getElementById('history-sub');
+    if (paymentHistory.length === 0) {
+      list.innerHTML = '<div class="hint">Hələ ödəniş tarixçəsi yoxdur.</div>';
+      if (sub) sub.textContent = '0 ödəniş';
+    } else {
+      list.innerHTML = paymentHistory.map(historyRowHTML).join('');
+      if (sub) sub.textContent = `${paymentHistory.length} ödəniş`;
     }
   }
 
@@ -1689,7 +1989,9 @@
       field_status: 'Status',
       status_active: 'Aktiv',
       status_deactive: 'Dayandırılıb',
-      btn_delete: 'Abunəlik Sil'
+      btn_delete: 'Abunəlik Sil',
+      tab_history: 'Tarixçə', tab_cards: 'Kartlar',
+      field_card: 'Ödəniş kartı'
     },
     en: {
       tab_overview: 'Overview', tab_subs: 'Subs', tab_notif: 'Alerts', tab_budget: 'Budget', tab_settings: 'Settings',
@@ -1717,7 +2019,9 @@
       field_status: 'Status',
       status_active: 'Active',
       status_deactive: 'Paused',
-      btn_delete: 'Delete Subscription'
+      btn_delete: 'Delete Subscription',
+      tab_history: 'History', tab_cards: 'Cards',
+      field_card: 'Payment card'
     },
     ru: {
       tab_overview: 'Обзор', tab_subs: 'Подписки', tab_notif: 'Уведомления', tab_budget: 'Бюджет', tab_settings: 'Настройки',
@@ -1745,7 +2049,9 @@
       field_status: 'Статус',
       status_active: 'Активно',
       status_deactive: 'Приостановлено',
-      btn_delete: 'Удалить подписку'
+      btn_delete: 'Удалить подписку',
+      tab_history: 'История', tab_cards: 'Карты',
+      field_card: 'Карта оплаты'
     },
     tr: {
       tab_overview: 'Genel', tab_subs: 'Abonelik', tab_notif: 'Bildirim', tab_budget: 'Bütçe', tab_settings: 'Ayarlar',
@@ -1773,7 +2079,9 @@
       field_status: 'Durum',
       status_active: 'Aktif',
       status_deactive: 'Durduruldu',
-      btn_delete: 'Aboneliği Sil'
+      btn_delete: 'Aboneliği Sil',
+      tab_history: 'Geçmiş', tab_cards: 'Kartlar',
+      field_card: 'Ödeme kartı'
     }
   };
 
