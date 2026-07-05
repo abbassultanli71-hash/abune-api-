@@ -583,7 +583,9 @@
               <h1 class="page-title" data-i18n="dashboard_title">Xoş gördük</h1>
               <div class="page-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
             </div>
-            <div class="icon-round"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div class="icon-round" onclick="switchScreen('settings')" title="Ayarlar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
           </div>
         </div>
 
@@ -593,7 +595,7 @@
             <div class="stat-label" data-i18n="stat_active">Aktiv abunəlik</div>
             <div class="stat-value" id="dashboard-active-count">0</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" style="cursor:pointer;" onclick="switchScreen('budget')">
             <div class="stat-icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
             <div class="stat-label" data-i18n="stat_monthly">Aylıq xərc</div>
             <div class="stat-value" id="dashboard-monthly-spend">₼0.00</div>
@@ -692,6 +694,9 @@
               <h1 class="page-title" data-i18n="budget_title">Aylıq limit</h1>
               <div class="page-sub" data-i18n="budget_sub">İstifadəçi başına 1 aktiv limit</div>
             </div>
+            <div class="icon-round" onclick="switchScreen('dashboard')" title="Geri">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
           </div>
         </div>
         <div class="budget-card">
@@ -749,8 +754,15 @@
       <!-- ============ AYARLAR ============ -->
       <div class="screen" id="scr-settings">
         <div class="scr-header">
-          <div class="eyebrow" data-i18n="settings_eyebrow">Ayarlar</div>
-          <h1 class="page-title" data-i18n="settings_title">Hesabım</h1>
+          <div class="h-row">
+            <div>
+              <div class="eyebrow" data-i18n="settings_eyebrow">Ayarlar</div>
+              <h1 class="page-title" data-i18n="settings_title">Hesabım</h1>
+            </div>
+            <div class="icon-round" onclick="switchScreen('dashboard')" title="Geri">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+          </div>
         </div>
         <div class="profile-card">
           <div class="avatar-lg" id="profile-initials">U.U</div>
@@ -788,6 +800,13 @@
                 <option value="ru">Русский</option>
                 <option value="tr">Türkçe</option>
               </select>
+            </div>
+          </div>
+          <div class="settings-row" style="cursor:pointer;" onclick="switchScreen('budget')">
+            <div class="settings-row-label" data-i18n="tab_budget">Büdcə</div>
+            <div class="settings-value" style="display:flex; align-items:center; gap:5px; color:var(--ink-muted);">
+              <span data-i18n="budget_title" style="font-family:var(--font-body); font-size:12.5px;">Aylıq limit</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px; height:14px; color:var(--ink-faint);"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
           </div>
         </div>
