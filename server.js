@@ -630,6 +630,54 @@ app.post('/api/abunelikler', async (req, res) => {
       }
     }
 
+    // ─── Büdcə limiti yoxlaması ─────────────────────────────────────────────
+    const budgetRow = await executeQuery(
+      `SELECT b.limit_mebleq, b.valyuta FROM budceler b WHERE b.istifadeci_id = :userId`,
+      { userId }
+    );
+
+    if (budgetRow.rows.length > 0) {
+      const budgetLimit  = Number(budgetRow.rows[0].LIMIT_MEBLEQ);
+      const budgetValyuta = budgetRow.rows[0].VALYUTA || 'AZN';
+
+      // Mövcud aktiv abunəliklərin aylıq xərclərini hesabla
+      const activeSubs = await executeQuery(
+        `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler
+          WHERE istifadeci_id = :userId AND status = 'active'`,
+        { userId }
+      );
+
+      // Tezliyə görə aylıq ekvivalent çevirici
+      const toMonthly = (qiymet, tezlik) => {
+        switch (tezlik) {
+          case 'weekly':      return qiymet * 4.333;
+          case 'monthly':     return qiymet;
+          case 'quarterly':   return qiymet / 3;
+          case 'yearly':      return qiymet / 12;
+          default:            return qiymet;
+        }
+      };
+
+      let currentMonthly = 0;
+      for (const row of activeSubs.rows) {
+        // Sadə yanaşma: hər valyutanı budcə valyutasıyla eyni hesab edirik
+        currentMonthly += toMonthly(Number(row.QIYMET), row.ODENIS_TEZLIYI);
+      }
+
+      // Yeni abunəliyin aylıq ekvivalenti
+      const newMonthly = toMonthly(parsedQiymet, odenisTezliyi);
+      const projectedTotal = currentMonthly + newMonthly;
+
+      if (projectedTotal > budgetLimit) {
+        return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
+          `Büdcə limiti keçilir! Mövcud aylıq xərc: ${currentMonthly.toFixed(2)} ${budgetValyuta}, ` +
+          `yeni abunəlik: +${newMonthly.toFixed(2)} ${budgetValyuta}, ` +
+          `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}.`
+        );
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     const sql = `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, odenis_metodu_id, status)
                  VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :odenis_metodu_id, 'active')`;
     const binds = {
