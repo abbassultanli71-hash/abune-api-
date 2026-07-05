@@ -112,7 +112,8 @@ CREATE TABLE istifadeci_ayarlari (
     esas_valyuta VARCHAR(10) DEFAULT 'AZN',
     bildiris_metodu VARCHAR(50) DEFAULT 'email',
     dil VARCHAR(5) DEFAULT 'az',
-    tema VARCHAR(10) DEFAULT 'dark'
+    tema VARCHAR(10) DEFAULT 'dark',
+    tema_rengi VARCHAR(30) DEFAULT 'gold'
 );
 
 -- Test Seed Data

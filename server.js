@@ -369,7 +369,7 @@ app.post('/api/istifadeciler', async (req, res) => {
     const userResult = await executeQuery(`SELECT id FROM istifadeciler WHERE username = :username`, { username: trimmedUsername });
     const userId = userResult.rows[0].ID;
     await executeQuery(
-      `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema) VALUES (:userId, 'AZN', 'email', 'az', 'dark')`,
+      `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema, tema_rengi) VALUES (:userId, 'AZN', 'email', 'az', 'dark', 'gold')`,
       { userId }, { autoCommit: true }
     );
     return successResponse(res, 201, 'Created', { message: 'İstifadəçi və onun ilkin ayarları uğurla yaradıldı.' });
@@ -1674,14 +1674,14 @@ app.get('/api/ayarlar/:username', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    const sql = `SELECT istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`;
+    const sql = `SELECT istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema, tema_rengi FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`;
     const result = await executeQuery(sql, { istifadeci_id: userId });
     if (result.rows.length === 0) {
       await executeQuery(
-        `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema) VALUES (:istifadeci_id, 'AZN', 'email', 'az', 'dark')`,
+        `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema, tema_rengi) VALUES (:istifadeci_id, 'AZN', 'email', 'az', 'dark', 'gold')`,
         { istifadeci_id: userId }, { autoCommit: true }
       );
-      return successResponse(res, 200, 'Success', { settings: { istifadeci_id: userId, username, esas_valyuta: 'AZN', bildiris_metodu: 'email', dil: 'az', tema: 'dark' } });
+      return successResponse(res, 200, 'Success', { settings: { istifadeci_id: userId, username, esas_valyuta: 'AZN', bildiris_metodu: 'email', dil: 'az', tema: 'dark', tema_rengi: 'gold' } });
     }
     return successResponse(res, 200, 'Success', { settings: { ...result.rows[0], USERNAME: username } });
   } catch (err) {
@@ -1731,15 +1731,17 @@ app.get('/api/ayarlar/:username', async (req, res) => {
  */
 app.put('/api/ayarlar/:username', async (req, res) => {
   const { username } = req.params;
-  const { esas_valyuta, bildiris_metodu, dil, tema } = req.body;
+  const { esas_valyuta, bildiris_metodu, dil, tema, tema_rengi } = req.body;
   const ICAZE_VERILEN_VALYUTALAR_L = ['AZN', 'USD', 'EUR'];
   const ICAZE_VERILEN_BILDIRISLER  = ['email', 'telegram'];
   const ICAZE_VERILEN_TEMALAR      = ['light', 'dark'];
+  const ICAZE_VERILEN_TEMA_RENGLERI = ['gold', 'teal', 'coral', 'purple', 'blue'];
   const ICAZE_VERILEN_DILLER = ['az','en','ru','tr','de','fr','es','it','pt','ar','zh','ja','ko','hi','nl','pl','sv','no','da','fi','cs','sk','ro','hu','uk','ka','kk','uz','hy','fa','he','id','ms','th','vi','el','bg','hr','sr','lt','lv','et','sl','sq','mk','bs','is','ga','cy','eu','ca','gl','mt','af','sw','tl','bn','ur','ta','te','kn','ml','si','my','km','lo','mn','ne','ps','so','am','ha','yo','ig'];
 
   if (esas_valyuta && !ICAZE_VERILEN_VALYUTALAR_L.includes(esas_valyuta.toUpperCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${esas_valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR_L.join(', ')} daxil edilə bilər.`);
   if (bildiris_metodu && !ICAZE_VERILEN_BILDIRISLER.includes(bildiris_metodu.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_NOTIFICATION_METHOD', `Yanlış bildiriş metodu: "${bildiris_metodu}". Yalnız ${ICAZE_VERILEN_BILDIRISLER.join(', ')} daxil edilə bilər.`);
   if (tema && !ICAZE_VERILEN_TEMALAR.includes(tema.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_THEME', `Yanlış tema: "${tema}". Yalnız ${ICAZE_VERILEN_TEMALAR.join(', ')} daxil edilə bilər.`);
+  if (tema_rengi && !ICAZE_VERILEN_TEMA_RENGLERI.includes(tema_rengi.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_THEME_COLOR', `Yanlış tema rəngi: "${tema_rengi}". Yalnız ${ICAZE_VERILEN_TEMA_RENGLERI.join(', ')} daxil edilə bilər.`);
   if (dil && !ICAZE_VERILEN_DILLER.includes(dil.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_LANGUAGE', `Yanlış dil kodu: "${dil}". ISO 639-1 formatında olmalıdır.`);
 
   try {
@@ -1749,26 +1751,38 @@ app.put('/api/ayarlar/:username', async (req, res) => {
     const settingsCheck = await executeQuery(`SELECT istifadeci_id FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id`, { istifadeci_id: userId });
     let sql;
     if (settingsCheck.rows.length > 0) {
-      sql = `UPDATE istifadeci_ayarlari SET esas_valyuta=:esas_valyuta, bildiris_metodu=:bildiris_metodu, dil=:dil, tema=:tema WHERE istifadeci_id=:istifadeci_id`;
+      sql = `UPDATE istifadeci_ayarlari SET esas_valyuta=:esas_valyuta, bildiris_metodu=:bildiris_metodu, dil=:dil, tema=:tema, tema_rengi=:tema_rengi WHERE istifadeci_id=:istifadeci_id`;
     } else {
-      sql = `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema) VALUES (:istifadeci_id, :esas_valyuta, :bildiris_metodu, :dil, :tema)`;
+      sql = `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema, tema_rengi) VALUES (:istifadeci_id, :esas_valyuta, :bildiris_metodu, :dil, :tema, :tema_rengi)`;
     }
     await executeQuery(sql, {
       istifadeci_id: userId,
       esas_valyuta: esas_valyuta ? esas_valyuta.toUpperCase() : 'AZN',
       bildiris_metodu: bildiris_metodu ? bildiris_metodu.toLowerCase() : 'email',
       dil: dil ? dil.toLowerCase() : 'az',
-      tema: tema ? tema.toLowerCase() : 'dark'
+      tema: tema ? tema.toLowerCase() : 'dark',
+      tema_rengi: tema_rengi ? tema_rengi.toLowerCase() : 'gold'
     }, { autoCommit: true });
     return successResponse(res, 200, 'Updated', { message: 'Ayarlar uğurla yeniləndi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
-startDueSubscriptionNotifierJob();
-app.listen(PORT, () => {
-  console.log(`Server started on http://localhost:${PORT}`);
-  console.log(`Swagger documentation is available on http://localhost:${PORT}/api-docs`);
-  //Remove ID GET endpoints and add notification validation;
-  //Remove notification PUT endpoint
+async function initDatabase() {
+  try {
+    await executeQuery(`ALTER TABLE istifadeci_ayarlari ADD COLUMN IF NOT EXISTS tema_rengi VARCHAR(30) DEFAULT 'gold'`);
+    console.log('Database schema initialization: tema_rengi column ensured.');
+  } catch (err) {
+    console.error('Failed to initialize settings table column tema_rengi:', err.message);
+  }
+}
+
+initDatabase().then(() => {
+  startDueSubscriptionNotifierJob();
+  app.listen(PORT, () => {
+    console.log(`Server started on http://localhost:${PORT}`);
+    console.log(`Swagger documentation is available on http://localhost:${PORT}/api-docs`);
+    //Remove ID GET endpoints and add notification validation;
+    //Remove notification PUT endpoint
+  });
 });

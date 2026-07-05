@@ -24,6 +24,8 @@
     --gold-soft: rgba(232,181,77,0.14);
     --teal-soft: rgba(79,189,186,0.14);
     --coral-soft: rgba(226,104,90,0.16);
+    --accent: var(--gold);
+    --accent-soft: var(--gold-soft);
     --shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', -apple-system, system-ui, sans-serif;
@@ -280,16 +282,16 @@
   .budget-spent { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
   .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); }
   .budget-bar-track { height: 8px; background: var(--surface-3); border-radius: 20px; overflow: hidden; }
-  .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--gold)); }
+  .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--accent)); }
   .budget-note { font-size: 11px; color: var(--ink-faint); margin-top: 10px; }
 
   /* ---- FAB ---- */
   .fab {
     position: absolute; right: 20px; bottom: 96px; z-index: 25;
     width: 54px; height: 54px; border-radius: 50%;
-    background: var(--gold); color: #221a08;
+    background: var(--accent); color: #221a08;
     display: flex; align-items: center; justify-content: center;
-    border: none; box-shadow: 0 12px 26px -8px rgba(232,181,77,0.55);
+    border: none; box-shadow: 0 12px 26px -8px var(--accent-soft);
     cursor: pointer;
   }
   .fab svg { width: 22px; height: 22px; }
@@ -309,7 +311,7 @@
     cursor: pointer;
   }
   .tab-item svg { width: 20px; height: 20px; }
-  .tab-item.active { color: var(--gold); }
+  .tab-item.active { color: var(--accent); }
   .tab-dot {
     position: absolute; top: 0px; right: 26%;
     width: 7px; height: 7px; border-radius: 50%; background: var(--coral);
@@ -325,7 +327,7 @@
     background: var(--surface-2); border: 1px solid var(--border); color: var(--ink-muted);
     cursor: pointer;
   }
-  .filter-chip.selected { background: var(--gold-soft); color: var(--gold); border-color: transparent; }
+  .filter-chip.selected { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
   .search-bar {
     margin: 0 20px 14px; display: flex; align-items: center; gap: 8px;
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
@@ -365,7 +367,7 @@
   .avatar-lg {
     width: 48px; height: 48px; border-radius: 50%; background: var(--surface-3);
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--gold);
+    font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--accent);
     border: 1px solid var(--border-strong); flex-shrink: 0;
   }
   .profile-name { font-weight: 600; font-size: 14.5px; }
@@ -373,7 +375,19 @@
 
   .theme-row { display: flex; gap: 8px; padding: 14px 16px; }
   .theme-opt { flex: 1; text-align: center; padding: 9px; border-radius: 10px; font-size: 12px; font-weight: 600; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink-muted); cursor: pointer; }
-  .theme-opt.selected { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
+  .theme-opt.selected { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+  .accent-row { display: flex; gap: 8px; padding: 14px 16px; }
+  .accent-opt {
+    flex: 1; height: 38px; display: flex; align-items: center; justify-content: center;
+    border-radius: 10px; font-size: 16px; background: var(--surface-2); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s ease;
+  }
+  .accent-opt.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 10px var(--accent-soft);
+  }
 
   /* ---- Modal (bottom sheet) ---- */
   .sheet-overlay {
@@ -412,7 +426,7 @@
     cursor: pointer;
     outline: none;
   }
-  .btn-primary { background: var(--gold); color: #221a08; border-color: transparent; }
+  .btn-primary { background: var(--accent); color: #221a08; border-color: transparent; }
   .btn svg { width: 15px; height: 15px; }
 
   .hint {
@@ -436,7 +450,7 @@
   .auth-logo-area svg {
     width: 44px;
     height: 44px;
-    color: var(--gold);
+    color: var(--accent);
     margin-bottom: 8px;
   }
   .auth-logo-area h2 {
@@ -778,11 +792,21 @@
           </div>
         </div>
         <div class="settings-group">
-          <div class="settings-row" style="border-bottom:none; flex-direction:column; align-items:stretch; gap:8px;">
+          <div class="settings-row" style="flex-direction:column; align-items:stretch; gap:8px;">
             <div class="settings-row-label" data-i18n="settings_theme">Görünüş</div>
             <div class="theme-row" style="padding:0;">
               <div class="theme-opt" id="theme-dark-opt" onclick="setTheme('dark')" data-i18n="theme_dark">Tünd</div>
               <div class="theme-opt" id="theme-light-opt" onclick="setTheme('light')" data-i18n="theme_light">Açıq</div>
+            </div>
+          </div>
+          <div class="settings-row" style="border-bottom:none; flex-direction:column; align-items:stretch; gap:8px;">
+            <div class="settings-row-label" data-i18n="settings_theme_color">Tema rəngi</div>
+            <div class="accent-row" style="padding:0; display:grid; grid-template-columns: repeat(5, 1fr); gap:6px;">
+              <div class="accent-opt" id="accent-gold-opt" data-color="gold" onclick="setAccentColor('gold')" style="color:#e8b54d;">●</div>
+              <div class="accent-opt" id="accent-teal-opt" data-color="teal" onclick="setAccentColor('teal')" style="color:#4fbdba;">●</div>
+              <div class="accent-opt" id="accent-coral-opt" data-color="coral" onclick="setAccentColor('coral')" style="color:#e2685a;">●</div>
+              <div class="accent-opt" id="accent-purple-opt" data-color="purple" onclick="setAccentColor('purple')" style="color:#a78bfa;">●</div>
+              <div class="accent-opt" id="accent-blue-opt" data-color="blue" onclick="setAccentColor('blue')" style="color:#3b82f6;">●</div>
             </div>
           </div>
         </div>
@@ -1050,7 +1074,7 @@
   let paymentHistory = [];
   let notifications = [];
   let budgetState = { limit: 300.00, spent: 0.00, currency: 'AZN', exists: false };
-  let currentSettings = { esas_valyuta: 'AZN', bildiris_metodu: 'email', dil: 'az', tema: 'dark' };
+  let currentSettings = { esas_valyuta: 'AZN', bildiris_metodu: 'email', dil: 'az', tema: 'dark', tema_rengi: 'gold' };
   
   let selectedCategoryFilter = 'All';
   const TODAY = new Date();
@@ -1214,6 +1238,7 @@
     if (settingsRes.ok && settingsRes.data && settingsRes.data.data && settingsRes.data.data.settings) {
       currentSettings = settingsRes.data.data.settings;
       setTheme(currentSettings.tema || 'dark');
+      applyAccentColor(currentSettings.tema_rengi || 'gold', currentSettings.tema || 'dark');
       applyLanguage(currentSettings.dil || 'az');
       document.getElementById('setting-currency').value = currentSettings.esas_valyuta || 'AZN';
       document.getElementById('setting-notif').value = currentSettings.bildiris_metodu || 'email';
@@ -1842,6 +1867,42 @@
     }
   }
 
+  const ACCENT_COLORS = {
+    dark: {
+      gold: { main: '#e8b54d', soft: 'rgba(232,181,77,0.14)' },
+      teal: { main: '#4fbdba', soft: 'rgba(79,189,186,0.14)' },
+      coral: { main: '#e2685a', soft: 'rgba(226,104,90,0.16)' },
+      purple: { main: '#a78bfa', soft: 'rgba(167,139,250,0.14)' },
+      blue: { main: '#3b82f6', soft: 'rgba(59,130,246,0.14)' }
+    },
+    light: {
+      gold: { main: '#b88314', soft: 'rgba(184,131,20,0.14)' },
+      teal: { main: '#1c8c89', soft: 'rgba(28,140,137,0.12)' },
+      coral: { main: '#c53f31', soft: 'rgba(197,63,49,0.12)' },
+      purple: { main: '#7c3aed', soft: 'rgba(124,58,237,0.12)' },
+      blue: { main: '#1d4ed8', soft: 'rgba(29,78,216,0.12)' }
+    }
+  };
+
+  function applyAccentColor(colorName, themeMode) {
+    const mode = themeMode || (document.documentElement.getAttribute('data-theme') || 'dark');
+    const themeColors = ACCENT_COLORS[mode] || ACCENT_COLORS.dark;
+    const color = themeColors[colorName] || themeColors.gold;
+    document.documentElement.style.setProperty('--accent', color.main);
+    document.documentElement.style.setProperty('--accent-soft', color.soft);
+
+    document.querySelectorAll('.accent-opt').forEach(opt => {
+      opt.classList.toggle('selected', opt.getAttribute('data-color') === colorName);
+    });
+  }
+
+  async function setAccentColor(colorName) {
+    if (!currentUser) return;
+    currentSettings.tema_rengi = colorName;
+    applyAccentColor(colorName);
+    await onSettingChange('tema_rengi', colorName);
+  }
+
   // Handle Setting updates
   async function onSettingChange(key, value) {
     currentSettings[key] = value;
@@ -1860,6 +1921,9 @@
     if (currentUser) {
       currentSettings.tema = mode;
       onSettingChange('tema', mode);
+    }
+    if (currentSettings && currentSettings.tema_rengi) {
+      applyAccentColor(currentSettings.tema_rengi, mode);
     }
   }
 
@@ -1978,6 +2042,7 @@
       settings_eyebrow: 'Ayarlar', settings_title: 'Hesabım',
       settings_currency: 'Əsas valyuta', settings_notif: 'Bildiriş metodu', settings_lang: 'Dil',
       settings_theme: 'Görünüş', theme_dark: 'Tünd', theme_light: 'Açıq',
+      settings_theme_color: 'Tema rəngi',
       sheet_title: 'Yeni abunəlik', field_name: 'Ad', field_price: 'Qiymət', field_currency: 'Valyuta',
       field_freq: 'Tezlik', field_start: 'Başlama tarixi', field_category: 'Kateqoriya',
       freq_monthly: 'Aylıq', freq_yearly: 'İllik', freq_quarterly: 'Rüblük', freq_weekly: 'Həftəlik',
@@ -2008,6 +2073,7 @@
       settings_eyebrow: 'Settings', settings_title: 'My account',
       settings_currency: 'Base currency', settings_notif: 'Notification method', settings_lang: 'Language',
       settings_theme: 'Appearance', theme_dark: 'Dark', theme_light: 'Light',
+      settings_theme_color: 'Theme color',
       sheet_title: 'New subscription', field_name: 'Name', field_price: 'Price', field_currency: 'Currency',
       field_freq: 'Frequency', field_start: 'Start date', field_category: 'Category',
       freq_monthly: 'Monthly', freq_yearly: 'Yearly', freq_quarterly: 'Quarterly', freq_weekly: 'Weekly',
@@ -2038,6 +2104,7 @@
       settings_eyebrow: 'Настройки', settings_title: 'Мой аккаунт',
       settings_currency: 'Основная валюта', settings_notif: 'Способ уведомления', settings_lang: 'Язык',
       settings_theme: 'Внешний вид', theme_dark: 'Тёмная', theme_light: 'Светлая',
+      settings_theme_color: 'Цвет темы',
       sheet_title: 'Новая подписка', field_name: 'Название', field_price: 'Цена', field_currency: 'Валюта',
       field_freq: 'Периодичность', field_start: 'Дата начала', field_category: 'Категория',
       freq_monthly: 'Ежемесячно', freq_yearly: 'Ежегодно', freq_quarterly: 'Ежеквартально', freq_weekly: 'Еженедельно',
@@ -2068,6 +2135,7 @@
       settings_eyebrow: 'Ayarlar', settings_title: 'Hesabım',
       settings_currency: 'Ana para birimi', settings_notif: 'Bildirim yöntemi', settings_lang: 'Dil',
       settings_theme: 'Görünüm', theme_dark: 'Koyu', theme_light: 'Açık',
+      settings_theme_color: 'Tema rengi',
       sheet_title: 'Yeni abonelik', field_name: 'Ad', field_price: 'Fiyat', field_currency: 'Para birimi',
       field_freq: 'Sıklık', field_start: 'Başlangıç tarihi', field_category: 'Kategori',
       freq_monthly: 'Aylık', freq_yearly: 'Yıllık', freq_quarterly: 'Üç aylık', freq_weekly: 'Haftalık',
