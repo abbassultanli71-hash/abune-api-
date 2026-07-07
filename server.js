@@ -753,25 +753,17 @@ app.post('/api/abunelikler', async (req, res) => {
     // ────────────────────────────────────────────────────────────────────────
 
     const sql = `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, odenis_metodu_id, status)
-                 VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :odenis_metodu_id, 'active')`;
+                 VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, :baslama_tarixi::date, :novbeti_odenis_tarixi::date, :kateqoriya, :odenis_metodu_id, 'active')
+                 RETURNING id`;
     const binds = {
       istifadeci_id: userId, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
       odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
       kateqoriya: kateqoriya || null, odenis_metodu_id: finalOdenisMetoduId
     };
 
-    await executeQuery(sql, binds, { autoCommit: true });
+    const insertResult = await executeQuery(sql, binds, { autoCommit: true });
+    const newSubId = insertResult.rows.length > 0 ? (insertResult.rows[0].ID || insertResult.rows[0].id) : null;
 
-    // Yeni yaranan abunəliyin ID-sini tap
-    const newSub = await executeQuery(
-      `SELECT id FROM abunelikler
-       WHERE istifadeci_id = :istifadeci_id AND ad = :ad
-       ORDER BY id DESC LIMIT 1`,
-      { istifadeci_id: userId, ad }
-    );
-    const newSubId = newSub.rows.length > 0 ? newSub.rows[0].ID : null;
-
-    // Avtomatik bildiriş əlavə et
     // Avtomatik bildiriş əlavə et
     await addAutoNotification(userId, newSubId, ad, novbetiOdenisTarixi);
 
@@ -876,7 +868,7 @@ app.put('/api/abunelikler', async (req, res) => {
     const finalAd = ad || queryAd;
     await executeQuery(
       `UPDATE abunelikler SET ad=:ad, qiymet=:qiymet, valyuta=:valyuta, odenis_tezliyi=:odenis_tezliyi,
-       baslama_tarixi=TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), novbeti_odenis_tarixi=TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'),
+       baslama_tarixi=:baslama_tarixi::date, novbeti_odenis_tarixi=:novbeti_odenis_tarixi::date,
        kateqoriya=:kateqoriya, status=:status, odenis_metodu_id=:odenis_metodu_id
        WHERE istifadeci_id=:istifadeci_id AND ad=:queryAd`,
       {
