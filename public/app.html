@@ -405,13 +405,20 @@
   .accent-row { display: flex; gap: 8px; padding: 14px 16px; }
   .accent-opt {
     flex: 1; height: 38px; display: flex; align-items: center; justify-content: center;
-    border-radius: 10px; font-size: 16px; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
     cursor: pointer; transition: all 0.2s ease;
+  }
+  .accent-opt .color-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    transition: transform 0.2s ease;
   }
   .accent-opt.selected {
     border-color: var(--accent);
     background: var(--accent-soft);
     box-shadow: 0 0 10px var(--accent-soft);
+  }
+  .accent-opt.selected .color-dot {
+    transform: scale(1.2);
   }
 
   /* ---- Modal (bottom sheet) ---- */
@@ -844,12 +851,22 @@
           </div>
           <div class="settings-row" style="border-bottom:none; flex-direction:column; align-items:stretch; gap:8px;">
             <div class="settings-row-label" data-i18n="settings_theme_color">Tema rəngi</div>
-            <div class="accent-row" style="padding:0; display:grid; grid-template-columns: repeat(5, 1fr); gap:6px;">
-              <div class="accent-opt" id="accent-gold-opt" data-color="gold" onclick="setAccentColor('gold')" style="color:#e8b54d;">●</div>
-              <div class="accent-opt" id="accent-teal-opt" data-color="teal" onclick="setAccentColor('teal')" style="color:#4fbdba;">●</div>
-              <div class="accent-opt" id="accent-coral-opt" data-color="coral" onclick="setAccentColor('coral')" style="color:#e2685a;">●</div>
-              <div class="accent-opt" id="accent-purple-opt" data-color="purple" onclick="setAccentColor('purple')" style="color:#a78bfa;">●</div>
-              <div class="accent-opt" id="accent-blue-opt" data-color="blue" onclick="setAccentColor('blue')" style="color:#3b82f6;">●</div>
+            <div class="accent-row" style="padding:0; display:grid; grid-template-columns: repeat(5, 1fr); gap:8px;">
+              <div class="accent-opt" id="accent-gold-opt" data-color="gold" onclick="setAccentColor('gold')">
+                <span class="color-dot" style="background:#e8b54d;"></span>
+              </div>
+              <div class="accent-opt" id="accent-teal-opt" data-color="teal" onclick="setAccentColor('teal')">
+                <span class="color-dot" style="background:#4fbdba;"></span>
+              </div>
+              <div class="accent-opt" id="accent-coral-opt" data-color="coral" onclick="setAccentColor('coral')">
+                <span class="color-dot" style="background:#e2685a;"></span>
+              </div>
+              <div class="accent-opt" id="accent-purple-opt" data-color="purple" onclick="setAccentColor('purple')">
+                <span class="color-dot" style="background:#a78bfa;"></span>
+              </div>
+              <div class="accent-opt" id="accent-blue-opt" data-color="blue" onclick="setAccentColor('blue')">
+                <span class="color-dot" style="background:#3b82f6;"></span>
+              </div>
             </div>
           </div>
         </div>
