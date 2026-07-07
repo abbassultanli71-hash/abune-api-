@@ -296,6 +296,29 @@
   }
   .fab svg { width: 22px; height: 22px; }
 
+  /* ---- Scroll-to-top button ---- */
+  .scroll-top-btn {
+    position: absolute; right: 20px; bottom: 160px; z-index: 24;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--surface-2); color: var(--ink-muted);
+    display: none; align-items: center; justify-content: center;
+    border: 1px solid var(--border-strong);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0;
+  }
+  .scroll-top-btn.visible {
+    display: flex;
+    opacity: 1;
+    animation: fadeInUp 0.2s ease forwards;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .scroll-top-btn svg { width: 18px; height: 18px; }
+
   /* ---- Bottom tab bar ---- */
   .tabbar {
     position: absolute; left: 0; right: 0; bottom: 0; z-index: 20;
@@ -873,6 +896,11 @@
       </div>
     </div>
 
+    <!-- Scroll-to-top button -->
+    <button id="scroll-top-btn" class="scroll-top-btn" onclick="scrollToTop()" title="Yuxarı qayıt">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
     <!-- Bottom sheet: Add subscription -->
     <div class="sheet-overlay" id="sheet-overlay">
       <div class="sheet">
@@ -1052,12 +1080,12 @@
               <h1 class="page-title">Kartlarım</h1>
               <div class="page-sub" id="cards-sub">Ödəniş metodları</div>
             </div>
-            <div class="icon-round" onclick="openCardSheet()">
+            <div class="icon-round" onclick="openCardSheet()" title="Yeni kart əlavə et">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
             </div>
           </div>
         </div>
-        <div class="section" style="padding-top:6px;">
+        <div class="section" style="padding-top:6px; padding-bottom:20px;">
           <div id="cards-list"><div class="hint">Yüklənir...</div></div>
         </div>
       </div>
@@ -1531,20 +1559,43 @@
 
   function switchScreen(name) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('scr-' + name).classList.add('active');
-    
+    const targetScreen = document.getElementById('scr-' + name);
+    targetScreen.classList.add('active');
+
     if (name !== 'auth') {
       document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
       const activeTab = document.querySelector(`.tab-item[data-screen="${name}"]`);
       if (activeTab) activeTab.classList.add('active');
-      document.getElementById('scr-' + name).scrollTop = 0;
+      targetScreen.scrollTop = 0;
 
-      // Hide FAB on settings/budget/cards screens
+      // Hide FAB on settings/budget/cards/history screens
       const fab = document.querySelector('.fab');
       if (fab) {
         fab.style.display = ['settings', 'budget', 'cards', 'history'].includes(name) ? 'none' : 'flex';
       }
+
+      // Attach scroll-to-top listener on this screen
+      const scrollBtn = document.getElementById('scroll-top-btn');
+      if (scrollBtn) {
+        // Remove previous listener to avoid duplicates
+        targetScreen._scrollHandler && targetScreen.removeEventListener('scroll', targetScreen._scrollHandler);
+        targetScreen._scrollHandler = () => {
+          if (targetScreen.scrollTop > 120) {
+            scrollBtn.classList.add('visible');
+          } else {
+            scrollBtn.classList.remove('visible');
+          }
+        };
+        targetScreen.addEventListener('scroll', targetScreen._scrollHandler);
+        scrollBtn.classList.remove('visible');
+      }
     }
+  }
+
+  function scrollToTop() {
+    const active = document.querySelector('.screen.active');
+    if (active) active.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('scroll-top-btn').classList.remove('visible');
   }
 
   function openSheet() { 
@@ -1733,15 +1784,21 @@
   }
 
   function cardRowHTML(c) {
+    // Show last 4 digits of pan in **** XXXX format, or dots if no pan stored
+    const panDisplay = c.pan
+      ? '**** ' + String(c.pan).replace(/\s/g, '').slice(-4)
+      : '&#9679;&#9679;&#9679;&#9679;';
     return `
       <div class="card-row">
         ${cardIconHTML(c.kart_tipi)}
         <div class="card-info">
           <div class="card-name">${c.ad}</div>
-          <div class="card-meta">${c.kart_tipi} · ${c.pan || '····'}</div>
+          <div class="card-meta">
+            <span style="font-family:var(--font-mono);letter-spacing:0.04em;">${panDisplay}</span>
+          </div>
         </div>
         <div class="card-right">
-          ${c.kart_istifade_tarixi ? `<div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);">${c.kart_istifade_tarixi}</div>` : ''}
+          ${c.kart_istifade_tarixi ? `<div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);margin-bottom:4px;">${c.kart_istifade_tarixi}</div>` : ''}
           <button class="card-delete" onclick="handleDeleteCard(${c.card_id})" title="Sil">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>

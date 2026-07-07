@@ -1903,6 +1903,18 @@ async function initDatabase() {
   } catch (err) {
     console.error('Failed to initialize istifadeciler table column password:', err.message);
   }
+  try {
+    await executeQuery(`ALTER TABLE odenis_metodlari ADD COLUMN IF NOT EXISTS pan VARCHAR(19)`);
+    console.log('Database schema initialization: pan column ensured.');
+  } catch (err) {
+    console.error('Failed to initialize odenis_metodlari table column pan:', err.message);
+  }
+  try {
+    await executeQuery(`ALTER TABLE istifadeciler ADD COLUMN IF NOT EXISTS username VARCHAR(50)`);
+    console.log('Database schema initialization: username column ensured.');
+  } catch (err) {
+    console.error('Failed to initialize istifadeciler table column username:', err.message);
+  }
 }
 
 initDatabase().then(() => {
