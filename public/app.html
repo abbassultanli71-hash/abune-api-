@@ -1019,6 +1019,15 @@
         </div>
         <input type="hidden" id="manage-sub-id">
         <input type="hidden" id="manage-sub-orig-name">
+        <div id="manage-budget-exceeded-banner" style="display:none; margin:10px 0; background:rgba(226,104,90,0.13); border:1px solid var(--coral,#e2685a); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#e2685a); line-height:1.5;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+            <div>
+              <strong>⚠️ Büdcə limiti keçilir!</strong>
+              <div id="manage-budget-exceeded-msg" style="margin-top:4px; font-size:12px; opacity:0.9;"></div>
+            </div>
+            <button onclick="document.getElementById('manage-budget-exceeded-banner').style.display='none'" style="background:none;border:none;cursor:pointer;color:inherit;font-size:16px;padding:0;line-height:1;">✕</button>
+          </div>
+        </div>
         <div class="field"><label data-i18n="field_name">Ad</label><input type="text" id="manage-sub-name"></div>
         <div class="field-row">
           <div class="field">
@@ -1740,6 +1749,7 @@
     document.getElementById('manage-sub-status').value = sub.status;
     document.getElementById('manage-sub-card').value = sub.odenis_metodu_id || '';
 
+    document.getElementById('manage-budget-exceeded-banner').style.display = 'none';
     clearManagePriceError();
     document.getElementById('sub-manage-overlay').classList.add('open');
   }
@@ -1799,9 +1809,19 @@
 
     if (res.ok) {
       closeManageSheet();
+      document.getElementById('manage-budget-exceeded-banner').style.display = 'none';
       loadAllData();
     } else {
-      alert(res.data?.error?.message || 'Abunəlik yenilənmədi.');
+      const errCode = res.data?.error?.code;
+      const errMsg  = res.data?.error?.message || 'Abunəlik yenilənmədi.';
+      if (errCode === 'BUDGET_EXCEEDED') {
+        document.getElementById('manage-budget-exceeded-msg').textContent = errMsg;
+        const banner = document.getElementById('manage-budget-exceeded-banner');
+        banner.style.display = 'block';
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        alert(errMsg);
+      }
     }
   }
 

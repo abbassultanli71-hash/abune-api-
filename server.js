@@ -839,6 +839,43 @@ app.put('/api/abunelikler', async (req, res) => {
     if (subCheck.rows.length === 0)
       return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
 
+    // ─── Büdcə limiti yoxlaması (yalnız status "active" olacaqsa) ─────────
+    if (statusValue === 'active') {
+      const budgetRow = await executeQuery(
+        `SELECT b.limit_mebleq, b.valyuta FROM budceler b WHERE b.istifadeci_id = :userId`,
+        { userId }
+      );
+
+      if (budgetRow.rows.length > 0) {
+        const budgetLimit   = Number(budgetRow.rows[0].LIMIT_MEBLEQ);
+        const budgetValyuta = budgetRow.rows[0].VALYUTA || 'AZN';
+
+        const activeSubs = await executeQuery(
+          `SELECT qiymet FROM abunelikler
+            WHERE istifadeci_id = :userId AND status = 'active' AND id != :subId`,
+          { userId, subId: subCheck.rows[0].ID }
+        );
+
+        let currentTotal = 0;
+        for (const row of activeSubs.rows) {
+          currentTotal += Number(row.QIYMET);
+        }
+
+        const projectedTotal = currentTotal + parsedQiymet;
+
+        if (projectedTotal > budgetLimit) {
+          const remaining = Math.max(0, budgetLimit - currentTotal);
+          return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
+            `Büdcə limiti keçilir! ` +
+            `Digər aktiv abunəliklər: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
+            `yenilənən abunəlik: +${parsedQiymet.toFixed(2)} ${budgetValyuta}, ` +
+            `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
+            `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})`
+          );
+        }
+      }
+    }
+
     let finalOdenisMetoduId = null;
     if (odenis_metodu_id !== undefined && odenis_metodu_id !== null && odenis_metodu_id !== '') {
       finalOdenisMetoduId = Number(odenis_metodu_id);
