@@ -538,17 +538,12 @@
           <!-- LOGIN VIEW -->
           <div class="auth-form-card" id="auth-login-view">
             <div class="field">
-              <label data-i18n="auth_select_user">Mövcud istifadəçi seçin</label>
-              <select id="auth-username-select" onchange="onSelectUserChange()">
-                <option value="">-- Seçin --</option>
-              </select>
-            </div>
-            <div class="field" style="text-align: center; color: var(--ink-faint); font-size: 11px; margin: 4px 0;">
-              - və ya username daxil edin -
-            </div>
-            <div class="field">
               <label>Username</label>
               <input type="text" id="auth-username-input" placeholder="məs. abbas.abbasov">
+            </div>
+            <div class="field">
+              <label>Şifrə</label>
+              <input type="password" id="auth-password-input" placeholder="••••••••" autocomplete="current-password">
             </div>
             <div class="field-error" id="auth-login-error" style="margin-bottom: 8px;"></div>
             <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">Daxil Ol</button>
@@ -567,6 +562,10 @@
             <div class="field">
               <label>Email</label>
               <input type="email" id="reg-email" placeholder="məs. abbas@example.com">
+            </div>
+            <div class="field">
+              <label>Şifrə</label>
+              <input type="password" id="reg-password" placeholder="ən azı 6 simvol" autocomplete="new-password">
             </div>
             <div class="field-error" id="auth-register-error" style="margin-bottom: 8px;"></div>
             <button class="btn btn-primary" style="width: 100%;" onclick="handleRegister()">Qeydiyyatdan Keç</button>
@@ -1155,45 +1154,24 @@
     document.getElementById('auth-register-error').classList.remove('show');
   }
 
-  // Fetch users list for login select
-  async function loadUsersSelect() {
-    const select = document.getElementById('auth-username-select');
-    select.innerHTML = '<option value="">-- Seçin --</option>';
-    const res = await apiFetch('GET', '/api/istifadeciler');
-    if (res.ok && Array.isArray(res.data)) {
-      res.data.forEach(user => {
-        const opt = document.createElement('option');
-        opt.value = user.username;
-        opt.textContent = `${user.ad} (@${user.username})`;
-        select.appendChild(opt);
-      });
-    }
-  }
-
-  function onSelectUserChange() {
-    const val = document.getElementById('auth-username-select').value;
-    if (val) {
-      document.getElementById('auth-username-input').value = val;
-    }
-  }
-
   // Login handler
   async function handleLogin() {
     const usernameInput = document.getElementById('auth-username-input').value.trim();
+    const passwordInput = document.getElementById('auth-password-input').value;
     const errorEl = document.getElementById('auth-login-error');
-    if (!usernameInput) {
-      errorEl.textContent = 'İstifadəçi adı daxil edilməlidir.';
+    if (!usernameInput || !passwordInput) {
+      errorEl.textContent = 'İstifadəçi adı və şifrə daxil edilməlidir.';
       errorEl.classList.add('show');
       return;
     }
 
-    const res = await apiFetch('GET', `/api/istifadeciler/${usernameInput}`);
+    const res = await apiFetch('POST', '/api/istifadeciler/login', { username: usernameInput, password: passwordInput });
     if (res.ok && res.data && res.data.data && res.data.data.user) {
       currentUser = res.data.data.user;
       localStorage.setItem('abunelik_user', JSON.stringify(currentUser));
       showApp();
     } else {
-      errorEl.textContent = res.data?.error?.message || 'İstifadəçi tapılmadı.';
+      errorEl.textContent = res.data?.error?.message || 'Xəta baş verdi.';
       errorEl.classList.add('show');
     }
   }
@@ -1203,17 +1181,23 @@
     const username = document.getElementById('reg-username').value.trim();
     const ad = document.getElementById('reg-ad').value.trim();
     const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
     const errorEl = document.getElementById('auth-register-error');
 
-    if (!username || !ad || !email) {
+    if (!username || !ad || !email || !password) {
       errorEl.textContent = 'Bütün sahələr doldurulmalıdır.';
       errorEl.classList.add('show');
       return;
     }
+    if (password.length < 6) {
+      errorEl.textContent = 'Şifrə ən azı 6 simvol olmalıdır.';
+      errorEl.classList.add('show');
+      return;
+    }
 
-    const res = await apiFetch('POST', '/api/istifadeciler', { username, ad, email });
+    const res = await apiFetch('POST', '/api/istifadeciler', { username, ad, email, password });
     if (res.ok) {
-      const loginRes = await apiFetch('GET', `/api/istifadeciler/${username}`);
+      const loginRes = await apiFetch('POST', '/api/istifadeciler/login', { username, password });
       if (loginRes.ok && loginRes.data && loginRes.data.data && loginRes.data.data.user) {
         currentUser = loginRes.data.data.user;
         localStorage.setItem('abunelik_user', JSON.stringify(currentUser));
@@ -1231,7 +1215,6 @@
     localStorage.removeItem('abunelik_user');
     currentUser = null;
     hideApp();
-    loadUsersSelect();
   }
 
   function showApp() {
@@ -1259,7 +1242,7 @@
     document.getElementById('app-tabbar').style.display = 'none';
     document.querySelector('.fab').style.display = 'none';
     document.getElementById('auth-username-input').value = '';
-    document.getElementById('auth-username-select').value = '';
+    document.getElementById('auth-password-input').value = '';
   }
 
   // Load all user data from API
@@ -2236,11 +2219,9 @@
         showApp();
       } catch (e) {
         hideApp();
-        loadUsersSelect();
       }
     } else {
       hideApp();
-      loadUsersSelect();
     }
   });
 </script>

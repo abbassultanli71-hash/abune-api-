@@ -15,8 +15,10 @@ DROP TABLE IF EXISTS istifadeciler CASCADE;
 -- 1. ISTIFADECILER (Users) Table
 CREATE TABLE istifadeciler (
     id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE,
     ad VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(200),
     yaradilma_tarixi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
