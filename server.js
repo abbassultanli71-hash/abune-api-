@@ -742,7 +742,8 @@ app.post('/api/abunelikler', async (req, res) => {
     // ────────────────────────────────────────────────────────────────────────
 
     const sql = `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, odenis_metodu_id, status)
-                 VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, :baslama_tarixi::DATE, :novbeti_odenis_tarixi::DATE, :kateqoriya, :odenis_metodu_id, 'active')`;
+                 VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, :baslama_tarixi::DATE, :novbeti_odenis_tarixi::DATE, :kateqoriya, :odenis_metodu_id, 'active')
+                 RETURNING id`;
     const binds = {
       istifadeci_id: userId, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
       odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
@@ -750,9 +751,9 @@ app.post('/api/abunelikler', async (req, res) => {
     };
 
     const insertResult = await executeQuery(sql, binds, { autoCommit: true });
-    const newSubId = insertResult.rows.length > 0 ? (insertResult.rows[0].ID || insertResult.rows[0].id) : null;
+    const newSubId = insertResult.rows.length > 0 ? Number(insertResult.rows[0].ID) : null;
 
-    // Avtomatik bildiriş əlavə et
+    // Avtomatik bildiriş əlavə et (bildiriş həmişə yaradılır — newSubId null olsa belə)
     await addAutoNotification(userId, newSubId, ad, novbetiOdenisTarixi);
 
     // Avtomatik ödəniş tarixçəsi əlavə et
