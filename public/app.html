@@ -366,14 +366,24 @@
   .settings-group { margin: 0 20px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
   .settings-row {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    padding: 15px 16px; border-bottom: 1px solid var(--border); gap: 12px;
   }
   .settings-row:last-child { border-bottom: none; }
-  .settings-row-label { font-size: 13px; font-weight: 500; }
+  .settings-row-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .settings-icon {
+    width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .settings-icon svg { width: 16px; height: 16px; }
+  .settings-icon.gold { background: var(--gold-soft); color: var(--gold); }
+  .settings-icon.teal { background: var(--teal-soft); color: var(--teal); }
+  .settings-icon.coral { background: var(--coral-soft); color: var(--coral); }
+  .settings-icon.neutral { background: var(--surface-2); color: var(--ink-muted); }
+  .settings-row-label { font-size: 13.5px; font-weight: 500; }
   .settings-row-sub { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
-  .settings-value { font-size: 12.5px; color: var(--ink-muted); font-family: var(--font-mono); display: flex; align-items: center; gap: 5px; }
+  .settings-value { font-size: 12.5px; color: var(--ink-muted); font-family: var(--font-mono); display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
   .settings-value svg { width: 14px; height: 14px; color: var(--ink-faint); }
-  .select-wrap { position: relative; }
+  .select-wrap { position: relative; flex-shrink: 0; }
   .select-wrap select {
     appearance: none; -webkit-appearance: none; -moz-appearance: none;
     background: none; border: none; color: var(--ink-muted);
@@ -802,9 +812,15 @@
             <div class="profile-sub" id="profile-username">@username</div>
           </div>
         </div>
+        <!-- Settings Group 1: Account/Preferences -->
         <div class="settings-group">
           <div class="settings-row">
-            <div class="settings-row-label" data-i18n="settings_currency">Əsas valyuta</div>
+            <div class="settings-row-left">
+              <div class="settings-icon gold">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div class="settings-row-label" data-i18n="settings_currency">Əsas valyuta</div>
+            </div>
             <div class="select-wrap">
               <select id="setting-currency" onchange="onSettingChange('esas_valyuta', this.value)">
                 <option value="AZN">AZN</option>
@@ -814,7 +830,12 @@
             </div>
           </div>
           <div class="settings-row">
-            <div class="settings-row-label" data-i18n="settings_notif">Bildiriş metodu</div>
+            <div class="settings-row-left">
+              <div class="settings-icon teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+              <div class="settings-row-label" data-i18n="settings_notif">Bildiriş metodu</div>
+            </div>
             <div class="select-wrap">
               <select id="setting-notif" onchange="onSettingChange('bildiris_metodu', this.value)">
                 <option value="email">Email</option>
@@ -823,7 +844,12 @@
             </div>
           </div>
           <div class="settings-row">
-            <div class="settings-row-label" data-i18n="settings_lang">Dil</div>
+            <div class="settings-row-left">
+              <div class="settings-icon neutral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+              </div>
+              <div class="settings-row-label" data-i18n="settings_lang">Dil</div>
+            </div>
             <div class="select-wrap">
               <select id="setting-lang" onchange="onSettingChange('dil', this.value)">
                 <option value="az">Azərbaycan</option>
@@ -833,27 +859,34 @@
               </select>
             </div>
           </div>
-          <div class="settings-row" style="cursor:pointer;" onclick="switchScreen('budget')">
-            <div class="settings-row-label" data-i18n="tab_budget">Büdcə</div>
-            <div class="settings-value" style="display:flex; align-items:center; gap:5px; color:var(--ink-muted);">
-              <span data-i18n="budget_title" style="font-family:var(--font-body); font-size:12.5px;">Aylıq limit</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px; height:14px; color:var(--ink-faint);"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
-          </div>
         </div>
+
+        <!-- Settings Group 2: Appearance -->
         <div class="settings-group">
-          <div class="settings-row" style="flex-direction:column; align-items:stretch; gap:8px;">
-            <div class="settings-row-label" data-i18n="settings_theme">Görünüş</div>
+          <div class="settings-row" style="flex-direction:column; align-items:stretch; gap:10px;">
+            <div class="settings-row-left">
+              <div class="settings-icon neutral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              </div>
+              <div class="settings-row-label" data-i18n="settings_theme">Görünüş</div>
+            </div>
             <div class="theme-row" style="padding:0;">
               <div class="theme-opt" id="theme-dark-opt" onclick="setTheme('dark')" data-i18n="theme_dark">Tünd</div>
               <div class="theme-opt" id="theme-light-opt" onclick="setTheme('light')" data-i18n="theme_light">Açıq</div>
             </div>
           </div>
         </div>
+
+        <!-- Settings Group 3: Logout -->
         <div class="settings-group" style="cursor:pointer;" onclick="handleLogout()">
-          <div class="settings-row" style="padding:18px 20px; align-items:center;">
-            <div class="settings-row-label" style="color:var(--coral); font-size:15px; font-weight:600;" data-i18n="settings_logout">Çıxış et</div>
-            <div class="settings-value" style="color:var(--coral);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px; height:18px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+          <div class="settings-row">
+            <div class="settings-row-left">
+              <div class="settings-icon coral">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              </div>
+              <div class="settings-row-label" style="color:var(--coral); font-size:14px; font-weight:600;" data-i18n="settings_logout">Çıxış et</div>
+            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px; height:14px; color:var(--coral); opacity:0.6;"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
         </div>
         <div class="hint" data-i18n="hint">Abunəm v1.1 · Bütün məlumatlar username üzərindən sinxronlaşdırılır</div>
