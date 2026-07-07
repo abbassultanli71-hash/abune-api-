@@ -8,6 +8,9 @@ const CRON_SCHEDULE = '0 * * * *';
  * Ödəniş tezliyinə görə fərqli xəbərdarlıq həddi tətbiq edir:
  * weekly -> 2 gün, monthly -> 7 gün, quarterly -> 14 gün, yearly -> 30 gün.
  * Yəni "1 gün qalıb" bütün abunəliklərə eyni tətbiq olunmur.
+ *
+ * Oracle SYSDATE / TRUNC → PostgreSQL CURRENT_DATE ilə əvəzləndi.
+ * Oracle || string concat → PostgreSQL || (eynidir, amma LIKE ilə çalışır)
  */
 async function findDueSubscriptions() {
   const sql = `
@@ -16,7 +19,7 @@ async function findDueSubscriptions() {
     FROM abunelikler a
     WHERE a.status = 'active'
       AND a.novbeti_odenis_tarixi <= (
-        TRUNC(SYSDATE) +
+        CURRENT_DATE +
         CASE a.odenis_tezliyi
           WHEN 'weekly'    THEN 2
           WHEN 'monthly'   THEN 7
@@ -28,8 +31,8 @@ async function findDueSubscriptions() {
       AND NOT EXISTS (
         SELECT 1 FROM bildirisler b
         WHERE b.istifadeci_id = a.istifadeci_id
-          AND b.basliq LIKE a.ad || '%'
-          AND TRUNC(b.gonderilme_tarixi) = TRUNC(SYSDATE)
+          AND b.abunelik_id = a.id
+          AND b.gonderilme_tarixi = CURRENT_DATE
       )
   `;
   const result = await executeQuery(sql);
@@ -57,7 +60,8 @@ async function runDueSubscriptionCheck() {
 
   for (const sub of dueSubs) {
     const istifadeciId = sub.ISTIFADECI_ID;
-    const appAdi = sub.AD;
+    const abunelikId   = sub.ABUNELIK_ID;
+    const appAdi       = sub.AD;
     const novbetiTarix = sub.NOVBETI_ODENIS_TARIXI;
 
     try {
@@ -65,11 +69,12 @@ async function runDueSubscriptionCheck() {
       const novbetiDate = new Date(Date.UTC(ny, nm - 1, nd));
       const qalanGun = Math.ceil((novbetiDate - bugun) / (1000 * 60 * 60 * 24));
 
-      await createDueDateNotification(istifadeciId, appAdi, novbetiTarix, qalanGun);
+      // abunelik_id də ötürülür ki, bildiriş abunəliyə bağlı olsun
+      await createDueDateNotification(istifadeciId, appAdi, novbetiTarix, qalanGun, abunelikId);
       created++;
     } catch (err) {
       failed++;
-      console.error(`[subscription-notifier] Xəta (abunelik_id=${sub.ABUNELIK_ID}, appAdi=${appAdi}):`, err.message);
+      console.error(`[subscription-notifier] Xəta (abunelik_id=${abunelikId}, appAdi=${appAdi}):`, err.message);
     }
   }
 

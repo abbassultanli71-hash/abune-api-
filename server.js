@@ -245,7 +245,7 @@ async function addAutoNotification(userId, abunelikId, appAd, novbetiOdenisTarix
 
     const { basliq, mesaj } = generateDueMessage(appAd, novbetiOdenisTarixi, qalanGun);
 
-      await executeQuery(
+    await executeQuery(
       `INSERT INTO bildirisler (istifadeci_id, abunelik_id, basliq, mesaj) VALUES (:istifadeci_id, :abunelik_id, :basliq, :mesaj)`,
       { istifadeci_id: userId, abunelik_id: abunelikId, basliq, mesaj },
       { autoCommit: true }
@@ -374,7 +374,7 @@ app.post('/api/istifadeciler', async (req, res) => {
     );
     return successResponse(res, 201, 'Created', { message: 'İstifadəçi və onun ilkin ayarları uğurla yaradıldı.' });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Məlumatların unikallığı pozuldu (eyni username və ya email artıq mövcuddur).');
+    if (err.code === '23505') return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Məlumatların unikallığı pozuldu (eyni username və ya email artıq mövcuddur).');
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
@@ -454,8 +454,8 @@ app.put('/api/istifadeciler/:username', async (req, res) => {
     );
     return successResponse(res, 200, 'Updated', { user: updated.rows[0] });
   } catch (err) {
-    if (err.message && err.message.includes('ORA-00001')) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Bu email və ya username artıq mövcuddur.');
-    if (err.message && err.message.includes('ORA-02292')) return errorResponse(res, 400, 'Bad Request', 'FK_CONSTRAINT', 'İstifadəçinin abunəliyi və ya bildirişi olduğu üçün username dəyişdirilə bilməz.');
+    if (err.code === '23505') return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Bu email və ya username artıq mövcuddur.');
+    if (err.code === '23503') return errorResponse(res, 400, 'Bad Request', 'FK_CONSTRAINT', 'İstifadəçinin abunəliyi və ya bildirişi olduğu üçün bu əməliyyat mümkün deyil.');
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
@@ -637,49 +637,38 @@ app.post('/api/abunelikler', async (req, res) => {
     );
 
     if (budgetRow.rows.length > 0) {
-      const budgetLimit  = Number(budgetRow.rows[0].LIMIT_MEBLEQ);
+      const budgetLimit   = Number(budgetRow.rows[0].LIMIT_MEBLEQ);
       const budgetValyuta = budgetRow.rows[0].VALYUTA || 'AZN';
 
-      // Mövcud aktiv abunəliklərin aylıq xərclərini hesabla
+      // Mövcud aktiv abunəliklərin qiymətlərini sadəcə topla (tezlik çevrilməsi yoxdur)
       const activeSubs = await executeQuery(
-        `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler
+        `SELECT qiymet FROM abunelikler
           WHERE istifadeci_id = :userId AND status = 'active'`,
         { userId }
       );
 
-      // Tezliyə görə aylıq ekvivalent çevirici
-      const toMonthly = (qiymet, tezlik) => {
-        switch (tezlik) {
-          case 'weekly':      return qiymet * 4.333;
-          case 'monthly':     return qiymet;
-          case 'quarterly':   return qiymet / 3;
-          case 'yearly':      return qiymet / 12;
-          default:            return qiymet;
-        }
-      };
-
-      let currentMonthly = 0;
+      let currentTotal = 0;
       for (const row of activeSubs.rows) {
-        // Sadə yanaşma: hər valyutanı budcə valyutasıyla eyni hesab edirik
-        currentMonthly += toMonthly(Number(row.QIYMET), row.ODENIS_TEZLIYI);
+        currentTotal += Number(row.QIYMET);
       }
 
-      // Yeni abunəliyin aylıq ekvivalenti
-      const newMonthly = toMonthly(parsedQiymet, odenisTezliyi);
-      const projectedTotal = currentMonthly + newMonthly;
+      const projectedTotal = currentTotal + parsedQiymet;
 
       if (projectedTotal > budgetLimit) {
+        const remaining = Math.max(0, budgetLimit - currentTotal);
         return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
-          `Büdcə limiti keçilir! Mövcud aylıq xərc: ${currentMonthly.toFixed(2)} ${budgetValyuta}, ` +
-          `yeni abunəlik: +${newMonthly.toFixed(2)} ${budgetValyuta}, ` +
-          `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}.`
+          `Büdcə limiti keçilir! ` +
+          `Mövcud xərc: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
+          `yeni abunəlik: +${parsedQiymet.toFixed(2)} ${budgetValyuta}, ` +
+          `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
+          `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})`
         );
       }
     }
     // ────────────────────────────────────────────────────────────────────────
 
     const sql = `INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, odenis_metodu_id, status)
-                 VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'), :kateqoriya, :odenis_metodu_id, 'active')`;
+                 VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, :baslama_tarixi::DATE, :novbeti_odenis_tarixi::DATE, :kateqoriya, :odenis_metodu_id, 'active')`;
     const binds = {
       istifadeci_id: userId, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
       odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
@@ -802,7 +791,7 @@ app.put('/api/abunelikler', async (req, res) => {
     const finalAd = ad || queryAd;
     await executeQuery(
       `UPDATE abunelikler SET ad=:ad, qiymet=:qiymet, valyuta=:valyuta, odenis_tezliyi=:odenis_tezliyi,
-       baslama_tarixi=TO_DATE(:baslama_tarixi, 'YYYY-MM-DD'), novbeti_odenis_tarixi=TO_DATE(:novbeti_odenis_tarixi, 'YYYY-MM-DD'),
+       baslama_tarixi=:baslama_tarixi::DATE, novbeti_odenis_tarixi=:novbeti_odenis_tarixi::DATE,
        kateqoriya=:kateqoriya, status=:status, odenis_metodu_id=:odenis_metodu_id
        WHERE istifadeci_id=:istifadeci_id AND ad=:queryAd`,
       {
@@ -1817,11 +1806,26 @@ app.put('/api/ayarlar/:username', async (req, res) => {
   }
 });
 async function initDatabase() {
-  try {
-    await executeQuery(`ALTER TABLE istifadeci_ayarlari ADD COLUMN IF NOT EXISTS tema_rengi VARCHAR(30) DEFAULT 'gold'`);
-    console.log('Database schema initialization: tema_rengi column ensured.');
-  } catch (err) {
-    console.error('Failed to initialize settings table column tema_rengi:', err.message);
+  const migrations = [
+    // istifadeci_ayarlari: tema_rengi sütunu
+    `ALTER TABLE istifadeci_ayarlari ADD COLUMN IF NOT EXISTS tema_rengi VARCHAR(30) DEFAULT 'gold'`,
+    // istifadeciler: username sütunu (əsas endpoint bu üzərindən işləyir)
+    `ALTER TABLE istifadeciler ADD COLUMN IF NOT EXISTS username VARCHAR(50)`,
+    // bildirisler: abunelik_id FK sütunu
+    `ALTER TABLE bildirisler ADD COLUMN IF NOT EXISTS abunelik_id INTEGER REFERENCES abunelikler(id) ON DELETE SET NULL`,
+    // odenis_metodlari: pan sütunu (tam kart nömrəsi)
+    `ALTER TABLE odenis_metodlari ADD COLUMN IF NOT EXISTS pan VARCHAR(19)`,
+    // budceler: hesab_mebleqi sütunu
+    `ALTER TABLE budceler ADD COLUMN IF NOT EXISTS hesab_mebleqi NUMERIC(10,2) DEFAULT 0.00`,
+  ];
+
+  for (const sql of migrations) {
+    try {
+      await executeQuery(sql);
+      console.log('Migration OK:', sql.slice(0, 60) + '...');
+    } catch (err) {
+      console.error('Migration failed:', err.message, '| SQL:', sql.slice(0, 80));
+    }
   }
 }
 

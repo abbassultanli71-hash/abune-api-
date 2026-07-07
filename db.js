@@ -25,7 +25,8 @@ function convertNamedToPositional(sql, binds) {
   }
   let index = 1;
   const pgBinds = [];
-  const pgSql = sql.replace(/:([a-zA-Z0-9_]+)/g, (match, name) => {
+  // Negative lookbehind (?<!:) ensures ::DATE style PostgreSQL casts are NOT matched as bind params
+  const pgSql = sql.replace(/(?<!:):([a-zA-Z0-9_]+)/g, (match, name) => {
     if (binds[name] !== undefined) {
       pgBinds.push(binds[name]);
       return `$${index++}`;
@@ -51,7 +52,7 @@ async function executeQuery(sql, binds = {}, options = {}) {
     }
     return { rows: uppercaseRows, rowsAffected: result.rowCount };
   } catch (err) {
-    console.error('Database Query Error:', err);
+    console.error('Database Query Error [code=%s]:', err.code, err.message);
     throw err;
   }
 }

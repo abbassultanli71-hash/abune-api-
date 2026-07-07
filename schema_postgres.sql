@@ -1,6 +1,6 @@
 -- PostgreSQL Database Schema for Subscription Management Platform
 
--- Drop tables if they exist
+-- Drop tables if they exist (dependency order: children first)
 DROP TABLE IF EXISTS istifadeci_ayarlari CASCADE;
 DROP TABLE IF EXISTS budceler CASCADE;
 DROP TABLE IF EXISTS abunelik_ortaqlar CASCADE;
@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS istifadeciler CASCADE;
 -- 1. ISTIFADECILER (Users) Table
 CREATE TABLE istifadeciler (
     id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
     ad VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     yaradilma_tarixi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -45,7 +46,7 @@ CREATE TABLE odenis_metodlari (
     istifadeci_id INTEGER NOT NULL REFERENCES istifadeciler(id) ON DELETE CASCADE,
     ad VARCHAR(100) NOT NULL,
     kart_tipi VARCHAR(50) NOT NULL,
-    son_dord_reqem VARCHAR(4),
+    pan VARCHAR(19),
     kart_istifade_tarixi VARCHAR(10),
     status VARCHAR(20) DEFAULT 'active'
 );
@@ -70,6 +71,7 @@ CREATE TABLE abunelikler (
 CREATE TABLE bildirisler (
     id SERIAL PRIMARY KEY,
     istifadeci_id INTEGER NOT NULL REFERENCES istifadeciler(id) ON DELETE CASCADE,
+    abunelik_id INTEGER REFERENCES abunelikler(id) ON DELETE SET NULL,
     basliq VARCHAR(200) NOT NULL,
     mesaj VARCHAR(1000) NOT NULL,
     gonderilme_tarixi DATE DEFAULT CURRENT_DATE,
@@ -102,7 +104,7 @@ CREATE TABLE budceler (
     istifadeci_id INTEGER NOT NULL REFERENCES istifadeciler(id) ON DELETE CASCADE,
     limit_mebleq NUMERIC(10, 2) NOT NULL,
     valyuta VARCHAR(10) DEFAULT 'AZN',
-    bildiris_faizi NUMERIC(5, 2) DEFAULT 90.00
+    hesab_mebleqi NUMERIC(10, 2) DEFAULT 0.00
 );
 
 -- 10. ISTIFADECI_AYARLARI Table
@@ -117,8 +119,8 @@ CREATE TABLE istifadeci_ayarlari (
 );
 
 -- Test Seed Data
-INSERT INTO istifadeciler (ad, email) VALUES ('Abbas Abbasov', 'abbas@example.com');
-INSERT INTO istifadeciler (ad, email) VALUES ('Elnur Mammadov', 'elnur@example.com');
+INSERT INTO istifadeciler (username, ad, email) VALUES ('abbas.abbasov', 'Abbas Abbasov', 'abbas@example.com');
+INSERT INTO istifadeciler (username, ad, email) VALUES ('elnur.mammadov', 'Elnur Mammadov', 'elnur@example.com');
 
 INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status)
 VALUES (1, 'Netflix', 12.99, 'USD', 'monthly', '2026-01-01', '2026-07-01', 'Entertainment', 'active');
@@ -126,8 +128,8 @@ VALUES (1, 'Netflix', 12.99, 'USD', 'monthly', '2026-01-01', '2026-07-01', 'Ente
 INSERT INTO abunelikler (istifadeci_id, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, novbeti_odenis_tarixi, kateqoriya, status)
 VALUES (2, 'Spotify', 4.99, 'USD', 'monthly', '2026-02-15', '2026-08-15', 'Music', 'active');
 
-INSERT INTO bildirisler (istifadeci_id, basliq, mesaj)
-VALUES (1, 'Yaxınlaşan Ödəniş', 'Netflix abunəliyiniz növbəti ay üçün yenilənəcək.');
+INSERT INTO bildirisler (istifadeci_id, abunelik_id, basliq, mesaj)
+VALUES (1, 1, 'Yaxınlaşan Ödəniş', 'Netflix abunəliyiniz növbəti ay üçün yenilənəcək.');
 
 INSERT INTO odenis_tarixcesi (abunelik_id, istifadeci_id, odenis_tarixi, mebleq, status)
 VALUES (1, 1, '2026-01-01', 12.99, 'success');

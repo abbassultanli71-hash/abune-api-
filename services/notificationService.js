@@ -24,12 +24,13 @@ function generateDueMessage(appAdi, novbetiTarix, qalanGun) {
   return { basliq, mesaj };
 }
 
-async function createDueDateNotification(istifadeciId, appAdi, novbetiTarix, qalanGun) {
+// abunelik_id parametri əlavə edildi — bildiriş abunəliyə bağlı olsun
+async function createDueDateNotification(istifadeciId, appAdi, novbetiTarix, qalanGun, abunelikId = null) {
   const { basliq, mesaj } = generateDueMessage(appAdi, novbetiTarix, qalanGun);
 
   await executeQuery(
-    `INSERT INTO bildirisler (istifadeci_id, basliq, mesaj) VALUES (:istifadeci_id, :basliq, :mesaj)`,
-    { istifadeci_id: istifadeciId, basliq, mesaj },
+    `INSERT INTO bildirisler (istifadeci_id, abunelik_id, basliq, mesaj) VALUES (:istifadeci_id, :abunelik_id, :basliq, :mesaj)`,
+    { istifadeci_id: istifadeciId, abunelik_id: abunelikId, basliq, mesaj },
     { autoCommit: true }
   );
 
