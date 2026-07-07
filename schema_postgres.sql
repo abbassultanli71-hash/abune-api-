@@ -18,6 +18,7 @@ CREATE TABLE istifadeciler (
     username VARCHAR(50) UNIQUE NOT NULL,
     ad VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(200),
     yaradilma_tarixi TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -4,6 +4,7 @@ const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const { executeQuery } = require('./db');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const { startDueSubscriptionNotifierJob } = require('./jobs/dueSubscriptionNotifier');
 const { generateDueMessage } = require('./services/notificationService');
@@ -324,6 +325,7 @@ app.get('/api/istifadeciler/:username', async (req, res) => {
  *               - username
  *               - ad
  *               - email
+ *               - password
  *             properties:
  *               username:
  *                 type: string
@@ -334,24 +336,29 @@ app.get('/api/istifadeciler/:username', async (req, res) => {
  *               email:
  *                 type: string
  *                 example: abbas@example.com
+ *               password:
+ *                 type: string
+ *                 example: SifremGizli123
  *     responses:
  *       201:
  *         description: İstifadəçi yaradıldı
  */
 app.post('/api/istifadeciler', async (req, res) => {
-  const { username, ad, email } = req.body;
+  const { username, ad, email, password } = req.body;
 
-  if (!username || !ad || !email) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və email sahələri məcburidir.');
+  if (!username || !ad || !email || !password) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad, email və password sahələri məcburidir.');
 
   const trimmedUsername = String(username).trim();
   const trimmedAd = String(ad).trim();
   const trimmedEmail = String(email).trim();
+  const trimmedPassword = String(password);
 
-  if (trimmedUsername.length === 0 || trimmedAd.length === 0 || trimmedEmail.length === 0) return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'username, ad və email sahələri boş qoyula bilməz.');
+  if (trimmedUsername.length === 0 || trimmedAd.length === 0 || trimmedEmail.length === 0 || trimmedPassword.length === 0) return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'username, ad, email və password sahələri boş qoyula bilməz.');
   if (!isValidUsername(trimmedUsername)) return errorResponse(res, 400, 'Bad Request', 'INVALID_USERNAME', 'Username yalnız hərf, rəqəm, "_" və "." ola bilər və 3-50 simvol aralığında olmalıdır.');
   if (trimmedAd.length < 3 || trimmedAd.length > 100) return errorResponse(res, 400, 'Bad Request', 'INVALID_NAME_LENGTH', 'Ad ən azı 3 və ən çoxu 100 simvoldan ibarət olmalıdır.');
   if (!isValidEmail(trimmedEmail)) return errorResponse(res, 400, 'Bad Request', 'INVALID_EMAIL', 'Email ünvanının formatı yanlışdır (nümunə: ad@example.com).');
   if (trimmedEmail.length > 100) return errorResponse(res, 400, 'Bad Request', 'EMAIL_TOO_LONG', 'Email ən çoxu 100 simvoldan ibarət olmalıdır.');
+  if (trimmedPassword.length < 6 || trimmedPassword.length > 72) return errorResponse(res, 400, 'Bad Request', 'INVALID_PASSWORD_LENGTH', 'Şifrə ən azı 6 və ən çoxu 72 simvoldan ibarət olmalıdır.');
 
   try {
     const usernameCheck = await executeQuery(`SELECT username FROM istifadeciler WHERE username = :username`, { username: trimmedUsername });
@@ -360,9 +367,11 @@ app.post('/api/istifadeciler', async (req, res) => {
     const emailCheck = await executeQuery(`SELECT email FROM istifadeciler WHERE email = :email`, { email: trimmedEmail });
     if (emailCheck.rows.length > 0) return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_EMAIL', 'Bu email ünvanı ilə artıq istifadəçi mövcuddur.');
 
+    const passwordHash = await bcrypt.hash(trimmedPassword, 10);
+
     await executeQuery(
-      `INSERT INTO istifadeciler (username, ad, email) VALUES (:username, :ad, :email)`,
-      { username: trimmedUsername, ad: trimmedAd, email: trimmedEmail },
+      `INSERT INTO istifadeciler (username, ad, email, password) VALUES (:username, :ad, :email, :password)`,
+      { username: trimmedUsername, ad: trimmedAd, email: trimmedEmail, password: passwordHash },
       { autoCommit: true }
     );
 
@@ -375,6 +384,71 @@ app.post('/api/istifadeciler', async (req, res) => {
     return successResponse(res, 201, 'Created', { message: 'İstifadəçi və onun ilkin ayarları uğurla yaradıldı.' });
   } catch (err) {
     if (err.code === '23505') return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Məlumatların unikallığı pozuldu (eyni username və ya email artıq mövcuddur).');
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
+ * /api/istifadeciler/login:
+ *   post:
+ *     summary: Username və şifrə ilə giriş edir
+ *     tags: [İstifadəçilər]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
+ *               password:
+ *                 type: string
+ *                 example: SifremGizli123
+ *     responses:
+ *       200:
+ *         description: Giriş uğurludur
+ *       404:
+ *         description: İstifadəçi tapılmadı
+ *       401:
+ *         description: Şifrə səhvdir
+ */
+app.post('/api/istifadeciler/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username və password sahələri məcburidir.');
+
+  const trimmedUsername = String(username).trim();
+  const trimmedPassword = String(password);
+
+  try {
+    const sql = `SELECT id, username, ad, email, password, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler WHERE username = :username`;
+    const result = await executeQuery(sql, { username: trimmedUsername });
+
+    if (result.rows.length === 0) {
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    }
+
+    const userRow = result.rows[0];
+    const storedHash = userRow.PASSWORD;
+
+    if (!storedHash) {
+      return errorResponse(res, 401, 'Unauthorized', 'WRONG_PASSWORD', 'Şifrə səhvdir.');
+    }
+
+    const isMatch = await bcrypt.compare(trimmedPassword, storedHash);
+    if (!isMatch) {
+      return errorResponse(res, 401, 'Unauthorized', 'WRONG_PASSWORD', 'Şifrə səhvdir.');
+    }
+
+    const { PASSWORD, ...userWithoutPassword } = userRow;
+    return successResponse(res, 200, 'Success', { user: userWithoutPassword });
+  } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
@@ -675,18 +749,9 @@ app.post('/api/abunelikler', async (req, res) => {
       kateqoriya: kateqoriya || null, odenis_metodu_id: finalOdenisMetoduId
     };
 
-    await executeQuery(sql, binds, { autoCommit: true });
+    const insertResult = await executeQuery(sql, binds, { autoCommit: true });
+    const newSubId = insertResult.rows.length > 0 ? (insertResult.rows[0].ID || insertResult.rows[0].id) : null;
 
-    // Yeni yaranan abunəliyin ID-sini tap
-    const newSub = await executeQuery(
-      `SELECT id FROM abunelikler
-       WHERE istifadeci_id = :istifadeci_id AND ad = :ad
-       ORDER BY id DESC LIMIT 1`,
-      { istifadeci_id: userId, ad }
-    );
-    const newSubId = newSub.rows.length > 0 ? newSub.rows[0].ID : null;
-
-    // Avtomatik bildiriş əlavə et
     // Avtomatik bildiriş əlavə et
     await addAutoNotification(userId, newSubId, ad, novbetiOdenisTarixi);
 
@@ -1826,6 +1891,24 @@ async function initDatabase() {
     } catch (err) {
       console.error('Migration failed:', err.message, '| SQL:', sql.slice(0, 80));
     }
+  }
+  try {
+    await executeQuery(`ALTER TABLE istifadeciler ADD COLUMN IF NOT EXISTS password VARCHAR(200)`);
+    console.log('Database schema initialization: password column ensured.');
+  } catch (err) {
+    console.error('Failed to initialize istifadeciler table column password:', err.message);
+  }
+  try {
+    await executeQuery(`ALTER TABLE odenis_metodlari ADD COLUMN IF NOT EXISTS pan VARCHAR(19)`);
+    console.log('Database schema initialization: pan column ensured.');
+  } catch (err) {
+    console.error('Failed to initialize odenis_metodlari table column pan:', err.message);
+  }
+  try {
+    await executeQuery(`ALTER TABLE istifadeciler ADD COLUMN IF NOT EXISTS username VARCHAR(50)`);
+    console.log('Database schema initialization: username column ensured.');
+  } catch (err) {
+    console.error('Failed to initialize istifadeciler table column username:', err.message);
   }
 }
 

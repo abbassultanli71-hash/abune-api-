@@ -1,7 +1,7 @@
 {
-  "name": "oracle-swagger-api",
+  "name": "abune-api",
   "version": "1.0.0",
-  "description": "Subscription Management Platform API with Oracle and Swagger",
+  "description": "Abunəlik İdarəetmə Platforması API (PostgreSQL + Swagger)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,6 +9,7 @@
     "tunnel": "ssh -o StrictHostKeyChecking=no -R abune-api:80:localhost:3000 serveo.net"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
