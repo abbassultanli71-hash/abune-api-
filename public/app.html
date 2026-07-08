@@ -615,6 +615,15 @@
   }
   .field-error.show { display: block; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-row-inline { display: flex; gap: 8px; align-items: stretch; }
+  .field-row-inline select { flex: 1; min-width: 0; }
+  .add-card-inline-btn {
+    flex-shrink: 0; width: 42px; display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 10px; cursor: pointer; font-size: 21px; font-weight: 600; line-height: 1;
+    transition: transform 0.12s ease;
+  }
+  .add-card-inline-btn:active { transform: scale(0.92); }
   .sheet-actions { display: flex; gap: 10px; margin-top: 8px; }
   .btn {
     flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -1203,9 +1212,12 @@
         </div>
         <div class="field">
           <label data-i18n="field_card">Ödəniş kartı</label>
-          <select id="new-sub-card">
-            <option value="">-- Kart seçilməyib --</option>
-          </select>
+          <div class="field-row-inline">
+            <select id="new-sub-card">
+              <option value="">-- Kart seçilməyib --</option>
+            </select>
+            <button type="button" class="add-card-inline-btn" onclick="openCardSheet('new-sub-card')" title="Yeni kart əlavə et">+</button>
+          </div>
         </div>
         <div id="budget-exceeded-banner" style="display:none; margin:0 0 10px; background:rgba(255,91,69,0.16); border:1px solid var(--coral,#ff5b45); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#ff5b45); line-height:1.5;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
@@ -1308,9 +1320,12 @@
         </div>
         <div class="field">
           <label data-i18n="field_card">Ödəniş kartı</label>
-          <select id="manage-sub-card">
-            <option value="">-- Kart seçilməyib --</option>
-          </select>
+          <div class="field-row-inline">
+            <select id="manage-sub-card">
+              <option value="">-- Kart seçilməyib --</option>
+            </select>
+            <button type="button" class="add-card-inline-btn" onclick="openCardSheet('manage-sub-card')" title="Yeni kart əlavə et">+</button>
+          </div>
         </div>
         <div class="sheet-actions" style="flex-direction:column; gap:8px;">
           <div style="display:flex; gap:10px; width:100%;">
@@ -2235,7 +2250,9 @@
     }
   }
 
-  function openCardSheet() {
+  let cardSheetReturnTarget = null;
+  function openCardSheet(returnTargetSelectId) {
+    cardSheetReturnTarget = returnTargetSelectId || null;
     document.getElementById('card-name').value = '';
     document.getElementById('card-name').classList.remove('invalid');
     document.getElementById('card-pan').value = '';
@@ -2378,8 +2395,17 @@ async function handleAddCard() {
     
     if (res.ok) {
       console.log('✅ Kart uğurla əlavə edildi!');
+      const newCardId = res.data?.data?.card_id ?? res.data?.card_id ?? null;
       closeCardSheet();
       await loadCards();
+      if (cardSheetReturnTarget && newCardId) {
+        const targetSel = document.getElementById(cardSheetReturnTarget);
+        if (targetSel) {
+          targetSel.value = String(newCardId);
+          targetSel.classList.remove('invalid');
+        }
+      }
+      cardSheetReturnTarget = null;
     } else {
       const errorMsg = res.data?.error?.message || res.data?.message || 'Kart əlavə edilə bilmədi.';
       console.log('❌ Server xətası:', errorMsg);
