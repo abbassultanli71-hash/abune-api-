@@ -579,7 +579,7 @@
 
   /* ---- Modal (bottom sheet) ---- */
   .sheet-overlay {
-    position: absolute; inset: 0; background: rgba(6,6,8,0.55);
+    position: fixed; inset: 0; background: rgba(6,6,8,0.55);
     display: none; align-items: flex-end; z-index: 40;
   }
   .sheet-overlay.open { display: flex; }
@@ -1905,9 +1905,16 @@
     document.getElementById('new-sub-start').value = `${yyyy}-${mm}-${dd}`;
     document.getElementById('new-sub-email').value = '';
     document.getElementById('new-sub-password').value = '';
-    document.getElementById('sheet-overlay').classList.add('open'); 
+    const overlay = document.getElementById('sheet-overlay');
+    overlay.classList.add('open'); 
+    const sheet = overlay.querySelector('.sheet');
+    if (sheet) sheet.scrollTop = 0;
   }
-  function closeSheet() { document.getElementById('sheet-overlay').classList.remove('open'); }
+  function closeSheet() {
+    document.getElementById('sheet-overlay').classList.remove('open');
+    if (document.activeElement) document.activeElement.blur();
+    setTimeout(() => { window.scrollTo(0, window.scrollY); }, 80);
+  }
   document.getElementById('sheet-overlay').addEventListener('click', e => {
     if (e.target.id === 'sheet-overlay') closeSheet();
   });
@@ -2028,11 +2035,16 @@
 
     document.getElementById('manage-budget-exceeded-banner').style.display = 'none';
     clearManagePriceError();
-    document.getElementById('sub-manage-overlay').classList.add('open');
+    const overlay = document.getElementById('sub-manage-overlay');
+    overlay.classList.add('open');
+    const sheet = overlay.querySelector('.sheet');
+    if (sheet) sheet.scrollTop = 0;
   }
 
   function closeManageSheet() {
     document.getElementById('sub-manage-overlay').classList.remove('open');
+    if (document.activeElement) document.activeElement.blur();
+    setTimeout(() => { window.scrollTo(0, window.scrollY); }, 80);
   }
   document.getElementById('sub-manage-overlay').addEventListener('click', e => {
     if (e.target.id === 'sub-manage-overlay') closeManageSheet();
@@ -2278,9 +2290,16 @@
     document.getElementById('card-error').classList.remove('show');
     document.getElementById('card-brand-badge').style.display = 'none';
     document.getElementById('card-pan-error').style.display = 'none';
-    document.getElementById('card-sheet-overlay').classList.add('open');
+    const overlay = document.getElementById('card-sheet-overlay');
+    overlay.classList.add('open');
+    const sheet = overlay.querySelector('.sheet');
+    if (sheet) sheet.scrollTop = 0;
   }
-  function closeCardSheet() { document.getElementById('card-sheet-overlay').classList.remove('open'); }
+  function closeCardSheet() {
+    document.getElementById('card-sheet-overlay').classList.remove('open');
+    if (document.activeElement) document.activeElement.blur();
+    setTimeout(() => { window.scrollTo(0, window.scrollY); }, 80);
+  }
   document.getElementById('card-sheet-overlay').addEventListener('click', e => {
     if (e.target.id === 'card-sheet-overlay') closeCardSheet();
   });
