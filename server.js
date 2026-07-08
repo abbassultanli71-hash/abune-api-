@@ -999,6 +999,8 @@ app.post('/api/abunelikler', async (req, res) => {
  *     responses:
  *       200:
  *         description: Yeniləndi
+ *       400:
+ *         description: Səhv sorğu və ya büdcə limiti keçildi
  *       404:
  *         description: Tapılmadı
  *         content:
@@ -1742,12 +1744,23 @@ app.get('/api/ayarlar/:username', async (req, res) => {
  *             properties:
  *               esas_valyuta:
  *                 type: string
+ *                 enum: [AZN, USD, EUR]
+ *                 example: AZN
  *               bildiris_metodu:
  *                 type: string
+ *                 enum: [email, telegram]
+ *                 example: email
  *               dil:
  *                 type: string
+ *                 example: az
  *               tema:
  *                 type: string
+ *                 enum: [light, dark]
+ *                 example: dark
+ *               tema_rengi:
+ *                 type: string
+ *                 enum: [gold, teal, coral, purple, blue]
+ *                 example: gold
  *     responses:
  *       200:
  *         description: Yeniləndi
@@ -1756,7 +1769,18 @@ app.get('/api/ayarlar/:username', async (req, res) => {
  */
 app.put('/api/ayarlar/:username', async (req, res) => {
   const { username } = req.params;
-  const { esas_valyuta, bildiris_metodu, dil, tema} = req.body;
+  const { esas_valyuta, bildiris_metodu, dil, tema, tema_rengi } = req.body;
+  const ICAZE_VERILEN_VALYUTALAR_L = ['AZN', 'USD', 'EUR'];
+  const ICAZE_VERILEN_BILDIRISLER  = ['email', 'telegram'];
+  const ICAZE_VERILEN_TEMALAR      = ['light', 'dark'];
+  const ICAZE_VERILEN_TEMA_RENGLERI = ['gold', 'teal', 'coral', 'purple', 'blue'];
+  const ICAZE_VERILEN_DILLER = ['az','en','ru','tr','de','fr','es','it','pt','ar','zh','ja','ko','hi','nl','pl','sv','no','da','fi','cs','sk','ro','hu','uk','ka','kk','uz','hy','fa','he','id','ms','th','vi','el','bg','hr','sr','lt','lv','et','sl','sq','mk','bs','is','ga','cy','eu','ca','gl','mt','af','sw','tl','bn','ur','ta','te','kn','ml','si','my','km','lo','mn','ne','ps','so','am','ha','yo','ig'];
+
+  if (esas_valyuta && !ICAZE_VERILEN_VALYUTALAR_L.includes(esas_valyuta.toUpperCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${esas_valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR_L.join(', ')} daxil edilə bilər.`);
+  if (bildiris_metodu && !ICAZE_VERILEN_BILDIRISLER.includes(bildiris_metodu.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_NOTIFICATION_METHOD', `Yanlış bildiriş metodu: "${bildiris_metodu}". Yalnız ${ICAZE_VERILEN_BILDIRISLER.join(', ')} daxil edilə bilər.`);
+  if (tema && !ICAZE_VERILEN_TEMALAR.includes(tema.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_THEME', `Yanlış tema: "${tema}". Yalnız ${ICAZE_VERILEN_TEMALAR.join(', ')} daxil edilə bilər.`);
+  if (tema_rengi && !ICAZE_VERILEN_TEMA_RENGLERI.includes(tema_rengi.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_THEME_COLOR', `Yanlış tema rəngi: "${tema_rengi}". Yalnız ${ICAZE_VERILEN_TEMA_RENGLERI.join(', ')} daxil edilə bilər.`);
+  if (dil && !ICAZE_VERILEN_DILLER.includes(dil.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_LANGUAGE', `Yanlış dil kodu: "${dil}". ISO 639-1 formatında olmalıdır.`);
 
   try {
     const userId = await getUserIdByUsername(username);
@@ -1764,7 +1788,7 @@ app.put('/api/ayarlar/:username', async (req, res) => {
 
     await executeQuery(
       `UPDATE istifadeci_ayarlari
-       SET esas_valyuta = :esas_valyuta, bildiris_metodu = :bildiris_metodu, dil = :dil, tema = :tema,
+       SET esas_valyuta = :esas_valyuta, bildiris_metodu = :bildiris_metodu, dil = :dil, tema = :tema, tema_rengi = :tema_rengi
        WHERE istifadeci_id = :istifadeci_id`,
       {
         esas_valyuta, bildiris_metodu, dil, tema, tema_rengi, istifadeci_id: userId
@@ -1840,13 +1864,11 @@ app.get('/api/budceler/:username', async (req, res) => {
  *                 type: number
  *               valyuta:
  *                 type: string
- *               hesab_mebleqi:
- *                 type: number
  *     responses:
  *       201:
  *         description: Büdcə yaradıldı
  *       400:
- *         description: Validation xətası
+ *         description: Mövcud abunəlik xərcləri limit məbləğindən çoxdur və ya digər yoxlama xətası
  */
 app.post('/api/budceler', async (req, res) => {
   const { username, limit_mebleq, valyuta, hesab_mebleqi } = req.body;
@@ -1858,13 +1880,25 @@ app.post('/api/budceler', async (req, res) => {
   if (isNaN(parsedLimit) || parsedLimit <= 0)
     return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'Limit 0-dan böyük olmalıdır.');
 
-  const parsedSpent = hesab_mebleqi ? Number(hesab_mebleqi) : 0;
-  if (isNaN(parsedSpent) || parsedSpent < 0)
-    return errorResponse(res, 400, 'Bad Request', 'INVALID_SPENT', 'Hesab məbləği mənfi ola bilməz.');
-
   try {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+
+    // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq
+    const activeSubs = await executeQuery(
+      `SELECT qiymet FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
+      { userId }
+    );
+
+    let totalSpend = 0;
+    for (const row of activeSubs.rows) {
+      totalSpend += Number(row.QIYMET);
+    }
+
+    if (totalSpend > parsedLimit) {
+      return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
+        `Mövcud abunəlik xərcləri (${totalSpend.toFixed(2)}) yeni limitdən (${parsedLimit.toFixed(2)}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
+    }
 
     await executeQuery(
       `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, hesab_mebleqi)
@@ -1873,7 +1907,7 @@ app.post('/api/budceler', async (req, res) => {
         istifadeci_id: userId,
         limit_mebleq: parsedLimit,
         valyuta: valyuta || 'AZN',
-        hesab_mebleqi: parsedSpent
+        hesab_mebleqi: totalSpend
       },
       { autoCommit: true }
     );
@@ -1907,11 +1941,11 @@ app.post('/api/budceler', async (req, res) => {
  *                 type: number
  *               valyuta:
  *                 type: string
- *               hesab_mebleqi:
- *                 type: number
  *     responses:
  *       200:
  *         description: Yeniləndi
+ *       400:
+ *         description: Mövcud abunəlik xərcləri limit məbləğindən çoxdur və ya digər yoxlama xətası
  *       404:
  *         description: İstifadəçi tapılmadı
  */
@@ -1923,12 +1957,32 @@ app.put('/api/budceler/:username', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
+    const parsedLimit = Number(limit_mebleq);
+    if (isNaN(parsedLimit) || parsedLimit <= 0)
+      return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'Limit 0-dan böyük olmalıdır.');
+
+    // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq
+    const activeSubs = await executeQuery(
+      `SELECT qiymet FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
+      { userId }
+    );
+
+    let totalSpend = 0;
+    for (const row of activeSubs.rows) {
+      totalSpend += Number(row.QIYMET);
+    }
+
+    if (totalSpend > parsedLimit) {
+      return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
+        `Mövcud abunəlik xərcləri (${totalSpend.toFixed(2)}) yeni limitdən (${parsedLimit.toFixed(2)}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
+    }
+
     await executeQuery(
       `UPDATE budceler
        SET limit_mebleq = :limit_mebleq, valyuta = :valyuta, hesab_mebleqi = :hesab_mebleqi
        WHERE istifadeci_id = :istifadeci_id`,
       {
-        limit_mebleq, valyuta, hesab_mebleqi, istifadeci_id: userId
+        limit_mebleq: parsedLimit, valyuta: valyuta || 'AZN', hesab_mebleqi: totalSpend, istifadeci_id: userId
       },
       { autoCommit: true }
     );
