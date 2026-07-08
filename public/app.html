@@ -1144,7 +1144,7 @@
       <div class="sheet-title">Yeni Kart</div>
       <button class="sheet-close" onclick="closeCardSheet()">✕</button>
     </div>
-    <div class="field"><label>Kart adı</label><input type="text" id="card-name" placeholder="məs. Kapital Bank"></div>
+    <div class="field"><label>Kart adı *</label><input type="text" id="card-name" placeholder="məs. Kapital Bank" required></div>
     <div class="field">
       <label>Kart növü</label>
       <select id="card-type">
@@ -1698,6 +1698,13 @@
       return;
     }
 
+    if (!cardId) {
+      cardInput.classList.add('invalid');
+      cardInput.focus();
+      return;
+    }
+    cardInput.classList.remove('invalid');
+
     clearPriceError();
 
     const payload = {
@@ -1707,9 +1714,9 @@
       valyuta: currency,
       odenis_tezliyi: freq,
       baslama_tarixi: start,
-      kateqoriya: category
+      kateqoriya: category,
+      odenis_metodu_id: cardId
     };
-    if (cardId) payload.odenis_metodu_id = cardId;
 
     // Budget banner sıfırla
     document.getElementById('budget-exceeded-banner').style.display = 'none';
@@ -1920,6 +1927,7 @@
 
   function openCardSheet() {
     document.getElementById('card-name').value = '';
+    document.getElementById('card-name').classList.remove('invalid');
     document.getElementById('card-type').value = 'visa';
     document.getElementById('card-pan').value = '';
     document.getElementById('card-expiry').value = '';
@@ -1939,15 +1947,25 @@
   }
 
   async function handleAddCard() {
-    const name = document.getElementById('card-name').value.trim();
+    const nameEl = document.getElementById('card-name');
+    const name = nameEl.value.trim();
     const kart_tipi = document.getElementById('card-type').value;
     const panRaw = document.getElementById('card-pan').value.replace(/\s/g, '');
     const expiry = document.getElementById('card-expiry').value.trim();
     const cvv = document.getElementById('card-cvv').value.trim();
     const errEl = document.getElementById('card-error');
 
-    if (!name || !kart_tipi) {
+    if (!name) {
       errEl.textContent = 'Kart adı məcburidir.';
+      errEl.classList.add('show');
+      nameEl.classList.add('invalid');
+      nameEl.focus();
+      return;
+    }
+    nameEl.classList.remove('invalid');
+
+    if (!kart_tipi) {
+      errEl.textContent = 'Kart növü seçilməlidir.';
       errEl.classList.add('show');
       return;
     }
