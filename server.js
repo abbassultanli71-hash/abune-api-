@@ -1369,21 +1369,31 @@ app.patch('/api/bildirisler/:id/read', async (req, res) => {
  *         description: İstifadəçi tapılmadı
  */
 app.get('/api/odenis-metodlari', async (req, res) => {
+  console.log('🔵 ========== KARTLARI GET ==========');
   const { username } = req.query;
-  if (!username) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
+  if (!username) {
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
+  }
   try {
     const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
-
-    const sql = `
-      SELECT id AS card_id, ad, kart_tipi, pan, kart_istifade_tarixi,
-             TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi
-      FROM odenis_metodlari
-      WHERE istifadeci_id = :istifadeci_id ORDER BY id
-    `;
-    const result = await executeQuery(sql, { istifadeci_id: userId });
-    return successResponse(res, 200, 'Success', { cards: result.rows });
+    if (userId === null) {
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    }
+    // SADƏCƏ MÖVCUD COLUMN-LARI SEÇ - yaradilma_tarixi OLMADAN
+    const sql = `SELECT id, ad, kart_tipi, pan, kart_istifade_tarixi FROM odenis_metodlari WHERE istifadeci_id = ${userId}`;
+    console.log('🔵 SQL:', sql);
+    const result = await executeQuery(sql);
+    console.log('🔵 Rows:', result.rows.length);
+    const cards = result.rows.map(row => ({
+      card_id: row.id || row.ID,
+      ad: row.ad || row.AD || 'Adsız Kart',
+      kart_tipi: row.kart_tipi || row.KART_TIPI || 'visa',
+      pan: row.pan || row.PAN || '',
+      kart_istifade_tarixi: row.kart_istifade_tarixi || row.KART_ISTIFADE_TARIXI || ''
+    }));
+    return successResponse(res, 200, 'Success', { cards });
   } catch (err) {
+    console.error('❌ Xəta:', err.message);
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
