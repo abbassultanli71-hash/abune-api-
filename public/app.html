@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="az" data-theme="dark">
 <head>
@@ -9,24 +10,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #14151a;
-    --surface: #1c1e25;
-    --surface-2: #23252e;
-    --surface-3: #2a2d38;
-    --border: rgba(242,240,234,0.09);
-    --border-strong: rgba(242,240,234,0.16);
-    --ink: #f2f0ea;
-    --ink-muted: #9a9dab;
-    --ink-faint: #64677a;
-    --gold: #e8b54d;
-    --teal: #4fbdba;
-    --coral: #e2685a;
-    --gold-soft: rgba(232,181,77,0.14);
-    --teal-soft: rgba(79,189,186,0.14);
-    --coral-soft: rgba(226,104,90,0.16);
-    --accent: var(--gold);
-    --accent-soft: var(--gold-soft);
-    --shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+    --bg: #0b0d10;
+    --surface: #14171c;
+    --surface-2: #191d24;
+    --surface-3: #22272f;
+    --border: rgba(232,236,244,0.07);
+    --border-strong: rgba(232,236,244,0.16);
+    --ink: #f5f7fa;
+    --ink-muted: #9aa3b2;
+    --ink-faint: #626b7a;
+    --gold: #f5c46b;
+    --teal: #4fd1c5;
+    --coral: #ff7a6b;
+    --purple: #b39dff;
+    --pink: #ff8fb8;
+    --blue: #7cb8ff;
+    --lime: #c8f560;
+    --gold-soft: rgba(245,196,107,0.14);
+    --teal-soft: rgba(79,209,197,0.14);
+    --coral-soft: rgba(255,122,107,0.15);
+    --purple-soft: rgba(179,157,255,0.16);
+    --pink-soft: rgba(255,143,184,0.15);
+    --blue-soft: rgba(124,184,255,0.16);
+    --lime-soft: rgba(200,245,96,0.18);
+    --accent: var(--lime);
+    --accent-soft: var(--lime-soft);
+    --accent-grad: linear-gradient(135deg, #e6ffb0 0%, #c8f560 45%, #9fdb2e 100%);
+    --hero-grad: linear-gradient(140deg, #1a1f2a 0%, #232a38 55%, #2f3a4d 100%);
+    --glow-accent: 0 12px 32px -10px rgba(200,245,96,0.42);
+    --glow-coral: 0 12px 32px -10px rgba(255,122,107,0.45);
+    --shadow: 0 24px 60px -24px rgba(0,0,0,0.75);
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', -apple-system, system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
@@ -34,20 +47,27 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   [data-theme="light"] {
-    --bg: #f4f2ec;
+    --bg: #f6f7f4;
     --surface: #ffffff;
-    --surface-2: #faf9f5;
-    --surface-3: #f0eee6;
-    --border: rgba(27,29,36,0.08);
-    --border-strong: rgba(27,29,36,0.14);
-    --ink: #1b1d24;
-    --ink-muted: #6b6e7a;
-    --ink-faint: #9799a3;
-    --gold-soft: rgba(184,131,20,0.14);
-    --teal-soft: rgba(28,140,137,0.12);
-    --coral-soft: rgba(197,63,49,0.12);
-    --shadow: 0 20px 50px -25px rgba(27,29,36,0.25);
+    --surface-2: #fbfbf7;
+    --surface-3: #f0f1ea;
+    --border: rgba(20,24,32,0.07);
+    --border-strong: rgba(20,24,32,0.14);
+    --ink: #14181f;
+    --ink-muted: #5b6472;
+    --ink-faint: #98a0ac;
+    --gold-soft: rgba(180,130,15,0.12);
+    --teal-soft: rgba(15,150,140,0.12);
+    --coral-soft: rgba(220,70,55,0.12);
+    --purple-soft: rgba(105,80,220,0.12);
+    --pink-soft: rgba(210,50,120,0.12);
+    --blue-soft: rgba(30,110,220,0.12);
+    --lime-soft: rgba(120,170,20,0.16);
+    --accent-grad: linear-gradient(135deg, #d8f77a 0%, #a8d93a 100%);
+    --hero-grad: linear-gradient(140deg, #14181f 0%, #232a38 100%);
+    --shadow: 0 24px 60px -28px rgba(20,24,32,0.22);
   }
+
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
@@ -70,9 +90,9 @@
     justify-content: center;
     padding: 30px 0;
     background:
-      radial-gradient(circle at 30% 20%, rgba(232,181,77,0.06), transparent 45%),
-      radial-gradient(circle at 80% 80%, rgba(79,189,186,0.05), transparent 45%),
-      #0b0c10;
+      radial-gradient(circle at 30% 20%, rgba(139,124,246,0.14), transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(31,224,194,0.08), transparent 45%),
+      #0c0a16;
   }
   .phone {
     width: 390px;
@@ -86,6 +106,40 @@
     display: flex;
     flex-direction: column;
   }
+  @keyframes blobDrift {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(-2%, 2%) scale(1.04); }
+    66%  { transform: translate(2%, -1%) scale(0.98); }
+    100% { transform: translate(0, 0) scale(1); }
+  }
+  .phone::before {
+    content: '';
+    position: absolute; inset: -8% -8%; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(139,124,246,0.22), transparent 60%),
+      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(31,224,194,0.14), transparent 55%),
+      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(244,114,182,0.13), transparent 55%),
+      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(96,165,250,0.10), transparent 60%);
+    animation: blobDrift 22s ease-in-out infinite;
+  }
+  .phone::after {
+    content: '';
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0.5; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
+  .phone > * { position: relative; z-index: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .phone::before { animation: none; }
+  }
+  [data-theme="light"] .phone::before {
+    background:
+      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(124,58,237,0.12), transparent 60%),
+      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(9,163,151,0.09), transparent 55%),
+      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(219,39,119,0.08), transparent 55%),
+      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(29,99,216,0.07), transparent 60%);
+  }
+  [data-theme="light"] .phone::after { opacity: 0.25; }
   .notch {
     position: absolute;
     top: 10px; left: 50%; transform: translateX(-50%);
@@ -107,22 +161,64 @@
   .statusbar .icons { display: flex; gap: 5px; align-items: center; }
 
   /* ---- Screens ---- */
-  .screens { position: relative; flex: 1; overflow: hidden; }
+  .screens { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; }
   .screen {
     position: absolute; inset: 0;
     display: none;
     flex-direction: column;
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 100px;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+    padding-bottom: 112px;
   }
+  .screen > * { flex-shrink: 0; }
+
   .screen::-webkit-scrollbar { width: 5px; height: 5px; }
   .screen::-webkit-scrollbar-track { background: transparent; }
   .screen::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
   .screen.active { display: flex; animation: fadein 0.28s ease; }
   @keyframes fadein { from { opacity: 0; transform: translateY(6px);} to {opacity: 1; transform: translateY(0);} }
 
-  .scr-header { padding: 8px 20px 16px; }
+  .scr-header { padding: 8px 20px 16px; position: relative; }
+  .scr-header::before {
+    content: ''; position: absolute; top: -20px; left: -10%; right: -10%; height: 130px;
+    background: radial-gradient(ellipse at 20% 0%, var(--gold-soft), transparent 60%),
+                radial-gradient(ellipse at 85% 30%, var(--teal-soft), transparent 55%);
+    pointer-events: none; z-index: -1; opacity: 0.8;
+  }
+
+  /* ---- Hero panel (vivid gradient greeting card) ---- */
+  .hero-panel {
+    margin: 8px 20px 18px;
+    padding: 22px 20px 24px;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    background: var(--hero-grad);
+    box-shadow: 0 18px 40px -16px rgba(105,82,224,0.55);
+  }
+  .hero-blob { position: absolute; border-radius: 50%; filter: blur(2px); pointer-events: none; opacity: 0.55; }
+  .hero-blob-1 { width: 140px; height: 140px; background: rgba(255,255,255,0.14); top: -60px; right: -30px; }
+  .hero-blob-2 { width: 90px; height: 90px; background: rgba(255,255,255,0.10); bottom: -40px; left: 20%; }
+  .hero-eyebrow {
+    font-family: var(--font-mono); font-size: 10.5px; color: rgba(255,255,255,0.75);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+  }
+  .hero-title { font-family: var(--font-display); font-size: 25px; font-weight: 600; margin: 0; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+  .hero-sub { color: rgba(255,255,255,0.82); font-size: 12.5px; margin-top: 4px; }
+  .hero-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #6952e0;
+    flex-shrink: 0; cursor: pointer; border: 2px solid rgba(255,255,255,0.5);
+    transition: transform 0.15s ease;
+  }
+  .hero-avatar:active { transform: scale(0.92); }
   .eyebrow {
     font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-faint);
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
@@ -139,6 +235,11 @@
     flex-shrink: 0;
     box-shadow: var(--shadow);
     cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .icon-round:active { transform: scale(0.92); }
+  @media (hover: hover) {
+    .icon-round:hover { border-color: var(--border-strong); }
   }
   .icon-round svg { width: 17px; height: 17px; }
 
@@ -152,15 +253,20 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
     padding: 14px 16px; min-width: 148px; flex-shrink: 0;
     display: flex; flex-direction: column; gap: 8px;
+    box-shadow: var(--shadow);
   }
   .stat-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
   .stat-icon svg { width: 14px; height: 14px; }
   .stat-icon.teal { background: var(--teal-soft); color: var(--teal); }
   .stat-icon.gold { background: var(--gold-soft); color: var(--gold); }
   .stat-icon.coral { background: var(--coral-soft); color: var(--coral); }
+  .stat-icon.purple { background: var(--purple-soft); color: var(--purple); }
+  .stat-icon.pink { background: var(--pink-soft); color: var(--pink); }
+  .stat-icon.blue { background: var(--blue-soft); color: var(--blue); }
   .stat-label { font-size: 11px; color: var(--ink-muted); font-weight: 500; }
-  .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; }
+  .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .stat-value small { font-size: 12px; color: var(--ink-faint); font-weight: 500; }
+  .stat-card-accent { border-color: var(--purple-soft); box-shadow: var(--shadow), inset 0 0 0 1px rgba(167,139,250,0.12); }
 
   /* ---- Signature: payment ruler ---- */
   .ruler-card {
@@ -168,6 +274,12 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
     padding: 18px 18px 20px;
     box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .ruler-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--hero-grad);
   }
   .ruler-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
   .ruler-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
@@ -176,12 +288,12 @@
   .ruler-track { position: relative; height: 2px; background: var(--border-strong); border-radius: 2px; }
   .ruler-today-line {
     position: absolute; top: -12px; bottom: -12px; width: 1px;
-    background: repeating-linear-gradient(to bottom, var(--gold) 0 4px, transparent 4px 8px);
+    background: repeating-linear-gradient(to bottom, var(--purple) 0 4px, transparent 4px 8px);
   }
   .ruler-today-label {
     position: absolute; top: -26px; transform: translateX(-50%);
-    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--gold);
-    background: var(--gold-soft); padding: 2px 6px; border-radius: 20px; white-space: nowrap;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--purple);
+    background: var(--purple-soft); padding: 2px 6px; border-radius: 20px; white-space: nowrap;
   }
   .ruler-chip {
     position: absolute; top: -5px; transform: translateX(-50%);
@@ -209,9 +321,13 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
     cursor: pointer;
-    transition: background 0.2s ease;
+    box-shadow: var(--shadow);
+    transition: background 0.2s ease, transform 0.15s ease, border-color 0.15s ease;
   }
-  .sub-row:active { background: var(--surface-2); }
+  .sub-row:active { background: var(--surface-2); transform: scale(0.99); }
+  @media (hover: hover) {
+    .sub-row:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  }
   .sub-icon {
     width: 40px; height: 40px; border-radius: 12px; background: var(--surface-3);
     display: flex; align-items: center; justify-content: center;
@@ -221,13 +337,16 @@
   .sub-icon.teal { background: var(--teal-soft); color: var(--teal); border-color: transparent; }
   .sub-icon.gold { background: var(--gold-soft); color: var(--gold); border-color: transparent; }
   .sub-icon.coral { background: var(--coral-soft); color: var(--coral); border-color: transparent; }
+  .sub-icon.purple { background: var(--purple-soft); color: var(--purple); border-color: transparent; }
+  .sub-icon.pink { background: var(--pink-soft); color: var(--pink); border-color: transparent; }
+  .sub-icon.blue { background: var(--blue-soft); color: var(--blue); border-color: transparent; }
   .sub-icon.neutral { background: var(--surface-3); color: var(--ink-faint); }
   .sub-info { flex: 1; min-width: 0; }
   .sub-name { font-weight: 600; font-size: 13.5px; }
   .sub-meta { font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
   .sub-meta .sep { margin: 0 4px; }
   .sub-right { text-align: right; flex-shrink: 0; }
-  .sub-price { font-family: var(--font-mono); font-weight: 600; font-size: 13.5px; }
+  .sub-price { font-family: var(--font-mono); font-weight: 600; font-size: 13.5px; font-variant-numeric: tabular-nums; }
   .sub-badge {
     display: inline-block; margin-top: 4px; font-family: var(--font-mono);
     font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px;
@@ -242,7 +361,11 @@
     display: flex; align-items: center; gap: 12px;
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
-    transition: background 0.2s ease;
+    box-shadow: var(--shadow);
+    transition: background 0.2s ease, border-color 0.15s ease;
+  }
+  @media (hover: hover) {
+    .card-row:hover, .history-row:hover { border-color: var(--border-strong); }
   }
   .card-icon, .history-icon {
     width: 40px; height: 40px; border-radius: 12px;
@@ -269,6 +392,7 @@
   .notif-item {
     display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 14px; padding: 13px 14px; margin-bottom: 8px;
+    box-shadow: var(--shadow);
   }
   .notif-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
   .notif-title { font-size: 12.5px; font-weight: 600; }
@@ -279,23 +403,33 @@
   .budget-card {
     margin: 0 20px 16px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 18px; padding: 18px 18px 20px;
+    box-shadow: var(--shadow);
   }
   .budget-nums { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
-  .budget-spent { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
-  .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); }
+  .budget-spent { font-family: var(--font-mono); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
   .budget-bar-track { height: 8px; background: var(--surface-3); border-radius: 20px; overflow: hidden; }
-  .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--accent)); }
+  .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--gold) 65%, var(--coral)); box-shadow: 0 0 12px -2px var(--accent-soft); }
+  .budget-ring-wrap { position: relative; width: 148px; height: 148px; margin: 4px auto 18px; }
+  .budget-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .budget-ring-track { fill: none; stroke: var(--surface-3); stroke-width: 11; }
+  .budget-ring-fill { fill: none; stroke: url(#ringGrad); stroke-width: 11; stroke-linecap: round; stroke-dasharray: 326.7; stroke-dashoffset: 326.7; transition: stroke-dashoffset 0.6s cubic-bezier(.16,.84,.44,1); }
+  .budget-ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .budget-ring-pct { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--ink); line-height: 1; }
+  .budget-ring-label { font-size: 10.5px; color: var(--ink-faint); margin-top: 4px; max-width: 90px; line-height: 1.3; }
   .budget-note { font-size: 11px; color: var(--ink-faint); margin-top: 10px; }
 
   /* ---- FAB ---- */
   .fab {
-    position: absolute; right: 20px; bottom: 96px; z-index: 25;
+    position: absolute; right: 20px; bottom: 104px; z-index: 25;
     width: 54px; height: 54px; border-radius: 50%;
-    background: var(--accent); color: #221a08;
+    background: var(--accent-grad); color: #fff;
     display: flex; align-items: center; justify-content: center;
-    border: none; box-shadow: 0 12px 26px -8px var(--accent-soft);
+    border: none; box-shadow: var(--glow-accent);
     cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
+  .fab:active { transform: scale(0.94); }
   .fab svg { width: 22px; height: 22px; }
 
   /* ---- Scroll-to-top button ---- */
@@ -323,20 +457,28 @@
 
   /* ---- Bottom tab bar ---- */
   .tabbar {
-    position: absolute; left: 0; right: 0; bottom: 0; z-index: 20;
+    position: absolute; left: 12px; right: 12px; bottom: calc(10px + var(--safe-bottom)); z-index: 20;
     background: var(--surface);
-    border-top: 1px solid var(--border);
+    border: 1px solid var(--border);
+    border-radius: 22px;
     display: flex;
-    padding: 8px 6px calc(10px + var(--safe-bottom));
+    padding: 8px 6px;
+    box-shadow: 0 16px 36px -14px rgba(105,82,224,0.35), var(--shadow);
   }
   .tab-item {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 4px 0;
-    border-radius: 12px; position: relative;
+    color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 6px 0;
+    border-radius: 14px; position: relative;
     cursor: pointer;
+    transition: color 0.2s ease;
   }
   .tab-item svg { width: 20px; height: 20px; }
-  .tab-item.active { color: var(--accent); }
+  .tab-item.active { color: #fff; }
+  .tab-item.active::before {
+    content: ''; position: absolute; inset: -2px 6px auto 6px; top: -6px; height: 34px;
+    background: var(--hero-grad); border-radius: 14px; z-index: -1;
+    box-shadow: 0 8px 18px -6px rgba(105,82,224,0.6);
+  }
   .tab-dot {
     position: absolute; top: 0px; right: 26%;
     width: 7px; height: 7px; border-radius: 50%; background: var(--coral);
@@ -357,13 +499,14 @@
     margin: 0 20px 14px; display: flex; align-items: center; gap: 8px;
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 11px 14px;
+    box-shadow: var(--shadow);
   }
   .search-bar svg { width: 16px; height: 16px; color: var(--ink-faint); flex-shrink: 0; }
   .search-bar input { flex: 1; background: none; border: none; color: var(--ink); font-size: 13px; outline: none; }
   .search-bar input::placeholder { color: var(--ink-faint); }
 
   /* ---- Settings ---- */
-  .settings-group { margin: 0 20px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .settings-group { margin: 0 20px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
   .settings-row {
     display: flex; align-items: center; justify-content: space-between;
     padding: 15px 16px; border-bottom: 1px solid var(--border); gap: 12px;
@@ -398,6 +541,7 @@
   .profile-card {
     margin: 4px 20px 18px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 12px;
+    box-shadow: var(--shadow);
   }
   .avatar-lg {
     width: 48px; height: 48px; border-radius: 50%; background: var(--surface-3);
@@ -441,6 +585,9 @@
     width: 100%; background: var(--surface); border-radius: 24px 24px 0 0;
     padding: 10px 20px calc(22px + var(--safe-bottom));
     max-height: 82%; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
     border-top: 1px solid var(--border-strong);
   }
   .sheet-handle { width: 36px; height: 4px; border-radius: 4px; background: var(--border-strong); margin: 6px auto 14px; }
@@ -453,7 +600,13 @@
     background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
     padding: 11px 12px; color: var(--ink); font-size: 14px;
     outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
+  .field select:focus, .field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .field input.invalid:focus { box-shadow: 0 0 0 3px var(--coral-soft); }
   .field input.invalid { border-color: var(--coral); }
   .field-error {
     display: none; font-size: 10.5px; color: var(--coral); font-weight: 500;
@@ -467,8 +620,10 @@
     background: var(--surface-2); color: var(--ink); font-size: 13.5px; font-weight: 600;
     cursor: pointer;
     outline: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-  .btn-primary { background: var(--accent); color: #221a08; border-color: transparent; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent-grad); color: #fff; border-color: transparent; box-shadow: var(--glow-accent); }
   .btn svg { width: 15px; height: 15px; }
 
   .hint {
@@ -489,11 +644,39 @@
     text-align: center;
     margin-bottom: 8px;
   }
+  @keyframes logoPop {
+    0% { opacity: 0; transform: scale(0.75) translateY(6px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes glowBreathe {
+    0%, 100% { box-shadow: 0 10px 26px -10px rgba(255,176,32,0.45); }
+    50% { box-shadow: 0 12px 30px -8px rgba(255,91,69,0.42); }
+  }
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .logo-badge {
+    width: 64px; height: 64px; border-radius: 20px;
+    background: var(--accent-grad);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    box-shadow: var(--glow-accent);
+    animation: logoPop 0.45s cubic-bezier(.16,.84,.44,1) both, glowBreathe 3.2s ease-in-out 0.45s infinite;
+  }
+  .auth-logo-area h2 { animation: riseIn 0.4s ease 0.12s both; }
+  .auth-logo-area p { animation: riseIn 0.4s ease 0.18s both; }
+  .auth-tabs { animation: riseIn 0.4s ease 0.24s both; }
+  .auth-form-card { animation: riseIn 0.4s ease 0.3s both; }
+  @media (prefers-reduced-motion: reduce) {
+    .logo-badge, .auth-logo-area h2, .auth-logo-area p, .auth-tabs, .auth-form-card {
+      animation: none !important;
+    }
+  }
   .auth-logo-area svg {
-    width: 44px;
-    height: 44px;
-    color: var(--accent);
-    margin-bottom: 8px;
+    width: 30px;
+    height: 30px;
+    color: #fff;
   }
   .auth-logo-area h2 {
     font-family: var(--font-display);
@@ -567,7 +750,9 @@
       <div class="screen active" id="scr-auth">
         <div class="auth-container">
           <div class="auth-logo-area">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="logo-mark"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <div class="logo-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="logo-mark"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
             <h2>Abunəm</h2>
             <p data-i18n="auth_subtitle">Abunəliklərinizi asanlıqla idarə edin</p>
           </div>
@@ -617,16 +802,16 @@
 
       <!-- ============ DASHBOARD ============ -->
       <div class="screen" id="scr-dashboard">
-        <div class="scr-header">
-          <div class="h-row">
+        <div class="hero-panel">
+          <div class="hero-blob hero-blob-1"></div>
+          <div class="hero-blob hero-blob-2"></div>
+          <div class="h-row" style="position:relative; z-index:1;">
             <div>
-              <div class="eyebrow" id="dashboard-date">4 İyul, Cümə axşamı</div>
-              <h1 class="page-title" data-i18n="dashboard_title">Xoş gördük</h1>
-              <div class="page-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
+              <div class="hero-eyebrow" id="dashboard-date">4 İyul, Cümə axşamı</div>
+              <h1 class="hero-title" data-i18n="dashboard_title">Xoş gördük</h1>
+              <div class="hero-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
             </div>
-            <div class="icon-round" onclick="switchScreen('settings')" title="Ayarlar">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            </div>
+            <div class="hero-avatar" id="hero-avatar-initials" onclick="switchScreen('settings')" title="Ayarlar">U.U</div>
           </div>
         </div>
 
@@ -636,7 +821,7 @@
             <div class="stat-label" data-i18n="stat_active">Aktiv abunəlik</div>
             <div class="stat-value" id="dashboard-active-count">0</div>
           </div>
-          <div class="stat-card" style="cursor:pointer;" onclick="switchScreen('budget')">
+          <div class="stat-card stat-card-accent" style="cursor:pointer;" onclick="switchScreen('budget')">
             <div class="stat-icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
             <div class="stat-label" data-i18n="stat_monthly">Aylıq xərc</div>
             <div class="stat-value" id="dashboard-monthly-spend">₼0.00</div>
@@ -741,6 +926,23 @@
           </div>
         </div>
         <div class="budget-card">
+          <div class="budget-ring-wrap">
+            <svg class="budget-ring" viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#a78bfa"/>
+                  <stop offset="55%" stop-color="#f472b6"/>
+                  <stop offset="100%" stop-color="#ffb020"/>
+                </linearGradient>
+              </defs>
+              <circle class="budget-ring-track" cx="60" cy="60" r="52"></circle>
+              <circle class="budget-ring-fill" id="budget-ring-fill" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="budget-ring-center">
+              <div class="budget-ring-pct" id="budget-ring-pct">0%</div>
+              <div class="budget-ring-label" data-i18n="budget_ring_label">limitdən istifadə</div>
+            </div>
+          </div>
           <div class="budget-nums">
             <span class="budget-spent">₼0.00</span>
             <span class="budget-limit">/ ₼0.00</span>
@@ -992,7 +1194,7 @@
             <option value="">-- Kart seçilməyib --</option>
           </select>
         </div>
-        <div id="budget-exceeded-banner" style="display:none; margin:0 0 10px; background:rgba(226,104,90,0.13); border:1px solid var(--coral,#e2685a); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#e2685a); line-height:1.5;">
+        <div id="budget-exceeded-banner" style="display:none; margin:0 0 10px; background:rgba(255,91,69,0.16); border:1px solid var(--coral,#ff5b45); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#ff5b45); line-height:1.5;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div>
               <strong>⚠️ Büdcə limiti keçilir!</strong>
@@ -1019,7 +1221,7 @@
         </div>
         <input type="hidden" id="manage-sub-id">
         <input type="hidden" id="manage-sub-orig-name">
-        <div id="manage-budget-exceeded-banner" style="display:none; margin:10px 0; background:rgba(226,104,90,0.13); border:1px solid var(--coral,#e2685a); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#e2685a); line-height:1.5;">
+        <div id="manage-budget-exceeded-banner" style="display:none; margin:10px 0; background:rgba(255,91,69,0.16); border:1px solid var(--coral,#ff5b45); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#ff5b45); line-height:1.5;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div>
               <strong>⚠️ Büdcə limiti keçilir!</strong>
@@ -1121,9 +1323,6 @@
               <h1 class="page-title">Kartlarım</h1>
               <div class="page-sub" id="cards-sub">Ödəniş metodları</div>
             </div>
-            <div class="icon-round" onclick="openCardSheet()" title="Yeni kart əlavə et">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            </div>
           </div>
         </div>
         <div class="section" style="padding-top:6px; padding-bottom:20px;">
@@ -1144,7 +1343,7 @@
       <div class="sheet-title">Yeni Kart</div>
       <button class="sheet-close" onclick="closeCardSheet()">✕</button>
     </div>
-    <div class="field"><label>Kart adı</label><input type="text" id="card-name" placeholder="məs. Kapital Bank"></div>
+    <div class="field"><label>Kart adı *</label><input type="text" id="card-name" placeholder="məs. Kapital Bank" required></div>
     <div class="field">
       <label>Kart növü</label>
       <select id="card-type">
@@ -1152,10 +1351,10 @@
         <option value="mastercard">Mastercard</option>
       </select>
     </div>
-    <div class="field"><label>Kart nömrəsi (PAN)</label><input type="text" id="card-pan" placeholder="4111 1111 1111 1111" maxlength="19" oninput="formatCardNum(this)"></div>
+    <div class="field"><label>Kart nömrəsi (PAN) *</label><input type="text" id="card-pan" placeholder="4111 1111 1111 1111" maxlength="19" oninput="formatCardNum(this)"></div>
     <div class="field-row">
-      <div class="field"><label>Son tarix (AA/İİ)</label><input type="text" id="card-expiry" placeholder="12/28" maxlength="5"></div>
-      <div class="field"><label>CVV</label><input type="password" id="card-cvv" placeholder="•••" maxlength="4"></div>
+      <div class="field"><label>Son tarix (AA/İİ) *</label><input type="text" id="card-expiry" placeholder="12/28" maxlength="5"></div>
+      <div class="field"><label>CVV *</label><input type="password" id="card-cvv" placeholder="•••" maxlength="3"></div>
     </div>
     <div class="field-error" id="card-error"></div>
     <div class="sheet-actions">
@@ -1295,6 +1494,8 @@
     document.getElementById('profile-fullname').textContent = currentUser.ad;
     document.getElementById('profile-username').textContent = '@' + currentUser.username;
     document.getElementById('profile-initials').textContent = initials(currentUser.ad);
+    const heroAvatarEl = document.getElementById('hero-avatar-initials');
+    if (heroAvatarEl) heroAvatarEl.textContent = initials(currentUser.ad);
     
     // Update date on dashboard
     const monthsAz = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
@@ -1452,10 +1653,10 @@
     'Other': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg>'
   };
   const CATEGORY_COLORS = {
-    'Entertainment': 'coral', 'Music': 'gold', 'Education': 'teal',
-    'Health & Fitness': 'coral', 'Productivity': 'teal', 'Gaming': 'gold',
-    'Cloud Storage': 'teal', 'News': 'gold', 'Food & Delivery': 'coral',
-    'Shopping': 'gold', 'Finance': 'teal', 'Other': 'neutral'
+    'Entertainment': 'coral', 'Music': 'pink', 'Education': 'blue',
+    'Health & Fitness': 'coral', 'Productivity': 'purple', 'Gaming': 'gold',
+    'Cloud Storage': 'teal', 'News': 'blue', 'Food & Delivery': 'gold',
+    'Shopping': 'pink', 'Finance': 'teal', 'Other': 'neutral'
   };
   function categoryIconHTML(category) {
     const icon = CATEGORY_ICONS[category] || CATEGORY_ICONS['Other'];
@@ -1698,6 +1899,13 @@
       return;
     }
 
+    if (!cardId) {
+      cardInput.classList.add('invalid');
+      cardInput.focus();
+      return;
+    }
+    cardInput.classList.remove('invalid');
+
     clearPriceError();
 
     const payload = {
@@ -1707,9 +1915,9 @@
       valyuta: currency,
       odenis_tezliyi: freq,
       baslama_tarixi: start,
-      kateqoriya: category
+      kateqoriya: category,
+      odenis_metodu_id: cardId
     };
-    if (cardId) payload.odenis_metodu_id = cardId;
 
     // Budget banner sıfırla
     document.getElementById('budget-exceeded-banner').style.display = 'none';
@@ -1920,10 +2128,14 @@
 
   function openCardSheet() {
     document.getElementById('card-name').value = '';
+    document.getElementById('card-name').classList.remove('invalid');
     document.getElementById('card-type').value = 'visa';
     document.getElementById('card-pan').value = '';
+    document.getElementById('card-pan').classList.remove('invalid');
     document.getElementById('card-expiry').value = '';
+    document.getElementById('card-expiry').classList.remove('invalid');
     document.getElementById('card-cvv').value = '';
+    document.getElementById('card-cvv').classList.remove('invalid');
     document.getElementById('card-error').textContent = '';
     document.getElementById('card-error').classList.remove('show');
     document.getElementById('card-sheet-overlay').classList.add('open');
@@ -1939,29 +2151,83 @@
   }
 
   async function handleAddCard() {
-    const name = document.getElementById('card-name').value.trim();
+    const nameEl = document.getElementById('card-name');
+    const name = nameEl.value.trim();
     const kart_tipi = document.getElementById('card-type').value;
-    const panRaw = document.getElementById('card-pan').value.replace(/\s/g, '');
-    const expiry = document.getElementById('card-expiry').value.trim();
-    const cvv = document.getElementById('card-cvv').value.trim();
+    const panEl = document.getElementById('card-pan');
+    const panRaw = panEl.value.replace(/\s/g, '');
+    const expiryEl = document.getElementById('card-expiry');
+    const expiry = expiryEl.value.trim();
+    const cvvEl = document.getElementById('card-cvv');
+    const cvv = cvvEl.value.trim();
     const errEl = document.getElementById('card-error');
 
-    if (!name || !kart_tipi) {
+    if (!name) {
       errEl.textContent = 'Kart adı məcburidir.';
+      errEl.classList.add('show');
+      nameEl.classList.add('invalid');
+      nameEl.focus();
+      return;
+    }
+    nameEl.classList.remove('invalid');
+
+    if (!kart_tipi) {
+      errEl.textContent = 'Kart növü seçilməlidir.';
       errEl.classList.add('show');
       return;
     }
+
+    if (!panRaw) {
+      errEl.textContent = 'Kart nömrəsi (PAN) məcburidir.';
+      errEl.classList.add('show');
+      panEl.classList.add('invalid');
+      panEl.focus();
+      return;
+    }
+    panEl.classList.remove('invalid');
+
+    if (!expiry) {
+      errEl.textContent = 'Son tarix (AA/İİ) məcburidir.';
+      errEl.classList.add('show');
+      expiryEl.classList.add('invalid');
+      expiryEl.focus();
+      return;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+      errEl.textContent = 'Son tarix formatı yanlışdır. Format: AA/İİ (məs: 12/28).';
+      errEl.classList.add('show');
+      expiryEl.classList.add('invalid');
+      expiryEl.focus();
+      return;
+    }
+    expiryEl.classList.remove('invalid');
+
+    if (!cvv) {
+      errEl.textContent = 'CVV məcburidir.';
+      errEl.classList.add('show');
+      cvvEl.classList.add('invalid');
+      cvvEl.focus();
+      return;
+    }
+    if (!/^\d{3}$/.test(cvv)) {
+      errEl.textContent = 'CVV yalnız 3 rəqəmdən ibarət olmalıdır.';
+      errEl.classList.add('show');
+      cvvEl.classList.add('invalid');
+      cvvEl.focus();
+      return;
+    }
+    cvvEl.classList.remove('invalid');
 
     errEl.classList.remove('show');
 
     const payload = {
       username: currentUser.username,
       ad: name,
-      kart_tipi: kart_tipi
+      kart_tipi: kart_tipi,
+      pan: panRaw,
+      kart_istifade_tarixi: expiry,
+      cvv: cvv
     };
-    if (panRaw) payload.pan = panRaw;
-    if (expiry) payload.kart_istifade_tarixi = expiry;
-    if (cvv) payload.cvv = cvv;
 
     const res = await apiFetch('POST', '/api/odenis-metodlari', payload);
     if (res.ok) {
@@ -2024,18 +2290,18 @@
 
   const ACCENT_COLORS = {
     dark: {
-      gold: { main: '#e8b54d', soft: 'rgba(232,181,77,0.14)' },
-      teal: { main: '#4fbdba', soft: 'rgba(79,189,186,0.14)' },
-      coral: { main: '#e2685a', soft: 'rgba(226,104,90,0.16)' },
-      purple: { main: '#a78bfa', soft: 'rgba(167,139,250,0.14)' },
-      blue: { main: '#3b82f6', soft: 'rgba(59,130,246,0.14)' }
+      gold: { main: '#ffb020', soft: 'rgba(255,176,32,0.18)' },
+      teal: { main: '#17e0c9', soft: 'rgba(23,224,201,0.16)' },
+      coral: { main: '#ff5b45', soft: 'rgba(255,91,69,0.19)' },
+      purple: { main: '#b48bff', soft: 'rgba(180,139,255,0.18)' },
+      blue: { main: '#4d8cff', soft: 'rgba(77,140,255,0.18)' }
     },
     light: {
-      gold: { main: '#b88314', soft: 'rgba(184,131,20,0.14)' },
-      teal: { main: '#1c8c89', soft: 'rgba(28,140,137,0.12)' },
-      coral: { main: '#c53f31', soft: 'rgba(197,63,49,0.12)' },
-      purple: { main: '#7c3aed', soft: 'rgba(124,58,237,0.12)' },
-      blue: { main: '#1d4ed8', soft: 'rgba(29,78,216,0.12)' }
+      gold: { main: '#d6850a', soft: 'rgba(214,133,10,0.16)' },
+      teal: { main: '#09a397', soft: 'rgba(9,163,151,0.14)' },
+      coral: { main: '#de3823', soft: 'rgba(222,56,35,0.14)' },
+      purple: { main: '#7c3aed', soft: 'rgba(124,58,237,0.14)' },
+      blue: { main: '#1d63d8', soft: 'rgba(29,99,216,0.14)' }
     }
   };
 
@@ -2091,6 +2357,13 @@
     document.querySelector('.budget-spent').textContent = sym + budgetState.spent.toFixed(2);
     document.querySelector('.budget-limit').textContent = '/ ' + sym + budgetState.limit.toFixed(2);
     document.querySelector('.budget-bar-fill').style.width = pct + '%';
+
+    // Circular progress ring
+    const ringCircumference = 326.7;
+    const ringFill = document.getElementById('budget-ring-fill');
+    if (ringFill) ringFill.style.strokeDashoffset = ringCircumference * (1 - pct / 100);
+    const ringPct = document.getElementById('budget-ring-pct');
+    if (ringPct) ringPct.textContent = pct + '%';
     
     // Update stats cards in dashboard
     document.getElementById('dashboard-monthly-spend').textContent = sym + budgetState.spent.toFixed(2);

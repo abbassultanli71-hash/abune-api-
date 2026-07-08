@@ -711,30 +711,31 @@ app.post('/api/abunelikler', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
 
-    let finalOdenisMetoduId = null;
-    if (odenis_metodu_id !== undefined && odenis_metodu_id !== null && odenis_metodu_id !== '') {
-      finalOdenisMetoduId = Number(odenis_metodu_id);
-      if (isNaN(finalOdenisMetoduId)) {
-        return errorResponse(res, 400, 'Bad Request', 'INVALID_PAYMENT_METHOD', 'Ödəniş metodu ID-si rəqəm olmalıdır.');
-      }
-      const cardCheck = await executeQuery(
-        `SELECT id FROM odenis_metodlari WHERE id = :id AND istifadeci_id = :userId`,
-        { id: finalOdenisMetoduId, userId }
-      );
-      if (cardCheck.rows.length === 0) {
-        return errorResponse(res, 400, 'Bad Request', 'PAYMENT_METHOD_NOT_FOUND', 'Ödəniş metodu tapılmadı və ya istifadəçiyə məxsus deyil.');
-      }
+    // ─── Ödəniş metodu (kart) MƏCBURİDİR ───────────────────────────────────
+    if (odenis_metodu_id === undefined || odenis_metodu_id === null || odenis_metodu_id === '') {
+      return errorResponse(res, 400, 'Bad Request', 'PAYMENT_METHOD_REQUIRED', 'Ödəniş metodu (kart) seçilməlidir.');
+    }
+    const finalOdenisMetoduId = Number(odenis_metodu_id);
+    if (isNaN(finalOdenisMetoduId)) {
+      return errorResponse(res, 400, 'Bad Request', 'INVALID_PAYMENT_METHOD', 'Ödəniş metodu ID-si rəqəm olmalıdır.');
+    }
+    const cardCheck = await executeQuery(
+      `SELECT id FROM odenis_metodlari WHERE id = :id AND istifadeci_id = :userId`,
+      { id: finalOdenisMetoduId, userId }
+    );
+    if (cardCheck.rows.length === 0) {
+      return errorResponse(res, 400, 'Bad Request', 'PAYMENT_METHOD_NOT_FOUND', 'Ödəniş metodu tapılmadı və ya istifadəçiyə məxsus deyil.');
     }
 
-    // ─── Büdcə limiti yoxlaması ─────────────────────────────────────────────
+    // ─── Büdcə limiti yoxlaması (büdcə yoxdursa belə, 300 AZN defolt limit tətbiq olunur) ──
     const budgetRow = await executeQuery(
       `SELECT b.limit_mebleq, b.valyuta FROM budceler b WHERE b.istifadeci_id = :userId`,
       { userId }
     );
 
-    if (budgetRow.rows.length > 0) {
-      const budgetLimit   = Number(budgetRow.rows[0].LIMIT_MEBLEQ);
-      const budgetValyuta = budgetRow.rows[0].VALYUTA || 'AZN';
+    {
+      const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
+      const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || 'AZN') : 'AZN';
 
       // Mövcud aktiv abunəliklərin qiymətlərini sadəcə topla (tezlik çevrilməsi yoxdur)
       const activeSubs = await executeQuery(
@@ -870,9 +871,9 @@ app.put('/api/abunelikler', async (req, res) => {
         { userId }
       );
 
-      if (budgetRow.rows.length > 0) {
-        const budgetLimit   = Number(budgetRow.rows[0].LIMIT_MEBLEQ);
-        const budgetValyuta = budgetRow.rows[0].VALYUTA || 'AZN';
+      {
+        const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
+        const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || 'AZN') : 'AZN';
 
         const activeSubs = await executeQuery(
           `SELECT qiymet FROM abunelikler
@@ -1355,19 +1356,28 @@ const sql = `SELECT c.id AS card_id,
 app.post('/api/odenis-metodlari', async (req, res) => {
   const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!username || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və kart_tipi sahələri məcburidir.');
-  if (pan && !isValidPanLuhn(pan)) {
+
+  if (!pan) {
+    return errorResponse(res, 400, 'Bad Request', 'PAN_REQUIRED', 'Kart nömrəsi (pan) məcburidir.');
+  }
+  if (!isValidPanLuhn(pan)) {
   return errorResponse(res, 400, 'Bad Request', 'INVALID_PAN',
     'Kart nömrəsi (pan) düzgün deyil (Luhn yoxlamasından keçmədi).');
   }
-  if (cvv !== undefined && cvv !== null && cvv !== '') {
+
+  if (cvv === undefined || cvv === null || cvv === '') {
+    return errorResponse(res, 400, 'Bad Request', 'CVV_REQUIRED', 'cvv məcburidir.');
+  }
   if (!/^\d{3}$/.test(String(cvv))) {
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CVV', 'cvv yalnız 3 rəqəmdən ibarət olmalıdır (məs: 123).');
   }
-}
 
   // Kartın istifadə tarixi: əvvəlcə format, sonra (format düzgündürsə) müddət yoxlanılır.
   // İki ayrı xəta nəticəsi (FORMAT / EXPIRED) qarışdırılmadan göstərilir.
-  if (kart_istifade_tarixi) {
+  if (!kart_istifade_tarixi) {
+    return errorResponse(res, 400, 'Bad Request', 'EXPIRY_REQUIRED', 'Kartın istifadə tarixi (son tarix) məcburidir.');
+  }
+  {
     const tarixCheck = isValidKartTarixi(kart_istifade_tarixi);
     if (!tarixCheck.valid) {
       if (tarixCheck.reason === 'FORMAT') {
