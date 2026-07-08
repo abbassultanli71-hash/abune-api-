@@ -2271,24 +2271,31 @@ async function handleAddCard() {
   const cvv = cvvEl.value.trim();
   const errEl = document.getElementById('card-error');
 
-  console.log('🔍 Kart əlavə etmə:', { name, panRaw: panRaw ? panRaw.substring(0,4)+'****' : null, expiry, cvv: cvv ? '***' : null });
+  console.log('🔵 ========== KART ƏLAVƏ ETMƏ ==========');
+  console.log('🔵 Name:', name);
+  console.log('🔵 PAN:', panRaw ? panRaw.substring(0,4) + '****' + panRaw.slice(-4) : 'EMPTY');
+  console.log('🔵 Expiry:', expiry);
+  console.log('🔵 CVV:', cvv ? '***' : 'EMPTY');
 
   // Auto-detect card brand from PAN
   const detectedBrand = detectCardBrandFromPan(panRaw);
+  console.log('🔵 Aşkarlanan brend:', detectedBrand);
+  
   if (!detectedBrand) {
     errEl.textContent = 'Dəstəklənməyən kart nömrəsi. Visa (4) və ya Mastercard (51-55, 2221-2720) daxil edin.';
     errEl.classList.add('show');
     panEl.classList.add('invalid');
     panEl.focus();
+    console.log('❌ Dəstəklənməyən brend');
     return;
   }
-  console.log('✅ Brend aşkar edildi:', detectedBrand);
 
   if (!name) {
     errEl.textContent = 'Kart adı məcburidir.';
     errEl.classList.add('show');
     nameEl.classList.add('invalid');
     nameEl.focus();
+    console.log('❌ Ad boşdur');
     return;
   }
   nameEl.classList.remove('invalid');
@@ -2298,6 +2305,7 @@ async function handleAddCard() {
     errEl.classList.add('show');
     panEl.classList.add('invalid');
     panEl.focus();
+    console.log('❌ PAN boşdur');
     return;
   }
   if (panRaw.length < 12) {
@@ -2305,6 +2313,7 @@ async function handleAddCard() {
     errEl.classList.add('show');
     panEl.classList.add('invalid');
     panEl.focus();
+    console.log('❌ PAN çox qısadır:', panRaw.length);
     return;
   }
   panEl.classList.remove('invalid');
@@ -2314,6 +2323,7 @@ async function handleAddCard() {
     errEl.classList.add('show');
     expiryEl.classList.add('invalid');
     expiryEl.focus();
+    console.log('❌ Expiry boşdur');
     return;
   }
   if (!/^\d{2}\/\d{2}$/.test(expiry)) {
@@ -2321,6 +2331,7 @@ async function handleAddCard() {
     errEl.classList.add('show');
     expiryEl.classList.add('invalid');
     expiryEl.focus();
+    console.log('❌ Expiry formatı yanlışdır:', expiry);
     return;
   }
   expiryEl.classList.remove('invalid');
@@ -2330,6 +2341,7 @@ async function handleAddCard() {
     errEl.classList.add('show');
     cvvEl.classList.add('invalid');
     cvvEl.focus();
+    console.log('❌ CVV boşdur');
     return;
   }
   if (!/^\d{3}$/.test(cvv)) {
@@ -2337,6 +2349,7 @@ async function handleAddCard() {
     errEl.classList.add('show');
     cvvEl.classList.add('invalid');
     cvvEl.focus();
+    console.log('❌ CVV formatı yanlışdır:', cvv);
     return;
   }
   cvvEl.classList.remove('invalid');
@@ -2351,19 +2364,26 @@ async function handleAddCard() {
     cvv: cvv
   };
 
-  console.log('📤 Payload:', { ...payload, pan: payload.pan.substring(0,4)+'****', cvv: '***' });
+  console.log('🔵 Göndərilən payload:', {
+    username: payload.username,
+    ad: payload.ad,
+    pan: payload.pan.substring(0,4) + '****' + payload.pan.slice(-4),
+    kart_istifade_tarixi: payload.kart_istifade_tarixi,
+    cvv: '***'
+  });
 
   try {
     const res = await apiFetch('POST', '/api/odenis-metodlari', payload);
-    console.log('📥 Cavab:', res);
+    console.log('🔵 Server cavabı:', res);
     
     if (res.ok) {
+      console.log('✅ Kart uğurla əlavə edildi!');
       closeCardSheet();
       await loadCards();
-      console.log('✅ Kart uğurla əlavə edildi');
     } else {
       const errorMsg = res.data?.error?.message || res.data?.message || 'Kart əlavə edilə bilmədi.';
-      console.log('❌ Xəta:', errorMsg);
+      console.log('❌ Server xətası:', errorMsg);
+      console.log('❌ Tam xəta:', JSON.stringify(res.data, null, 2));
       errEl.textContent = errorMsg;
       errEl.classList.add('show');
     }
