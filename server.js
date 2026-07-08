@@ -1426,6 +1426,10 @@ app.get('/api/odenis-metodlari/has-cards', async (req, res) => {
   }
 });
 
+// =============================================
+// --- ODENIS METODLARI (Payment Methods) ROUTES ---
+// =============================================
+
 /**
  * @swagger
  * /api/odenis-metodlari:
@@ -1462,7 +1466,7 @@ app.get('/api/odenis-metodlari/has-cards', async (req, res) => {
  *               cvv:
  *                 type: string
  *                 example: "123"
- *                 description: CVV kodu (3 rəqəm)
+ *                 description: CVV kodu (3 rəqəm) - YALNIZ VALİDASİYA ÜÇÜN, SAXLANILMIR
  *     responses:
  *       201:
  *         description: Ödəniş metodu əlavə edildi
@@ -1507,7 +1511,7 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     }
   }
 
-  // Validate CVV
+  // Validate CVV - yalnız format yoxlanışı, database-də saxlanılmır
   if (!/^\d{3}$/.test(trimmedCvv))
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CVV', 'CVV yalnız 3 rəqəmdən ibarət olmalıdır.');
 
@@ -1515,16 +1519,16 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
+    // CVV database-də SAXLANILMIR - yalnız validasiya üçün istifadə olunur
     await executeQuery(
-      `INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, pan, kart_istifade_tarixi, cvv)
-       VALUES (:istifadeci_id, :ad, :kart_tipi, :pan, :kart_istifade_tarixi, :cvv)`,
+      `INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, pan, kart_istifade_tarixi)
+       VALUES (:istifadeci_id, :ad, :kart_tipi, :pan, :kart_istifade_tarixi)`,
       {
         istifadeci_id: userId,
         ad: trimmedAd,
         kart_tipi: detectedBrand,
         pan: trimmedPan,
-        kart_istifade_tarixi: trimmedExpiry,
-        cvv: trimmedCvv
+        kart_istifade_tarixi: trimmedExpiry
       },
       { autoCommit: true }
     );
@@ -1534,7 +1538,6 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
-
 /**
  * @swagger
  * /api/odenis-metodlari/{id}:
