@@ -2260,104 +2260,119 @@
     input.value = v.replace(/(\d{4})(?=\d)/g, '$1 ');
   }
 
-  async function handleAddCard() {
-    const nameEl = document.getElementById('card-name');
-    const name = nameEl.value.trim();
-    const panEl = document.getElementById('card-pan');
-    const panRaw = panEl.value.replace(/\s/g, '');
-    const expiryEl = document.getElementById('card-expiry');
-    const expiry = expiryEl.value.trim();
-    const cvvEl = document.getElementById('card-cvv');
-    const cvv = cvvEl.value.trim();
-    const errEl = document.getElementById('card-error');
+async function handleAddCard() {
+  const nameEl = document.getElementById('card-name');
+  const name = nameEl.value.trim();
+  const panEl = document.getElementById('card-pan');
+  const panRaw = panEl.value.replace(/\s/g, '');
+  const expiryEl = document.getElementById('card-expiry');
+  const expiry = expiryEl.value.trim();
+  const cvvEl = document.getElementById('card-cvv');
+  const cvv = cvvEl.value.trim();
+  const errEl = document.getElementById('card-error');
 
-    // Auto-detect card brand from PAN
-    const detectedBrand = detectCardBrandFromPan(panRaw);
-    if (!detectedBrand) {
-      errEl.textContent = 'Dəstəklənməyən kart nömrəsi. Visa (4) və ya Mastercard (51-55, 2221-2720) daxil edin.';
-      errEl.classList.add('show');
-      panEl.classList.add('invalid');
-      panEl.focus();
-      return;
-    }
+  console.log('🔍 Kart əlavə etmə:', { name, panRaw: panRaw ? panRaw.substring(0,4)+'****' : null, expiry, cvv: cvv ? '***' : null });
 
-    if (!name) {
-      errEl.textContent = 'Kart adı məcburidir.';
-      errEl.classList.add('show');
-      nameEl.classList.add('invalid');
-      nameEl.focus();
-      return;
-    }
-    nameEl.classList.remove('invalid');
+  // Auto-detect card brand from PAN
+  const detectedBrand = detectCardBrandFromPan(panRaw);
+  if (!detectedBrand) {
+    errEl.textContent = 'Dəstəklənməyən kart nömrəsi. Visa (4) və ya Mastercard (51-55, 2221-2720) daxil edin.';
+    errEl.classList.add('show');
+    panEl.classList.add('invalid');
+    panEl.focus();
+    return;
+  }
+  console.log('✅ Brend aşkar edildi:', detectedBrand);
 
-    if (!panRaw) {
-      errEl.textContent = 'Kart nömrəsi (PAN) məcburidir.';
-      errEl.classList.add('show');
-      panEl.classList.add('invalid');
-      panEl.focus();
-      return;
-    }
-    if (panRaw.length < 12) {
-      errEl.textContent = 'Kart nömrəsi ən azı 12 rəqəm olmalıdır.';
-      errEl.classList.add('show');
-      panEl.classList.add('invalid');
-      panEl.focus();
-      return;
-    }
-    panEl.classList.remove('invalid');
+  if (!name) {
+    errEl.textContent = 'Kart adı məcburidir.';
+    errEl.classList.add('show');
+    nameEl.classList.add('invalid');
+    nameEl.focus();
+    return;
+  }
+  nameEl.classList.remove('invalid');
 
-    if (!expiry) {
-      errEl.textContent = 'Son tarix (AA/İİ) məcburidir.';
-      errEl.classList.add('show');
-      expiryEl.classList.add('invalid');
-      expiryEl.focus();
-      return;
-    }
-    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-      errEl.textContent = 'Son tarix formatı yanlışdır. Format: AA/İİ (məs: 12/28).';
-      errEl.classList.add('show');
-      expiryEl.classList.add('invalid');
-      expiryEl.focus();
-      return;
-    }
-    expiryEl.classList.remove('invalid');
+  if (!panRaw) {
+    errEl.textContent = 'Kart nömrəsi (PAN) məcburidir.';
+    errEl.classList.add('show');
+    panEl.classList.add('invalid');
+    panEl.focus();
+    return;
+  }
+  if (panRaw.length < 12) {
+    errEl.textContent = 'Kart nömrəsi ən azı 12 rəqəm olmalıdır.';
+    errEl.classList.add('show');
+    panEl.classList.add('invalid');
+    panEl.focus();
+    return;
+  }
+  panEl.classList.remove('invalid');
 
-    if (!cvv) {
-      errEl.textContent = 'CVV məcburidir.';
-      errEl.classList.add('show');
-      cvvEl.classList.add('invalid');
-      cvvEl.focus();
-      return;
-    }
-    if (!/^\d{3}$/.test(cvv)) {
-      errEl.textContent = 'CVV yalnız 3 rəqəmdən ibarət olmalıdır.';
-      errEl.classList.add('show');
-      cvvEl.classList.add('invalid');
-      cvvEl.focus();
-      return;
-    }
-    cvvEl.classList.remove('invalid');
+  if (!expiry) {
+    errEl.textContent = 'Son tarix (AA/İİ) məcburidir.';
+    errEl.classList.add('show');
+    expiryEl.classList.add('invalid');
+    expiryEl.focus();
+    return;
+  }
+  if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+    errEl.textContent = 'Son tarix formatı yanlışdır. Format: AA/İİ (məs: 12/28).';
+    errEl.classList.add('show');
+    expiryEl.classList.add('invalid');
+    expiryEl.focus();
+    return;
+  }
+  expiryEl.classList.remove('invalid');
 
-    errEl.classList.remove('show');
+  if (!cvv) {
+    errEl.textContent = 'CVV məcburidir.';
+    errEl.classList.add('show');
+    cvvEl.classList.add('invalid');
+    cvvEl.focus();
+    return;
+  }
+  if (!/^\d{3}$/.test(cvv)) {
+    errEl.textContent = 'CVV yalnız 3 rəqəmdən ibarət olmalıdır.';
+    errEl.classList.add('show');
+    cvvEl.classList.add('invalid');
+    cvvEl.focus();
+    return;
+  }
+  cvvEl.classList.remove('invalid');
 
-    const payload = {
-      username: currentUser.username,
-      ad: name,
-      pan: panRaw,
-      kart_istifade_tarixi: expiry,
-      cvv: cvv
-    };
+  errEl.classList.remove('show');
 
+  const payload = {
+    username: currentUser.username,
+    ad: name,
+    pan: panRaw,
+    kart_istifade_tarixi: expiry,
+    cvv: cvv
+  };
+
+  console.log('📤 Payload:', { ...payload, pan: payload.pan.substring(0,4)+'****', cvv: '***' });
+
+  try {
     const res = await apiFetch('POST', '/api/odenis-metodlari', payload);
+    console.log('📥 Cavab:', res);
+    
     if (res.ok) {
       closeCardSheet();
       await loadCards();
+      console.log('✅ Kart uğurla əlavə edildi');
     } else {
-      errEl.textContent = res.data?.error?.message || 'Kart əlavə edilə bilmədi.';
+      const errorMsg = res.data?.error?.message || res.data?.message || 'Kart əlavə edilə bilmədi.';
+      console.log('❌ Xəta:', errorMsg);
+      errEl.textContent = errorMsg;
       errEl.classList.add('show');
     }
+  } catch (error) {
+    console.error('❌ Fetch xətası:', error);
+    errEl.textContent = 'Serverlə əlaqə qurulmadı.';
+    errEl.classList.add('show');
   }
-
+}
   // Card brand detection helper (client-side)
   function detectCardBrandFromPan(pan) {
     const cleaned = String(pan).replace(/\s/g, '');
