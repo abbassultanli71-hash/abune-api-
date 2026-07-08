@@ -381,6 +381,10 @@ app.post('/api/istifadeciler', async (req, res) => {
       `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema, tema_rengi) VALUES (:userId, 'AZN', 'email', 'az', 'dark', 'gold')`,
       { userId }, { autoCommit: true }
     );
+    await executeQuery(
+      `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, hesab_mebleqi) VALUES (:userId, 300.00, 'AZN', 0.00)`,
+      { userId }, { autoCommit: true }
+    );
     return successResponse(res, 201, 'Created', { message: 'İstifadəçi və onun ilkin ayarları uğurla yaradıldı.' });
   } catch (err) {
     if (err.code === '23505') return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_ENTRY', 'Məlumatların unikallığı pozuldu (eyni username və ya email artıq mövcuddur).');
