@@ -1152,10 +1152,10 @@
         <option value="mastercard">Mastercard</option>
       </select>
     </div>
-    <div class="field"><label>Kart nömrəsi (PAN)</label><input type="text" id="card-pan" placeholder="4111 1111 1111 1111" maxlength="19" oninput="formatCardNum(this)"></div>
+    <div class="field"><label>Kart nömrəsi (PAN) *</label><input type="text" id="card-pan" placeholder="4111 1111 1111 1111" maxlength="19" oninput="formatCardNum(this)"></div>
     <div class="field-row">
-      <div class="field"><label>Son tarix (AA/İİ)</label><input type="text" id="card-expiry" placeholder="12/28" maxlength="5"></div>
-      <div class="field"><label>CVV</label><input type="password" id="card-cvv" placeholder="•••" maxlength="4"></div>
+      <div class="field"><label>Son tarix (AA/İİ) *</label><input type="text" id="card-expiry" placeholder="12/28" maxlength="5"></div>
+      <div class="field"><label>CVV *</label><input type="password" id="card-cvv" placeholder="•••" maxlength="3"></div>
     </div>
     <div class="field-error" id="card-error"></div>
     <div class="sheet-actions">
@@ -1930,8 +1930,11 @@
     document.getElementById('card-name').classList.remove('invalid');
     document.getElementById('card-type').value = 'visa';
     document.getElementById('card-pan').value = '';
+    document.getElementById('card-pan').classList.remove('invalid');
     document.getElementById('card-expiry').value = '';
+    document.getElementById('card-expiry').classList.remove('invalid');
     document.getElementById('card-cvv').value = '';
+    document.getElementById('card-cvv').classList.remove('invalid');
     document.getElementById('card-error').textContent = '';
     document.getElementById('card-error').classList.remove('show');
     document.getElementById('card-sheet-overlay').classList.add('open');
@@ -1950,9 +1953,12 @@
     const nameEl = document.getElementById('card-name');
     const name = nameEl.value.trim();
     const kart_tipi = document.getElementById('card-type').value;
-    const panRaw = document.getElementById('card-pan').value.replace(/\s/g, '');
-    const expiry = document.getElementById('card-expiry').value.trim();
-    const cvv = document.getElementById('card-cvv').value.trim();
+    const panEl = document.getElementById('card-pan');
+    const panRaw = panEl.value.replace(/\s/g, '');
+    const expiryEl = document.getElementById('card-expiry');
+    const expiry = expiryEl.value.trim();
+    const cvvEl = document.getElementById('card-cvv');
+    const cvv = cvvEl.value.trim();
     const errEl = document.getElementById('card-error');
 
     if (!name) {
@@ -1970,16 +1976,57 @@
       return;
     }
 
+    if (!panRaw) {
+      errEl.textContent = 'Kart nömrəsi (PAN) məcburidir.';
+      errEl.classList.add('show');
+      panEl.classList.add('invalid');
+      panEl.focus();
+      return;
+    }
+    panEl.classList.remove('invalid');
+
+    if (!expiry) {
+      errEl.textContent = 'Son tarix (AA/İİ) məcburidir.';
+      errEl.classList.add('show');
+      expiryEl.classList.add('invalid');
+      expiryEl.focus();
+      return;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+      errEl.textContent = 'Son tarix formatı yanlışdır. Format: AA/İİ (məs: 12/28).';
+      errEl.classList.add('show');
+      expiryEl.classList.add('invalid');
+      expiryEl.focus();
+      return;
+    }
+    expiryEl.classList.remove('invalid');
+
+    if (!cvv) {
+      errEl.textContent = 'CVV məcburidir.';
+      errEl.classList.add('show');
+      cvvEl.classList.add('invalid');
+      cvvEl.focus();
+      return;
+    }
+    if (!/^\d{3}$/.test(cvv)) {
+      errEl.textContent = 'CVV yalnız 3 rəqəmdən ibarət olmalıdır.';
+      errEl.classList.add('show');
+      cvvEl.classList.add('invalid');
+      cvvEl.focus();
+      return;
+    }
+    cvvEl.classList.remove('invalid');
+
     errEl.classList.remove('show');
 
     const payload = {
       username: currentUser.username,
       ad: name,
-      kart_tipi: kart_tipi
+      kart_tipi: kart_tipi,
+      pan: panRaw,
+      kart_istifade_tarixi: expiry,
+      cvv: cvv
     };
-    if (panRaw) payload.pan = panRaw;
-    if (expiry) payload.kart_istifade_tarixi = expiry;
-    if (cvv) payload.cvv = cvv;
 
     const res = await apiFetch('POST', '/api/odenis-metodlari', payload);
     if (res.ok) {
