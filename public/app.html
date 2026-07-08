@@ -11,25 +11,32 @@
   :root {
     --bg: #14151a;
     --surface: #1c1e25;
-    --surface-2: #23252e;
-    --surface-3: #2a2d38;
-    --border: rgba(242,240,234,0.09);
-    --border-strong: rgba(242,240,234,0.16);
-    --ink: #f2f0ea;
-    --ink-muted: #9a9dab;
-    --ink-faint: #64677a;
+    --surface-2: #241c3f;
+    --surface-3: #2c2350;
+    --border: rgba(238,235,255,0.09);
+    --border-strong: rgba(238,235,255,0.17);
+    --ink: #f4f2ff;
+    --ink-muted: #a9a0d4;
+    --ink-faint: #746b9e;
     --gold: #ffb020;
-    --teal: #17e0c9;
-    --coral: #ff5b45;
+    --teal: #1fe0c2;
+    --coral: #ff6b6b;
+    --purple: #a78bfa;
+    --pink: #f472b6;
+    --blue: #60a5fa;
     --gold-soft: rgba(255,176,32,0.18);
-    --teal-soft: rgba(23,224,201,0.16);
-    --coral-soft: rgba(255,91,69,0.19);
-    --accent: var(--gold);
-    --accent-soft: var(--gold-soft);
-    --accent-grad: linear-gradient(135deg, #ffc247 0%, var(--gold) 45%, var(--coral) 100%);
-    --glow-accent: 0 10px 28px -8px rgba(255,176,32,0.55);
-    --glow-coral: 0 10px 28px -8px rgba(255,91,69,0.5);
-    --shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+    --teal-soft: rgba(31,224,194,0.16);
+    --coral-soft: rgba(255,107,107,0.19);
+    --purple-soft: rgba(167,139,250,0.22);
+    --pink-soft: rgba(244,114,182,0.20);
+    --blue-soft: rgba(96,165,250,0.20);
+    --accent: var(--purple);
+    --accent-soft: var(--purple-soft);
+    --accent-grad: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 45%, #7c6ff0 100%);
+    --hero-grad: linear-gradient(135deg, #8b7cf6 0%, #7c6ff0 45%, #6952e0 100%);
+    --glow-accent: 0 10px 28px -8px rgba(139,124,246,0.55);
+    --glow-coral: 0 10px 28px -8px rgba(255,107,107,0.5);
+    --shadow: 0 20px 50px -20px rgba(20,12,45,0.65);
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', -apple-system, system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
@@ -37,19 +44,22 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   [data-theme="light"] {
-    --bg: #f4f2ec;
+    --bg: #f2effc;
     --surface: #ffffff;
-    --surface-2: #faf9f5;
-    --surface-3: #f0eee6;
-    --border: rgba(27,29,36,0.08);
-    --border-strong: rgba(27,29,36,0.14);
-    --ink: #1b1d24;
-    --ink-muted: #6b6e7a;
-    --ink-faint: #9799a3;
+    --surface-2: #f8f6ff;
+    --surface-3: #efe9ff;
+    --border: rgba(45,27,105,0.08);
+    --border-strong: rgba(45,27,105,0.15);
+    --ink: #241b42;
+    --ink-muted: #6f6690;
+    --ink-faint: #a49bc4;
     --gold-soft: rgba(214,133,10,0.16);
     --teal-soft: rgba(9,163,151,0.14);
     --coral-soft: rgba(222,56,35,0.14);
-    --shadow: 0 20px 50px -25px rgba(27,29,36,0.25);
+    --purple-soft: rgba(124,58,237,0.14);
+    --pink-soft: rgba(219,39,119,0.13);
+    --blue-soft: rgba(29,99,216,0.14);
+    --shadow: 0 20px 50px -25px rgba(45,27,105,0.22);
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -73,9 +83,9 @@
     justify-content: center;
     padding: 30px 0;
     background:
-      radial-gradient(circle at 30% 20%, rgba(255,176,32,0.10), transparent 45%),
-      radial-gradient(circle at 80% 80%, rgba(23,224,201,0.08), transparent 45%),
-      #0b0c10;
+      radial-gradient(circle at 30% 20%, rgba(139,124,246,0.14), transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(31,224,194,0.08), transparent 45%),
+      #0c0a16;
   }
   .phone {
     width: 390px;
@@ -99,10 +109,10 @@
     content: '';
     position: absolute; inset: -8% -8%; z-index: 0; pointer-events: none;
     background:
-      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(255,176,32,0.16), transparent 60%),
-      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(23,224,201,0.13), transparent 55%),
-      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(255,91,69,0.10), transparent 55%),
-      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(255,176,32,0.08), transparent 60%);
+      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(139,124,246,0.22), transparent 60%),
+      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(31,224,194,0.14), transparent 55%),
+      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(244,114,182,0.13), transparent 55%),
+      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(96,165,250,0.10), transparent 60%);
     animation: blobDrift 22s ease-in-out infinite;
   }
   .phone::after {
@@ -117,10 +127,10 @@
   }
   [data-theme="light"] .phone::before {
     background:
-      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(214,133,10,0.10), transparent 60%),
-      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(9,163,151,0.08), transparent 55%),
-      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(222,56,35,0.06), transparent 55%),
-      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(214,133,10,0.05), transparent 60%);
+      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(124,58,237,0.12), transparent 60%),
+      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(9,163,151,0.09), transparent 55%),
+      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(219,39,119,0.08), transparent 55%),
+      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(29,99,216,0.07), transparent 60%);
   }
   [data-theme="light"] .phone::after { opacity: 0.25; }
   .notch {
@@ -166,6 +176,35 @@
                 radial-gradient(ellipse at 85% 30%, var(--teal-soft), transparent 55%);
     pointer-events: none; z-index: -1; opacity: 0.8;
   }
+
+  /* ---- Hero panel (vivid gradient greeting card) ---- */
+  .hero-panel {
+    margin: 8px 20px 18px;
+    padding: 22px 20px 24px;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    background: var(--hero-grad);
+    box-shadow: 0 18px 40px -16px rgba(105,82,224,0.55);
+  }
+  .hero-blob { position: absolute; border-radius: 50%; filter: blur(2px); pointer-events: none; opacity: 0.55; }
+  .hero-blob-1 { width: 140px; height: 140px; background: rgba(255,255,255,0.14); top: -60px; right: -30px; }
+  .hero-blob-2 { width: 90px; height: 90px; background: rgba(255,255,255,0.10); bottom: -40px; left: 20%; }
+  .hero-eyebrow {
+    font-family: var(--font-mono); font-size: 10.5px; color: rgba(255,255,255,0.75);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+  }
+  .hero-title { font-family: var(--font-display); font-size: 25px; font-weight: 600; margin: 0; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+  .hero-sub { color: rgba(255,255,255,0.82); font-size: 12.5px; margin-top: 4px; }
+  .hero-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #6952e0;
+    flex-shrink: 0; cursor: pointer; border: 2px solid rgba(255,255,255,0.5);
+    transition: transform 0.15s ease;
+  }
+  .hero-avatar:active { transform: scale(0.92); }
   .eyebrow {
     font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-faint);
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
@@ -207,9 +246,13 @@
   .stat-icon.teal { background: var(--teal-soft); color: var(--teal); }
   .stat-icon.gold { background: var(--gold-soft); color: var(--gold); }
   .stat-icon.coral { background: var(--coral-soft); color: var(--coral); }
+  .stat-icon.purple { background: var(--purple-soft); color: var(--purple); }
+  .stat-icon.pink { background: var(--pink-soft); color: var(--pink); }
+  .stat-icon.blue { background: var(--blue-soft); color: var(--blue); }
   .stat-label { font-size: 11px; color: var(--ink-muted); font-weight: 500; }
   .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .stat-value small { font-size: 12px; color: var(--ink-faint); font-weight: 500; }
+  .stat-card-accent { border-color: var(--purple-soft); box-shadow: var(--shadow), inset 0 0 0 1px rgba(167,139,250,0.12); }
 
   /* ---- Signature: payment ruler ---- */
   .ruler-card {
@@ -217,6 +260,12 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
     padding: 18px 18px 20px;
     box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .ruler-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--hero-grad);
   }
   .ruler-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
   .ruler-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
@@ -225,12 +274,12 @@
   .ruler-track { position: relative; height: 2px; background: var(--border-strong); border-radius: 2px; }
   .ruler-today-line {
     position: absolute; top: -12px; bottom: -12px; width: 1px;
-    background: repeating-linear-gradient(to bottom, var(--gold) 0 4px, transparent 4px 8px);
+    background: repeating-linear-gradient(to bottom, var(--purple) 0 4px, transparent 4px 8px);
   }
   .ruler-today-label {
     position: absolute; top: -26px; transform: translateX(-50%);
-    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--gold);
-    background: var(--gold-soft); padding: 2px 6px; border-radius: 20px; white-space: nowrap;
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--purple);
+    background: var(--purple-soft); padding: 2px 6px; border-radius: 20px; white-space: nowrap;
   }
   .ruler-chip {
     position: absolute; top: -5px; transform: translateX(-50%);
@@ -274,6 +323,9 @@
   .sub-icon.teal { background: var(--teal-soft); color: var(--teal); border-color: transparent; }
   .sub-icon.gold { background: var(--gold-soft); color: var(--gold); border-color: transparent; }
   .sub-icon.coral { background: var(--coral-soft); color: var(--coral); border-color: transparent; }
+  .sub-icon.purple { background: var(--purple-soft); color: var(--purple); border-color: transparent; }
+  .sub-icon.pink { background: var(--pink-soft); color: var(--pink); border-color: transparent; }
+  .sub-icon.blue { background: var(--blue-soft); color: var(--blue); border-color: transparent; }
   .sub-icon.neutral { background: var(--surface-3); color: var(--ink-faint); }
   .sub-info { flex: 1; min-width: 0; }
   .sub-name { font-weight: 600; font-size: 13.5px; }
@@ -344,13 +396,20 @@
   .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
   .budget-bar-track { height: 8px; background: var(--surface-3); border-radius: 20px; overflow: hidden; }
   .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--gold) 65%, var(--coral)); box-shadow: 0 0 12px -2px var(--accent-soft); }
+  .budget-ring-wrap { position: relative; width: 148px; height: 148px; margin: 4px auto 18px; }
+  .budget-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .budget-ring-track { fill: none; stroke: var(--surface-3); stroke-width: 11; }
+  .budget-ring-fill { fill: none; stroke: url(#ringGrad); stroke-width: 11; stroke-linecap: round; stroke-dasharray: 326.7; stroke-dashoffset: 326.7; transition: stroke-dashoffset 0.6s cubic-bezier(.16,.84,.44,1); }
+  .budget-ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .budget-ring-pct { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--ink); line-height: 1; }
+  .budget-ring-label { font-size: 10.5px; color: var(--ink-faint); margin-top: 4px; max-width: 90px; line-height: 1.3; }
   .budget-note { font-size: 11px; color: var(--ink-faint); margin-top: 10px; }
 
   /* ---- FAB ---- */
   .fab {
-    position: absolute; right: 20px; bottom: 96px; z-index: 25;
+    position: absolute; right: 20px; bottom: 104px; z-index: 25;
     width: 54px; height: 54px; border-radius: 50%;
-    background: var(--accent-grad); color: #221a08;
+    background: var(--accent-grad); color: #fff;
     display: flex; align-items: center; justify-content: center;
     border: none; box-shadow: var(--glow-accent);
     cursor: pointer;
@@ -384,23 +443,27 @@
 
   /* ---- Bottom tab bar ---- */
   .tabbar {
-    position: absolute; left: 0; right: 0; bottom: 0; z-index: 20;
+    position: absolute; left: 12px; right: 12px; bottom: calc(10px + var(--safe-bottom)); z-index: 20;
     background: var(--surface);
-    border-top: 1px solid var(--border);
+    border: 1px solid var(--border);
+    border-radius: 22px;
     display: flex;
-    padding: 8px 6px calc(10px + var(--safe-bottom));
+    padding: 8px 6px;
+    box-shadow: 0 16px 36px -14px rgba(105,82,224,0.35), var(--shadow);
   }
   .tab-item {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 4px 0;
-    border-radius: 12px; position: relative;
+    color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 6px 0;
+    border-radius: 14px; position: relative;
     cursor: pointer;
+    transition: color 0.2s ease;
   }
   .tab-item svg { width: 20px; height: 20px; }
-  .tab-item.active { color: var(--accent); }
+  .tab-item.active { color: #fff; }
   .tab-item.active::before {
-    content: ''; position: absolute; inset: -2px 8px auto 8px; top: -4px; height: 30px;
-    background: var(--accent-soft); border-radius: 12px; z-index: -1;
+    content: ''; position: absolute; inset: -2px 6px auto 6px; top: -6px; height: 34px;
+    background: var(--hero-grad); border-radius: 14px; z-index: -1;
+    box-shadow: 0 8px 18px -6px rgba(105,82,224,0.6);
   }
   .tab-dot {
     position: absolute; top: 0px; right: 26%;
@@ -543,7 +606,7 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
   .btn:active { transform: scale(0.98); }
-  .btn-primary { background: var(--accent-grad); color: #221a08; border-color: transparent; box-shadow: var(--glow-accent); }
+  .btn-primary { background: var(--accent-grad); color: #fff; border-color: transparent; box-shadow: var(--glow-accent); }
   .btn svg { width: 15px; height: 15px; }
 
   .hint {
@@ -596,7 +659,7 @@
   .auth-logo-area svg {
     width: 30px;
     height: 30px;
-    color: #221a08;
+    color: #fff;
   }
   .auth-logo-area h2 {
     font-family: var(--font-display);
@@ -722,16 +785,16 @@
 
       <!-- ============ DASHBOARD ============ -->
       <div class="screen" id="scr-dashboard">
-        <div class="scr-header">
-          <div class="h-row">
+        <div class="hero-panel">
+          <div class="hero-blob hero-blob-1"></div>
+          <div class="hero-blob hero-blob-2"></div>
+          <div class="h-row" style="position:relative; z-index:1;">
             <div>
-              <div class="eyebrow" id="dashboard-date">4 İyul, Cümə axşamı</div>
-              <h1 class="page-title" data-i18n="dashboard_title">Xoş gördük</h1>
-              <div class="page-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
+              <div class="hero-eyebrow" id="dashboard-date">4 İyul, Cümə axşamı</div>
+              <h1 class="hero-title" data-i18n="dashboard_title">Xoş gördük</h1>
+              <div class="hero-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
             </div>
-            <div class="icon-round" onclick="switchScreen('settings')" title="Ayarlar">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            </div>
+            <div class="hero-avatar" id="hero-avatar-initials" onclick="switchScreen('settings')" title="Ayarlar">U.U</div>
           </div>
         </div>
 
@@ -741,7 +804,7 @@
             <div class="stat-label" data-i18n="stat_active">Aktiv abunəlik</div>
             <div class="stat-value" id="dashboard-active-count">0</div>
           </div>
-          <div class="stat-card" style="cursor:pointer;" onclick="switchScreen('budget')">
+          <div class="stat-card stat-card-accent" style="cursor:pointer;" onclick="switchScreen('budget')">
             <div class="stat-icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
             <div class="stat-label" data-i18n="stat_monthly">Aylıq xərc</div>
             <div class="stat-value" id="dashboard-monthly-spend">₼0.00</div>
@@ -846,6 +909,23 @@
           </div>
         </div>
         <div class="budget-card">
+          <div class="budget-ring-wrap">
+            <svg class="budget-ring" viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#a78bfa"/>
+                  <stop offset="55%" stop-color="#f472b6"/>
+                  <stop offset="100%" stop-color="#ffb020"/>
+                </linearGradient>
+              </defs>
+              <circle class="budget-ring-track" cx="60" cy="60" r="52"></circle>
+              <circle class="budget-ring-fill" id="budget-ring-fill" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="budget-ring-center">
+              <div class="budget-ring-pct" id="budget-ring-pct">0%</div>
+              <div class="budget-ring-label" data-i18n="budget_ring_label">limitdən istifadə</div>
+            </div>
+          </div>
           <div class="budget-nums">
             <span class="budget-spent">₼0.00</span>
             <span class="budget-limit">/ ₼0.00</span>
@@ -1400,6 +1480,8 @@
     document.getElementById('profile-fullname').textContent = currentUser.ad;
     document.getElementById('profile-username').textContent = '@' + currentUser.username;
     document.getElementById('profile-initials').textContent = initials(currentUser.ad);
+    const heroAvatarEl = document.getElementById('hero-avatar-initials');
+    if (heroAvatarEl) heroAvatarEl.textContent = initials(currentUser.ad);
     
     // Update date on dashboard
     const monthsAz = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
@@ -1557,10 +1639,10 @@
     'Other': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.1" fill="currentColor" stroke="none"/></svg>'
   };
   const CATEGORY_COLORS = {
-    'Entertainment': 'coral', 'Music': 'gold', 'Education': 'teal',
-    'Health & Fitness': 'coral', 'Productivity': 'teal', 'Gaming': 'gold',
-    'Cloud Storage': 'teal', 'News': 'gold', 'Food & Delivery': 'coral',
-    'Shopping': 'gold', 'Finance': 'teal', 'Other': 'neutral'
+    'Entertainment': 'coral', 'Music': 'pink', 'Education': 'blue',
+    'Health & Fitness': 'coral', 'Productivity': 'purple', 'Gaming': 'gold',
+    'Cloud Storage': 'teal', 'News': 'blue', 'Food & Delivery': 'gold',
+    'Shopping': 'pink', 'Finance': 'teal', 'Other': 'neutral'
   };
   function categoryIconHTML(category) {
     const icon = CATEGORY_ICONS[category] || CATEGORY_ICONS['Other'];
@@ -2261,6 +2343,13 @@
     document.querySelector('.budget-spent').textContent = sym + budgetState.spent.toFixed(2);
     document.querySelector('.budget-limit').textContent = '/ ' + sym + budgetState.limit.toFixed(2);
     document.querySelector('.budget-bar-fill').style.width = pct + '%';
+
+    // Circular progress ring
+    const ringCircumference = 326.7;
+    const ringFill = document.getElementById('budget-ring-fill');
+    if (ringFill) ringFill.style.strokeDashoffset = ringCircumference * (1 - pct / 100);
+    const ringPct = document.getElementById('budget-ring-pct');
+    if (ringPct) ringPct.textContent = pct + '%';
     
     // Update stats cards in dashboard
     document.getElementById('dashboard-monthly-spend').textContent = sym + budgetState.spent.toFixed(2);
