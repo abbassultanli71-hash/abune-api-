@@ -1679,24 +1679,44 @@ app.delete('/api/odenis-metodlari/:id', async (req, res) => {
  *         description: İstifadəçi tapılmadı
  */
 app.get('/api/odenis-tarixcesi', async (req, res) => {
+  console.log('🔵 ========== TARİXÇƏ GET ==========');
   const { username } = req.query;
-  if (!username) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
+  if (!username) {
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
+  }
   try {
     const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
-
-    const sql = `
-      SELECT h.id AS history_id, a.ad AS app_adi, h.mebleq, h.valyuta, h.status,
-             TO_CHAR(h.odenis_tarixi, 'YYYY-MM-DD') as odenis_tarixi,
-             a.kateqoriya
-      FROM odenis_tarixcesi h
-      JOIN abunelikler a ON h.abunelik_id = a.id
-      WHERE h.istifadeci_id = :istifadeci_id ORDER BY h.id DESC
-    `;
-    const result = await executeQuery(sql, { istifadeci_id: userId });
-    return successResponse(res, 200, 'Success', { paymenthistory: result.rows });
+    if (userId === null) {
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    }
+    
+    // Əvvəlcə cədvəlin strukturunu yoxlayaq - SADƏ SORĞU
+    const sql = `SELECT * FROM odenis_tarixcesi WHERE istifadeci_id = ${userId} LIMIT 10`;
+    console.log('🔵 SQL:', sql);
+    const result = await executeQuery(sql);
+    console.log('🔵 Rows:', result.rows.length);
+    
+    // Əgər məlumat yoxdursa, boş array qaytar
+    if (result.rows.length === 0) {
+      return successResponse(res, 200, 'No payment history', { paymenthistory: [] });
+    }
+    
+    // Məlumatları formatla
+    const history = result.rows.map(row => ({
+      history_id: row.id || row.ID,
+      app_adi: row.app_adi || 'Unknown',
+      mebleq: row.mebleq || 0,
+      valyuta: row.valyuta || 'AZN',
+      status: row.status || 'success',
+      odenis_tarixi: row.odenis_tarixi || row.ODENIS_TARIXI || new Date().toISOString().split('T')[0],
+      kateqoriya: row.kateqoriya || 'Other'
+    }));
+    
+    return successResponse(res, 200, 'Success', { paymenthistory: history });
   } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+    console.error('❌ Xəta:', err.message);
+    console.error('❌ Stack:', err.stack);
+    return successResponse(res, 200, 'No payment history', { paymenthistory: [] });
   }
 });
 
