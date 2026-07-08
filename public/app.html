@@ -10,34 +10,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #14151a;
-    --surface: #1c1e25;
-    --surface-2: #241c3f;
-    --surface-3: #2c2350;
-    --border: rgba(238,235,255,0.09);
-    --border-strong: rgba(238,235,255,0.17);
-    --ink: #f4f2ff;
-    --ink-muted: #a9a0d4;
-    --ink-faint: #746b9e;
-    --gold: #ffb020;
-    --teal: #1fe0c2;
-    --coral: #ff6b6b;
-    --purple: #a78bfa;
-    --pink: #f472b6;
-    --blue: #60a5fa;
-    --gold-soft: rgba(255,176,32,0.18);
-    --teal-soft: rgba(31,224,194,0.16);
-    --coral-soft: rgba(255,107,107,0.19);
-    --purple-soft: rgba(167,139,250,0.22);
-    --pink-soft: rgba(244,114,182,0.20);
-    --blue-soft: rgba(96,165,250,0.20);
-    --accent: var(--purple);
-    --accent-soft: var(--purple-soft);
-    --accent-grad: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 45%, #7c6ff0 100%);
-    --hero-grad: linear-gradient(135deg, #8b7cf6 0%, #7c6ff0 45%, #6952e0 100%);
-    --glow-accent: 0 10px 28px -8px rgba(139,124,246,0.55);
-    --glow-coral: 0 10px 28px -8px rgba(255,107,107,0.5);
-    --shadow: 0 20px 50px -20px rgba(20,12,45,0.65);
+    --bg: #0b0d10;
+    --surface: #14171c;
+    --surface-2: #191d24;
+    --surface-3: #22272f;
+    --border: rgba(232,236,244,0.07);
+    --border-strong: rgba(232,236,244,0.16);
+    --ink: #f5f7fa;
+    --ink-muted: #9aa3b2;
+    --ink-faint: #626b7a;
+    --gold: #f5c46b;
+    --teal: #4fd1c5;
+    --coral: #ff7a6b;
+    --purple: #b39dff;
+    --pink: #ff8fb8;
+    --blue: #7cb8ff;
+    --lime: #c8f560;
+    --gold-soft: rgba(245,196,107,0.14);
+    --teal-soft: rgba(79,209,197,0.14);
+    --coral-soft: rgba(255,122,107,0.15);
+    --purple-soft: rgba(179,157,255,0.16);
+    --pink-soft: rgba(255,143,184,0.15);
+    --blue-soft: rgba(124,184,255,0.16);
+    --lime-soft: rgba(200,245,96,0.18);
+    --accent: var(--lime);
+    --accent-soft: var(--lime-soft);
+    --accent-grad: linear-gradient(135deg, #e6ffb0 0%, #c8f560 45%, #9fdb2e 100%);
+    --hero-grad: linear-gradient(140deg, #1a1f2a 0%, #232a38 55%, #2f3a4d 100%);
+    --glow-accent: 0 12px 32px -10px rgba(200,245,96,0.42);
+    --glow-coral: 0 12px 32px -10px rgba(255,122,107,0.45);
+    --shadow: 0 24px 60px -24px rgba(0,0,0,0.75);
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', -apple-system, system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
@@ -45,23 +47,27 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   [data-theme="light"] {
-    --bg: #f2effc;
+    --bg: #f6f7f4;
     --surface: #ffffff;
-    --surface-2: #f8f6ff;
-    --surface-3: #efe9ff;
-    --border: rgba(45,27,105,0.08);
-    --border-strong: rgba(45,27,105,0.15);
-    --ink: #241b42;
-    --ink-muted: #6f6690;
-    --ink-faint: #a49bc4;
-    --gold-soft: rgba(214,133,10,0.16);
-    --teal-soft: rgba(9,163,151,0.14);
-    --coral-soft: rgba(222,56,35,0.14);
-    --purple-soft: rgba(124,58,237,0.14);
-    --pink-soft: rgba(219,39,119,0.13);
-    --blue-soft: rgba(29,99,216,0.14);
-    --shadow: 0 20px 50px -25px rgba(45,27,105,0.22);
+    --surface-2: #fbfbf7;
+    --surface-3: #f0f1ea;
+    --border: rgba(20,24,32,0.07);
+    --border-strong: rgba(20,24,32,0.14);
+    --ink: #14181f;
+    --ink-muted: #5b6472;
+    --ink-faint: #98a0ac;
+    --gold-soft: rgba(180,130,15,0.12);
+    --teal-soft: rgba(15,150,140,0.12);
+    --coral-soft: rgba(220,70,55,0.12);
+    --purple-soft: rgba(105,80,220,0.12);
+    --pink-soft: rgba(210,50,120,0.12);
+    --blue-soft: rgba(30,110,220,0.12);
+    --lime-soft: rgba(120,170,20,0.16);
+    --accent-grad: linear-gradient(135deg, #d8f77a 0%, #a8d93a 100%);
+    --hero-grad: linear-gradient(140deg, #14181f 0%, #232a38 100%);
+    --shadow: 0 24px 60px -28px rgba(20,24,32,0.22);
   }
+
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
