@@ -182,6 +182,11 @@
     flex-shrink: 0;
     box-shadow: var(--shadow);
     cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .icon-round:active { transform: scale(0.92); }
+  @media (hover: hover) {
+    .icon-round:hover { border-color: var(--border-strong); }
   }
   .icon-round svg { width: 17px; height: 17px; }
 
@@ -195,6 +200,7 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
     padding: 14px 16px; min-width: 148px; flex-shrink: 0;
     display: flex; flex-direction: column; gap: 8px;
+    box-shadow: var(--shadow);
   }
   .stat-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
   .stat-icon svg { width: 14px; height: 14px; }
@@ -202,7 +208,7 @@
   .stat-icon.gold { background: var(--gold-soft); color: var(--gold); }
   .stat-icon.coral { background: var(--coral-soft); color: var(--coral); }
   .stat-label { font-size: 11px; color: var(--ink-muted); font-weight: 500; }
-  .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; }
+  .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .stat-value small { font-size: 12px; color: var(--ink-faint); font-weight: 500; }
 
   /* ---- Signature: payment ruler ---- */
@@ -252,9 +258,13 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
     cursor: pointer;
-    transition: background 0.2s ease;
+    box-shadow: var(--shadow);
+    transition: background 0.2s ease, transform 0.15s ease, border-color 0.15s ease;
   }
-  .sub-row:active { background: var(--surface-2); }
+  .sub-row:active { background: var(--surface-2); transform: scale(0.99); }
+  @media (hover: hover) {
+    .sub-row:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  }
   .sub-icon {
     width: 40px; height: 40px; border-radius: 12px; background: var(--surface-3);
     display: flex; align-items: center; justify-content: center;
@@ -270,7 +280,7 @@
   .sub-meta { font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
   .sub-meta .sep { margin: 0 4px; }
   .sub-right { text-align: right; flex-shrink: 0; }
-  .sub-price { font-family: var(--font-mono); font-weight: 600; font-size: 13.5px; }
+  .sub-price { font-family: var(--font-mono); font-weight: 600; font-size: 13.5px; font-variant-numeric: tabular-nums; }
   .sub-badge {
     display: inline-block; margin-top: 4px; font-family: var(--font-mono);
     font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px;
@@ -285,7 +295,11 @@
     display: flex; align-items: center; gap: 12px;
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
-    transition: background 0.2s ease;
+    box-shadow: var(--shadow);
+    transition: background 0.2s ease, border-color 0.15s ease;
+  }
+  @media (hover: hover) {
+    .card-row:hover, .history-row:hover { border-color: var(--border-strong); }
   }
   .card-icon, .history-icon {
     width: 40px; height: 40px; border-radius: 12px;
@@ -312,6 +326,7 @@
   .notif-item {
     display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 14px; padding: 13px 14px; margin-bottom: 8px;
+    box-shadow: var(--shadow);
   }
   .notif-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
   .notif-title { font-size: 12.5px; font-weight: 600; }
@@ -322,10 +337,11 @@
   .budget-card {
     margin: 0 20px 16px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 18px; padding: 18px 18px 20px;
+    box-shadow: var(--shadow);
   }
   .budget-nums { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
-  .budget-spent { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
-  .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); }
+  .budget-spent { font-family: var(--font-mono); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
   .budget-bar-track { height: 8px; background: var(--surface-3); border-radius: 20px; overflow: hidden; }
   .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--gold) 65%, var(--coral)); box-shadow: 0 0 12px -2px var(--accent-soft); }
   .budget-note { font-size: 11px; color: var(--ink-faint); margin-top: 10px; }
@@ -406,13 +422,14 @@
     margin: 0 20px 14px; display: flex; align-items: center; gap: 8px;
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 11px 14px;
+    box-shadow: var(--shadow);
   }
   .search-bar svg { width: 16px; height: 16px; color: var(--ink-faint); flex-shrink: 0; }
   .search-bar input { flex: 1; background: none; border: none; color: var(--ink); font-size: 13px; outline: none; }
   .search-bar input::placeholder { color: var(--ink-faint); }
 
   /* ---- Settings ---- */
-  .settings-group { margin: 0 20px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .settings-group { margin: 0 20px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
   .settings-row {
     display: flex; align-items: center; justify-content: space-between;
     padding: 15px 16px; border-bottom: 1px solid var(--border); gap: 12px;
@@ -447,6 +464,7 @@
   .profile-card {
     margin: 4px 20px 18px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 12px;
+    box-shadow: var(--shadow);
   }
   .avatar-lg {
     width: 48px; height: 48px; border-radius: 50%; background: var(--surface-3);
@@ -502,7 +520,13 @@
     background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
     padding: 11px 12px; color: var(--ink); font-size: 14px;
     outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
+  .field select:focus, .field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .field input.invalid:focus { box-shadow: 0 0 0 3px var(--coral-soft); }
   .field input.invalid { border-color: var(--coral); }
   .field-error {
     display: none; font-size: 10.5px; color: var(--coral); font-weight: 500;
@@ -541,16 +565,15 @@
     margin-bottom: 8px;
   }
   @keyframes logoPop {
-    0% { opacity: 0; transform: scale(0.4) rotate(-18deg); }
-    60% { opacity: 1; transform: scale(1.08) rotate(4deg); }
-    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    0% { opacity: 0; transform: scale(0.75) translateY(6px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
   }
   @keyframes glowBreathe {
-    0%, 100% { box-shadow: 0 10px 28px -8px rgba(255,176,32,0.55); }
-    50% { box-shadow: 0 14px 38px -6px rgba(255,91,69,0.6); }
+    0%, 100% { box-shadow: 0 10px 26px -10px rgba(255,176,32,0.45); }
+    50% { box-shadow: 0 12px 30px -8px rgba(255,91,69,0.42); }
   }
   @keyframes riseIn {
-    from { opacity: 0; transform: translateY(14px); }
+    from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   .logo-badge {
@@ -559,12 +582,12 @@
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 12px;
     box-shadow: var(--glow-accent);
-    animation: logoPop 0.7s cubic-bezier(.2,.9,.3,1.3) both, glowBreathe 2.6s ease-in-out 0.7s infinite;
+    animation: logoPop 0.45s cubic-bezier(.16,.84,.44,1) both, glowBreathe 3.2s ease-in-out 0.45s infinite;
   }
-  .auth-logo-area h2 { animation: riseIn 0.5s ease 0.25s both; }
-  .auth-logo-area p { animation: riseIn 0.5s ease 0.35s both; }
-  .auth-tabs { animation: riseIn 0.5s ease 0.45s both; }
-  .auth-form-card { animation: riseIn 0.5s ease 0.55s both; }
+  .auth-logo-area h2 { animation: riseIn 0.4s ease 0.12s both; }
+  .auth-logo-area p { animation: riseIn 0.4s ease 0.18s both; }
+  .auth-tabs { animation: riseIn 0.4s ease 0.24s both; }
+  .auth-form-card { animation: riseIn 0.4s ease 0.3s both; }
   @media (prefers-reduced-motion: reduce) {
     .logo-badge, .auth-logo-area h2, .auth-logo-area p, .auth-tabs, .auth-form-card {
       animation: none !important;
