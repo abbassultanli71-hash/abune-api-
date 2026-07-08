@@ -1710,7 +1710,7 @@ app.get('/api/ayarlar/:username', async (req, res) => {
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
     const sql = `
-      SELECT esas_valyuta, bildiris_metodu, dil, tema, tema_rengi
+      SELECT esas_valyuta, bildiris_metodu, dil, tema
       FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id
     `;
     const result = await executeQuery(sql, { istifadeci_id: userId });
