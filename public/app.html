@@ -18,14 +18,17 @@
     --ink: #f2f0ea;
     --ink-muted: #9a9dab;
     --ink-faint: #64677a;
-    --gold: #e8b54d;
-    --teal: #4fbdba;
-    --coral: #e2685a;
-    --gold-soft: rgba(232,181,77,0.14);
-    --teal-soft: rgba(79,189,186,0.14);
-    --coral-soft: rgba(226,104,90,0.16);
+    --gold: #ffb020;
+    --teal: #17e0c9;
+    --coral: #ff5b45;
+    --gold-soft: rgba(255,176,32,0.18);
+    --teal-soft: rgba(23,224,201,0.16);
+    --coral-soft: rgba(255,91,69,0.19);
     --accent: var(--gold);
     --accent-soft: var(--gold-soft);
+    --accent-grad: linear-gradient(135deg, #ffc247 0%, var(--gold) 45%, var(--coral) 100%);
+    --glow-accent: 0 10px 28px -8px rgba(255,176,32,0.55);
+    --glow-coral: 0 10px 28px -8px rgba(255,91,69,0.5);
     --shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', -apple-system, system-ui, sans-serif;
@@ -43,9 +46,9 @@
     --ink: #1b1d24;
     --ink-muted: #6b6e7a;
     --ink-faint: #9799a3;
-    --gold-soft: rgba(184,131,20,0.14);
-    --teal-soft: rgba(28,140,137,0.12);
-    --coral-soft: rgba(197,63,49,0.12);
+    --gold-soft: rgba(214,133,10,0.16);
+    --teal-soft: rgba(9,163,151,0.14);
+    --coral-soft: rgba(222,56,35,0.14);
     --shadow: 0 20px 50px -25px rgba(27,29,36,0.25);
   }
 
@@ -70,8 +73,8 @@
     justify-content: center;
     padding: 30px 0;
     background:
-      radial-gradient(circle at 30% 20%, rgba(232,181,77,0.06), transparent 45%),
-      radial-gradient(circle at 80% 80%, rgba(79,189,186,0.05), transparent 45%),
+      radial-gradient(circle at 30% 20%, rgba(255,176,32,0.10), transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(23,224,201,0.08), transparent 45%),
       #0b0c10;
   }
   .phone {
@@ -122,7 +125,13 @@
   .screen.active { display: flex; animation: fadein 0.28s ease; }
   @keyframes fadein { from { opacity: 0; transform: translateY(6px);} to {opacity: 1; transform: translateY(0);} }
 
-  .scr-header { padding: 8px 20px 16px; }
+  .scr-header { padding: 8px 20px 16px; position: relative; }
+  .scr-header::before {
+    content: ''; position: absolute; top: -20px; left: -10%; right: -10%; height: 130px;
+    background: radial-gradient(ellipse at 20% 0%, var(--gold-soft), transparent 60%),
+                radial-gradient(ellipse at 85% 30%, var(--teal-soft), transparent 55%);
+    pointer-events: none; z-index: -1; opacity: 0.8;
+  }
   .eyebrow {
     font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-faint);
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
@@ -284,18 +293,20 @@
   .budget-spent { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
   .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); }
   .budget-bar-track { height: 8px; background: var(--surface-3); border-radius: 20px; overflow: hidden; }
-  .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--accent)); }
+  .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--gold) 65%, var(--coral)); box-shadow: 0 0 12px -2px var(--accent-soft); }
   .budget-note { font-size: 11px; color: var(--ink-faint); margin-top: 10px; }
 
   /* ---- FAB ---- */
   .fab {
     position: absolute; right: 20px; bottom: 96px; z-index: 25;
     width: 54px; height: 54px; border-radius: 50%;
-    background: var(--accent); color: #221a08;
+    background: var(--accent-grad); color: #221a08;
     display: flex; align-items: center; justify-content: center;
-    border: none; box-shadow: 0 12px 26px -8px var(--accent-soft);
+    border: none; box-shadow: var(--glow-accent);
     cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
+  .fab:active { transform: scale(0.94); }
   .fab svg { width: 22px; height: 22px; }
 
   /* ---- Scroll-to-top button ---- */
@@ -337,6 +348,10 @@
   }
   .tab-item svg { width: 20px; height: 20px; }
   .tab-item.active { color: var(--accent); }
+  .tab-item.active::before {
+    content: ''; position: absolute; inset: -2px 8px auto 8px; top: -4px; height: 30px;
+    background: var(--accent-soft); border-radius: 12px; z-index: -1;
+  }
   .tab-dot {
     position: absolute; top: 0px; right: 26%;
     width: 7px; height: 7px; border-radius: 50%; background: var(--coral);
@@ -467,8 +482,10 @@
     background: var(--surface-2); color: var(--ink); font-size: 13.5px; font-weight: 600;
     cursor: pointer;
     outline: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-  .btn-primary { background: var(--accent); color: #221a08; border-color: transparent; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent-grad); color: #221a08; border-color: transparent; box-shadow: var(--glow-accent); }
   .btn svg { width: 15px; height: 15px; }
 
   .hint {
@@ -489,11 +506,17 @@
     text-align: center;
     margin-bottom: 8px;
   }
+  .logo-badge {
+    width: 64px; height: 64px; border-radius: 20px;
+    background: var(--accent-grad);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    box-shadow: var(--glow-accent);
+  }
   .auth-logo-area svg {
-    width: 44px;
-    height: 44px;
-    color: var(--accent);
-    margin-bottom: 8px;
+    width: 30px;
+    height: 30px;
+    color: #221a08;
   }
   .auth-logo-area h2 {
     font-family: var(--font-display);
@@ -567,7 +590,9 @@
       <div class="screen active" id="scr-auth">
         <div class="auth-container">
           <div class="auth-logo-area">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="logo-mark"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <div class="logo-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="logo-mark"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
             <h2>Abunəm</h2>
             <p data-i18n="auth_subtitle">Abunəliklərinizi asanlıqla idarə edin</p>
           </div>
@@ -992,7 +1017,7 @@
             <option value="">-- Kart seçilməyib --</option>
           </select>
         </div>
-        <div id="budget-exceeded-banner" style="display:none; margin:0 0 10px; background:rgba(226,104,90,0.13); border:1px solid var(--coral,#e2685a); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#e2685a); line-height:1.5;">
+        <div id="budget-exceeded-banner" style="display:none; margin:0 0 10px; background:rgba(255,91,69,0.16); border:1px solid var(--coral,#ff5b45); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#ff5b45); line-height:1.5;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div>
               <strong>⚠️ Büdcə limiti keçilir!</strong>
@@ -1019,7 +1044,7 @@
         </div>
         <input type="hidden" id="manage-sub-id">
         <input type="hidden" id="manage-sub-orig-name">
-        <div id="manage-budget-exceeded-banner" style="display:none; margin:10px 0; background:rgba(226,104,90,0.13); border:1px solid var(--coral,#e2685a); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#e2685a); line-height:1.5;">
+        <div id="manage-budget-exceeded-banner" style="display:none; margin:10px 0; background:rgba(255,91,69,0.16); border:1px solid var(--coral,#ff5b45); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#ff5b45); line-height:1.5;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div>
               <strong>⚠️ Büdcə limiti keçilir!</strong>
@@ -2089,18 +2114,18 @@
 
   const ACCENT_COLORS = {
     dark: {
-      gold: { main: '#e8b54d', soft: 'rgba(232,181,77,0.14)' },
-      teal: { main: '#4fbdba', soft: 'rgba(79,189,186,0.14)' },
-      coral: { main: '#e2685a', soft: 'rgba(226,104,90,0.16)' },
-      purple: { main: '#a78bfa', soft: 'rgba(167,139,250,0.14)' },
-      blue: { main: '#3b82f6', soft: 'rgba(59,130,246,0.14)' }
+      gold: { main: '#ffb020', soft: 'rgba(255,176,32,0.18)' },
+      teal: { main: '#17e0c9', soft: 'rgba(23,224,201,0.16)' },
+      coral: { main: '#ff5b45', soft: 'rgba(255,91,69,0.19)' },
+      purple: { main: '#b48bff', soft: 'rgba(180,139,255,0.18)' },
+      blue: { main: '#4d8cff', soft: 'rgba(77,140,255,0.18)' }
     },
     light: {
-      gold: { main: '#b88314', soft: 'rgba(184,131,20,0.14)' },
-      teal: { main: '#1c8c89', soft: 'rgba(28,140,137,0.12)' },
-      coral: { main: '#c53f31', soft: 'rgba(197,63,49,0.12)' },
-      purple: { main: '#7c3aed', soft: 'rgba(124,58,237,0.12)' },
-      blue: { main: '#1d4ed8', soft: 'rgba(29,78,216,0.12)' }
+      gold: { main: '#d6850a', soft: 'rgba(214,133,10,0.16)' },
+      teal: { main: '#09a397', soft: 'rgba(9,163,151,0.14)' },
+      coral: { main: '#de3823', soft: 'rgba(222,56,35,0.14)' },
+      purple: { main: '#7c3aed', soft: 'rgba(124,58,237,0.14)' },
+      blue: { main: '#1d63d8', soft: 'rgba(29,99,216,0.14)' }
     }
   };
 
