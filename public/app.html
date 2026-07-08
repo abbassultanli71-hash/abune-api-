@@ -160,8 +160,13 @@
     display: none;
     flex-direction: column;
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 100px;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+    padding-bottom: 112px;
   }
   .screen::-webkit-scrollbar { width: 5px; height: 5px; }
   .screen::-webkit-scrollbar-track { background: transparent; }
@@ -571,6 +576,9 @@
     width: 100%; background: var(--surface); border-radius: 24px 24px 0 0;
     padding: 10px 20px calc(22px + var(--safe-bottom));
     max-height: 82%; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
     border-top: 1px solid var(--border-strong);
   }
   .sheet-handle { width: 36px; height: 4px; border-radius: 4px; background: var(--border-strong); margin: 6px auto 14px; }
@@ -1305,9 +1313,6 @@
               <div class="eyebrow">Ödəniş</div>
               <h1 class="page-title">Kartlarım</h1>
               <div class="page-sub" id="cards-sub">Ödəniş metodları</div>
-            </div>
-            <div class="icon-round" onclick="openCardSheet()" title="Yeni kart əlavə et">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
             </div>
           </div>
         </div>
