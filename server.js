@@ -664,6 +664,24 @@ app.get('/api/abunelikler', async (req, res) => {
  *       201:
  *         description: Abunəlik əlavə edildi (status avtomatik "active", novbeti_odenis_tarixi avtomatik hesablanır)
  */
+async function syncBudgetSpent(userId) {
+  try {
+    const activeSubs = await executeQuery(
+      `SELECT qiymet FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
+      { userId }
+    );
+    let total = 0;
+    for (const row of activeSubs.rows) { total += Number(row.QIYMET); }
+    await executeQuery(
+      `UPDATE budceler SET hesab_mebleqi = :total WHERE istifadeci_id = :userId`,
+      { total, userId },
+      { autoCommit: true }
+    );
+  } catch (err) {
+    console.error('syncBudgetSpent xetasi:', err.message);
+  }
+}
+
 app.post('/api/abunelikler', async (req, res) => {
   const { username, ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, odenis_metodu_id } = req.body;
 
@@ -764,6 +782,8 @@ app.post('/api/abunelikler', async (req, res) => {
     if (newSubId) {
       await addAutoPaymentHistory(userId, newSubId, parsedQiymet, baslama_tarixi);
     }
+
+    await syncBudgetSpent(userId);
 
     return successResponse(res, 201, 'Created', {
       message: 'Abunəlik uğurla əlavə edildi. Bildiriş və ödəniş tarixçəsi avtomatik yaradıldı.',
@@ -909,6 +929,9 @@ app.put('/api/abunelikler', async (req, res) => {
       },
       { autoCommit: true }
     );
+
+    await syncBudgetSpent(userId);
+
     return successResponse(res, 200, 'Updated', {
       message: 'Abunəlik uğurla yeniləndi.',
       novbeti_odenis_tarixi: novbetiOdenisTarixi
