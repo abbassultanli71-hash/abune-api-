@@ -1397,45 +1397,6 @@ app.get('/api/odenis-metodlari', async (req, res) => {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
-
-/**
- * @swagger
- * /api/odenis-metodlari/has-cards:
- *   get:
- *     summary: İstifadəçinin ödəniş metodları olub-olmadığını yoxlayır
- *     tags: [Ödəniş Metodları]
- *     parameters:
- *       - in: query
- *         name: username
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Uğurlu əməliyyat
- *       400:
- *         description: username göndərilmədi
- *       404:
- *         description: İstifadəçi tapılmadı
- */
-app.get('/api/odenis-metodlari/has-cards', async (req, res) => {
-  const { username } = req.query;
-  if (!username) return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username sorğu parametri məcburidir.');
-  try {
-    const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
-
-    const result = await executeQuery(
-      `SELECT COUNT(*) as count FROM odenis_metodlari WHERE istifadeci_id = :istifadeci_id`,
-      { istifadeci_id: userId }
-    );
-    const hasCards = result.rows[0].COUNT > 0;
-    return successResponse(res, 200, 'Success', { has_cards: hasCards });
-  } catch (err) {
-    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
-  }
-});
-
 // =============================================
 // --- ODENIS METODLARI (Payment Methods) ROUTES ---
 // =============================================
@@ -1787,8 +1748,6 @@ app.get('/api/ayarlar/:username', async (req, res) => {
  *                 type: string
  *               tema:
  *                 type: string
- *               tema_rengi:
- *                 type: string
  *     responses:
  *       200:
  *         description: Yeniləndi
@@ -1797,7 +1756,7 @@ app.get('/api/ayarlar/:username', async (req, res) => {
  */
 app.put('/api/ayarlar/:username', async (req, res) => {
   const { username } = req.params;
-  const { esas_valyuta, bildiris_metodu, dil, tema, tema_rengi } = req.body;
+  const { esas_valyuta, bildiris_metodu, dil, tema} = req.body;
 
   try {
     const userId = await getUserIdByUsername(username);
@@ -1805,7 +1764,7 @@ app.put('/api/ayarlar/:username', async (req, res) => {
 
     await executeQuery(
       `UPDATE istifadeci_ayarlari
-       SET esas_valyuta = :esas_valyuta, bildiris_metodu = :bildiris_metodu, dil = :dil, tema = :tema, tema_rengi = :tema_rengi
+       SET esas_valyuta = :esas_valyuta, bildiris_metodu = :bildiris_metodu, dil = :dil, tema = :tema,
        WHERE istifadeci_id = :istifadeci_id`,
       {
         esas_valyuta, bildiris_metodu, dil, tema, tema_rengi, istifadeci_id: userId
