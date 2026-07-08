@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="az" data-theme="dark">
 <head>
@@ -1147,6 +1146,17 @@
           <button class="sheet-close" onclick="closeSheet()">✕</button>
         </div>
         <div class="field"><label data-i18n="field_name">Ad</label><input type="text" id="new-sub-name" placeholder="məs. Netflix"></div>
+        <!-- Account Credentials for validation -->
+        <div class="field-row">
+          <div class="field">
+            <label>Hesab Email</label>
+            <input type="email" id="new-sub-email" placeholder="netflix@test.com">
+          </div>
+          <div class="field">
+            <label>Hesab Şifrə</label>
+            <input type="password" id="new-sub-password" placeholder="••••••••">
+          </div>
+        </div>
         <div class="field-row">
           <div class="field">
             <label data-i18n="field_price">Qiymət</label>
@@ -1224,6 +1234,17 @@
         </div>
         <input type="hidden" id="manage-sub-id">
         <input type="hidden" id="manage-sub-orig-name">
+        <!-- Account Credentials for validation -->
+        <div class="field-row">
+          <div class="field">
+            <label>Hesab Email</label>
+            <input type="email" id="manage-sub-email" placeholder="netflix@test.com">
+          </div>
+          <div class="field">
+            <label>Hesab Şifrə</label>
+            <input type="password" id="manage-sub-password" placeholder="••••••••">
+          </div>
+        </div>
         <div id="manage-budget-exceeded-banner" style="display:none; margin:10px 0; background:rgba(255,91,69,0.16); border:1px solid var(--coral,#ff5b45); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#ff5b45); line-height:1.5;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
             <div>
@@ -1301,69 +1322,52 @@
       </div>
     </div>
 
-      <!-- ============ ÖDƏNİŞ TARİXÇƏSİ ============ -->
-      <div class="screen" id="scr-history">
-        <div class="scr-header">
-          <div class="h-row">
-            <div>
-              <div class="eyebrow">Ödənişlər</div>
-              <h1 class="page-title">Tarixçə</h1>
-              <div class="page-sub" id="history-sub">Yüklənir...</div>
-            </div>
+    <!-- ============ KARTLAR ============ -->
+    <div class="screen" id="scr-cards">
+      <div class="scr-header">
+        <div class="h-row">
+          <div>
+            <div class="eyebrow">Ödəniş</div>
+            <h1 class="page-title">Kartlarım</h1>
+            <div class="page-sub" id="cards-sub">Ödəniş metodları</div>
           </div>
         </div>
-        <div class="section" style="padding-top:6px;">
-          <div id="history-list"><div class="hint">Yüklənir...</div></div>
-        </div>
       </div>
+      <div class="section" style="padding-top:6px; padding-bottom:20px;">
+        <div id="cards-list"><div class="hint">Yüklənir...</div></div>
+      </div>
+    </div>
 
-      <!-- ============ KARTLAR ============ -->
-      <div class="screen" id="scr-cards">
-        <div class="scr-header">
-          <div class="h-row">
-            <div>
-              <div class="eyebrow">Ödəniş</div>
-              <h1 class="page-title">Kartlarım</h1>
-              <div class="page-sub" id="cards-sub">Ödəniş metodları</div>
-            </div>
+    <!-- Bottom sheet: Add card (NO manual cardType selection) -->
+    <div class="sheet-overlay" id="card-sheet-overlay">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head">
+          <div class="sheet-title">Yeni Kart</div>
+          <button class="sheet-close" onclick="closeCardSheet()">✕</button>
+        </div>
+        <div class="field"><label>Kart adı *</label><input type="text" id="card-name" placeholder="məs. Kapital Bank" required></div>
+        <!-- Card brand is auto-detected from PAN, no manual selection -->
+        <div class="field">
+          <label>Kart nömrəsi (PAN) *</label>
+          <div style="position:relative;">
+            <input type="text" id="card-pan" placeholder="4111 1111 1111 1111" maxlength="19" oninput="formatCardNum(this); detectCardBrandUI(this.value);">
+            <span id="card-brand-badge" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:11px; font-weight:600; padding:2px 8px; border-radius:12px; background:var(--surface-3); color:var(--ink-muted); display:none;"></span>
           </div>
+          <div class="field-error" id="card-pan-error" style="display:none;">Dəstəklənməyən kart növü.</div>
         </div>
-        <div class="section" style="padding-top:6px; padding-bottom:20px;">
-          <div id="cards-list"><div class="hint">Yüklənir...</div></div>
+        <div class="field-row">
+          <div class="field"><label>Son tarix (AA/İİ) *</label><input type="text" id="card-expiry" placeholder="12/28" maxlength="5"></div>
+          <div class="field"><label>CVV *</label><input type="password" id="card-cvv" placeholder="•••" maxlength="3"></div>
+        </div>
+        <div class="field-error" id="card-error"></div>
+        <div class="sheet-actions">
+          <button class="btn" onclick="closeCardSheet()">İmtina</button>
+          <button class="btn btn-primary" onclick="handleAddCard()">Əlavə et</button>
         </div>
       </div>
-
     </div>
 
-  </div>
-</div>
-
-<!-- Bottom sheet: Add card -->
-<div class="sheet-overlay" id="card-sheet-overlay">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head">
-      <div class="sheet-title">Yeni Kart</div>
-      <button class="sheet-close" onclick="closeCardSheet()">✕</button>
-    </div>
-    <div class="field"><label>Kart adı *</label><input type="text" id="card-name" placeholder="məs. Kapital Bank" required></div>
-    <div class="field">
-      <label>Kart növü</label>
-      <select id="card-type">
-        <option value="visa">Visa</option>
-        <option value="mastercard">Mastercard</option>
-      </select>
-    </div>
-    <div class="field"><label>Kart nömrəsi (PAN) *</label><input type="text" id="card-pan" placeholder="4111 1111 1111 1111" maxlength="19" oninput="formatCardNum(this)"></div>
-    <div class="field-row">
-      <div class="field"><label>Son tarix (AA/İİ) *</label><input type="text" id="card-expiry" placeholder="12/28" maxlength="5"></div>
-      <div class="field"><label>CVV *</label><input type="password" id="card-cvv" placeholder="•••" maxlength="3"></div>
-    </div>
-    <div class="field-error" id="card-error"></div>
-    <div class="sheet-actions">
-      <button class="btn" onclick="closeCardSheet()">İmtina</button>
-      <button class="btn btn-primary" onclick="handleAddCard()">Əlavə et</button>
-    </div>
   </div>
 </div>
 
@@ -1563,14 +1567,15 @@
         title: n.basliq,
         msg: n.mesaj,
         urgency: getUrgency(n.basliq, n.mesaj),
-        time: n.gonderilme_tarixi
+        time: n.gonderilme_tarixi,
+        is_read: n.is_read || false
       }));
     } else {
       notifications = [];
     }
 
     // 4. Budget
-    const budgetRes = await apiFetch('GET', `/api/budceler?username=${currentUser.username}`);
+    const budgetRes = await apiFetch('GET', `/api/budceler/${currentUser.username}`);
     const activeSubs = subscriptions.filter(s => s.status === 'active');
     
     // Calculate total spend (converting to AZN or keep as is? Let's just sum raw values for now as simple presentation)
@@ -1736,31 +1741,40 @@
 
   function notifRowHTML(n) {
     const color = n.urgency === 'urgent' ? 'var(--coral)' : n.urgency === 'soon' ? 'var(--gold)' : 'var(--teal)';
+    const readStatus = n.is_read ? ' (oxundu)' : '';
     return `
-      <div class="notif-item">
+      <div class="notif-item" style="${n.is_read ? 'opacity:0.6;' : ''}">
         <span class="notif-dot" style="background:${color}"></span>
         <div style="flex: 1;">
-          <div class="notif-title">${n.title}</div>
+          <div class="notif-title">${n.title}${readStatus}</div>
           <div class="notif-msg">${n.msg}</div>
           <div class="notif-time">${n.time}</div>
         </div>
-        <button class="sheet-close" style="font-size:12px; padding: 2px 6px;" onclick="handleDeleteNotification(${n.id})">✕</button>
+        <button class="sheet-close" style="font-size:12px; padding: 2px 6px;" onclick="handleMarkNotificationRead(${n.id})" title="Oxundu kimi işarələ">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
       </div>`;
   }
   
   function renderNotifs() {
+    const unreadCount = notifications.filter(n => !n.is_read).length;
     document.getElementById('notif-preview-list').innerHTML = notifications.slice(0,2).map(notifRowHTML).join('');
     document.getElementById('notif-full-list').innerHTML = notifications.map(notifRowHTML).join('');
     
     // Toggle tab badge dot
-    document.getElementById('notif-badge').style.display = notifications.length > 0 ? 'block' : 'none';
+    document.getElementById('notif-badge').style.display = unreadCount > 0 ? 'block' : 'none';
   }
 
-  async function handleDeleteNotification(id) {
-    const res = await apiFetch('DELETE', `/api/bildirisler/${id}`);
+  // Mark notification as read (PATCH instead of DELETE)
+  async function handleMarkNotificationRead(id) {
+    const res = await apiFetch('PATCH', `/api/bildirisler/${id}/read`);
     if (res.ok) {
-      notifications = notifications.filter(n => n.id !== id);
+      notifications = notifications.map(n => 
+        n.id === id ? { ...n, is_read: true } : n
+      );
       renderNotifs();
+    } else {
+      alert(res.data?.error?.message || 'Bildiriş oxunmuş kimi işarələnə bilmədi.');
     }
   }
 
@@ -1805,13 +1819,13 @@
   function switchScreen(name) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const targetScreen = document.getElementById('scr-' + name);
-    targetScreen.classList.add('active');
+    if (targetScreen) targetScreen.classList.add('active');
 
     if (name !== 'auth') {
       document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
       const activeTab = document.querySelector(`.tab-item[data-screen="${name}"]`);
       if (activeTab) activeTab.classList.add('active');
-      targetScreen.scrollTop = 0;
+      if (targetScreen) targetScreen.scrollTop = 0;
 
       // Show FAB on dashboard, subs, and cards screens, configure dynamically
       const fab = document.querySelector('.fab');
@@ -1832,9 +1846,11 @@
 
       // Attach scroll-to-top listener on this screen
       const scrollBtn = document.getElementById('scroll-top-btn');
-      if (scrollBtn) {
+      if (scrollBtn && targetScreen) {
         // Remove previous listener to avoid duplicates
-        targetScreen._scrollHandler && targetScreen.removeEventListener('scroll', targetScreen._scrollHandler);
+        if (targetScreen._scrollHandler) {
+          targetScreen.removeEventListener('scroll', targetScreen._scrollHandler);
+        }
         targetScreen._scrollHandler = () => {
           if (targetScreen.scrollTop > 120) {
             scrollBtn.classList.add('visible');
@@ -1860,6 +1876,8 @@
     const mm = String(TODAY.getMonth() + 1).padStart(2, '0');
     const dd = String(TODAY.getDate()).padStart(2, '0');
     document.getElementById('new-sub-start').value = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('new-sub-email').value = '';
+    document.getElementById('new-sub-password').value = '';
     document.getElementById('sheet-overlay').classList.add('open'); 
   }
   function closeSheet() { document.getElementById('sheet-overlay').classList.remove('open'); }
@@ -1881,6 +1899,8 @@
     const startInput = document.getElementById('new-sub-start');
     const catInput = document.getElementById('new-sub-category');
     const cardInput = document.getElementById('new-sub-card');
+    const emailInput = document.getElementById('new-sub-email');
+    const passwordInput = document.getElementById('new-sub-password');
 
     const name = nameInput.value.trim();
     const price = Number(priceInput.value);
@@ -1889,11 +1909,22 @@
     const start = startInput.value;
     const category = catInput.value;
     const cardId = cardInput.value || null;
+    const accountEmail = emailInput.value.trim();
+    const accountPassword = passwordInput.value.trim();
 
     if (!name) {
       nameInput.focus();
       return;
     }
+
+    if (!accountEmail || !accountPassword) {
+      emailInput.classList.add('invalid');
+      passwordInput.classList.add('invalid');
+      emailInput.focus();
+      return;
+    }
+    emailInput.classList.remove('invalid');
+    passwordInput.classList.remove('invalid');
 
     if (!priceInput.value || isNaN(price) || price <= 0) {
       document.getElementById('price-error').classList.add('show');
@@ -1919,7 +1950,9 @@
       odenis_tezliyi: freq,
       baslama_tarixi: start,
       kateqoriya: category,
-      odenis_metodu_id: cardId
+      odenis_metodu_id: cardId,
+      accountemail: accountEmail,
+      accountpassword: accountPassword
     };
 
     // Budget banner sıfırla
@@ -1931,6 +1964,8 @@
       closeSheet();
       nameInput.value = '';
       priceInput.value = '';
+      emailInput.value = '';
+      passwordInput.value = '';
       loadAllData();
     } else {
       const errCode = res.data?.error?.code;
@@ -1941,6 +1976,8 @@
         const banner = document.getElementById('budget-exceeded-banner');
         banner.style.display = 'block';
         banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else if (errCode === 'ACCOUNT_NOT_FOUND') {
+        alert('Abunəlik hesabı tapılmadı! Email və şifrəni yoxlayın.');
       } else {
         alert(errMsg);
       }
@@ -1959,6 +1996,8 @@
     document.getElementById('manage-sub-category').value = sub.category;
     document.getElementById('manage-sub-status').value = sub.status;
     document.getElementById('manage-sub-card').value = sub.odenis_metodu_id || '';
+    document.getElementById('manage-sub-email').value = '';
+    document.getElementById('manage-sub-password').value = '';
 
     document.getElementById('manage-budget-exceeded-banner').style.display = 'none';
     clearManagePriceError();
@@ -1990,11 +2029,22 @@
     const category = document.getElementById('manage-sub-category').value;
     const status = document.getElementById('manage-sub-status').value;
     const cardId = document.getElementById('manage-sub-card').value || null;
+    const accountEmail = document.getElementById('manage-sub-email').value.trim();
+    const accountPassword = document.getElementById('manage-sub-password').value.trim();
 
     if (!name) {
       document.getElementById('manage-sub-name').focus();
       return;
     }
+
+    if (!accountEmail || !accountPassword) {
+      document.getElementById('manage-sub-email').classList.add('invalid');
+      document.getElementById('manage-sub-password').classList.add('invalid');
+      document.getElementById('manage-sub-email').focus();
+      return;
+    }
+    document.getElementById('manage-sub-email').classList.remove('invalid');
+    document.getElementById('manage-sub-password').classList.remove('invalid');
 
     if (!priceInput.value || isNaN(price) || price <= 0) {
       document.getElementById('manage-price-error').classList.add('show');
@@ -2013,7 +2063,9 @@
       baslama_tarixi: start,
       kateqoriya: category,
       status: status,
-      odenis_metodu_id: cardId
+      odenis_metodu_id: cardId,
+      accountemail: accountEmail,
+      accountpassword: accountPassword
     };
 
     const res = await apiFetch('PUT', `/api/abunelikler?username=${currentUser.username}&ad=${origName}`, updatePayload);
@@ -2030,6 +2082,8 @@
         const banner = document.getElementById('manage-budget-exceeded-banner');
         banner.style.display = 'block';
         banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else if (errCode === 'ACCOUNT_NOT_FOUND') {
+        alert('Abunəlik hesabı tapılmadı! Email və şifrəni yoxlayın.');
       } else {
         alert(errMsg);
       }
@@ -2058,10 +2112,10 @@
   }
 
   function cardRowHTML(c) {
-    // Show last 4 digits of pan in **** XXXX format, or dots if no pan stored
     const panDisplay = c.pan
       ? '**** ' + String(c.pan).replace(/\s/g, '').slice(-4)
       : '&#9679;&#9679;&#9679;&#9679;';
+    const brandLabel = (c.kart_tipi || '').toLowerCase() === 'visa' ? 'Visa' : 'Mastercard';
     return `
       <div class="card-row">
         ${cardIconHTML(c.kart_tipi)}
@@ -2069,6 +2123,7 @@
           <div class="card-name">${c.ad}</div>
           <div class="card-meta">
             <span style="font-family:var(--font-mono);letter-spacing:0.04em;">${panDisplay}</span>
+            <span style="margin-left:8px;font-size:10px;color:var(--ink-faint);background:var(--surface-2);padding:1px 8px;border-radius:10px;">${brandLabel}</span>
           </div>
         </div>
         <div class="card-right">
@@ -2095,7 +2150,13 @@
     const list = document.getElementById('cards-list');
     const sub = document.getElementById('cards-sub');
     if (cards.length === 0) {
-      list.innerHTML = '<div class="hint">Hələ kart əlavə edilməyib. + düyməsini istifadə edin.</div>';
+      list.innerHTML = `
+        <div class="hint" style="padding:20px 0;">
+          <div style="font-size:40px;margin-bottom:12px;">💳</div>
+          Hələ kart əlavə edilməyib.<br>
+          <span style="color:var(--ink-muted);font-size:12px;">Yeni kart əlavə etmək üçün <strong style="color:var(--accent);">+</strong> düyməsini istifadə edin.</span>
+        </div>
+      `;
       if (sub) sub.textContent = '0 ödəniş metodu';
     } else {
       list.innerHTML = cards.map(cardRowHTML).join('');
@@ -2112,11 +2173,53 @@
       cards.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.card_id;
-        opt.textContent = `${c.ad} (${c.kart_tipi} ${c.pan || ''})`;
+        const brandLabel = (c.kart_tipi || '').toLowerCase() === 'visa' ? 'Visa' : 'Mastercard';
+        opt.textContent = `${c.ad} (${brandLabel} ${c.pan ? '****' + String(c.pan).slice(-4) : ''})`;
         sel.appendChild(opt);
       });
       if (currentVal) sel.value = currentVal;
     });
+  }
+
+  // Card Brand Detection UI
+  function detectCardBrandUI(pan) {
+    const badge = document.getElementById('card-brand-badge');
+    const errorEl = document.getElementById('card-pan-error');
+    const cleaned = String(pan).replace(/\s/g, '');
+    
+    if (cleaned.length < 2) {
+      badge.style.display = 'none';
+      errorEl.style.display = 'none';
+      return;
+    }
+    
+    let brand = null;
+    if (cleaned.startsWith('4')) {
+      brand = 'Visa';
+    } else if (cleaned.startsWith('51') || cleaned.startsWith('52') || cleaned.startsWith('53') || 
+               cleaned.startsWith('54') || cleaned.startsWith('55')) {
+      brand = 'Mastercard';
+    } else if (cleaned.length >= 4) {
+      const prefix = parseInt(cleaned.substring(0, 4));
+      if (prefix >= 2221 && prefix <= 2720) {
+        brand = 'Mastercard';
+      }
+    }
+    
+    if (brand) {
+      badge.textContent = brand;
+      badge.style.display = 'block';
+      badge.style.background = brand === 'Visa' ? 'var(--teal-soft)' : 'var(--gold-soft)';
+      badge.style.color = brand === 'Visa' ? 'var(--teal)' : 'var(--gold)';
+      errorEl.style.display = 'none';
+    } else {
+      badge.style.display = 'none';
+      if (cleaned.length >= 4) {
+        errorEl.style.display = 'block';
+      } else {
+        errorEl.style.display = 'none';
+      }
+    }
   }
 
   async function handleDeleteCard(id) {
@@ -2124,6 +2227,9 @@
     const res = await apiFetch('DELETE', `/api/odenis-metodlari/${id}`);
     if (res.ok) {
       await loadCards();
+    } else if (res.status === 409) {
+      // Payment method in use
+      alert('Bu kart aktiv abunəliklərdə istifadə olunur. Əvvəlcə abunəliyi başqa karta keçirin və ya silin.');
     } else {
       alert(res.data?.error?.message || 'Kart silinə bilmədi.');
     }
@@ -2132,7 +2238,6 @@
   function openCardSheet() {
     document.getElementById('card-name').value = '';
     document.getElementById('card-name').classList.remove('invalid');
-    document.getElementById('card-type').value = 'visa';
     document.getElementById('card-pan').value = '';
     document.getElementById('card-pan').classList.remove('invalid');
     document.getElementById('card-expiry').value = '';
@@ -2141,6 +2246,8 @@
     document.getElementById('card-cvv').classList.remove('invalid');
     document.getElementById('card-error').textContent = '';
     document.getElementById('card-error').classList.remove('show');
+    document.getElementById('card-brand-badge').style.display = 'none';
+    document.getElementById('card-pan-error').style.display = 'none';
     document.getElementById('card-sheet-overlay').classList.add('open');
   }
   function closeCardSheet() { document.getElementById('card-sheet-overlay').classList.remove('open'); }
@@ -2156,7 +2263,6 @@
   async function handleAddCard() {
     const nameEl = document.getElementById('card-name');
     const name = nameEl.value.trim();
-    const kart_tipi = document.getElementById('card-type').value;
     const panEl = document.getElementById('card-pan');
     const panRaw = panEl.value.replace(/\s/g, '');
     const expiryEl = document.getElementById('card-expiry');
@@ -2164,6 +2270,16 @@
     const cvvEl = document.getElementById('card-cvv');
     const cvv = cvvEl.value.trim();
     const errEl = document.getElementById('card-error');
+
+    // Auto-detect card brand from PAN
+    const detectedBrand = detectCardBrandFromPan(panRaw);
+    if (!detectedBrand) {
+      errEl.textContent = 'Dəstəklənməyən kart nömrəsi. Visa (4) və ya Mastercard (51-55, 2221-2720) daxil edin.';
+      errEl.classList.add('show');
+      panEl.classList.add('invalid');
+      panEl.focus();
+      return;
+    }
 
     if (!name) {
       errEl.textContent = 'Kart adı məcburidir.';
@@ -2174,14 +2290,15 @@
     }
     nameEl.classList.remove('invalid');
 
-    if (!kart_tipi) {
-      errEl.textContent = 'Kart növü seçilməlidir.';
-      errEl.classList.add('show');
-      return;
-    }
-
     if (!panRaw) {
       errEl.textContent = 'Kart nömrəsi (PAN) məcburidir.';
+      errEl.classList.add('show');
+      panEl.classList.add('invalid');
+      panEl.focus();
+      return;
+    }
+    if (panRaw.length < 12) {
+      errEl.textContent = 'Kart nömrəsi ən azı 12 rəqəm olmalıdır.';
       errEl.classList.add('show');
       panEl.classList.add('invalid');
       panEl.focus();
@@ -2226,7 +2343,6 @@
     const payload = {
       username: currentUser.username,
       ad: name,
-      kart_tipi: kart_tipi,
       pan: panRaw,
       kart_istifade_tarixi: expiry,
       cvv: cvv
@@ -2240,6 +2356,19 @@
       errEl.textContent = res.data?.error?.message || 'Kart əlavə edilə bilmədi.';
       errEl.classList.add('show');
     }
+  }
+
+  // Card brand detection helper (client-side)
+  function detectCardBrandFromPan(pan) {
+    const cleaned = String(pan).replace(/\s/g, '');
+    if (cleaned.startsWith('4')) return 'visa';
+    if (cleaned.startsWith('51') || cleaned.startsWith('52') || cleaned.startsWith('53') || 
+        cleaned.startsWith('54') || cleaned.startsWith('55')) return 'mastercard';
+    if (cleaned.length >= 4) {
+      const prefix = parseInt(cleaned.substring(0, 4));
+      if (prefix >= 2221 && prefix <= 2720) return 'mastercard';
+    }
+    return null;
   }
 
   // ---- Payment History ----
@@ -2282,6 +2411,7 @@
   function renderPaymentHistory() {
     const list = document.getElementById('history-list');
     const sub = document.getElementById('history-sub');
+    if (!list) return;
     if (paymentHistory.length === 0) {
       list.innerHTML = '<div class="hint">Hələ ödəniş tarixçəsi yoxdur.</div>';
       if (sub) sub.textContent = '0 ödəniş';
