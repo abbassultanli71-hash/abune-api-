@@ -1474,12 +1474,20 @@ app.get('/api/odenis-metodlari/has-cards', async (req, res) => {
  *         description: Validation xətası
  */
 app.post('/api/odenis-metodlari', async (req, res) => {
+  console.log('🔵 ========== KART ƏLAVƏ ETMƏ SORĞUSU ==========');
+  console.log('🔵 Request body:', JSON.stringify(req.body, null, 2));
+  
   const { username, ad, pan, kart_istifade_tarixi, cvv } = req.body;
 
-  console.log('📥 Kart əlavə etmə sorğusu:', { username, ad, pan: pan ? pan.substring(0,4)+'****' : null, kart_istifade_tarixi, cvv: cvv ? '***' : null });
-
+  // 1. Sahələrin yoxlanılması
   if (!username || !ad || !pan || !kart_istifade_tarixi || !cvv) {
-    console.log('❌ Sahələr çatışmır:', { username: !!username, ad: !!ad, pan: !!pan, kart_istifade_tarixi: !!kart_istifade_tarixi, cvv: !!cvv });
+    console.log('❌ Sahələr çatışmır:', { 
+      username: !!username, 
+      ad: !!ad, 
+      pan: !!pan, 
+      kart_istifade_tarixi: !!kart_istifade_tarixi, 
+      cvv: !!cvv 
+    });
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad, pan, kart_istifade_tarixi və cvv sahələri məcburidir.');
   }
 
@@ -1488,26 +1496,41 @@ app.post('/api/odenis-metodlari', async (req, res) => {
   const trimmedExpiry = String(kart_istifade_tarixi).trim();
   const trimmedCvv = String(cvv).trim();
 
+  console.log('🔵 Təmizlənmiş məlumatlar:', {
+    ad: trimmedAd,
+    pan: trimmedPan ? trimmedPan.substring(0,4) + '****' + trimmedPan.slice(-4) : null,
+    expiry: trimmedExpiry,
+    cvv: trimmedCvv ? '***' : null
+  });
+
+  // 2. Boş sahələrin yoxlanılması
   if (trimmedAd.length === 0 || trimmedPan.length === 0 || trimmedExpiry.length === 0 || trimmedCvv.length === 0) {
+    console.log('❌ Boş sahələr var');
     return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'Bütün sahələr boş qoyula bilməz.');
   }
 
-  // Auto-detect card brand
+  // 3. Kart brendinin avtomatik aşkarlanması
   const detectedBrand = detectCardBrand(trimmedPan);
+  console.log('🔵 Aşkarlanan brend:', detectedBrand);
+  
   if (!detectedBrand) {
-    console.log('❌ Dəstəklənməyən kart:', trimmedPan.substring(0,4));
+    console.log('❌ Dəstəklənməyən kart prefixi:', trimmedPan.substring(0, 4));
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CARD_PREFIX', 'Unsupported or invalid card number.');
   }
-  console.log('✅ Kart brendi aşkar edildi:', detectedBrand);
 
-  // Validate PAN with Luhn algorithm
-  if (!isValidPanLuhn(trimmedPan)) {
+  // 4. Luhn alqoritmi ilə PAN yoxlanışı
+  const isLuhnValid = isValidPanLuhn(trimmedPan);
+  console.log('🔵 Luhn yoxlaması:', isLuhnValid);
+  
+  if (!isLuhnValid) {
     console.log('❌ Luhn yoxlaması uğursuz');
     return errorResponse(res, 400, 'Bad Request', 'INVALID_PAN', 'Kart nömrəsi düzgün deyil (Luhn yoxlaması uğursuz).');
   }
 
-  // Validate expiry date
+  // 5. Son istifadə tarixinin yoxlanılması
   const expiryCheck = isValidKartTarixi(trimmedExpiry);
+  console.log('🔵 Son istifadə tarixi yoxlaması:', expiryCheck);
+  
   if (!expiryCheck.valid) {
     if (expiryCheck.reason === 'FORMAT') {
       return errorResponse(res, 400, 'Bad Request', 'INVALID_EXPIRY_FORMAT', 'Son istifadə tarixi formatı yanlışdır (MM/YY).');
@@ -1516,40 +1539,59 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     }
   }
 
-  // Validate CVV - yalnız format yoxlanışı, database-də saxlanılmır
+  // 6. CVV yoxlanışı (yalnız format, database-də saxlanılmır)
   if (!/^\d{3}$/.test(trimmedCvv)) {
+    console.log('❌ CVV formatı yanlışdır:', trimmedCvv);
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CVV', 'CVV yalnız 3 rəqəmdən ibarət olmalıdır.');
   }
 
   try {
+    // 7. İstifadəçi ID-nin tapılması
     const userId = await getUserIdByUsername(username);
+    console.log('🔵 İstifadəçi ID:', userId);
+    
     if (userId === null) {
       console.log('❌ İstifadəçi tapılmadı:', username);
       return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
     }
-    console.log('✅ İstifadəçi ID:', userId);
 
-    // CVV database-də SAXLANILMIR - yalnız validasiya üçün istifadə olunur
+    // 8. Database-ə əlavə etmə (CVV SAXLANILMIR)
     const sql = `INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, pan, kart_istifade_tarixi)
-                 VALUES (:istifadeci_id, :ad, :kart_tipi, :pan, :kart_istifade_tarixi)`;
+                 VALUES ($1, $2, $3, $4, $5) RETURNING id`;
     
-    const binds = {
-      istifadeci_id: userId,
-      ad: trimmedAd,
-      kart_tipi: detectedBrand,
-      pan: trimmedPan,
-      kart_istifade_tarixi: trimmedExpiry
-    };
+    const values = [
+      userId,
+      trimmedAd,
+      detectedBrand,
+      trimmedPan,
+      trimmedExpiry
+    ];
     
-    console.log('📝 SQL:', sql);
-    console.log('📝 Binds:', { ...binds, pan: binds.pan.substring(0,4)+'****' });
+    console.log('🔵 SQL:', sql);
+    console.log('🔵 Values:', {
+      istifadeci_id: values[0],
+      ad: values[1],
+      kart_tipi: values[2],
+      pan: values[3] ? values[3].substring(0,4) + '****' + values[3].slice(-4) : null,
+      kart_istifade_tarixi: values[4]
+    });
 
-    await executeQuery(sql, binds, { autoCommit: true });
-    console.log('✅ Kart uğurla əlavə edildi');
-
-    return successResponse(res, 201, 'Created', { message: 'Ödəniş metodu uğurla əlavə edildi.' });
+    const result = await executeQuery(sql, values, { autoCommit: true });
+    console.log('🔵 Insert nəticəsi:', result);
+    
+    if (result.rows && result.rows.length > 0) {
+      console.log('✅ Kart uğurla əlavə edildi. ID:', result.rows[0].ID);
+      return successResponse(res, 201, 'Created', { 
+        message: 'Ödəniş metodu uğurla əlavə edildi.',
+        card_id: result.rows[0].ID
+      });
+    } else {
+      console.log('❌ Kart əlavə edilərkən ID qaytarılmadı');
+      return successResponse(res, 201, 'Created', { message: 'Ödəniş metodu uğurla əlavə edildi.' });
+    }
   } catch (err) {
     console.error('❌ Xəta:', err.message);
+    console.error('❌ Xəta detalı:', err.stack);
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
