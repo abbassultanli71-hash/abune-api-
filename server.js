@@ -1329,19 +1329,28 @@ const sql = `SELECT c.id AS card_id,
 app.post('/api/odenis-metodlari', async (req, res) => {
   const { username, ad, kart_tipi, pan, cvv, kart_istifade_tarixi } = req.body;
   if (!username || !ad || !kart_tipi) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad və kart_tipi sahələri məcburidir.');
-  if (pan && !isValidPanLuhn(pan)) {
+
+  if (!pan) {
+    return errorResponse(res, 400, 'Bad Request', 'PAN_REQUIRED', 'Kart nömrəsi (pan) məcburidir.');
+  }
+  if (!isValidPanLuhn(pan)) {
   return errorResponse(res, 400, 'Bad Request', 'INVALID_PAN',
     'Kart nömrəsi (pan) düzgün deyil (Luhn yoxlamasından keçmədi).');
   }
-  if (cvv !== undefined && cvv !== null && cvv !== '') {
+
+  if (cvv === undefined || cvv === null || cvv === '') {
+    return errorResponse(res, 400, 'Bad Request', 'CVV_REQUIRED', 'cvv məcburidir.');
+  }
   if (!/^\d{3}$/.test(String(cvv))) {
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CVV', 'cvv yalnız 3 rəqəmdən ibarət olmalıdır (məs: 123).');
   }
-}
 
   // Kartın istifadə tarixi: əvvəlcə format, sonra (format düzgündürsə) müddət yoxlanılır.
   // İki ayrı xəta nəticəsi (FORMAT / EXPIRED) qarışdırılmadan göstərilir.
-  if (kart_istifade_tarixi) {
+  if (!kart_istifade_tarixi) {
+    return errorResponse(res, 400, 'Bad Request', 'EXPIRY_REQUIRED', 'Kartın istifadə tarixi (son tarix) məcburidir.');
+  }
+  {
     const tarixCheck = isValidKartTarixi(kart_istifade_tarixi);
     if (!tarixCheck.valid) {
       if (tarixCheck.reason === 'FORMAT') {
