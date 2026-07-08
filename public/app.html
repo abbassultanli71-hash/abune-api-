@@ -1699,7 +1699,7 @@
       preview.map(subRowHTML).join('') : '<div class="hint">Yaxınlaşan ödəniş yoxdur.</div>';
     
     // Update sub title counts
-    document.querySelector('.page-sub[data-i18n="dashboard_sub"]').textContent = `${activeSubs.length} aktiv abunəlik izlənilir`;
+    document.querySelector('.hero-sub[data-i18n="dashboard_sub"]').textContent = `${activeSubs.length} aktiv abunəlik izlənilir`;
     document.getElementById('subs-screen-sub').textContent = `${subscriptions.length} abunəlik · ${activeSubs.length} aktiv`;
 
     // Render full list with filter
