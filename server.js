@@ -1472,34 +1472,39 @@ app.get('/api/odenis-metodlari/has-cards', async (req, res) => {
  *         description: Ödəniş metodu əlavə edildi
  *       400:
  *         description: Validation xətası
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/InvalidCardPrefixError'
  */
 app.post('/api/odenis-metodlari', async (req, res) => {
   const { username, ad, pan, kart_istifade_tarixi, cvv } = req.body;
 
-  if (!username || !ad || !pan || !kart_istifade_tarixi || !cvv)
+  console.log('📥 Kart əlavə etmə sorğusu:', { username, ad, pan: pan ? pan.substring(0,4)+'****' : null, kart_istifade_tarixi, cvv: cvv ? '***' : null });
+
+  if (!username || !ad || !pan || !kart_istifade_tarixi || !cvv) {
+    console.log('❌ Sahələr çatışmır:', { username: !!username, ad: !!ad, pan: !!pan, kart_istifade_tarixi: !!kart_istifade_tarixi, cvv: !!cvv });
     return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad, pan, kart_istifade_tarixi və cvv sahələri məcburidir.');
+  }
 
   const trimmedAd = String(ad).trim();
   const trimmedPan = String(pan).replace(/\s/g, '');
   const trimmedExpiry = String(kart_istifade_tarixi).trim();
   const trimmedCvv = String(cvv).trim();
 
-  if (trimmedAd.length === 0 || trimmedPan.length === 0 || trimmedExpiry.length === 0 || trimmedCvv.length === 0)
+  if (trimmedAd.length === 0 || trimmedPan.length === 0 || trimmedExpiry.length === 0 || trimmedCvv.length === 0) {
     return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'Bütün sahələr boş qoyula bilməz.');
+  }
 
   // Auto-detect card brand
   const detectedBrand = detectCardBrand(trimmedPan);
   if (!detectedBrand) {
+    console.log('❌ Dəstəklənməyən kart:', trimmedPan.substring(0,4));
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CARD_PREFIX', 'Unsupported or invalid card number.');
   }
+  console.log('✅ Kart brendi aşkar edildi:', detectedBrand);
 
   // Validate PAN with Luhn algorithm
-  if (!isValidPanLuhn(trimmedPan))
+  if (!isValidPanLuhn(trimmedPan)) {
+    console.log('❌ Luhn yoxlaması uğursuz');
     return errorResponse(res, 400, 'Bad Request', 'INVALID_PAN', 'Kart nömrəsi düzgün deyil (Luhn yoxlaması uğursuz).');
+  }
 
   // Validate expiry date
   const expiryCheck = isValidKartTarixi(trimmedExpiry);
@@ -1512,29 +1517,39 @@ app.post('/api/odenis-metodlari', async (req, res) => {
   }
 
   // Validate CVV - yalnız format yoxlanışı, database-də saxlanılmır
-  if (!/^\d{3}$/.test(trimmedCvv))
+  if (!/^\d{3}$/.test(trimmedCvv)) {
     return errorResponse(res, 400, 'Bad Request', 'INVALID_CVV', 'CVV yalnız 3 rəqəmdən ibarət olmalıdır.');
+  }
 
   try {
     const userId = await getUserIdByUsername(username);
-    if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    if (userId === null) {
+      console.log('❌ İstifadəçi tapılmadı:', username);
+      return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    }
+    console.log('✅ İstifadəçi ID:', userId);
 
     // CVV database-də SAXLANILMIR - yalnız validasiya üçün istifadə olunur
-    await executeQuery(
-      `INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, pan, kart_istifade_tarixi)
-       VALUES (:istifadeci_id, :ad, :kart_tipi, :pan, :kart_istifade_tarixi)`,
-      {
-        istifadeci_id: userId,
-        ad: trimmedAd,
-        kart_tipi: detectedBrand,
-        pan: trimmedPan,
-        kart_istifade_tarixi: trimmedExpiry
-      },
-      { autoCommit: true }
-    );
+    const sql = `INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, pan, kart_istifade_tarixi)
+                 VALUES (:istifadeci_id, :ad, :kart_tipi, :pan, :kart_istifade_tarixi)`;
+    
+    const binds = {
+      istifadeci_id: userId,
+      ad: trimmedAd,
+      kart_tipi: detectedBrand,
+      pan: trimmedPan,
+      kart_istifade_tarixi: trimmedExpiry
+    };
+    
+    console.log('📝 SQL:', sql);
+    console.log('📝 Binds:', { ...binds, pan: binds.pan.substring(0,4)+'****' });
+
+    await executeQuery(sql, binds, { autoCommit: true });
+    console.log('✅ Kart uğurla əlavə edildi');
 
     return successResponse(res, 201, 'Created', { message: 'Ödəniş metodu uğurla əlavə edildi.' });
   } catch (err) {
+    console.error('❌ Xəta:', err.message);
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
