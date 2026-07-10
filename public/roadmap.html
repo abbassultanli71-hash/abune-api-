@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Abun&#601;m - Strateji Yol X&#601;rit&#601;si</title>
+  <title>Abunəm - Strateji Yol Xəritəsi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -126,6 +126,7 @@
       transition: all 0.3s ease;
       position: relative; overflow: hidden;
       display: flex; flex-direction: column;
+      height: 480px;
     }
     .roadmap-card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -216,9 +217,8 @@
 
   <div class="header-area">
     <h1>Abun&#601;m Strateji Yol X&#601;rit&#601;si</h1>
-    <p>12 Ayl&#305;q İnki&#351;af, V&#601;rdi&#351; v&#601; Miqyaslanma Plan&#305;</p>
+    <p>12 Ayl&#305;q &#304;nkişaf, V&#601;rdiş v&#601; Miqyaslanma Plan&#305;</p>
     
-    <!-- Interactive View Controller Toggle -->
     <div class="layout-switcher">
       <button class="switch-btn active" id="btn-horizontal" onclick="setView('horizontal')">
         <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
@@ -226,12 +226,11 @@
       </button>
       <button class="switch-btn" id="btn-vertical" onclick="setView('vertical')">
         <svg viewBox="0 0 24 24"><path d="M4 9h16v2H4zm0 4h10v2H4z"/></svg>
-        &#350;aquli Zaman X&#601;tti
+        Şaquli Zaman X&#601;tti
       </button>
     </div>
   </div>
 
-  <!-- Main Roadmap Container -->
   <div class="roadmap-board" id="roadmap-container">
     
     <!-- Phase 1 -->
@@ -245,15 +244,19 @@
           <span class="duration">0 - 2 ay</span>
         </div>
         <h3 class="card-title"><span class="icon">🚀</span> Saxlama T&#601;m&#601;li</h3>
-        <p class="card-sub">İstifad&#601;&#231;iy&#601; t&#601;tbiqi yenid&#601;n a&#231;maq &#252;&#231;&#252;n g&#252;cl&#252; s&#601;b&#601;bl&#601;r yaratmaq</p>
+        <p class="card-sub">&#304;stifad&#601;&#231;iy&#601; t&#601;tbiqi yenid&#601;n a&#231;maq &#252;&#231;&#252;n daimi s&#601;b&#601;b yaratmaq</p>
         <ul class="feature-list">
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>Yenil&#601;nm&#601; / qiym&#601;t art&#305;m&#305; bildiri&#351;i (&#246;d&#601;ni&#351;d&#601;n 2-30 g&#252;n &#601;vv&#601;l push)</span>
+            <span>Yenil&#601;nm&#601; / qiym&#601;t art&#305;m&#305; bildirisi (&#246;d&#601;nişd&#601;n 2-30 g&#252;n &#601;vv&#601;l push)</span>
           </li>
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>S&#305;naq m&#252;dd&#601;tinin bitm&#601; a&#351;karlanmas&#305; (&#246;d&#601;ni&#351;li plana ke&#231;m&#601;d&#601;n 48-72 saat &#601;vv&#601;l x&#601;b&#601;rdarl&#305;q)</span>
+            <span>Ayl&#305;q b&#252;dc&#601; limiti v&#601; dair&#601;vi x&#601;rc monitorinqi (limitin aş&#305;lmas&#305; x&#601;b&#601;rdarl&#305;&#287;&#305;)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>&#214;d&#601;niş c&#601;dv&#601;li x&#601;tkeşi (ayl&#305;q &#246;d&#601;niş tarixl&#601;rinin vizual t&#601;qvimi)</span>
           </li>
         </ul>
       </div>
@@ -269,12 +272,12 @@
           <span class="phase-badge">M&#601;rh&#601;l&#601; 2</span>
           <span class="duration">2 - 4 ay</span>
         </div>
-        <h3 class="card-title"><span class="icon">💎</span> V&#601;rdi&#351; v&#601; S&#252;but</h3>
-        <p class="card-sub">T&#601;tbiqin d&#601;y&#601;rini g&#246;r&#252;n&#601;n etm&#601;k, h&#601;ft&#601;lik geri d&#246;n&#252;&#351;&#252; m&#246;hk&#601;ml&#601;ndirm&#601;k</p>
+        <h3 class="card-title"><span class="icon">💎</span> V&#601;rdiş v&#601; S&#252;but</h3>
+        <p class="card-sub">T&#601;tbiqin d&#601;y&#601;rini g&#246;r&#252;n&#601;n etm&#601;k, h&#601;ft&#601;lik geri d&#246;n&#252;ş&#252; m&#246;hk&#601;ml&#601;ndirm&#601;k</p>
         <ul class="feature-list">
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>Toplanm&#305;&#351; q&#601;na&#601;t d&#601;ft&#601;ri (payla&#351;&#305;la bil&#601;n &#252;mumi q&#601;na&#601;t say&#287;ac&#305;)</span>
+            <span>Toplanm&#305;ş q&#601;na&#601;t d&#601;ft&#601;ri (paylaş&#305;la bil&#601;n &#252;mumi q&#601;na&#601;t sayğac&#305;)</span>
           </li>
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -295,19 +298,19 @@
           <span class="duration">4 - 7 ay</span>
         </div>
         <h3 class="card-title"><span class="icon">⚡</span> G&#601;lir Modelini Qur</h3>
-        <p class="card-sub">&#350;&#601;ffaf, &#231;oxqatl&#305; premium qiym&#601;tl&#601;ndirm&#601; mexanizmini i&#351;&#601; salmaq</p>
+        <p class="card-sub">Ş&#601;ffaf, &#231;oxqatl&#305; premium qiym&#601;tl&#601;ndirm&#601; mexanizmini iş&#601; salmaq</p>
         <ul class="feature-list">
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>Pulsuz / Plus / Concierge s&#601;viyy&#601;l&#601;ri (sabit, &#351;&#601;ffaf Plus qiym&#601;ti)</span>
+            <span>Pulsuz / Plus / Premium abun&#601;lik s&#601;viyy&#601;l&#601;ri</span>
           </li>
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>&#214;z&#252;n-et l&#601;&#287;v b&#601;l&#601;d&#231;il&#601;ri (add&#305;m-add&#305;m add&#305;mlar, m&#601;suliyy&#601;t g&#246;t&#252;rm&#601;d&#601;n)</span>
+            <span>&#199;oxvalyutal&#305; (AZN, USD, EUR) avtomatik m&#601;z&#601;nn&#601; &#231;evrilm&#601;si v&#601; vahid x&#601;rc hesabat&#305;</span>
           </li>
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>Koqort x&#601;rc m&#252;qayis&#601;si (analitika y&#252;ks&#601;ltm&#601; tetikleyicisi)</span>
+            <span>Koqort x&#601;rc analitikas&#305; (dig&#601;r istifad&#601;&#231;il&#601;rl&#601; abun&#601;lik x&#601;rcl&#601;rinin m&#252;qayis&#601;si)</span>
           </li>
         </ul>
       </div>
@@ -324,11 +327,15 @@
           <span class="duration">7 - 9 ay</span>
         </div>
         <h3 class="card-title"><span class="icon">🛡️</span> Etibarla Miqyaslan</h3>
-        <p class="card-sub">R&#601;qibl&#601;rin q&#305;rd&#305;&#287;&#305; etibar bo&#351;luqlar&#305;n&#305; g&#252;v&#601;nl&#601; doldurmaq</p>
+        <p class="card-sub">R&#601;qibl&#601;rin buraxd&#305;&#287;&#305; etibar boşluqlar&#305;n&#305; g&#252;v&#601;nl&#601; doldurmaq</p>
         <ul class="feature-list">
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>T&#601;sdiq&#601; ba&#287;l&#305; concierge xidm&#601;ti (h&#601;r &#601;m&#601;liyyat &#252;&#231;&#252;n &#601;vv&#601;lc&#601;d&#601;n &#246;d&#601;ni&#351; t&#601;sdiqi)</span>
+            <span>T&#601;sdiq&#601; ba&#287;l&#305; concierge xidm&#601;ti (h&#601;r &#601;m&#601;liyyat &#252;&#231;&#252;n &#601;vv&#601;lc&#601;d&#601;n &#246;d&#601;niş t&#601;sdiqi)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>&#214;d&#601;niş tarixl&#601;ri jurnali (✓ u&#287;urlu v&#601; ya ✗ u&#287;ursuz &#246;d&#601;nişl&#601;rin qeydiyyat&#305;)</span>
           </li>
         </ul>
       </div>
@@ -345,19 +352,19 @@
           <span class="duration">9 - 12 ay</span>
         </div>
         <h3 class="card-title"><span class="icon">🌐</span> M&#252;dafi&#601; X&#601;nd&#601;yi</h3>
-        <p class="card-sub">Co&#287;rafiya, valyuta v&#601; B2B pe&#351;&#601;kar istifad&#601;&#231;i kateqoriyalar&#305; il&#601; b&#246;y&#252;m&#601;</p>
+        <p class="card-sub">Co&#287;rafiya, valyuta v&#601; B2B peş&#601;kar istifad&#601;&#231;i seqmenti il&#601; b&#246;y&#252;m&#601;</p>
         <ul class="feature-list">
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>&#199;oxvalyutal&#305; / beyn&#601;lxalq (AB&#350; r&#601;qibl&#601;rin&#601; qar&#351;&#305; regional &#252;st&#252;nl&#252;k)</span>
+            <span>Kart c&#252;zdan&#305; inteqrasiyas&#305; (bank kartlar&#305;n&#305;n abun&#601;likl&#601;r &#252;zr&#601; balans limitl&#601;ri)</span>
           </li>
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>B2B / pe&#351;&#601;kar istifad&#601;&#231;i geni&#351;l&#601;nm&#601;si (freelancer, &#231;oxistifad&#601;&#231;ili)</span>
+            <span>B2B / freelancer-l&#601;r &#252;&#231;&#252;n &#231;oxistifad&#601;&#231;ili abun&#601;lik id&#601;n&#601;tildəsi d&#601;st&#601;yi</span>
           </li>
           <li class="feature-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>Maliyy&#601; sa&#287;laml&#305;&#287;&#305; xalland&#305;r&#305;lmas&#305; (k&#601;nara y&#252;ng&#252;l geni&#351;l&#601;nm&#601;)</span>
+            <span>Maliyy&#601; sa&#287;laml&#305;&#287;&#305; xalland&#305;r&#305;lmas&#305; (k&#601;nara y&#252;ng&#252;l genişl&#601;nm&#601;)</span>
           </li>
         </ul>
       </div>
