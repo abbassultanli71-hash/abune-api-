@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abunəm - Məhsul Yol Xəritəsi (Roadmap)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0914;
+      --surface: rgba(22, 20, 36, 0.65);
+      --border: rgba(255, 255, 255, 0.08);
+      --ink: #f5f7fa;
+      --ink-muted: #a5a6c2;
+      --ink-faint: #737599;
+      --p1: #FF5B45;
+      --p2: #6952E0;
+      --p3: #00C9FF;
+      --p4: #1FE0C2;
+      --p5: #FFB800;
+    }
+    body {
+      margin: 0; padding: 40px 20px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* Ambient backgrounds */
+    body::before {
+      content: ''; position: absolute; top: -10%; right: -20%; width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(105, 82, 224, 0.15) 0%, transparent 70%);
+      z-index: 0; pointer-events: none;
+    }
+    body::after {
+      content: ''; position: absolute; bottom: 10%; left: -20%; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(31, 224, 194, 0.1) 0%, transparent 70%);
+      z-index: 0; pointer-events: none;
+    }
+    .header-area {
+      text-align: center; margin-bottom: 50px; position: relative; z-index: 2;
+    }
+    .header-area h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px; font-weight: 700; margin: 0 0 10px;
+      background: linear-gradient(135deg, #1fe0c2, #00c9ff, #6952e0);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header-area p { color: var(--ink-muted); font-size: 15px; margin: 0; }
+    
+    /* Timeline Container */
+    .timeline {
+      position: relative; max-width: 500px; width: 100%; z-index: 2;
+      padding-left: 24px; box-sizing: border-box;
+    }
+    /* Timeline Line */
+    .timeline::before {
+      content: ''; position: absolute; left: 6px; top: 12px; bottom: 12px; width: 3px;
+      background: linear-gradient(180deg, var(--p1), var(--p2), var(--p3), var(--p4), var(--p5));
+      border-radius: 4px;
+    }
+    
+    /* Timeline Item */
+    .timeline-item {
+      position: relative; margin-bottom: 40px;
+      opacity: 0; transform: translateY(20px);
+      animation: slideIn 0.6s ease forwards;
+    }
+    .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+    .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+    .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+    
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Dot indicator */
+    .timeline-dot {
+      position: absolute; left: -24px; top: 18px; width: 15px; height: 15px;
+      border-radius: 50%; border: 3px solid var(--bg);
+      transform: translateX(-50%); z-index: 3;
+      box-shadow: 0 0 10px var(--color);
+      background: var(--color);
+    }
+    
+    /* Glassmorphic Card */
+    .roadmap-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+      padding: 20px 22px; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .roadmap-card:hover {
+      transform: translateY(-2px); border-color: rgba(255,255,255,0.15);
+    }
+    .card-head {
+      display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;
+    }
+    .phase-badge {
+      font-size: 11px; font-weight: 700; color: #0f0f1a;
+      background: var(--color); padding: 4px 10px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .duration {
+      font-size: 11px; font-weight: 600; color: var(--color);
+      text-shadow: 0 0 8px rgba(255,255,255,0.1);
+    }
+    .card-title {
+      font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 600; margin: 0 0 4px;
+    }
+    .card-sub { font-size: 12px; color: var(--ink-muted); margin-bottom: 16px; line-height: 1.4; }
+    
+    /* Checklist */
+    .feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .feature-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--ink-muted); line-height: 1.4; }
+    .feature-item svg { width: 14px; height: 14px; color: var(--color); flex-shrink: 0; margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+  <div class="header-area">
+    <h1>Abunəm Məhsul Yol Xəritəsi</h1>
+    <p>12 Aylıq İnkişaf və Miqyaslanma Strategiyası</p>
+  </div>
+
+  <div class="timeline">
+    
+    <!-- Phase 1 -->
+    <div class="timeline-item">
+      <div class="timeline-dot" style="--color: var(--p1);"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge" style="--color: var(--p1);">Mərhələ 1</span>
+          <span class="duration" style="--color: var(--p1);">0 - 2 ay</span>
+        </div>
+        <h3 class="card-title">Saxlama Təməli</h3>
+        <p class="card-sub">İstifadəçiyə tətbiqi yenidən açmaq üçün daimi səbəb yaratmaq</p>
+        <ul class="feature-list">
+          <li class="feature-item" style="--color: var(--p1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Yenilənmə / qiymət artımı bildirişi (ödənişdən 3-5 gün əvvəl push alert)</span>
+          </li>
+          <li class="feature-item" style="--color: var(--p1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Sınaq müddətinin bitməsi aşkarlanması (ödənişli plana keçmədən 48-72 saat əvvəl xəbərdarlıq)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="timeline-item">
+      <div class="timeline-dot" style="--color: var(--p2);"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge" style="--color: var(--p2);">Mərhələ 2</span>
+          <span class="duration" style="--color: var(--p2);">2 - 4 ay</span>
+        </div>
+        <h3 class="card-title">Vərdiş və Sübut</h3>
+        <p class="card-sub">Tətbiqin dəyərini görünən etmək, həftəlik geri dönüşü möhkəmləndirmək</p>
+        <ul class="feature-list">
+          <li class="feature-item" style="--color: var(--p2);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Toplanmış qənaət dəftəri (paylaşıla bilən ümumi qənaət sayğacı)</span>
+          </li>
+          <li class="feature-item" style="--color: var(--p2);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>"Buna dəyərmi?" xallandırılması (az istifadə edilən abunəliklərdə xəbərdarlıq)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="timeline-item">
+      <div class="timeline-dot" style="--color: var(--p3);"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge" style="--color: var(--p3);">Mərhələ 3</span>
+          <span class="duration" style="--color: var(--p3);">4 - 7 ay</span>
+        </div>
+        <h3 class="card-title">Gəlir Modelinin Qurulması</h3>
+        <p class="card-sub">Şəffaf, çoxqatlı qiymətləndirmə və gəlirlərin artırılması</p>
+        <ul class="feature-list">
+          <li class="feature-item" style="--color: var(--p3);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Pulsuz / Plus / Concierge səviyyələri (sabit, şəffaf Plus abunəlik modeli)</span>
+          </li>
+          <li class="feature-item" style="--color: var(--p3);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Özün-et ləğv bələdçiləri (abunəlikləri addım-addım asan ləğv etmə qaydaları)</span>
+          </li>
+          <li class="feature-item" style="--color: var(--p3);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Koqort xərc müqayisəsi (analitika vasitəsilə abunəlik paketini yüksəltmə tetikliyi)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="timeline-item">
+      <div class="timeline-dot" style="--color: var(--p4);"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge" style="--color: var(--p4);">Mərhələ 4</span>
+          <span class="duration" style="--color: var(--p4);">7 - 9 ay</span>
+        </div>
+        <h3 class="card-title">Etibarla Miqyaslanma</h3>
+        <p class="card-sub">Rəqiblərin buraxdığı etibar boşluqlarını doldurmaq və güvən qazanmaq</p>
+        <ul class="feature-list">
+          <li class="feature-item" style="--color: var(--p4);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Təsdiqə bağlı concierge xidməti (hər abunəlik ödənişi üçün əvvəlcədən təsdiq sorğusu)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="timeline-item">
+      <div class="timeline-dot" style="--color: var(--p5);"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge" style="--color: var(--p5);">Mərhələ 5</span>
+          <span class="duration" style="--color: var(--p5);">9 - 12 ay</span>
+        </div>
+        <h3 class="card-title">Müdafiə Oluna Bilən Xəndək</h3>
+        <p class="card-sub">Coğrafiya, yeni kateqoriyalar və B2B seqmentləri ilə miqyaslanmaq</p>
+        <ul class="feature-list">
+          <li class="feature-item" style="--color: var(--p5);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Çoxvalyutalı / beynəlxalq dəstək (qlobal rəqiblərə qarşı regional üstünlük)</span>
+          </li>
+          <li class="feature-item" style="--color: var(--p5);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>B2B / peşəkar istifadəçi genişlənməsi (freelancer-lər üçün çoxistifadəçili abunəlik idarəetməsi)</span>
+          </li>
+          <li class="feature-item" style="--color: var(--p5);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Maliye sağlamlığı xallandırılması (digər maliyyə xərclərinə yüngül genişlənmə)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
