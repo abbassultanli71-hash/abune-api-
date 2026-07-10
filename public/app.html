@@ -580,6 +580,13 @@
     transform: scale(1.2);
   }
 
+  body.sheet-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
   /* ---- Modal (bottom sheet) ---- */
   .sheet-overlay {
     position: fixed; inset: 0; background: rgba(6,6,8,0.55);
@@ -1900,6 +1907,15 @@
     document.getElementById('scroll-top-btn').classList.remove('visible');
   }
 
+  function updateBodyScrollLock() {
+    const anyOpen = document.querySelectorAll('.sheet-overlay.open').length > 0;
+    if (anyOpen) {
+      document.body.classList.add('sheet-open');
+    } else {
+      document.body.classList.remove('sheet-open');
+    }
+  }
+
   function openSheet() { 
     // Set start date to today's date formatted as YYYY-MM-DD
     const yyyy = TODAY.getFullYear();
@@ -1912,11 +1928,13 @@
     document.getElementById('new-sub-currency').value = currentSettings.esas_valyuta || 'AZN';
     const overlay = document.getElementById('sheet-overlay');
     overlay.classList.add('open'); 
+    updateBodyScrollLock();
     const sheet = overlay.querySelector('.sheet');
     if (sheet) sheet.scrollTop = 0;
   }
   function closeSheet() {
     document.getElementById('sheet-overlay').classList.remove('open');
+    updateBodyScrollLock();
     if (document.activeElement) document.activeElement.blur();
     setTimeout(() => { window.scrollTo(0, window.scrollY); }, 80);
   }
@@ -2063,12 +2081,14 @@
     clearManagePriceError();
     const overlay = document.getElementById('sub-manage-overlay');
     overlay.classList.add('open');
+    updateBodyScrollLock();
     const sheet = overlay.querySelector('.sheet');
     if (sheet) sheet.scrollTop = 0;
   }
 
   function closeManageSheet() {
     document.getElementById('sub-manage-overlay').classList.remove('open');
+    updateBodyScrollLock();
     if (document.activeElement) document.activeElement.blur();
     setTimeout(() => { window.scrollTo(0, window.scrollY); }, 80);
   }
@@ -2318,11 +2338,13 @@
     document.getElementById('card-pan-error').style.display = 'none';
     const overlay = document.getElementById('card-sheet-overlay');
     overlay.classList.add('open');
+    updateBodyScrollLock();
     const sheet = overlay.querySelector('.sheet');
     if (sheet) sheet.scrollTop = 0;
   }
   function closeCardSheet() {
     document.getElementById('card-sheet-overlay').classList.remove('open');
+    updateBodyScrollLock();
     if (document.activeElement) document.activeElement.blur();
     setTimeout(() => { window.scrollTo(0, window.scrollY); }, 80);
   }
@@ -2868,6 +2890,15 @@ async function handleAddCard() {
     } else {
       hideApp();
     }
+
+    // iOS/iPhone scroll and rubber-banding fix for modals
+    document.querySelectorAll('.sheet-overlay').forEach(overlay => {
+      overlay.addEventListener('touchmove', e => {
+        if (!e.target.closest('.sheet')) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    });
   });
 </script>
 
