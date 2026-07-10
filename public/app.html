@@ -1603,21 +1603,33 @@
       totalSpend += s.price;
     });
 
-    if (budgetRes.ok && budgetRes.data && budgetRes.data.data && budgetRes.data.data.budgets && budgetRes.data.data.budgets.length > 0) {
-      const b = budgetRes.data.data.budgets[0];
-      budgetState = {
-        limit: parseFloat(b.limit_mebleq),
-        spent: totalSpend, // dynamically count spent
-        currency: b.valyuta || 'AZN',
-        exists: true
-      };
-      // update backend spent count if different
-      if (parseFloat(b.hesab_mebleqi) !== totalSpend) {
-        apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
-          limit_mebleq: budgetState.limit,
-          valyuta: budgetState.currency,
-          hesab_mebleqi: totalSpend
-        });
+    if (budgetRes.ok && budgetRes.data && budgetRes.data.data) {
+      const b = budgetRes.data.data.budget || (budgetRes.data.data.budgets && budgetRes.data.data.budgets[0]);
+      if (b) {
+        const dbLimit = b.LIMIT_MEBLEQ !== undefined ? b.LIMIT_MEBLEQ : b.limit_mebleq;
+        const dbValyuta = b.VALYUTA !== undefined ? b.VALYUTA : b.valyuta;
+        const dbSpent = b.HESAB_MEBLEQI !== undefined ? b.HESAB_MEBLEQI : b.hesab_mebleqi;
+        budgetState = {
+          limit: parseFloat(dbLimit) || 300.00,
+          spent: totalSpend, // dynamically count spent
+          currency: dbValyuta || 'AZN',
+          exists: true
+        };
+        // update backend spent count if different
+        if (parseFloat(dbSpent) !== totalSpend) {
+          apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
+            limit_mebleq: budgetState.limit,
+            valyuta: budgetState.currency,
+            hesab_mebleqi: totalSpend
+          });
+        }
+      } else {
+        budgetState = {
+          limit: 300.00,
+          spent: totalSpend,
+          currency: 'AZN',
+          exists: false
+        };
       }
     } else {
       budgetState = {
