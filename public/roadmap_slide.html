@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <title>Abunəm - Yol Xəritəsi Slaydı</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05040a;
+      --card-bg: rgba(16, 13, 33, 0.75);
+      
+      /* Super High-Contrast Neon Colors */
+      --p1: #FF2E5F; /* Neon Pink */
+      --p1-glow: rgba(255, 46, 95, 0.4);
+      
+      --p2: #8B5CF6; /* Electric Violet */
+      --p2-glow: rgba(139, 92, 246, 0.4);
+      
+      --p3: #00D2FF; /* Cyber Cyan */
+      --p3-glow: rgba(0, 210, 255, 0.4);
+      
+      --p4: #10B981; /* Emerald Green */
+      --p4-glow: rgba(16, 185, 129, 0.4);
+      
+      --p5: #FFB800; /* Neon Amber */
+      --p5-glow: rgba(255, 184, 0, 0.4);
+    }
+    
+    body {
+      margin: 0; padding: 0;
+      width: 1920px; height: 1080px;
+      background: radial-gradient(circle at 50% 20%, #150d3a 0%, #05040a 80%);
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      display: flex; flex-direction: column;
+      box-sizing: border-box;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Neon glowing background shapes */
+    .glow-sphere {
+      position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.35; pointer-events: none;
+    }
+    .gs-1 { top: -100px; left: 100px; width: 450px; height: 450px; background: var(--p1); }
+    .gs-2 { top: 300px; right: -100px; width: 500px; height: 500px; background: var(--p3); }
+    .gs-3 { bottom: -100px; left: 200px; width: 400px; height: 400px; background: var(--p2); }
+    
+    /* Header Area */
+    .slide-header {
+      padding: 60px 80px 30px; display: flex; justify-content: space-between; align-items: flex-end; z-index: 5;
+    }
+    .header-left h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 52px; font-weight: 800; margin: 0 0 10px;
+      background: linear-gradient(135deg, #00d2ff, #8b5cf6, #ff2e5f);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+    .header-left p {
+      color: #a7a9c8; font-size: 20px; margin: 0; font-weight: 500;
+    }
+    .header-right {
+      font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: #8b5cf6;
+      border: 1px solid rgba(139, 92, 246, 0.3); padding: 8px 20px; border-radius: 30px;
+      background: rgba(139, 92, 246, 0.05);
+    }
+    
+    /* Slide Grid Layout */
+    .slide-grid {
+      padding: 0 80px; display: flex; gap: 30px;
+      flex: 1; box-sizing: border-box; align-items: flex-start;
+      position: relative; z-index: 5; margin-top: 40px;
+    }
+    
+    /* Timeline horizontal track line */
+    .slide-grid::before {
+      content: ''; position: absolute;
+      left: 170px; right: 170px; top: 12px; height: 4px;
+      background: linear-gradient(90deg, var(--p1), var(--p2), var(--p3), var(--p4), var(--p5));
+      border-radius: 4px; z-index: 1; opacity: 0.8;
+    }
+    
+    .phase-column {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      position: relative; z-index: 2;
+    }
+    
+    .node-dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #05040a; border: 5px solid var(--color);
+      box-shadow: 0 0 20px var(--color), 0 0 40px var(--color);
+      z-index: 3;
+    }
+    
+    .col-connector {
+      width: 3px; height: 35px;
+      background: linear-gradient(to bottom, var(--color), rgba(255,255,255,0.01));
+      opacity: 0.9;
+    }
+    
+    /* Glowing Slide Card */
+    .slide-card {
+      background: var(--card-bg);
+      border: 2px solid var(--color);
+      border-radius: 28px;
+      padding: 30px 24px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 40px -10px var(--glow);
+      width: 100%; box-sizing: border-box;
+      position: relative; overflow: hidden;
+      height: 600px; display: flex; flex-direction: column;
+    }
+    
+    /* Glowing card top edge */
+    .slide-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: var(--color);
+    }
+    
+    /* Giant Transparent Index Digit */
+    .bg-digit {
+      position: absolute; right: 20px; bottom: -10px;
+      font-family: 'Outfit', sans-serif; font-size: 110px; font-weight: 800;
+      color: var(--color); opacity: 0.08; pointer-events: none;
+    }
+    
+    .card-meta {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px;
+    }
+    .card-badge {
+      font-size: 11px; font-weight: 800; color: #fff;
+      background: var(--color); padding: 6px 14px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 1px;
+      box-shadow: 0 0 15px -2px var(--color);
+    }
+    .card-time {
+      font-size: 14px; font-weight: 800; color: var(--color);
+      letter-spacing: 0.5px;
+    }
+    
+    .card-title {
+      font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; margin: 0 0 12px;
+      color: #ffffff; display: flex; align-items: center; gap: 10px;
+      text-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+    .card-title .icon { font-size: 26px; }
+    
+    .card-desc {
+      font-size: 15px; color: #ffffff; margin-bottom: 28px; line-height: 1.5; font-weight: 500;
+    }
+    
+    .list-features {
+      list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 18px;
+    }
+    .list-item {
+      display: flex; align-items: flex-start; gap: 10px; font-size: 14.5px; color: var(--ink-muted); line-height: 1.5;
+    }
+    .list-item svg {
+      width: 16px; height: 16px; color: var(--color); flex-shrink: 0; margin-top: 3px;
+      filter: drop-shadow(0 0 6px var(--color));
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background glowing spheres -->
+  <div class="glow-sphere gs-1"></div>
+  <div class="glow-sphere gs-2"></div>
+  <div class="glow-sphere gs-3"></div>
+
+  <div class="slide-header">
+    <div class="header-left">
+      <h1>Abunəm Strateji Yol Xəritəsi</h1>
+      <p>12 Aylıq İnkişaf, Vərdiş və Miqyaslanma Planı</p>
+    </div>
+    <div class="header-right">PITCH DECK</div>
+  </div>
+
+  <div class="slide-grid">
+    
+    <!-- Phase 1 -->
+    <div class="phase-column" style="--color: var(--p1); --glow: var(--p1-glow);">
+      <div class="node-dot"></div>
+      <div class="col-connector"></div>
+      <div class="slide-card">
+        <div class="bg-digit">01</div>
+        <div class="card-meta">
+          <span class="card-badge">Mərhələ 1</span>
+          <span class="card-time">0 - 2 ay</span>
+        </div>
+        <h3 class="card-title"><span class="icon">🚀</span> Saxlama Təməli</h3>
+        <p class="card-desc">İstifadəçiyə tətbiqi yenidən açmaq üçün daimi səbəb yaratmaq</p>
+        <ul class="list-features">
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Yenilənmə / qiymət artımı bildirişi (ödənişdən 3-5 gün əvvəl push)</span>
+          </li>
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Sınaq müddətinin bitmə aşkarlanması (ödənişli plana keçmədən 48-72 saat əvvəl xəbərdarlıq)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase-column" style="--color: var(--p2); --glow: var(--p2-glow);">
+      <div class="node-dot"></div>
+      <div class="col-connector"></div>
+      <div class="slide-card">
+        <div class="bg-digit">02</div>
+        <div class="card-meta">
+          <span class="card-badge">Mərhələ 2</span>
+          <span class="card-time">2 - 4 ay</span>
+        </div>
+        <h3 class="card-title"><span class="icon">💎</span> Vərdiş və Sübut</h3>
+        <p class="card-desc">Tətbiqin dəyərini görünən etmək, həftəlik geri dönüşü möhkəmləndirmək</p>
+        <ul class="list-features">
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Toplanmış qənaət dəftəri (paylaşıla bilən ümumi qənaət sayğacı)</span>
+          </li>
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>"Buna dəyərmi?" xallandırılması (az istifadə olunan abunəliklərdə xatırlatma)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase-column" style="--color: var(--p3); --glow: var(--p3-glow);">
+      <div class="node-dot"></div>
+      <div class="col-connector"></div>
+      <div class="slide-card">
+        <div class="bg-digit">03</div>
+        <div class="card-meta">
+          <span class="card-badge">Mərhələ 3</span>
+          <span class="card-time">4 - 7 ay</span>
+        </div>
+        <h3 class="card-title"><span class="icon">⚡</span> Gəlir Modelini Qur</h3>
+        <p class="card-desc">Şəffaf, çoxqatlı premium qiymətləndirmə mexanizmini işə salmaq</p>
+        <ul class="list-features">
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Pulsuz / Plus / Concierge səviyyələri (sabit, şəffaf Plus qiyməti)</span>
+          </li>
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Özün-et ləğv bələdçiləri (addım-addım addımlar, məsuliyyət götürmədən)</span>
+          </li>
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Koqort xərc müqayisəsi (analitika yüksəltmə tetikleyicisi)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase-column" style="--color: var(--p4); --glow: var(--p4-glow);">
+      <div class="node-dot"></div>
+      <div class="col-connector"></div>
+      <div class="slide-card">
+        <div class="bg-digit">04</div>
+        <div class="card-meta">
+          <span class="card-badge">Mərhələ 4</span>
+          <span class="card-time">7 - 9 ay</span>
+        </div>
+        <h3 class="card-title"><span class="icon">🛡️</span> Etibarla Miqyaslan</h3>
+        <p class="card-desc">Rəqiblərin qırdığı etibar boşluqlarını güvənlə doldurmaq</p>
+        <ul class="list-features">
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Təsdiqə bağlı concierge xidməti (hər əməliyyat üçün əvvəlcədən ödəniş təsdiqi)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="phase-column" style="--color: var(--p5); --glow: var(--p5-glow);">
+      <div class="node-dot"></div>
+      <div class="col-connector"></div>
+      <div class="slide-card">
+        <div class="bg-digit">05</div>
+        <div class="card-meta">
+          <span class="card-badge">Mərhələ 5</span>
+          <span class="card-time">9 - 12 ay</span>
+        </div>
+        <h3 class="card-title"><span class="icon">🌐</span> Müdafiə Xəndəyi</h3>
+        <p class="card-desc">Coğrafiya, valyuta və B2B peşəkar istifadəçi seqmenti ilə böyümə</p>
+        <ul class="list-features">
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Çoxvalyutalı / beynəlxalq (ABŞ rəqiblərinə qarşı regional üstünlük)</span>
+          </li>
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>B2B / peşəkar istifadəçi genişlənməsi (freelancer, çoxistifadəçili)</span>
+          </li>
+          <li class="list-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Maliyyə sağlamlığı xallandırılması (kənara yüngül genişlənmə)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
