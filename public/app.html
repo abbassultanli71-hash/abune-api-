@@ -1906,7 +1906,7 @@
     document.getElementById('new-sub-email').value = '';
     document.getElementById('new-sub-password').value = '';
     // Set default currency to primary currency
-    document.getElementById('new-sub-currency').value = currentSettings.esas_valyuta || 'AZN';
+    document.getElementById('new-sub-currency').value = (currentSettings.esas_valyuta || 'AZN').toUpperCase();
     const overlay = document.getElementById('sheet-overlay');
     overlay.classList.add('open'); 
     const sheet = overlay.querySelector('.sheet');

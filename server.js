@@ -854,6 +854,17 @@ app.post('/api/abunelikler', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
 
+    let finalValyuta = valyuta;
+    if (!finalValyuta) {
+      const settingsRow = await executeQuery(
+        `SELECT esas_valyuta FROM istifadeci_ayarlari WHERE istifadeci_id = :userId`,
+        { userId }
+      );
+      if (settingsRow.rows.length > 0) {
+        finalValyuta = settingsRow.rows[0].ESAS_VALYUTA;
+      }
+    }
+
     // Validate subscription account credentials (mock validation)
     const isValidAccount = await validateSubscriptionAccount(ad, accountemail, accountpassword);
     if (!isValidAccount) {
@@ -916,7 +927,7 @@ app.post('/api/abunelikler', async (req, res) => {
                  VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, :baslama_tarixi::DATE, :novbeti_odenis_tarixi::DATE, :kateqoriya, :odenis_metodu_id, 'active')
                  RETURNING id`;
     const binds = {
-      istifadeci_id: userId, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
+      istifadeci_id: userId, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(finalValyuta),
       odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
       kateqoriya: kateqoriya || null, odenis_metodu_id: finalOdenisMetoduId
     };
