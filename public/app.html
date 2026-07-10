@@ -390,12 +390,15 @@
   .badge-success { background: var(--teal-soft); color: var(--teal); font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
   .badge-fail { background: var(--coral-soft); color: var(--coral); font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
 
-  /* ---- Notifications ---- */
   .notif-item {
     display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 14px; padding: 13px 14px; margin-bottom: 8px;
     box-shadow: var(--shadow);
+    transition: background-color 0.15s ease, transform 0.1s ease;
   }
+  .notif-item.clickable { cursor: pointer; }
+  .notif-item.clickable:hover { background: var(--surface-2); }
+  .notif-item.clickable:active { transform: scale(0.98); }
   .notif-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
   .notif-title { font-size: 12.5px; font-weight: 600; }
   .notif-msg { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
@@ -1766,20 +1769,17 @@
 
   function notifRowHTML(n) {
     const color = n.urgency === 'urgent' ? 'var(--coral)' : n.urgency === 'soon' ? 'var(--gold)' : 'var(--teal)';
-    const readStatus = n.is_read ? ' (oxundu)' : '';
-    const readButton = n.is_read ? '' : `
-        <button class="sheet-close" style="font-size:12px; padding: 2px 6px;" onclick="handleMarkNotificationRead(${n.id})" title="Oxundu kimi işarələ">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-        </button>`;
+    const dotHtml = n.is_read ? '' : `<span class="notif-dot" style="background:${color}"></span>`;
+    const clickableClass = n.is_read ? '' : 'clickable';
+    const clickHandler = n.is_read ? '' : `onclick="handleMarkNotificationRead(${n.id})"`;
     return `
-      <div class="notif-item" style="${n.is_read ? 'opacity:0.6;' : ''}">
-        <span class="notif-dot" style="background:${color}"></span>
+      <div class="notif-item ${clickableClass}" ${clickHandler} style="${n.is_read ? 'opacity:0.6;' : ''}">
+        ${dotHtml}
         <div style="flex: 1;">
-          <div class="notif-title">${n.title}${readStatus}</div>
+          <div class="notif-title">${n.title}</div>
           <div class="notif-msg">${n.msg}</div>
           <div class="notif-time">${n.time}</div>
         </div>
-        ${readButton}
       </div>`;
   }
   
@@ -1905,6 +1905,8 @@
     document.getElementById('new-sub-start').value = `${yyyy}-${mm}-${dd}`;
     document.getElementById('new-sub-email').value = '';
     document.getElementById('new-sub-password').value = '';
+    // Set default currency to primary currency
+    document.getElementById('new-sub-currency').value = currentSettings.esas_valyuta || 'AZN';
     const overlay = document.getElementById('sheet-overlay');
     overlay.classList.add('open'); 
     const sheet = overlay.querySelector('.sheet');
