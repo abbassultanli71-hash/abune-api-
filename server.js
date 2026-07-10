@@ -251,6 +251,20 @@ function isValidCurrency(valyuta) {
   return ICAZE_VERILEN_VALYUTALAR.includes(getValidCurrency(valyuta));
 }
 
+const RATES_TO_AZN = {
+  AZN: 1.0,
+  USD: 1.7,
+  EUR: 1.8
+};
+
+function convertCurrency(amount, from, to) {
+  const fromRate = RATES_TO_AZN[from.toUpperCase()] || 1.0;
+  const toRate = RATES_TO_AZN[to.toUpperCase()] || 1.0;
+  const amountInAzn = amount * fromRate;
+  const amountInTarget = amountInAzn / toRate;
+  return Number(amountInTarget.toFixed(2));
+}
+
 // İstifadəçinin username-inə görə daxili (PostgreSQL) ID-sini tapır.
 // Bütün API endpointləri istifadəçini "username" ilə qəbul edir, daxili sorğularda isə FK üçün bu ID istifadə olunur.
 async function getUserIdByUsername(username) {
@@ -1818,6 +1832,13 @@ app.put('/api/ayarlar/:username', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
+    // 1. Get old currency before updating settings
+    const oldSettingsRow = await executeQuery(
+      `SELECT esas_valyuta FROM istifadeci_ayarlari WHERE istifadeci_id = :userId`,
+      { userId }
+    );
+    const oldCurrency = oldSettingsRow.rows.length > 0 ? (oldSettingsRow.rows[0].ESAS_VALYUTA || 'AZN') : 'AZN';
+
     await executeQuery(
       `UPDATE istifadeci_ayarlari
        SET esas_valyuta = :esas_valyuta, bildiris_metodu = :bildiris_metodu, dil = :dil, tema = :tema, tema_rengi = :tema_rengi
@@ -1828,17 +1849,59 @@ app.put('/api/ayarlar/:username', async (req, res) => {
       { autoCommit: true }
     );
 
-    if (esas_valyuta) {
-      await executeQuery(
-        `UPDATE budceler SET valyuta = :esas_valyuta WHERE istifadeci_id = :istifadeci_id`,
-        { esas_valyuta, istifadeci_id: userId },
-        { autoCommit: true }
+    if (esas_valyuta && esas_valyuta.toUpperCase() !== oldCurrency.toUpperCase()) {
+      const fromCurr = oldCurrency.toUpperCase();
+      const toCurr = esas_valyuta.toUpperCase();
+
+      // Convert budget limits and spent totals
+      const budgetRes = await executeQuery(
+        `SELECT limit_mebleq, hesab_mebleqi FROM budceler WHERE istifadeci_id = :userId`,
+        { userId }
       );
-      await executeQuery(
-        `UPDATE abunelikler SET valyuta = :esas_valyuta WHERE istifadeci_id = :istifadeci_id`,
-        { esas_valyuta, istifadeci_id: userId },
-        { autoCommit: true }
+      if (budgetRes.rows.length > 0) {
+        const oldLimit = Number(budgetRes.rows[0].LIMIT_MEBLEQ);
+        const oldSpent = Number(budgetRes.rows[0].HESAB_MEBLEQI);
+        const newLimit = convertCurrency(oldLimit, fromCurr, toCurr);
+        const newSpent = convertCurrency(oldSpent, fromCurr, toCurr);
+        
+        await executeQuery(
+          `UPDATE budceler 
+           SET limit_mebleq = :newLimit, hesab_mebleqi = :newSpent, valyuta = :toCurr 
+           WHERE istifadeci_id = :userId`,
+          { newLimit, newSpent, toCurr, userId },
+          { autoCommit: true }
+        );
+      }
+
+      // Convert subscriptions
+      const subsRes = await executeQuery(
+        `SELECT id, qiymet FROM abunelikler WHERE istifadeci_id = :userId`,
+        { userId }
       );
+      for (const row of subsRes.rows) {
+        const oldPrice = Number(row.QIYMET);
+        const newPrice = convertCurrency(oldPrice, fromCurr, toCurr);
+        await executeQuery(
+          `UPDATE abunelikler SET qiymet = :newPrice, valyuta = :toCurr WHERE id = :subId`,
+          { newPrice, toCurr, subId: row.ID },
+          { autoCommit: true }
+        );
+      }
+
+      // Convert payment history
+      const historyRes = await executeQuery(
+        `SELECT id, mebleq FROM odenis_tarixcesi WHERE istifadeci_id = :userId`,
+        { userId }
+      );
+      for (const row of historyRes.rows) {
+        const oldHistoryAmt = Number(row.MEBLEQ);
+        const newHistoryAmt = convertCurrency(oldHistoryAmt, fromCurr, toCurr);
+        await executeQuery(
+          `UPDATE odenis_tarixcesi SET mebleq = :newHistoryAmt WHERE id = :historyId`,
+          { newHistoryAmt, historyId: row.ID },
+          { autoCommit: true }
+        );
+      }
     }
 
     return successResponse(res, 200, 'Updated', { message: 'Ayarlar uğurla yeniləndi.' });
