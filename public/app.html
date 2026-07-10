@@ -1657,7 +1657,16 @@
     <!-- Bottom sheet: Add card (NO manual cardType selection) -->
     <div class="sheet-overlay" id="card-sheet-overlay">
       <div class="sheet">
-               <!-- Front of the card -->
+        <div class="sheet-handle"></div>
+        <div class="sheet-head">
+          <div class="sheet-title">Yeni Kart</div>
+          <button class="sheet-close" onclick="closeCardSheet()">✕</button>
+        </div>
+
+        <!-- Live Preview Card Mockup -->
+        <div class="preview-card-container">
+          <div class="preview-card" id="live-preview-card">
+            <!-- Front of the card -->
             <div class="preview-card-front">
               <div class="preview-card-glow"></div>
               <!-- Futuristic background mesh -->
