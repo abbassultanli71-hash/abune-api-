@@ -1163,9 +1163,12 @@ app.put('/api/abunelikler', async (req, res) => {
 app.delete('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const subCheck = await executeQuery(`SELECT id FROM abunelikler WHERE id = :id`, { id });
+    // İstifadəçi ID-sini əvvəlcədən götür ki, silindikdən sonra büdcəni yeniləyək
+    const subCheck = await executeQuery(`SELECT id, istifadeci_id FROM abunelikler WHERE id = :id`, { id });
     if (subCheck.rows.length === 0)
       return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
+
+    const ownerId = subCheck.rows[0].ISTIFADECI_ID;
 
     // Əvvəlcə həmin abunəliyə aid bildirişləri sil
     await executeQuery(`DELETE FROM bildirisler WHERE abunelik_id = :id`, { id });
@@ -1173,6 +1176,10 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
     // Sonra abunəliyin özünü sil
     const result = await executeQuery(`DELETE FROM abunelikler WHERE id = :id`, { id }, { autoCommit: true });
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
+
+    // Büdcə xərclənib məbləğini yenilə — aktiv abunəliklərin cəmi
+    await syncBudgetSpent(ownerId);
+
     return successResponse(res, 200, 'Deleted', { message: 'Abunəlik və əlaqəli bildirişlər uğurla silindi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
