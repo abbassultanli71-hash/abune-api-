@@ -12,10 +12,8 @@
       --bg: #0b0914;
       --surface: rgba(22, 20, 36, 0.65);
       --border: rgba(255, 255, 255, 0.08);
-      --border-active: rgba(255, 255, 255, 0.2);
       --ink: #f5f7fa;
       --ink-muted: #a5a6c2;
-      --ink-faint: #737599;
       --p1: #FF5B45;
       --p2: #6952E0;
       --p3: #00C9FF;
@@ -23,7 +21,7 @@
       --p5: #FFB800;
     }
     body {
-      margin: 0; padding: 40px 10px;
+      margin: 0; padding: 40px 20px;
       background: var(--bg);
       color: var(--ink);
       font-family: 'Inter', sans-serif;
@@ -33,20 +31,20 @@
       position: relative;
       overflow-x: hidden;
     }
-    /* Ambient glowing spheres in background */
+    /* Background glows */
     body::before {
       content: ''; position: absolute; top: -10%; right: -10%; width: 450px; height: 450px;
-      background: radial-gradient(circle, rgba(105, 82, 224, 0.16) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(105, 82, 224, 0.15) 0%, transparent 70%);
       z-index: 0; pointer-events: none;
     }
     body::after {
       content: ''; position: absolute; bottom: 5%; left: -15%; width: 550px; height: 550px;
-      background: radial-gradient(circle, rgba(31, 224, 194, 0.12) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(31, 224, 194, 0.1) 0%, transparent 70%);
       z-index: 0; pointer-events: none;
     }
     
     .header-area {
-      text-align: center; margin-bottom: 40px; position: relative; z-index: 2;
+      text-align: center; margin-bottom: 50px; position: relative; z-index: 2;
     }
     .header-area h1 {
       font-family: 'Outfit', sans-serif;
@@ -56,129 +54,105 @@
     }
     .header-area p { color: var(--ink-muted); font-size: 15px; margin: 0; }
     
-    /* Roadmap Frame Wrapper */
-    .roadmap-wrapper {
-      position: relative; max-width: 1100px; width: 100%; z-index: 2;
-      display: flex; flex-direction: column; align-items: center;
+    /* Board Container */
+    .roadmap-board {
+      position: relative; display: flex; gap: 20px;
+      width: 100%; max-width: 1200px; z-index: 2;
+      box-sizing: border-box;
     }
     
-    /* Horizontal Timeline Line/Track */
-    .timeline-track-area {
-      position: relative; width: 90%; max-width: 800px; height: 60px;
-      margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
-    }
-    .timeline-line {
-      position: absolute; left: 0; right: 0; top: 50%; height: 3px;
+    /* Connecting horizontal line */
+    .roadmap-board::before {
+      content: ''; position: absolute;
+      left: calc(10% / 2); right: calc(10% / 2); top: 10px; height: 3px;
       background: linear-gradient(90deg, var(--p1), var(--p2), var(--p3), var(--p4), var(--p5));
-      transform: translateY(-50%); z-index: 1;
-      border-radius: 4px; opacity: 0.8;
+      border-radius: 4px; z-index: 1; opacity: 0.8;
+      transition: all 0.3s;
     }
+    
+    /* Column for each phase */
+    .phase-col {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      min-width: 0; position: relative; z-index: 2;
+      transition: transform 0.3s ease;
+    }
+    
+    /* Node element */
     .timeline-node {
-      width: 14px; height: 14px; border-radius: 50%;
+      width: 16px; height: 16px; border-radius: 50%;
       background: #0b0914; border: 3px solid var(--color);
       box-shadow: 0 0 10px var(--color);
-      z-index: 2; position: relative; cursor: pointer;
-      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.25s, box-shadow 0.25s;
+      z-index: 3; transition: transform 0.25s, background 0.25s, box-shadow 0.25s;
     }
-    .timeline-node.active {
-      transform: scale(1.5); background: var(--color);
+    .phase-col:hover .timeline-node {
+      transform: scale(1.3); background: var(--color);
       box-shadow: 0 0 16px var(--color), 0 0 30px var(--color);
     }
-    .timeline-node::after {
-      content: attr(data-label);
-      position: absolute; bottom: -26px; left: 50%; transform: translateX(-50%);
-      font-size: 10px; font-weight: 700; color: var(--ink-muted);
-      white-space: nowrap; transition: color 0.25s;
-    }
-    .timeline-node.active::after {
-      color: var(--ink);
-    }
     
-    /* Horizontal Carousel Scroll Area */
-    .carousel-outer {
-      position: relative; width: 100%; display: flex; align-items: center; justify-content: center;
-    }
-    .cards-container {
-      display: flex; gap: 28px; overflow-x: auto;
-      padding: 10px 20px 40px;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      width: 100%; max-width: 900px;
-      box-sizing: border-box;
-      scroll-behavior: smooth;
-    }
-    .cards-container::-webkit-scrollbar { display: none; }
-    
-    /* Hanging Card Wrapper */
-    .card-wrapper {
-      flex: 0 0 310px; scroll-snap-align: center;
-      display: flex; flex-direction: column; align-items: center;
-      position: relative;
-    }
+    /* Vertical connector line */
     .card-connector {
       width: 2px; height: 26px;
       background: linear-gradient(to bottom, var(--color), rgba(255,255,255,0.05));
-      opacity: 0.8;
+      opacity: 0.8; z-index: 2;
     }
     
     /* Glassmorphic Card */
     .roadmap-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
-      padding: 22px; box-shadow: var(--shadow); width: 100%; box-sizing: border-box;
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+      padding: 18px 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      width: 100%; box-sizing: border-box;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
       position: relative; overflow: hidden;
+      display: flex; flex-direction: column;
     }
     .roadmap-card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: var(--color); opacity: 0.7;
     }
-    .card-wrapper.active .roadmap-card {
-      border-color: var(--border-active);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px -5px rgba(255,255,255,0.05);
-      transform: scale(1.02);
+    .phase-col:hover .roadmap-card {
+      transform: translateY(-4px); border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     }
     
+    /* Card content */
     .card-head {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
     }
     .phase-badge {
-      font-size: 10px; font-weight: 700; color: #0f0f1a;
-      background: var(--color); padding: 4px 10px; border-radius: 20px;
+      font-size: 9px; font-weight: 700; color: #0f0f1a;
+      background: var(--color); padding: 3px 8px; border-radius: 20px;
       text-transform: uppercase; letter-spacing: 0.5px;
     }
     .duration {
       font-size: 11px; font-weight: 700; color: var(--color);
     }
     .card-title {
-      font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 600; margin: 0 0 6px;
+      font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 600; margin: 0 0 6px;
     }
-    .card-sub { font-size: 12.5px; color: var(--ink-muted); margin-bottom: 18px; line-height: 1.45; min-height: 36px; }
+    .card-sub { font-size: 11.5px; color: var(--ink-muted); margin-bottom: 16px; line-height: 1.4; min-height: 34px; }
     
     /* Checklist */
-    .feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 11px; }
-    .feature-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--ink-muted); line-height: 1.4; }
-    .feature-item svg { width: 14px; height: 14px; color: var(--color); flex-shrink: 0; margin-top: 2px; }
+    .feature-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .feature-item { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; color: var(--ink-muted); line-height: 1.35; }
+    .feature-item svg { width: 13px; height: 13px; color: var(--color); flex-shrink: 0; margin-top: 1px; }
     
-    /* Navigation Controls */
-    .nav-btn {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-      color: var(--ink); display: flex; align-items: center; justify-content: center;
-      cursor: pointer; z-index: 5; transition: background 0.2s, border-color 0.2s;
-      position: absolute; top: calc(50% + 10px); transform: translateY(-50%);
-    }
-    .nav-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
-    .nav-btn:active { transform: translateY(-50%) scale(0.95); }
-    .nav-btn.prev { left: -50px; }
-    .nav-btn.next { right: -50px; }
-    .nav-btn svg { width: 20px; height: 20px; }
-    
-    /* Responsive styling overrides */
-    @media (max-width: 1040px) {
-      .nav-btn { display: none; } /* Hide desktop buttons on mobile swipe view */
-      .cards-container { padding-left: 20px; padding-right: 20px; }
+    /* Mobile-specific horizontal swiping view */
+    @media (max-width: 950px) {
+      .roadmap-board {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding: 10px 20px 40px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .roadmap-board::-webkit-scrollbar { display: none; }
+      .phase-col {
+        flex: 0 0 280px;
+        scroll-snap-align: center;
+      }
+      .roadmap-board::before {
+        left: 140px; right: 140px;
+      }
     }
   </style>
 </head>
@@ -189,207 +163,134 @@
     <p>12 Aylıq İnkişaf və Miqyaslanma Strategiyası</p>
   </div>
 
-  <div class="roadmap-wrapper">
+  <!-- Unified Self-Aligning Grid/Board -->
+  <div class="roadmap-board">
     
-    <!-- Top Interactive Timeline nodes -->
-    <div class="timeline-track-area">
-      <div class="timeline-line"></div>
-      <div class="timeline-node active" style="--color: var(--p1);" data-label="Mərhələ 1" onclick="scrollToCard(0)"></div>
-      <div class="timeline-node" style="--color: var(--p2);" data-label="Mərhələ 2" onclick="scrollToCard(1)"></div>
-      <div class="timeline-node" style="--color: var(--p3);" data-label="Mərhələ 3" onclick="scrollToCard(2)"></div>
-      <div class="timeline-node" style="--color: var(--p4);" data-label="Mərhələ 4" onclick="scrollToCard(3)"></div>
-      <div class="timeline-node" style="--color: var(--p5);" data-label="Mərhələ 5" onclick="scrollToCard(4)"></div>
-    </div>
-    
-    <!-- Horizontal Swipeable Cards Carousel -->
-    <div class="carousel-outer">
-      <button class="nav-btn prev" onclick="scrollPrev()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
-      
-      <div class="cards-container" id="cards-container">
-        
-        <!-- Phase 1 -->
-        <div class="card-wrapper active" id="card-p1" style="--color: var(--p1);">
-          <div class="card-connector"></div>
-          <div class="roadmap-card">
-            <div class="card-head">
-              <span class="phase-badge">Mərhələ 1</span>
-              <span class="duration">0 - 2 ay</span>
-            </div>
-            <h3 class="card-title">Saxlama Təməli</h3>
-            <p class="card-sub">İstifadəçiyə tətbiqi yenidən açmaq üçün daimi səbəb yaratmaq</p>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Yenilənmə / qiymət artımı bildirişi (ödənişdən 3-5 gün əvvəl push)</span>
-              </li>
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Sınaq müddətinin bitmə aşkarlanması (ödənişli plana keçmədən 48-72 saat əvvəl xəbərdarlıq)</span>
-              </li>
-            </ul>
-          </div>
+    <!-- Phase 1 -->
+    <div class="phase-col" style="--color: var(--p1);">
+      <div class="timeline-node"></div>
+      <div class="card-connector"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge">Mərhələ 1</span>
+          <span class="duration">0 - 2 ay</span>
         </div>
-
-        <!-- Phase 2 -->
-        <div class="card-wrapper" id="card-p2" style="--color: var(--p2);">
-          <div class="card-connector"></div>
-          <div class="roadmap-card">
-            <div class="card-head">
-              <span class="phase-badge">Mərhələ 2</span>
-              <span class="duration">2 - 4 ay</span>
-            </div>
-            <h3 class="card-title">Vərdiş və Sübut</h3>
-            <p class="card-sub">Tətbiqin dəyərini görünən etmək, həftəlik geri dönüşü möhkəmləndirmək</p>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Toplanmış qənaət dəftəri (paylaşıla bilən ümumi qənaət sayğacı)</span>
-              </li>
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>"Buna dəyərmi?" xallandırılması (az istifadə olunan abunəliklərdə xəbərdarlıq)</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Phase 3 -->
-        <div class="card-wrapper" id="card-p3" style="--color: var(--p3);">
-          <div class="card-connector"></div>
-          <div class="roadmap-card">
-            <div class="card-head">
-              <span class="phase-badge">Mərhələ 3</span>
-              <span class="duration">4 - 7 ay</span>
-            </div>
-            <h3 class="card-title">Gəlir Modelini Qur</h3>
-            <p class="card-sub">Şəffaf, çoxqatlı qiymətləndirmə və gəlirlərin artırılması</p>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Pulsuz / Plus / Concierge səviyyələri (sabit, şəffaf Plus abunəlik modeli)</span>
-              </li>
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Özün-et ləğv bələdçiləri (addım-addım asan ləğv etmə qaydaları)</span>
-              </li>
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Koqort xərc müqayisəsi (analitika vasitəsilə abunəlik paketini yüksəltmə tetikliyi)</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Phase 4 -->
-        <div class="card-wrapper" id="card-p4" style="--color: var(--p4);">
-          <div class="card-connector"></div>
-          <div class="roadmap-card">
-            <div class="card-head">
-              <span class="phase-badge">Mərhələ 4</span>
-              <span class="duration">7 - 9 ay</span>
-            </div>
-            <h3 class="card-title">Etibarla Miqyaslan</h3>
-            <p class="card-sub">Rəqiblərin buraxdığı etibar boşluqlarını doldurmaq və güvən qazanmaq</p>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Təsdiqə bağlı concierge xidməti (hər abunəlik ödənişi üçün əvvəlcədən təsdiq sorğusu)</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Phase 5 -->
-        <div class="card-wrapper" id="card-p5" style="--color: var(--p5);">
-          <div class="card-connector"></div>
-          <div class="roadmap-card">
-            <div class="card-head">
-              <span class="phase-badge">Mərhələ 5</span>
-              <span class="duration">9 - 12 ay</span>
-            </div>
-            <h3 class="card-title">Müdafiə Oluna Bilən Xəndək</h3>
-            <p class="card-sub">Coğrafiya, yeni kateqoriyalar və B2B seqmentləri ilə miqyaslanmaq</p>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Çoxvalyutalı / beynəlxalq dəstək (qlobal rəqiblərə qarşı regional üstünlük)</span>
-              </li>
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>B2B / peşəkar istifadəçi genişlənməsi (freelancer-lər üçün çoxistifadəçili abunəlik idarəetməsi)</span>
-              </li>
-              <li class="feature-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Maliyyə sağlamlığı xallandırılması (digər maliyyə xərclərinə yüngül genişlənmə)</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
+        <h3 class="card-title">Saxlama Təməli</h3>
+        <p class="card-sub">İstifadəçiyə tətbiqi yenidən açmaq üçün daimi səbəb yaratmaq</p>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Yenilənmə / qiymət artımı bildirişi (ödənişdən 3-5 gün əvvəl push)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Sınaq müddətinin bitmə aşkarlanması (ödənişli plana keçmədən 48-72 saat əvvəl xəbərdarlıq)</span>
+          </li>
+        </ul>
       </div>
-      
-      <button class="nav-btn next" onclick="scrollNext()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase-col" style="--color: var(--p2);">
+      <div class="timeline-node"></div>
+      <div class="card-connector"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge">Mərhələ 2</span>
+          <span class="duration">2 - 4 ay</span>
+        </div>
+        <h3 class="card-title">Vərdiş və Sübut</h3>
+        <p class="card-sub">Tətbiqin dəyərini görünən etmək, həftəlik geri dönüşü möhkəmləndirmək</p>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Toplanmış qənaət dəftəri (paylaşıla bilən ümumi qənaət sayğacı)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>"Buna dəyərmi?" xallandırılması (az istifadə olunan abunəliklərdə xəbərdarlıq)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase-col" style="--color: var(--p3);">
+      <div class="timeline-node"></div>
+      <div class="card-connector"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge">Mərhələ 3</span>
+          <span class="duration">4 - 7 ay</span>
+        </div>
+        <h3 class="card-title">Gəlir Modelini Qur</h3>
+        <p class="card-sub">Şəffaf, çoxqatlı qiymətləndirmə və gəlirlərin artırılması</p>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Pulsuz / Plus / Concierge səviyyələri (sabit Plus qiyməti)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Özün-et ləğv bələdçiləri (addım-addım asan ləğv)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Koqort xərc müqayisəsi (analitika yüksəltmə tetikliyi)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase-col" style="--color: var(--p4);">
+      <div class="timeline-node"></div>
+      <div class="card-connector"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge">Mərhələ 4</span>
+          <span class="duration">7 - 9 ay</span>
+        </div>
+        <h3 class="card-title">Etibarla Miqyaslan</h3>
+        <p class="card-sub">Rəqiblərin buraxdığı etibar boşluqlarını doldurmaq və güvən qazanmaq</p>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Təsdiqə bağlı concierge xidməti (hər əməliyyat üçün təsdiq sorğusu)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="phase-col" style="--color: var(--p5);">
+      <div class="timeline-node"></div>
+      <div class="card-connector"></div>
+      <div class="roadmap-card">
+        <div class="card-head">
+          <span class="phase-badge">Mərhələ 5</span>
+          <span class="duration">9 - 12 ay</span>
+        </div>
+        <h3 class="card-title">Müdafiə Oluna Bilən Xəndək</h3>
+        <p class="card-sub">Coğrafiya, yeni kateqoriyalar və B2B seqmentləri ilə miqyaslanmaq</p>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Çoxvalyutalı / beynəlxalq dəstək (qlobal rəqiblərə qarşı regional üstünlük)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>B2B / peşəkar istifadəçi genişlənməsi (çoxistifadəçili abunəlik idarəetməsi)</span>
+          </li>
+          <li class="feature-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Maliyyə sağlamlığı xallandırılması (kənara yüngül genişlənmə)</span>
+          </li>
+        </ul>
+      </div>
     </div>
 
   </div>
-
-  <script>
-    const container = document.getElementById('cards-container');
-    const nodes = document.querySelectorAll('.timeline-node');
-    const wrappers = document.querySelectorAll('.card-wrapper');
-    
-    function scrollToCard(index) {
-      const card = document.getElementById('card-p' + (index + 1));
-      if (card) {
-        container.scrollTo({
-          left: card.offsetLeft - container.offsetLeft - (container.clientWidth - card.clientWidth) / 2,
-          behavior: 'smooth'
-        });
-      }
-    }
-    
-    // Auto-highlight active node and card wrapper on scroll
-    container.addEventListener('scroll', () => {
-      let activeIndex = 0;
-      let minDiff = Infinity;
-      const center = container.scrollLeft + container.clientWidth / 2;
-      
-      for (let i = 0; i < 5; i++) {
-        const card = document.getElementById('card-p' + (i + 1));
-        if (card) {
-          const cardCenter = card.offsetLeft + card.clientWidth / 2;
-          const diff = Math.abs(center - cardCenter);
-          if (diff < minDiff) {
-            minDiff = diff;
-            activeIndex = i;
-          }
-        }
-      }
-      
-      nodes.forEach((node, idx) => {
-        if (idx === activeIndex) {
-          node.classList.add('active');
-        } else {
-          node.classList.remove('active');
-        }
-      });
-      
-      wrappers.forEach((wrap, idx) => {
-        if (idx === activeIndex) {
-          wrap.classList.add('active');
-        } else {
-          wrap.classList.remove('active');
-        }
-      });
-    });
-    
-    function scrollNext() {
-      container.scrollBy({ left: 340, behavior: 'smooth' });
-    }
-    function scrollPrev() {
-      container.scrollBy({ left: -340, behavior: 'smooth' });
-    }
-  </script>
 
 </body>
 </html>
