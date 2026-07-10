@@ -844,18 +844,20 @@
     box-shadow: 0 10px 25px rgba(0,0,0,0.5);
   }
   .preview-card-front {
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%), rgba(22, 19, 43, 0.75);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.03) 60%, rgba(255,255,255,0.0) 100%), 
+                linear-gradient(210deg, #1e1948 0%, #110e25 100%);
+    border: 1px solid rgba(255,255,255,0.18);
     padding: 16px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.65), inset 0 1px 1px rgba(255,255,255,0.25);
   }
   .preview-card-glow {
     position: absolute;
     top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
     pointer-events: none;
   }
   .preview-card-header {
@@ -874,12 +876,10 @@
     text-transform: uppercase;
   }
   .preview-brand-logo {
-    font-family: var(--font-display);
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    color: var(--ink);
-    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 22px;
   }
   .preview-card-chip {
     width: 32px;
@@ -1659,7 +1659,7 @@
               <div class="preview-card-glow"></div>
               <div class="preview-card-header">
                 <span class="preview-bank-name" id="preview-bank-name">BANK ADI</span>
-                <span class="preview-brand-logo" id="preview-brand-logo">CARD</span>
+                <span class="preview-brand-logo" id="preview-brand-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></span>
               </div>
               <div class="preview-card-chip"></div>
               <div class="preview-card-number" id="preview-card-number">•••• •••• •••• ••••</div>
@@ -2616,10 +2616,12 @@
     const badge = document.getElementById('card-brand-badge');
     const errorEl = document.getElementById('card-pan-error');
     const cleaned = String(pan).replace(/\s/g, '');
+    const logoEl = document.getElementById('preview-brand-logo');
     
     if (cleaned.length < 2) {
       badge.style.display = 'none';
       errorEl.style.display = 'none';
+      if (logoEl) logoEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
       return;
     }
     
@@ -2636,20 +2638,21 @@
       }
     }
     
+    const logoEl = document.getElementById('preview-brand-logo');
     if (brand) {
       badge.textContent = brand;
       badge.style.display = 'block';
       badge.style.background = brand === 'Visa' ? 'var(--teal-soft)' : 'var(--gold-soft)';
       badge.style.color = brand === 'Visa' ? 'var(--teal)' : 'var(--gold)';
       errorEl.style.display = 'none';
-      if (document.getElementById('preview-brand-logo')) {
-        document.getElementById('preview-brand-logo').textContent = brand.toUpperCase();
+      if (logoEl) {
+        logoEl.innerHTML = brand === 'Visa' ? 
+          `<svg viewBox="0 0 24 15" fill="none" style="height: 18px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));"><path d="M10.2 1.3L8.6 11.5c-.1.6-.5.9-1 .9H2.8c-.3 0-.5-.1-.6-.4L.1 2.3c-.1-.3 0-.5.2-.6.9-.3 2.1-.7 3.2-1 .2 0 .4.2.5.4l1.8 7.3L7.7 1.5c0-.2.2-.4.5-.4h2zm8.5 4.3c0-2-1.7-2.6-3.4-2.6-2.1 0-3.3.9-3.3 2.2 0 1.9 2.6 2 2.6 3.1 0 .5-.6.7-1.2.7-1.5 0-2.6-.4-2.6-.4s-.3.6-.5 1c0 0 1 .4 2.8.4 2.3 0 3.6-.9 3.6-2.3 0-2-2.6-2.1-2.6-3.2 0-.4.5-.6 1.1-.6 1.1 0 1.9.3 1.9.3s.2-.6.4-1.1c0 0-.8-.3-2-.3M24 1.5l-2.2 10.9H20L22.2 1.5H24zm-10 0l-2.4 10.9h1.7l2.4-10.9h-1.7z" fill="#FFF"/></svg>` : 
+          `<svg viewBox="0 0 24 15" fill="none" style="height: 22px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));"><circle cx="7" cy="7.5" r="7" fill="#EB001B"/><circle cx="15" cy="7.5" r="7" fill="#F79E1B" fill-opacity="0.8"/><path d="M11 7.5a6.99 6.99 0 0 1 2-4.9 6.99 6.99 0 0 1 0 9.8 6.99 6.99 0 0 1-2-4.9z" fill="#FF5F00"/></svg>`;
       }
     } else {
       badge.style.display = 'none';
-      if (document.getElementById('preview-brand-logo')) {
-        document.getElementById('preview-brand-logo').textContent = 'CARD';
-      }
+      if (logoEl) logoEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
       if (cleaned.length >= 4) {
         errorEl.style.display = 'block';
       } else {
@@ -2689,7 +2692,7 @@
 
     // Reset Live Preview Card Mockup
     document.getElementById('preview-bank-name').textContent = 'BANK ADI';
-    document.getElementById('preview-brand-logo').textContent = 'CARD';
+    document.getElementById('preview-brand-logo').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
     document.getElementById('preview-card-number').textContent = '•••• •••• •••• ••••';
     document.getElementById('preview-card-expiry').textContent = 'AA/İİ';
     document.getElementById('preview-card-name').textContent = (currentUser && currentUser.ad ? currentUser.ad.toUpperCase() : 'ABUNƏÇİ');
