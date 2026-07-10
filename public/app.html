@@ -988,10 +988,9 @@
             <label data-i18n="budget_limit_label">Limit məbləği</label>
             <input type="number" id="budget-limit-input" step="0.01" placeholder="300.00">
           </div>
-          <div class="field" style="padding:0 16px;">
-            <label data-i18n="budget_spent_label">Xərclənib (hesab_mebleqi)</label>
-            <input type="number" id="budget-spent-input" step="0.01" placeholder="0.00" readonly>
-          </div>
+          <!-- hesab_mebleqi avtomatik hesablanır — istifadəçi redaktə edə bilməz -->
+          <input type="hidden" id="budget-spent-input" value="0">
+
           <div class="field" style="padding:0 16px 14px;">
             <label data-i18n="budget_currency_label">Valyuta</label>
             <select id="budget-currency-input">

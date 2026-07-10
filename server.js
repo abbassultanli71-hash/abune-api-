@@ -1837,6 +1837,9 @@ app.get('/api/budceler/:username', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
+    // Hər dəfə GET edildikdə hesab_mebleqi-ni aktiv abunəliklərdən yenidən hesabla
+    await syncBudgetSpent(userId);
+
     const sql = `
       SELECT limit_mebleq, valyuta, hesab_mebleqi
       FROM budceler WHERE istifadeci_id = :istifadeci_id
