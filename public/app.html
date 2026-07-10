@@ -1969,6 +1969,27 @@
 
     clearPriceError();
 
+    // ── CLIENT-SIDE büdcə limiti yoxlaması ──────────────────────────────────
+    // budgetState.limit - cari limit (hətta default 300 olsa belə)
+    // budgetState.spent - mövcud aktiv abunəliklərin cəmi
+    {
+      const effectiveLimit = budgetState.limit > 0 ? budgetState.limit : 300;
+      const currentSpent   = budgetState.spent  || 0;
+      const projectedTotal = currentSpent + price;
+
+      if (projectedTotal > effectiveLimit) {
+        const remaining = Math.max(0, effectiveLimit - currentSpent);
+        const sym = currencySymbol(budgetState.currency || 'AZN');
+        const errMsg = `Büdcə limiti keçilir! Mövcud xərc: ${sym}${currentSpent.toFixed(2)}, yeni abunəlik: +${sym}${price.toFixed(2)}, cəmi: ${sym}${projectedTotal.toFixed(2)} — limit: ${sym}${effectiveLimit.toFixed(2)}. (Qalan boş büdcə: ${sym}${remaining.toFixed(2)})`;
+        document.getElementById('budget-exceeded-msg').textContent = errMsg;
+        const banner = document.getElementById('budget-exceeded-banner');
+        banner.style.display = 'block';
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     const payload = {
       username: currentUser.username,
       ad: name,
