@@ -747,6 +747,8 @@
     border-radius: 20px;
     padding: 20px;
     box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   /* ---- Real mobil ekranlarda: telefon çərçivəsini ləğv et, tam ekran ol ---- */
@@ -1011,9 +1013,8 @@
             <svg class="budget-ring" viewBox="0 0 120 120">
               <defs>
                 <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#a78bfa"/>
-                  <stop offset="55%" stop-color="#f472b6"/>
-                  <stop offset="100%" stop-color="#ffb020"/>
+                  <stop offset="0%" stop-color="#1fe0c2"/>
+                  <stop offset="100%" stop-color="#00c9ff"/>
                 </linearGradient>
               </defs>
               <circle class="budget-ring-track" cx="60" cy="60" r="52"></circle>
