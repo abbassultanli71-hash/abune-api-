@@ -12,36 +12,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b0d10;
-    --surface: #14171c;
-    --surface-2: #191d24;
-    --surface-3: #22272f;
-    --border: rgba(232,236,244,0.07);
-    --border-strong: rgba(232,236,244,0.16);
+    --bg: #0b0914;
+    --surface: rgba(22, 20, 36, 0.65);
+    --surface-2: rgba(30, 28, 50, 0.7);
+    --surface-3: rgba(45, 42, 75, 0.75);
+    --border: rgba(255, 255, 255, 0.07);
+    --border-strong: rgba(255, 255, 255, 0.15);
     --ink: #f5f7fa;
-    --ink-muted: #9aa3b2;
-    --ink-faint: #626b7a;
+    --ink-muted: #a5a6c2;
+    --ink-faint: #737599;
     --gold: #f5c46b;
-    --teal: #4fd1c5;
-    --coral: #ff7a6b;
-    --purple: #b39dff;
+    --teal: #1fe0c2;
+    --coral: #ff5b45;
+    --purple: #6952e0;
     --pink: #ff8fb8;
-    --blue: #7cb8ff;
-    --lime: #c8f560;
-    --gold-soft: rgba(245,196,107,0.14);
-    --teal-soft: rgba(79,209,197,0.14);
-    --coral-soft: rgba(255,122,107,0.15);
-    --purple-soft: rgba(179,157,255,0.16);
-    --pink-soft: rgba(255,143,184,0.15);
-    --blue-soft: rgba(124,184,255,0.16);
-    --lime-soft: rgba(200,245,96,0.18);
-    --accent: var(--lime);
-    --accent-soft: var(--lime-soft);
-    --accent-grad: linear-gradient(135deg, #e6ffb0 0%, #c8f560 45%, #9fdb2e 100%);
-    --hero-grad: linear-gradient(140deg, #1a1f2a 0%, #232a38 55%, #2f3a4d 100%);
-    --glow-accent: 0 12px 32px -10px rgba(200,245,96,0.42);
-    --glow-coral: 0 12px 32px -10px rgba(255,122,107,0.45);
-    --shadow: 0 24px 60px -24px rgba(0,0,0,0.75);
+    --blue: #00c9ff;
+    --lime: #1fe0c2;
+    --gold-soft: rgba(245, 196, 107, 0.12);
+    --teal-soft: rgba(31, 224, 194, 0.12);
+    --coral-soft: rgba(255, 91, 69, 0.12);
+    --purple-soft: rgba(105, 82, 224, 0.15);
+    --pink-soft: rgba(255, 143, 184, 0.12);
+    --blue-soft: rgba(0, 201, 255, 0.12);
+    --lime-soft: rgba(31, 224, 194, 0.15);
+    --accent: var(--teal);
+    --accent-soft: var(--teal-soft);
+    --accent-grad: linear-gradient(135deg, #1fe0c2 0%, #00c9ff 100%);
+    --hero-grad: linear-gradient(140deg, #1d1836 0%, #120e23 60%, #0b0914 100%);
+    --glow-accent: 0 12px 32px -10px rgba(31, 224, 194, 0.35);
+    --glow-coral: 0 12px 32px -10px rgba(255, 91, 69, 0.38);
+    --shadow: 0 20px 48px -18px rgba(0,0,0,0.65);
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', -apple-system, system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
@@ -256,6 +256,8 @@
     padding: 14px 16px; min-width: 148px; flex-shrink: 0;
     display: flex; flex-direction: column; gap: 8px;
     box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .stat-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
   .stat-icon svg { width: 14px; height: 14px; }
@@ -269,13 +271,15 @@
   .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .stat-value small { font-size: 12px; color: var(--ink-faint); font-weight: 500; }
   .stat-card-accent { border-color: var(--purple-soft); box-shadow: var(--shadow), inset 0 0 0 1px rgba(167,139,250,0.12); }
-
+ 
   /* ---- Signature: payment ruler ---- */
   .ruler-card {
     margin: 18px 20px 6px;
     background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
     padding: 18px 18px 20px;
     box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     position: relative;
     overflow: hidden;
   }
@@ -324,6 +328,8 @@
     border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
     cursor: pointer;
     box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition: background 0.2s ease, transform 0.15s ease, border-color 0.15s ease;
   }
   .sub-row:active { background: var(--surface-2); transform: scale(0.99); }
@@ -469,6 +475,8 @@
     display: flex;
     padding: 8px 6px;
     box-shadow: 0 16px 36px -14px rgba(105,82,224,0.35), var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .tab-item {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
