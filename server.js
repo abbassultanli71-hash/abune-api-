@@ -913,8 +913,7 @@ app.post('/api/abunelikler', async (req, res) => {
     );
 
     {
-      const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
-      const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || 'AZN') : 'AZN';
+      const budgetLimit = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
 
       // Mövcud aktiv abunəliklərin qiymətlərini sadəcə topla (tezlik çevrilməsi yoxdur)
       const activeSubs = await executeQuery(
@@ -934,10 +933,10 @@ app.post('/api/abunelikler', async (req, res) => {
         const remaining = Math.max(0, budgetLimit - currentTotal);
         return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
           `Büdcə limiti keçilir! ` +
-          `Mövcud xərc: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
-          `yeni abunəlik: +${parsedQiymet.toFixed(2)} ${budgetValyuta}, ` +
-          `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
-          `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})` 
+          `Mövcud xərc: ${currentTotal.toFixed(2)} ${esasValyuta}, ` +
+          `yeni abunəlik: +${parsedQiymet.toFixed(2)} ${esasValyuta}, ` +
+          `cəmi: ${projectedTotal.toFixed(2)} ${esasValyuta} — limit: ${budgetLimit.toFixed(2)} ${esasValyuta}. ` +
+          `(Qalan boş büdcə: ${remaining.toFixed(2)} ${esasValyuta})` 
         );
       }
     }
@@ -1113,13 +1112,12 @@ app.put('/api/abunelikler', async (req, res) => {
     // ─── Büdcə limiti yoxlaması (yalnız status "active" olacaqsa) ─────────
     if (statusValue === 'active') {
       const budgetRow = await executeQuery(
-        `SELECT b.limit_mebleq, b.valyuta FROM budceler b WHERE b.istifadeci_id = :userId`,
+        `SELECT b.limit_mebleq FROM budceler b WHERE b.istifadeci_id = :userId`,
         { userId }
       );
 
       {
-        const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
-        const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || 'AZN') : 'AZN';
+        const budgetLimit = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
 
         const activeSubs = await executeQuery(
           `SELECT qiymet FROM abunelikler
@@ -1138,10 +1136,10 @@ app.put('/api/abunelikler', async (req, res) => {
           const remaining = Math.max(0, budgetLimit - currentTotal);
           return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
             `Büdcə limiti keçilir! ` +
-            `Digər aktiv abunəliklər: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
-            `yenilənən abunəlik: +${parsedQiymet.toFixed(2)} ${budgetValyuta}, ` +
-            `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
-            `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})` 
+            `Digər aktiv abunəliklər: ${currentTotal.toFixed(2)} ${esasValyuta}, ` +
+            `yenilənən abunəlik: +${parsedQiymet.toFixed(2)} ${esasValyuta}, ` +
+            `cəmi: ${projectedTotal.toFixed(2)} ${esasValyuta} — limit: ${budgetLimit.toFixed(2)} ${esasValyuta}. ` +
+            `(Qalan boş büdcə: ${remaining.toFixed(2)} ${esasValyuta})` 
           );
         }
       }
