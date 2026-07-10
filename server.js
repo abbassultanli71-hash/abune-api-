@@ -1722,7 +1722,7 @@ app.get('/api/ayarlar/:username', async (req, res) => {
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
     const sql = `
-      SELECT esas_valyuta, bildiris_metodu, dil, tema, tema_rengi
+      SELECT esas_valyuta, bildiris_metodu, dil, tema
       FROM istifadeci_ayarlari WHERE istifadeci_id = :istifadeci_id
     `;
     const result = await executeQuery(sql, { istifadeci_id: userId });
@@ -1767,10 +1767,6 @@ app.get('/api/ayarlar/:username', async (req, res) => {
  *                 type: string
  *                 enum: [light, dark]
  *                 example: dark
- *               tema_rengi:
- *                 type: string
- *                 enum: [gold, teal, coral, purple, blue]
- *                 example: gold
  *     responses:
  *       200:
  *         description: Yeniləndi
@@ -1779,7 +1775,7 @@ app.get('/api/ayarlar/:username', async (req, res) => {
  */
 app.put('/api/ayarlar/:username', async (req, res) => {
   const { username } = req.params;
-  const { esas_valyuta, bildiris_metodu, dil, tema, tema_rengi } = req.body;
+  const { esas_valyuta, bildiris_metodu, dil, tema } = req.body;
   const ICAZE_VERILEN_VALYUTALAR_L = ['AZN', 'USD', 'EUR'];
   const ICAZE_VERILEN_BILDIRISLER  = ['email', 'telegram'];
   const ICAZE_VERILEN_TEMALAR      = ['light', 'dark'];
@@ -1789,7 +1785,6 @@ app.put('/api/ayarlar/:username', async (req, res) => {
   if (esas_valyuta && !ICAZE_VERILEN_VALYUTALAR_L.includes(esas_valyuta.toUpperCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_CURRENCY', `Yanlış valyuta: "${esas_valyuta}". Yalnız ${ICAZE_VERILEN_VALYUTALAR_L.join(', ')} daxil edilə bilər.`);
   if (bildiris_metodu && !ICAZE_VERILEN_BILDIRISLER.includes(bildiris_metodu.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_NOTIFICATION_METHOD', `Yanlış bildiriş metodu: "${bildiris_metodu}". Yalnız ${ICAZE_VERILEN_BILDIRISLER.join(', ')} daxil edilə bilər.`);
   if (tema && !ICAZE_VERILEN_TEMALAR.includes(tema.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_THEME', `Yanlış tema: "${tema}". Yalnız ${ICAZE_VERILEN_TEMALAR.join(', ')} daxil edilə bilər.`);
-  if (tema_rengi && !ICAZE_VERILEN_TEMA_RENGLERI.includes(tema_rengi.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_THEME_COLOR', `Yanlış tema rəngi: "${tema_rengi}". Yalnız ${ICAZE_VERILEN_TEMA_RENGLERI.join(', ')} daxil edilə bilər.`);
   if (dil && !ICAZE_VERILEN_DILLER.includes(dil.toLowerCase())) return errorResponse(res, 400, 'Bad Request', 'INVALID_LANGUAGE', `Yanlış dil kodu: "${dil}". ISO 639-1 formatında olmalıdır.`);
 
   try {
@@ -1798,10 +1793,10 @@ app.put('/api/ayarlar/:username', async (req, res) => {
 
     await executeQuery(
       `UPDATE istifadeci_ayarlari
-       SET esas_valyuta = :esas_valyuta, bildiris_metodu = :bildiris_metodu, dil = :dil, tema = :tema, tema_rengi = :tema_rengi
+       SET esas_valyuta = :esas_valyuta, bildiris_metodu = :bildiris_metodu, dil = :dil, tema = :tema
        WHERE istifadeci_id = :istifadeci_id`,
       {
-        esas_valyuta, bildiris_metodu, dil, tema, tema_rengi, istifadeci_id: userId
+        esas_valyuta, bildiris_metodu, dil, tema,  istifadeci_id: userId
       },
       { autoCommit: true }
     );
