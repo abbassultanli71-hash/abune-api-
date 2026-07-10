@@ -1745,6 +1745,12 @@
     // Update sub title counts
     document.querySelector('.hero-sub[data-i18n="dashboard_sub"]').textContent = `${activeSubs.length} aktiv abunəlik izlənilir`;
     document.getElementById('subs-screen-sub').textContent = `${subscriptions.length} abunəlik · ${activeSubs.length} aktiv`;
+    
+    // Update dashboard active count stat card
+    const activeCountEl = document.getElementById('dashboard-active-count');
+    if (activeCountEl) {
+      activeCountEl.textContent = activeSubs.length;
+    }
 
     // Render full list with filter
     filterSubscriptionsList();
