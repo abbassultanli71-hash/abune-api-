@@ -1400,6 +1400,9 @@ app.get('/api/odenis-metodlari', async (req, res) => {
       pan: row.pan || row.PAN || '',
       kart_istifade_tarixi: row.kart_istifade_tarixi || row.KART_ISTIFADE_TARIXI || ''
     }));
+    if (cards.length === 0) {
+      return successResponse(res, 200, 'No card found', { cards: [] });
+    }
     return successResponse(res, 200, 'Success', { cards });
   } catch (err) {
     console.error('❌ Xəta:', err.message);
