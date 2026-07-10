@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abunəm - HD Transparent Logo</title>
+  <style>
+    body {
+      margin: 0; padding: 24px;
+      background: #0f0f1a;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 90vh;
+      text-align: center;
+    }
+    h2 { margin-bottom: 6px; font-weight: 600; }
+    p { color: #a0a0b0; font-size: 14px; margin-bottom: 24px; max-width: 320px; }
+    .logo-container {
+      width: 256px; height: 256px;
+      /* Checkerboard pattern to visually represent transparency */
+      background: 
+        linear-gradient(45deg, #181827 25%, transparent 25%),
+        linear-gradient(-45deg, #181827 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #181827 75%),
+        linear-gradient(-45deg, transparent 75%, #181827 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+      background-color: #0f0f1a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .logo-container img {
+      width: 256px; height: 256px;
+      object-fit: contain;
+    }
+    .btn {
+      background: linear-gradient(135deg, #1FE0C2, #00C9FF);
+      color: #0f0f1a;
+      border: none;
+      padding: 15px 32px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(31,224,194,0.3);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      display: inline-block;
+    }
+    .btn:active { transform: scale(0.97); }
+    canvas { display: none; }
+  </style>
+</head>
+<body>
+
+  <h2>Abunəm HD Şəffaf Loqo</h2>
+  <p>Kart və dövri ödəniş oxlarından ibarət 1024x1024 PNG loqo. Telefonunuza yükləmək üçün düyməyə klikləyin:</p>
+
+  <div class="logo-container">
+    <img id="logo-preview" alt="Yüklənir...">
+  </div>
+
+  <a id="download-btn" class="btn" download="Abunem_Logo_HD.png">Loqonu Yüklə (PNG)</a>
+
+  <canvas id="logo-canvas" width="1024" height="1024"></canvas>
+
+  <script>
+    const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 4 16 16" width="1024" height="1024" fill="none">
+      <defs>
+        <linearGradient id="logo-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FF5B45" />
+          <stop offset="100%" stop-color="#6952E0" />
+        </linearGradient>
+        <linearGradient id="logo-grad-2" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#1FE0C2" />
+          <stop offset="100%" stop-color="#00C9FF" />
+        </linearGradient>
+      </defs>
+      
+      <!-- 3D Loop - Back portion -->
+      <path d="M4 12a8 8 0 0 1 12.8-6.4" stroke="url(#logo-grad-2)" stroke-width="1.8" stroke-linecap="round" />
+      
+      <!-- The Credit Card -->
+      <rect x="5" y="8" width="14" height="9" rx="1.5" stroke="url(#logo-grad-1)" stroke-width="1.6" fill="none" />
+      <line x1="5" y1="11" x2="19" y2="11" stroke="url(#logo-grad-1)" stroke-width="1.6" />
+      <rect x="7" y="13.5" width="2" height="1.5" rx="0.3" fill="#1FE0C2" />
+      <line x1="14" y1="14" x2="17" y2="14" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.6" />
+      
+      <!-- 3D Loop - Front portion wrapping around the card with an arrow head -->
+      <path d="M20 12a8 8 0 0 1-12.8 6.4" stroke="url(#logo-grad-2)" stroke-width="1.8" stroke-linecap="round" />
+      <path d="M8 15.5l-2.5 3 3 2.5" stroke="url(#logo-grad-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>`;
+
+    window.addEventListener('load', () => {
+      const canvas = document.getElementById('logo-canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      const svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgMarkup);
+      
+      img.onload = () => {
+        ctx.clearRect(0, 0, 1024, 1024);
+        ctx.drawImage(img, 0, 0, 1024, 1024);
+        
+        const pngUrl = canvas.toDataURL('image/png');
+        
+        document.getElementById('logo-preview').src = pngUrl;
+        document.getElementById('download-btn').href = pngUrl;
+      };
+      
+      img.src = svgUrl;
+    });
+  </script>
+
+</body>
+</html>
