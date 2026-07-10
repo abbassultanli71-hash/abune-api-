@@ -251,20 +251,6 @@ function isValidCurrency(valyuta) {
   return ICAZE_VERILEN_VALYUTALAR.includes(getValidCurrency(valyuta));
 }
 
-const RATES_TO_AZN = {
-  AZN: 1.0,
-  USD: 1.7,
-  EUR: 1.8
-};
-
-function convertCurrency(amount, from, to) {
-  const fromRate = RATES_TO_AZN[from.toUpperCase()] || 1.0;
-  const toRate = RATES_TO_AZN[to.toUpperCase()] || 1.0;
-  const amountInAzn = amount * fromRate;
-  const amountInTarget = amountInAzn / toRate;
-  return Number(amountInTarget.toFixed(2));
-}
-
 // İstifadəçinin username-inə görə daxili (PostgreSQL) ID-sini tapır.
 // Bütün API endpointləri istifadəçini "username" ilə qəbul edir, daxili sorğularda isə FK üçün bu ID istifadə olunur.
 async function getUserIdByUsername(username) {
@@ -868,22 +854,6 @@ app.post('/api/abunelikler', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
 
-    let finalValyuta = valyuta;
-    const settingsRow = await executeQuery(
-      `SELECT esas_valyuta FROM istifadeci_ayarlari WHERE istifadeci_id = :userId`,
-      { userId }
-    );
-    const esasValyuta = settingsRow.rows.length > 0 ? settingsRow.rows[0].ESAS_VALYUTA : 'AZN';
-
-    if (finalValyuta) {
-      if (getValidCurrency(finalValyuta) !== getValidCurrency(esasValyuta)) {
-        return errorResponse(res, 400, 'Bad Request', 'CURRENCY_MISMATCH', 
-          `Abunəlik valyutası istifadəçinin əsas valyutasına (${esasValyuta}) uyğun olmalıdır.`);
-      }
-    } else {
-      finalValyuta = esasValyuta;
-    }
-
     // Validate subscription account credentials (mock validation)
     const isValidAccount = await validateSubscriptionAccount(ad, accountemail, accountpassword);
     if (!isValidAccount) {
@@ -913,7 +883,8 @@ app.post('/api/abunelikler', async (req, res) => {
     );
 
     {
-      const budgetLimit = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
+      const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
+      const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || 'AZN') : 'AZN';
 
       // Mövcud aktiv abunəliklərin qiymətlərini sadəcə topla (tezlik çevrilməsi yoxdur)
       const activeSubs = await executeQuery(
@@ -933,10 +904,10 @@ app.post('/api/abunelikler', async (req, res) => {
         const remaining = Math.max(0, budgetLimit - currentTotal);
         return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
           `Büdcə limiti keçilir! ` +
-          `Mövcud xərc: ${currentTotal.toFixed(2)} ${esasValyuta}, ` +
-          `yeni abunəlik: +${parsedQiymet.toFixed(2)} ${esasValyuta}, ` +
-          `cəmi: ${projectedTotal.toFixed(2)} ${esasValyuta} — limit: ${budgetLimit.toFixed(2)} ${esasValyuta}. ` +
-          `(Qalan boş büdcə: ${remaining.toFixed(2)} ${esasValyuta})` 
+          `Mövcud xərc: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
+          `yeni abunəlik: +${parsedQiymet.toFixed(2)} ${budgetValyuta}, ` +
+          `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
+          `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})` 
         );
       }
     }
@@ -945,7 +916,7 @@ app.post('/api/abunelikler', async (req, res) => {
                  VALUES (:istifadeci_id, :ad, :qiymet, :valyuta, :odenis_tezliyi, :baslama_tarixi::DATE, :novbeti_odenis_tarixi::DATE, :kateqoriya, :odenis_metodu_id, 'active')
                  RETURNING id`;
     const binds = {
-      istifadeci_id: userId, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(finalValyuta),
+      istifadeci_id: userId, ad, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
       odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
       kateqoriya: kateqoriya || null, odenis_metodu_id: finalOdenisMetoduId
     };
@@ -1080,22 +1051,6 @@ app.put('/api/abunelikler', async (req, res) => {
     if (userId === null)
       return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    let finalValyuta = valyuta;
-    const settingsRow = await executeQuery(
-      `SELECT esas_valyuta FROM istifadeci_ayarlari WHERE istifadeci_id = :userId`,
-      { userId }
-    );
-    const esasValyuta = settingsRow.rows.length > 0 ? settingsRow.rows[0].ESAS_VALYUTA : 'AZN';
-
-    if (finalValyuta) {
-      if (getValidCurrency(finalValyuta) !== getValidCurrency(esasValyuta)) {
-        return errorResponse(res, 400, 'Bad Request', 'CURRENCY_MISMATCH', 
-          `Abunəlik valyutası istifadəçinin əsas valyutasına (${esasValyuta}) uyğun olmalıdır.`);
-      }
-    } else {
-      finalValyuta = esasValyuta;
-    }
-
     const subCheck = await executeQuery(
       `SELECT id FROM abunelikler WHERE istifadeci_id = :istifadeci_id AND ad = :ad`,
       { istifadeci_id: userId, ad: queryAd }
@@ -1112,12 +1067,13 @@ app.put('/api/abunelikler', async (req, res) => {
     // ─── Büdcə limiti yoxlaması (yalnız status "active" olacaqsa) ─────────
     if (statusValue === 'active') {
       const budgetRow = await executeQuery(
-        `SELECT b.limit_mebleq FROM budceler b WHERE b.istifadeci_id = :userId`,
+        `SELECT b.limit_mebleq, b.valyuta FROM budceler b WHERE b.istifadeci_id = :userId`,
         { userId }
       );
 
       {
-        const budgetLimit = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
+        const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
+        const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || 'AZN') : 'AZN';
 
         const activeSubs = await executeQuery(
           `SELECT qiymet FROM abunelikler
@@ -1136,10 +1092,10 @@ app.put('/api/abunelikler', async (req, res) => {
           const remaining = Math.max(0, budgetLimit - currentTotal);
           return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
             `Büdcə limiti keçilir! ` +
-            `Digər aktiv abunəliklər: ${currentTotal.toFixed(2)} ${esasValyuta}, ` +
-            `yenilənən abunəlik: +${parsedQiymet.toFixed(2)} ${esasValyuta}, ` +
-            `cəmi: ${projectedTotal.toFixed(2)} ${esasValyuta} — limit: ${budgetLimit.toFixed(2)} ${esasValyuta}. ` +
-            `(Qalan boş büdcə: ${remaining.toFixed(2)} ${esasValyuta})` 
+            `Digər aktiv abunəliklər: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
+            `yenilənən abunəlik: +${parsedQiymet.toFixed(2)} ${budgetValyuta}, ` +
+            `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
+            `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})` 
           );
         }
       }
@@ -1167,7 +1123,7 @@ app.put('/api/abunelikler', async (req, res) => {
        kateqoriya=:kateqoriya, status=:status, odenis_metodu_id=:odenis_metodu_id
        WHERE istifadeci_id=:istifadeci_id AND ad=:queryAd`,
       {
-        ad: finalAd, qiymet: parsedQiymet, valyuta: getValidCurrency(finalValyuta),
+        ad: finalAd, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
         odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
         kateqoriya: kateqoriya || null, status: statusValue, odenis_metodu_id: finalOdenisMetoduId,
         istifadeci_id: userId, queryAd
@@ -1207,12 +1163,9 @@ app.put('/api/abunelikler', async (req, res) => {
 app.delete('/api/abunelikler/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    // Silinmədən əvvəl istifadəçi ID-sini götür (syncBudgetSpent üçün lazımdır)
-    const subCheck = await executeQuery(`SELECT id, istifadeci_id FROM abunelikler WHERE id = :id`, { id });
+    const subCheck = await executeQuery(`SELECT id FROM abunelikler WHERE id = :id`, { id });
     if (subCheck.rows.length === 0)
       return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
-
-    const ownerId = subCheck.rows[0].ISTIFADECI_ID;
 
     // Əvvəlcə həmin abunəliyə aid bildirişləri sil
     await executeQuery(`DELETE FROM bildirisler WHERE abunelik_id = :id`, { id });
@@ -1220,10 +1173,6 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
     // Sonra abunəliyin özünü sil
     const result = await executeQuery(`DELETE FROM abunelikler WHERE id = :id`, { id }, { autoCommit: true });
     if (result.rowsAffected === 0) return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
-
-    // Büdcə xərclənib məbləğini yenilə (silindikdən sonra aktiv abunəliklərin cəmi)
-    await syncBudgetSpent(ownerId);
-
     return successResponse(res, 200, 'Deleted', { message: 'Abunəlik və əlaqəli bildirişlər uğurla silindi.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
@@ -1837,13 +1786,6 @@ app.put('/api/ayarlar/:username', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    // 1. Get old currency before updating settings
-    const oldSettingsRow = await executeQuery(
-      `SELECT esas_valyuta FROM istifadeci_ayarlari WHERE istifadeci_id = :userId`,
-      { userId }
-    );
-    const oldCurrency = oldSettingsRow.rows.length > 0 ? (oldSettingsRow.rows[0].ESAS_VALYUTA || 'AZN') : 'AZN';
-
     await executeQuery(
       `UPDATE istifadeci_ayarlari
        SET esas_valyuta = :esas_valyuta, bildiris_metodu = :bildiris_metodu, dil = :dil, tema = :tema, tema_rengi = :tema_rengi
@@ -1853,61 +1795,6 @@ app.put('/api/ayarlar/:username', async (req, res) => {
       },
       { autoCommit: true }
     );
-
-    if (esas_valyuta && esas_valyuta.toUpperCase() !== oldCurrency.toUpperCase()) {
-      const fromCurr = oldCurrency.toUpperCase();
-      const toCurr = esas_valyuta.toUpperCase();
-
-      // Convert budget limits and spent totals
-      const budgetRes = await executeQuery(
-        `SELECT limit_mebleq, hesab_mebleqi FROM budceler WHERE istifadeci_id = :userId`,
-        { userId }
-      );
-      if (budgetRes.rows.length > 0) {
-        const oldLimit = Number(budgetRes.rows[0].LIMIT_MEBLEQ);
-        const oldSpent = Number(budgetRes.rows[0].HESAB_MEBLEQI);
-        const newLimit = convertCurrency(oldLimit, fromCurr, toCurr);
-        const newSpent = convertCurrency(oldSpent, fromCurr, toCurr);
-        
-        await executeQuery(
-          `UPDATE budceler 
-           SET limit_mebleq = :newLimit, hesab_mebleqi = :newSpent, valyuta = :toCurr 
-           WHERE istifadeci_id = :userId`,
-          { newLimit, newSpent, toCurr, userId },
-          { autoCommit: true }
-        );
-      }
-
-      // Convert subscriptions
-      const subsRes = await executeQuery(
-        `SELECT id, qiymet FROM abunelikler WHERE istifadeci_id = :userId`,
-        { userId }
-      );
-      for (const row of subsRes.rows) {
-        const oldPrice = Number(row.QIYMET);
-        const newPrice = convertCurrency(oldPrice, fromCurr, toCurr);
-        await executeQuery(
-          `UPDATE abunelikler SET qiymet = :newPrice, valyuta = :toCurr WHERE id = :subId`,
-          { newPrice, toCurr, subId: row.ID },
-          { autoCommit: true }
-        );
-      }
-
-      // Convert payment history
-      const historyRes = await executeQuery(
-        `SELECT id, mebleq FROM odenis_tarixcesi WHERE istifadeci_id = :userId`,
-        { userId }
-      );
-      for (const row of historyRes.rows) {
-        const oldHistoryAmt = Number(row.MEBLEQ);
-        const newHistoryAmt = convertCurrency(oldHistoryAmt, fromCurr, toCurr);
-        await executeQuery(
-          `UPDATE odenis_tarixcesi SET mebleq = :newHistoryAmt WHERE id = :historyId`,
-          { newHistoryAmt, historyId: row.ID },
-          { autoCommit: true }
-        );
-      }
-    }
 
     return successResponse(res, 200, 'Updated', { message: 'Ayarlar uğurla yeniləndi.' });
   } catch (err) {
