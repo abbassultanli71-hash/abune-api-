@@ -813,6 +813,168 @@
     .tab-item.active::before { height: 30px; border-radius: 10px; }
     .screen { padding-bottom: 84px; }
   }
+
+  /* ---- Live Preview Card Mockup Styles ---- */
+  .preview-card-container {
+    perspective: 1000px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 10px 0 20px;
+  }
+  .preview-card {
+    width: 290px;
+    height: 170px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 16px;
+  }
+  .preview-card.flipped {
+    transform: rotateY(180deg);
+  }
+  .preview-card-front, .preview-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 16px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  }
+  .preview-card-front {
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%), rgba(22, 19, 43, 0.75);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  .preview-card-glow {
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .preview-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+  }
+  .preview-bank-name {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--ink);
+    opacity: 0.85;
+    text-transform: uppercase;
+  }
+  .preview-brand-logo {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--ink);
+    opacity: 0.9;
+  }
+  .preview-card-chip {
+    width: 32px;
+    height: 24px;
+    background: linear-gradient(135deg, #f5d061 0%, #e2b33c 100%);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+    z-index: 2;
+  }
+  .preview-card-chip::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 80%);
+  }
+  .preview-card-number {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--ink);
+    margin: 12px 0 6px;
+    z-index: 2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .preview-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    z-index: 2;
+  }
+  .preview-label {
+    font-size: 7px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .preview-value {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .preview-card-back {
+    background: rgba(16, 14, 30, 0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px 0;
+  }
+  .preview-card-strip {
+    width: 100%;
+    height: 34px;
+    background: #070510;
+    margin-top: 10px;
+  }
+  .preview-card-signature-area {
+    padding: 0 20px;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .preview-card-signature {
+    width: 100%;
+    height: 28px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    position: relative;
+  }
+  .preview-card-cvv-box {
+    position: absolute;
+    right: 30px;
+    background: #ffffff;
+    color: #070510;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+    margin-top: 2px;
+  }
+  .preview-card-back-text {
+    font-size: 7px;
+    color: var(--ink-faint);
+    text-align: center;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
 </style>
 </head>
 <body>
@@ -1488,6 +1650,42 @@
           <div class="sheet-title">Yeni Kart</div>
           <button class="sheet-close" onclick="closeCardSheet()">✕</button>
         </div>
+
+        <!-- Live Preview Card Mockup -->
+        <div class="preview-card-container">
+          <div class="preview-card" id="live-preview-card">
+            <!-- Front of the card -->
+            <div class="preview-card-front">
+              <div class="preview-card-glow"></div>
+              <div class="preview-card-header">
+                <span class="preview-bank-name" id="preview-bank-name">BANK ADI</span>
+                <span class="preview-brand-logo" id="preview-brand-logo">CARD</span>
+              </div>
+              <div class="preview-card-chip"></div>
+              <div class="preview-card-number" id="preview-card-number">•••• •••• •••• ••••</div>
+              <div class="preview-card-footer">
+                <div class="preview-card-holder">
+                  <div class="preview-label">KART SAHİBİ</div>
+                  <div class="preview-value" id="preview-card-name">ABBAS SULTANLI</div>
+                </div>
+                <div class="preview-card-expiry">
+                  <div class="preview-label">SON TARİX</div>
+                  <div class="preview-value" id="preview-card-expiry">AA/İİ</div>
+                </div>
+              </div>
+            </div>
+            <!-- Back of the card -->
+            <div class="preview-card-back">
+              <div class="preview-card-strip"></div>
+              <div class="preview-card-signature-area">
+                <div class="preview-card-signature"></div>
+                <div class="preview-card-cvv-box" id="preview-card-cvv">•••</div>
+              </div>
+              <div class="preview-card-back-text">Abunəm Wallet Secure System</div>
+            </div>
+          </div>
+        </div>
+
         <div class="field"><label>Kart adı *</label><input type="text" id="card-name" placeholder="məs. Kapital Bank" required></div>
         <!-- Card brand is auto-detected from PAN, no manual selection -->
         <div class="field">
@@ -2444,8 +2642,14 @@
       badge.style.background = brand === 'Visa' ? 'var(--teal-soft)' : 'var(--gold-soft)';
       badge.style.color = brand === 'Visa' ? 'var(--teal)' : 'var(--gold)';
       errorEl.style.display = 'none';
+      if (document.getElementById('preview-brand-logo')) {
+        document.getElementById('preview-brand-logo').textContent = brand.toUpperCase();
+      }
     } else {
       badge.style.display = 'none';
+      if (document.getElementById('preview-brand-logo')) {
+        document.getElementById('preview-brand-logo').textContent = 'CARD';
+      }
       if (cleaned.length >= 4) {
         errorEl.style.display = 'block';
       } else {
@@ -2482,6 +2686,16 @@
     document.getElementById('card-error').classList.remove('show');
     document.getElementById('card-brand-badge').style.display = 'none';
     document.getElementById('card-pan-error').style.display = 'none';
+
+    // Reset Live Preview Card Mockup
+    document.getElementById('preview-bank-name').textContent = 'BANK ADI';
+    document.getElementById('preview-brand-logo').textContent = 'CARD';
+    document.getElementById('preview-card-number').textContent = '•••• •••• •••• ••••';
+    document.getElementById('preview-card-expiry').textContent = 'AA/İİ';
+    document.getElementById('preview-card-name').textContent = (currentUser && currentUser.ad ? currentUser.ad.toUpperCase() : 'ABUNƏÇİ');
+    document.getElementById('preview-card-cvv').textContent = '•••';
+    document.getElementById('live-preview-card').classList.remove('flipped');
+
     const overlay = document.getElementById('card-sheet-overlay');
     overlay.classList.add('open');
     updateBodyScrollLock();
@@ -3044,6 +3258,45 @@ async function handleAddCard() {
       }
     } else {
       hideApp();
+    }
+
+    // Real-time Card Preview Listeners
+    const cardNameInp = document.getElementById('card-name');
+    const cardPanInp = document.getElementById('card-pan');
+    const cardExpiryInp = document.getElementById('card-expiry');
+    const cardCvvInp = document.getElementById('card-cvv');
+    const livePreviewCard = document.getElementById('live-preview-card');
+
+    if (cardNameInp) {
+      cardNameInp.addEventListener('input', (e) => {
+        document.getElementById('preview-bank-name').textContent = e.target.value.toUpperCase() || 'BANK ADI';
+      });
+    }
+    if (cardPanInp) {
+      cardPanInp.addEventListener('input', (e) => {
+        document.getElementById('preview-card-number').textContent = e.target.value || '•••• •••• •••• ••••';
+      });
+    }
+    if (cardExpiryInp) {
+      cardExpiryInp.addEventListener('input', (e) => {
+        let val = e.target.value;
+        if (val.length === 2 && !val.includes('/')) {
+          val = val + '/';
+          e.target.value = val;
+        }
+        document.getElementById('preview-card-expiry').textContent = val || 'AA/İİ';
+      });
+    }
+    if (cardCvvInp) {
+      cardCvvInp.addEventListener('input', (e) => {
+        document.getElementById('preview-card-cvv').textContent = e.target.value || '•••';
+      });
+      cardCvvInp.addEventListener('focus', () => {
+        livePreviewCard.classList.add('flipped');
+      });
+      cardCvvInp.addEventListener('blur', () => {
+        livePreviewCard.classList.remove('flipped');
+      });
     }
 
     // iOS/iPhone scroll and rubber-banding fix for modals
