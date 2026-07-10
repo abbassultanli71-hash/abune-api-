@@ -245,6 +245,36 @@
   }
   .icon-round svg { width: 17px; height: 17px; }
 
+  /* ---- Dashboard Budget Card (Figma Style) ---- */
+  .dashboard-budget-card {
+    margin: 0 20px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .db-left { display: flex; flex-direction: column; gap: 4px; }
+  .db-eyebrow { font-size: 11px; color: var(--ink-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .db-spent { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--ink); }
+  .db-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); }
+  .db-action {
+    margin-top: 8px; font-size: 11.5px; color: var(--teal); font-weight: 600;
+    display: flex; align-items: center; gap: 4px; cursor: pointer;
+  }
+  .db-action svg { width: 12px; height: 12px; transition: transform 0.2s; }
+  .db-action:hover svg { transform: translateX(2px); }
+  .db-right { width: 90px; height: 90px; position: relative; }
+  .db-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .db-ring-track { fill: none; stroke: var(--surface-3); stroke-width: 10; }
+  .db-ring-fill { fill: none; stroke: url(#ringGrad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset 0.6s ease; }
+  .db-ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
+
   /* ---- Horizontal scroll stat cards ---- */
   .stat-scroll {
     display: flex; gap: 10px; padding: 0 20px 4px;
@@ -895,6 +925,25 @@
               <div class="hero-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
             </div>
             <div class="hero-avatar" id="hero-avatar-initials" onclick="switchScreen('settings')" title="Ayarlar">U.U</div>
+          </div>
+        </div>
+
+        <div class="dashboard-budget-card" onclick="switchScreen('budget')" style="cursor:pointer;" title="Büdcəyə keç">
+          <div class="db-left">
+            <div class="db-eyebrow" data-i18n="stat_monthly">Aylıq Xərc</div>
+            <div class="db-spent" id="db-budget-spent">₼0.00</div>
+            <div class="db-limit" id="db-budget-limit">/ ₼300.00</div>
+            <div class="db-action">
+              <span data-i18n="budget_details">Büdcə təfərrüatı</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+          </div>
+          <div class="db-right">
+            <svg class="db-ring" viewBox="0 0 100 100">
+              <circle class="db-ring-track" cx="50" cy="50" r="40"></circle>
+              <circle class="db-ring-fill" id="db-ring-fill" cx="50" cy="50" r="40"></circle>
+            </svg>
+            <div class="db-ring-pct" id="db-ring-pct">0%</div>
           </div>
         </div>
 
@@ -2708,6 +2757,17 @@ async function handleAddCard() {
     
     // Update stats cards in dashboard
     document.getElementById('dashboard-monthly-spend').textContent = sym + budgetState.spent.toFixed(2);
+
+    // Update new figma-style dashboard budget card
+    const dbSpent = document.getElementById('db-budget-spent');
+    if (dbSpent) dbSpent.textContent = sym + budgetState.spent.toFixed(2);
+    const dbLimit = document.getElementById('db-budget-limit');
+    if (dbLimit) dbLimit.textContent = '/ ' + sym + budgetState.limit.toFixed(2);
+    
+    const dbRingFill = document.getElementById('db-ring-fill');
+    if (dbRingFill) dbRingFill.style.strokeDashoffset = 251.2 * (1 - pct / 100);
+    const dbRingPct = document.getElementById('db-ring-pct');
+    if (dbRingPct) dbRingPct.textContent = pct + '%';
     
     document.querySelector('.budget-note').innerHTML =
       `Limitin <strong style="color:var(--ink)">%${pct}</strong>-i istifadə olunub · ${sym}${free.toFixed(2)} sərbəst qalıb.`;
