@@ -855,14 +855,19 @@ app.post('/api/abunelikler', async (req, res) => {
     if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'Qeyd olunan istifadəçi (username) mövcud deyil.');
 
     let finalValyuta = valyuta;
-    if (!finalValyuta) {
-      const settingsRow = await executeQuery(
-        `SELECT esas_valyuta FROM istifadeci_ayarlari WHERE istifadeci_id = :userId`,
-        { userId }
-      );
-      if (settingsRow.rows.length > 0) {
-        finalValyuta = settingsRow.rows[0].ESAS_VALYUTA;
+    const settingsRow = await executeQuery(
+      `SELECT esas_valyuta FROM istifadeci_ayarlari WHERE istifadeci_id = :userId`,
+      { userId }
+    );
+    const esasValyuta = settingsRow.rows.length > 0 ? settingsRow.rows[0].ESAS_VALYUTA : 'AZN';
+
+    if (finalValyuta) {
+      if (getValidCurrency(finalValyuta) !== getValidCurrency(esasValyuta)) {
+        return errorResponse(res, 400, 'Bad Request', 'CURRENCY_MISMATCH', 
+          `Abunəlik valyutası istifadəçinin əsas valyutasına (${esasValyuta}) uyğun olmalıdır.`);
       }
+    } else {
+      finalValyuta = esasValyuta;
     }
 
     // Validate subscription account credentials (mock validation)
@@ -1062,6 +1067,22 @@ app.put('/api/abunelikler', async (req, res) => {
     if (userId === null)
       return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
+    let finalValyuta = valyuta;
+    const settingsRow = await executeQuery(
+      `SELECT esas_valyuta FROM istifadeci_ayarlari WHERE istifadeci_id = :userId`,
+      { userId }
+    );
+    const esasValyuta = settingsRow.rows.length > 0 ? settingsRow.rows[0].ESAS_VALYUTA : 'AZN';
+
+    if (finalValyuta) {
+      if (getValidCurrency(finalValyuta) !== getValidCurrency(esasValyuta)) {
+        return errorResponse(res, 400, 'Bad Request', 'CURRENCY_MISMATCH', 
+          `Abunəlik valyutası istifadəçinin əsas valyutasına (${esasValyuta}) uyğun olmalıdır.`);
+      }
+    } else {
+      finalValyuta = esasValyuta;
+    }
+
     const subCheck = await executeQuery(
       `SELECT id FROM abunelikler WHERE istifadeci_id = :istifadeci_id AND ad = :ad`,
       { istifadeci_id: userId, ad: queryAd }
@@ -1134,7 +1155,7 @@ app.put('/api/abunelikler', async (req, res) => {
        kateqoriya=:kateqoriya, status=:status, odenis_metodu_id=:odenis_metodu_id
        WHERE istifadeci_id=:istifadeci_id AND ad=:queryAd`,
       {
-        ad: finalAd, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
+        ad: finalAd, qiymet: parsedQiymet, valyuta: getValidCurrency(finalValyuta),
         odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
         kateqoriya: kateqoriya || null, status: statusValue, odenis_metodu_id: finalOdenisMetoduId,
         istifadeci_id: userId, queryAd
@@ -1806,6 +1827,19 @@ app.put('/api/ayarlar/:username', async (req, res) => {
       },
       { autoCommit: true }
     );
+
+    if (esas_valyuta) {
+      await executeQuery(
+        `UPDATE budceler SET valyuta = :esas_valyuta WHERE istifadeci_id = :istifadeci_id`,
+        { esas_valyuta, istifadeci_id: userId },
+        { autoCommit: true }
+      );
+      await executeQuery(
+        `UPDATE abunelikler SET valyuta = :esas_valyuta WHERE istifadeci_id = :istifadeci_id`,
+        { esas_valyuta, istifadeci_id: userId },
+        { autoCommit: true }
+      );
+    }
 
     return successResponse(res, 200, 'Updated', { message: 'Ayarlar uğurla yeniləndi.' });
   } catch (err) {
