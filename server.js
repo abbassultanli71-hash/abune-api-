@@ -1052,11 +1052,14 @@ app.put('/api/abunelikler', async (req, res) => {
       return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
     const subCheck = await executeQuery(
-      `SELECT id FROM abunelikler WHERE istifadeci_id = :istifadeci_id AND ad = :ad`,
+      `SELECT id, qiymet, status FROM abunelikler WHERE istifadeci_id = :istifadeci_id AND ad = :ad`,
       { istifadeci_id: userId, ad: queryAd }
     );
     if (subCheck.rows.length === 0)
       return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
+
+    const originalPrice = subCheck.rows[0].QIYMET !== undefined ? Number(subCheck.rows[0].QIYMET) : Number(subCheck.rows[0].qiymet);
+    const originalStatus = (subCheck.rows[0].STATUS !== undefined ? subCheck.rows[0].STATUS : subCheck.rows[0].status || '').toLowerCase();
 
     // Validate subscription account credentials (mock validation)
     const isValidAccount = await validateSubscriptionAccount(queryAd, accountemail, accountpassword);
@@ -1064,8 +1067,11 @@ app.put('/api/abunelikler', async (req, res) => {
       return errorResponse(res, 404, 'Not Found', 'ACCOUNT_NOT_FOUND', 'Application account not found or credentials are incorrect.');
     }
 
-    // ─── Büdcə limiti yoxlaması (yalnız status "active" olacaqsa) ─────────
-    if (statusValue === 'active') {
+    // ─── Büdcə limiti yoxlaması (yalnız məsrəf artdıqda və ya status "active"ə keçdikdə) ───
+    const isIncreasingExpense = (statusValue === 'active' && originalStatus !== 'active') ||
+                                (statusValue === 'active' && parsedQiymet > originalPrice);
+
+    if (statusValue === 'active' && isIncreasingExpense) {
       const budgetRow = await executeQuery(
         `SELECT b.limit_mebleq, b.valyuta FROM budceler b WHERE b.istifadeci_id = :userId`,
         { userId }
@@ -1078,12 +1084,12 @@ app.put('/api/abunelikler', async (req, res) => {
         const activeSubs = await executeQuery(
           `SELECT qiymet FROM abunelikler
             WHERE istifadeci_id = :userId AND status = 'active' AND id != :subId`,
-          { userId, subId: subCheck.rows[0].ID }
+          { userId, subId: subCheck.rows[0].id || subCheck.rows[0].ID }
         );
 
         let currentTotal = 0;
         for (const row of activeSubs.rows) {
-          currentTotal += Number(row.QIYMET);
+          currentTotal += Number(row.QIYMET || row.qiymet);
         }
 
         const projectedTotal = currentTotal + parsedQiymet;
