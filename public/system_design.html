@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abunəm - Sistem Memarlığı və Dizaynı (C4 Model)</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #05040a;
+      --panel-bg: rgba(16, 13, 33, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.15);
+      
+      /* Neon Accents */
+      --p1: #FF2E5F; /* Neon Pink */
+      --p2: #8B5CF6; /* Violet */
+      --p3: #00D2FF; /* Cyber Cyan */
+      --p4: #10B981; /* Emerald */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Widescreen Header */
+    header {
+      padding: 24px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(5, 4, 10, 0.8);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--p1), var(--p2));
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+    }
+
+    .header-title h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, #a7a9c8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 85px);
+    }
+
+    /* Left Sidebar: Controls & Layer Selector */
+    .sidebar {
+      width: 320px;
+      border-right: 1px solid var(--border-color);
+      background: rgba(10, 8, 22, 0.4);
+      display: flex;
+      flex-direction: column;
+      padding: 30px 24px;
+      gap: 28px;
+      overflow-y: auto;
+    }
+
+    .sidebar-section h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #8b5cf6;
+      margin-bottom: 16px;
+    }
+
+    /* Navigation Buttons */
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      list-style: none;
+    }
+
+    .nav-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      padding: 14px 18px;
+      border-radius: 12px;
+      color: #a7a9c8;
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-strong);
+      color: #fff;
+    }
+
+    .nav-btn.active {
+      background: rgba(139, 92, 246, 0.1);
+      border-color: var(--p2);
+      color: #fff;
+      box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.15);
+    }
+
+    .nav-btn-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: var(--border-color);
+      color: #a7a9c8;
+    }
+
+    .nav-btn.active .nav-btn-badge {
+      background: var(--p2);
+      color: #fff;
+    }
+
+    /* Viewport Control Panel */
+    .viewport-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .control-btn {
+      flex: 1;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .control-btn:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: var(--border-strong);
+    }
+
+    /* Center Area: Diagram Canvas Viewport */
+    .canvas-viewport {
+      flex: 1;
+      background: radial-gradient(circle at 50% 50%, #0d0b24 0%, #05040a 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .canvas-container {
+      width: 95%;
+      height: 95%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease-out;
+      transform-origin: center center;
+    }
+
+    /* Object tag for rendering local vector SVG diagrams */
+    .diagram-object {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      border: none;
+      object-fit: contain;
+    }
+
+    /* Right Sidebar: Context Info Panel */
+    .info-panel {
+      width: 380px;
+      background: rgba(5, 4, 10, 0.9);
+      padding: 30px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .info-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .info-header p {
+      font-size: 13.5px;
+      color: #a7a9c8;
+      line-height: 1.4;
+    }
+
+    .info-divider {
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    .info-section h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #00d2ff;
+      margin-bottom: 12px;
+    }
+
+    .info-section p {
+      font-size: 14px;
+      color: #a7a9c8;
+      line-height: 1.6;
+    }
+
+    /* Description item layout */
+    .desc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .desc-item {
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .desc-item-title {
+      font-weight: 700;
+      font-size: 13px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .desc-item-title .tech-tag {
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--p3);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(0, 210, 255, 0.05);
+    }
+
+    .desc-item-body {
+      font-size: 12.5px;
+      color: #a7a9c8;
+      line-height: 1.5;
+    }
+
+    /* Interactive Legend block */
+    .legend-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #a7a9c8;
+    }
+
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .bg-person { background-color: #08427B; }
+    .bg-system { background-color: #1168BD; }
+    .bg-container { background-color: #438DD5; }
+    .bg-external { background-color: #999999; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Widescreen Header -->
+  <header>
+    <div class="header-logo">
+      <span class="logo-badge">ABUNƏM</span>
+      <div class="header-title">
+        <h1>Sistem Memarlığı və Dizaynı</h1>
+      </div>
+    </div>
+    <div style="font-size: 13px; color: #a7a9c8; font-weight: 600;">C4 ARCHITECTURE SUITE</div>
+  </header>
+
+  <!-- Main Dashboard Container -->
+  <div class="dashboard-container">
+    
+    <!-- Left Sidebar: Controls & Nav -->
+    <div class="sidebar">
+      
+      <!-- Diagrams Layer Selector -->
+      <div class="sidebar-section">
+        <h3>Memarlıq Qatları</h3>
+        <ul class="nav-list">
+          <li>
+            <button class="nav-btn active" onclick="switchLayer('L1', this)">
+              <span>Sistem Konteksti</span>
+              <span class="nav-btn-badge">L1</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" onclick="switchLayer('L2', this)">
+              <span>Konteyner Diaqramı</span>
+              <span class="nav-btn-badge">L2</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" onclick="switchLayer('L3', this)">
+              <span>Komponent Diaqramı</span>
+              <span class="nav-btn-badge">L3</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" onclick="switchLayer('UC', this)">
+              <span>Usecase Diaqramı</span>
+              <span class="nav-btn-badge">UML</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Navigation & Scale Tools -->
+      <div class="sidebar-section">
+        <h3>Görünüş Alətləri</h3>
+        <div class="viewport-controls">
+          <button class="control-btn" onclick="zoom(0.1)" title="Yaxınlaşdır">➕</button>
+          <button class="control-btn" onclick="zoom(-0.1)" title="Uzaqlaşdır">➖</button>
+          <button class="control-btn" onclick="zoomReset()" title="Sıfırla">🔄</button>
+        </div>
+      </div>
+
+      <!-- General Stats info -->
+      <div class="sidebar-section" style="margin-top: auto;">
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; font-size: 12px; color: #a7a9c8; line-height: 1.6;">
+          <strong>💡 İpucu:</strong> Diaqramları yaxından araşdırmaq üçün yuxarıdakı böyütmə alətlərindən istifadə edə bilərsiniz.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Center Canvas Viewport -->
+    <div class="canvas-viewport">
+      <div class="canvas-container" id="canvas-container">
+        <!-- Local SVG object -->
+        <object id="diagram-view" data="Abunelik_C4_L1_Context_HD.svg" type="image/svg+xml" class="diagram-object"></object>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Context Info Panel -->
+    <div class="info-panel" id="info-panel">
+      
+      <!-- Header -->
+      <div class="info-header">
+        <h2 id="layer-title">Sistem Konteksti (L1 Context)</h2>
+        <p id="layer-subtitle">Abunəm platformasının xarici sistemlər və istifadəçilərlə qarşılıqlı əlaqə sərhədləri.</p>
+      </div>
+
+      <div class="info-divider"></div>
+
+      <!-- Dynamic Layer Description -->
+      <div class="info-section">
+        <h4 id="layer-purpose-header">Məqsəd</h4>
+        <p id="layer-purpose">Sistemin biznes mühitində necə yerləşdiyini, istifadəçilərin kim olduğunu və xarici inteqrasiya nöqtələrini yüksək səviyyədə göstərmək.</p>
+      </div>
+
+      <!-- Dynamic Elements Details List -->
+      <div class="info-section" style="flex: 1;">
+        <h4>Əsas Elementlər</h4>
+        <div class="desc-list" id="layer-elements">
+          
+          <div class="desc-item">
+            <div class="desc-item-title">
+              <span>İstifadəçi (Abunəçi)</span>
+              <span class="tech-tag">Person</span>
+            </div>
+            <div class="desc-item-body">Platformaya daxil olaraq öz abunəliklərini, büdcəsini və kartlarını idarə edən müştəri.</div>
+          </div>
+
+          <div class="desc-item">
+            <div class="desc-item-title">
+              <span>Abunəm Platforması</span>
+              <span class="tech-tag">System</span>
+            </div>
+            <div class="desc-item-body">İstifadəçilərin abunə xərclərinə nəzarət edən, büdcə hesablayan əsas proqram təminatı.</div>
+          </div>
+
+          <div class="desc-item">
+            <div class="desc-item-title">
+              <span>Ödəniş Provayderi</span>
+              <span class="tech-tag">Ext. System</span>
+            </div>
+            <div class="desc-item-body">Kart balanslarının yoxlanılması və ödəniş əməliyyatlarının aparılmasını təqlid edən mock bank API-ı.</div>
+          </div>
+
+          <div class="desc-item">
+            <div class="desc-item-title">
+              <span>SMTP Mail Server</span>
+              <span class="tech-tag">Ext. System</span>
+            </div>
+            <div class="desc-item-body">Yaxınlaşan ödənişlər və büdcə limitinin keçilməsi haqqında istifadəçiyə e-poçt göndərən xarici SMTP xidməti.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Map Legend -->
+      <div class="info-section">
+        <h4>Şərti İşarələr</h4>
+        <div class="legend-grid">
+          <div class="legend-item"><div class="legend-color bg-person"></div><span>İstifadəçi</span></div>
+          <div class="legend-item"><div class="legend-color bg-system"></div><span>Sistem</span></div>
+          <div class="legend-item"><div class="legend-color bg-container"></div><span>Konteyner</span></div>
+          <div class="legend-item"><div class="legend-color bg-external"></div><span>Xarici Sistem</span></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // Scale variable for viewport zoom
+    let currentScale = 1.0;
+    const canvasContainer = document.getElementById('canvas-container');
+
+    // Data for different layers
+    const layerData = {
+      L1: {
+        title: "Sistem Konteksti (L1)",
+        subtitle: "Abunəm platformasının xarici sistemlər və istifadəçilərlə qarşılıqlı əlaqə sərhədləri.",
+        file: "Abunelik_C4_L1_Context_HD.svg",
+        purpose: "Sistemin biznes mühitində necə yerləşdiyini, istifadəçilərin kim olduğunu və xarici inteqrasiya nöqtələrini yüksək səviyyədə göstərmək.",
+        elements: [
+          { name: "İstifadəçi (Abunəçi)", tech: "Person", desc: "Platformaya daxil olaraq öz abunəliklərini, büdcəsini və kartlarını idarə edən müştəri." },
+          { name: "Abunəm Platforması", tech: "System", desc: "İstifadəçilərin abunə xərclərinə nəzarət edən, büdcə hesablayan əsas proqram təminatı." },
+          { name: "Ödəniş Provayderi", tech: "Ext. System", desc: "Kart balanslarının yoxlanılması və ödəniş əməliyyatlarının aparılmasını təqlid edən mock bank API-ı." },
+          { name: "SMTP Mail Server", tech: "Ext. System", desc: "Yaxınlaşan ödənişlər və büdcə limitinin keçilməsi haqqında istifadəçiyə e-poçt göndərən xarici SMTP xidməti." }
+        ]
+      },
+      L2: {
+        title: "Konteyner Memarlığı (L2)",
+        subtitle: "Sistemi təşkil edən əsas proqram konteynerləri və onların texnologiya yığınları.",
+        file: "Abunelik_C4_L2_Container_HD.svg",
+        purpose: "Sistemin yüksək səviyyəli memarlıq hissələrini (frontend, backend, verilənlər bazası və cron-job) vizuallaşdırmaq.",
+        elements: [
+          { name: "Frontend Veb UI", tech: "HTML/CSS/JS", desc: "İstifadəçilərin daxil olub bütün əməliyyatları apardıqları zərif responsive web interfeysi." },
+          { name: "REST API Server", tech: "Node.js/Express", desc: "Bütün sorğuları emal edən, validasiya aparan və bazaya sorğuları yönləndirən backend konteyneri." },
+          { name: "Verilənlər Bazası", tech: "PostgreSQL", desc: "İstifadəçi, abunəlik, kart və ödəniş tarixçəsi cədvəllərini saxlayan əlaqəli məlumat bazası." },
+          { name: "Cron Job (Worker)", tech: "Node-cron", desc: "Hər saat arxa fonda işləyərək yaxınlaşan ödənişləri tapan və bildiriş göndərən xidmət." }
+        ]
+      },
+      L3: {
+        title: "Komponent Quruluşu (L3)",
+        subtitle: "Backend REST API serverinin daxilindəki əsas kod komponentləri və onların iş mexanizmi.",
+        file: "Abunelik_C4_L3_Components_HD.svg",
+        purpose: "Backend konteynerinin daxili arxitekturasını, nəzarətçiləri (controllers) və xidmətləri (services) analiz etmək.",
+        elements: [
+          { name: "Auth Controller", tech: "Component", desc: "İstifadəçi qeydiyyatı, giriş (login) validasiyası və şifrələri (bcrypt) idarə edir." },
+          { name: "Subscription Manager", tech: "Component", desc: "Abunəliklərin əlavə olunması, növbəti ödəniş tarixinin hesablanması və silinməsini tənzimləyir." },
+          { name: "Budget & Currency Service", tech: "Component", desc: "Valyuta konvertasiyası (AZN, USD, EUR) və ümumi büdcə limitinin keçilməsini hesablayır." },
+          { name: "Database Adapter (db.js)", tech: "Component", desc: "Oracle SQL dialektindən PostgreSQL dialektinə avtomatik sorğu və parametrləri konvertasiya edir." }
+        ]
+      },
+      UC: {
+        title: "Use Case Diaqramı (UML)",
+        subtitle: "İstifadəçi və kənar sistemlərin tətbiq üzərində icra edə biləcəyi funksional istifadə ssenariləri.",
+        file: "usecase.svg",
+        purpose: "Sistemin istifadəçilərə təqdim etdiyi bütün əsas funksionallığı UML standartları çərçivəsində göstərmək.",
+        elements: [
+          { name: "İstifadəçi Ssenariləri", tech: "Usecase", desc: "Abunəlik əlavə etmək, redaktə etmək, aylıq limit təyin etmək, kartlar əlavə etmək və s." },
+          { name: "Xarici İnteqrasiyalar", tech: "Usecase", desc: "Yaxınlaşan ödəniş zamanı istifadəçiyə e-poçt xəbərdarlığı göndərmək." },
+          { name: "Daxili Məntiq", tech: "System Boundary", desc: "Büdcə limitinin anlıq yoxlanılması ssenariləri." }
+        ]
+      }
+    };
+
+    // Layer switcher function
+    function switchLayer(layerId, btn) {
+      // Set active nav button
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const data = layerData[layerId];
+      if (!data) return;
+
+      // Update diagram view source
+      document.getElementById('diagram-view').setAttribute('data', data.file);
+
+      // Update right details panel
+      document.getElementById('layer-title').textContent = data.title;
+      document.getElementById('layer-subtitle').textContent = data.subtitle;
+      document.getElementById('layer-purpose').textContent = data.purpose;
+
+      // Populate elements
+      const elementsContainer = document.getElementById('layer-elements');
+      elementsContainer.innerHTML = '';
+
+      data.elements.forEach(el => {
+        const item = document.createElement('div');
+        item.className = 'desc-item';
+        item.innerHTML = `
+          <div class="desc-item-title">
+            <span>${el.name}</span>
+            <span class="tech-tag">${el.tech}</span>
+          </div>
+          <div class="desc-item-body">${el.desc}</div>
+        `;
+        elementsContainer.appendChild(item);
+      });
+
+      // Reset zoom
+      zoomReset();
+    }
+
+    // Zooming functions
+    function zoom(amount) {
+      currentScale += amount;
+      if (currentScale < 0.4) currentScale = 0.4;
+      if (currentScale > 3.0) currentScale = 3.0;
+      applyTransform();
+    }
+
+    function zoomReset() {
+      currentScale = 1.0;
+      applyTransform();
+    }
+
+    function applyTransform() {
+      canvasContainer.style.transform = `scale(${currentScale})`;
+    }
+  </script>
+</body>
+</html>
