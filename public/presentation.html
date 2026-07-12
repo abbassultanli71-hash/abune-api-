@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abunəm — Layihə Təqdimatı</title>
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & THEME
+       ========================================================================== */
+    :root {
+      --bg: #090d1a;
+      --bg-darker: #05070f;
+      --bg-card: rgba(15, 22, 41, 0.7);
+      --accent: #6366f1;
+      --accent-gradient: linear-gradient(135deg, #6366f1, #818cf8, #c4b5fd);
+      --green: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Animated background orbs */
+    .orb-bg {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+    }
+    .orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent), transparent);
+      top: -200px;
+      left: -100px;
+      animation: float 12s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #10b981, transparent);
+      bottom: -150px;
+      right: -100px;
+      animation: float 15s ease-in-out infinite reverse;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-40px) scale(1.05); }
+    }
+
+    /* ==========================================================================
+       SLIDE FRAMEWORK
+       ========================================================================== */
+    .presentation-container {
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+    }
+
+    /* Top Navigation Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent-gradient);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+    }
+    .project-tag {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 100px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Slide Deck viewport */
+    .slides-viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 48px;
+    }
+
+    .slide {
+      position: absolute;
+      width: 100%;
+      max-width: 1200px;
+      height: 85%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 60px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(30px);
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.96) translateY(20px);
+      transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1) translateY(0);
+    }
+
+    /* Slide contents layout */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 60px;
+      margin-top: 40px;
+    }
+    .slide-text {
+      flex: 1;
+      max-width: 650px;
+    }
+    .slide-visual {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      height: 100%;
+      min-height: 350px;
+    }
+
+    /* Typography */
+    .slide h2 {
+      font-family: var(--font-display);
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .slide-title-gradient {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .slide-subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+    .slide-desc {
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+
+    /* Lists and grids */
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      font-size: 17px;
+      line-height: 1.5;
+    }
+    .feature-item i {
+      color: var(--accent);
+      font-size: 18px;
+      margin-top: 4px;
+    }
+    .feature-item strong {
+      color: var(--text);
+    }
+
+    .slide-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+    }
+    .grid-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .grid-box:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      transform: translateY(-2px);
+    }
+    .gb-icon {
+      font-size: 24px;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .gb-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .gb-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Bottom Controller bar */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 48px;
+      border-top: 1px solid var(--border);
+      background: rgba(5, 7, 15, 0.4);
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .btn-ctrl {
+      width: 46px;
+      height: 46px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+    .btn-ctrl:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+    .progress-bar-container {
+      flex: 1;
+      max-width: 400px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 0 32px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-gradient);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+    .slide-number {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       SPECIFIC SLIDE STYLING
+       ========================================================================== */
+    /* Slide 1: Welcome Slide */
+    .welcome-body {
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      margin-top: 0;
+    }
+    .welcome-title {
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      font-family: var(--font-display);
+    }
+    .welcome-sub {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+    .badge-icon {
+      font-size: 64px;
+      color: var(--accent);
+      margin-bottom: 24px;
+      animation: heartbeat 2s infinite ease-in-out;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Card mockup visualization */
+    .card-mockup {
+      width: 320px;
+      height: 190px;
+      background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transform: rotate(-5deg) translateY(-20px);
+      animation: cardFloatAnim 4s ease-in-out infinite alternate;
+    }
+    @keyframes cardFloatAnim {
+      from { transform: rotate(-5deg) translateY(-15px); }
+      to { transform: rotate(-3deg) translateY(5px); }
+    }
+    .cm-header { display: flex; justify-content: space-between; align-items: center; }
+    .cm-chip { width: 38px; height: 28px; background: #e2e8f0; border-radius: 4px; opacity: 0.8; }
+    .cm-logo { font-weight: bold; font-family: var(--font-display); font-size: 20px; color: #fff; }
+    .cm-pan { font-family: 'Courier New', monospace; font-size: 17px; letter-spacing: 2.5px; margin: 24px 0 10px; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); }
+    .cm-footer { display: flex; justify-content: space-between; font-size: 11px; text-transform: uppercase; color: var(--text-muted); }
+
+    /* SVG Integration container */
+    .svg-embed-box {
+      width: 100%;
+      height: 100%;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #fff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+    .svg-embed-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .roadmap-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .roadmap-step {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+    .rs-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-family: var(--font-display);
+    }
+    .rs-info { flex: 1; }
+    .rs-title { font-weight: 600; color: #fff; font-size: 16px; margin-bottom: 4px;}
+    .rs-desc { font-size: 13px; color: var(--text-muted); }
+
+    /* Keyboard hint */
+    .kb-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.03);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .kb-key {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: monospace;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated Background Orbs -->
+  <div class="orb-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <div class="presentation-container">
+    
+    <!-- Top Header -->
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon"><i class="fa-solid fa-rotate"></i></div>
+        <span>Abunəm</span>
+      </div>
+      <div class="project-tag">Layihə Təqdimatı</div>
+    </div>
+
+    <!-- Slides Viewport -->
+    <div class="slides-viewport">
+
+      <!-- Slide 1: Welcome -->
+      <div class="slide active" id="slide-1">
+        <div class="slide-body welcome-body">
+          <div class="badge-icon"><i class="fa-solid fa-circle-nodes"></i></div>
+          <h1 class="welcome-title">Abunəliklərin Ağıllı İdarəedilməsi</h1>
+          <p class="welcome-sub">Müasir subscription idarəetmə platforması: limitsiz nəzarət, təhlükəsizlik və dostlarla paylaşım.</p>
+          <div class="kb-hint">Naviqasiya üçün klaviaturanın <span class="kb-key">→</span> və <span class="kb-key">←</span> düymələrini və ya oxları sıxın</div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Problem Statement -->
+      <div class="slide" id="slide-2">
+        <div>
+          <span class="slide-subtitle">01 / PROBLEM</span>
+          <h2>İdarə Olunmayan <span class="slide-title-gradient">Abunəlik Xərcləri</span></h2>
+        </div>
+        <div class="slide-body">
+          <div class="slide-text">
+            <p class="slide-desc">Bu gün hər bir istifadəçinin Netflix, Spotify, iCloud və s. kimi onlarla abunəliyi var. Bu sistemlərin idarə edilməməsi bir çox itkilərə yol açır:</p>
+            <ul class="feature-list">
+              <li class="feature-item">
+                <i class="fa-solid fa-circle-xmark" style="color:var(--red);"></i>
+                <span><strong>Unudulan Ödənişlər:</strong> Vaxtı unudulan və kartdan avtomatik çıxılan pullar büdcə sızmalarına səbəb olur.</span>
+              </li>
+              <li class="feature-item">
+                <i class="fa-solid fa-circle-xmark" style="color:var(--red);"></i>
+                <span><strong>Ortalaşdırılmayan Xərclər:</strong> Ailə və dost paketlərində ortaq xərclərin ədalətli bölünməməsi.</span>
+              </li>
+              <li class="feature-item">
+                <i class="fa-solid fa-circle-xmark" style="color:var(--red);"></i>
+                <span><strong>Limitsiz Kart Təhlükəsi:</strong> Kənar xidmətlərə verilən kart nömrələrinin (PAN) kiber-təhlükə altında qalması.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="slide-visual">
+            <div class="card-mockup" style="background: linear-gradient(135deg, #ef4444 0%, #7f1d1d 100%);">
+              <div class="cm-header">
+                <div class="cm-chip"></div>
+                <div class="cm-logo">Limit Aşıldı</div>
+              </div>
+              <div class="cm-pan">4111 11** **** 1111</div>
+              <div class="cm-footer">
+                <div>Abunəçi</div>
+                <div>Xəta: -₼15.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: The Solution -->
+      <div class="slide" id="slide-3">
+        <div>
+          <span class="slide-subtitle">02 / HƏLL</span>
+          <h2>Abunəm ile <span class="slide-title-gradient">Mərkəzi Nəzarət</span></h2>
+        </div>
+        <div class="slide-body">
+          <div class="slide-text">
+            <p class="slide-desc">Abunəm bütün abunəlik xərclərini, limitlərini və ödəniş metodlarını vahid paneldən tam nəzarətdə saxlamağa imkan verir:</p>
+            <ul class="feature-list">
+              <li class="feature-item">
+                <i class="fa-solid fa-circle-check" style="color:var(--green);"></i>
+                <span><strong>Gecikməyən Xəbərdarlıqlar:</strong> Ödənişə 1-3 gün qalmış abunəçiyə avtomatik bildirişlər göndərilir.</span>
+              </li>
+              <li class="feature-item">
+                <i class="fa-solid fa-circle-check" style="color:var(--green);"></i>
+                <span><strong>Aylıq Büdcə Limiti:</strong> Limit aşılarsa, sistem sizi dərhal məlumatlandırır və yeni xərcləri tənzimləyir.</span>
+              </li>
+              <li class="feature-item">
+                <i class="fa-solid fa-circle-check" style="color:var(--green);"></i>
+                <span><strong>Ortaq İstifadə (Split Billing):</strong> Dostlarınızla abunəliklər yaradıb ödəniş faizlərini ədalətli şəkildə bölüşün.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="slide-visual">
+            <div class="card-mockup" style="background: linear-gradient(135deg, #093c23 0%, #10b981 100%);">
+              <div class="cm-header">
+                <div class="cm-chip"></div>
+                <div class="cm-logo">Təsdiqləndi</div>
+              </div>
+              <div class="cm-pan">5577 38** **** 2291</div>
+              <div class="cm-footer">
+                <div>Limit: ₼300.00</div>
+                <div>Xərc: ₼145.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: System Architecture -->
+      <div class="slide" id="slide-4">
+        <div>
+          <span class="slide-subtitle">03 / ARXİTEKTURA</span>
+          <h2>C4 Model — <span class="slide-title-gradient">Sistem Diaqramı</span></h2>
+        </div>
+        <div class="slide-body" style="margin-top: 20px;">
+          <div class="slide-text" style="max-width: 400px;">
+            <p class="slide-desc" style="font-size:16px;">Sistemimiz tamamilə genişlənə bilən, PCI-DSS standartlarına uyğun 3 layerli struktura malikdir:</p>
+            <ul class="feature-list" style="gap:12px; font-size:15px;">
+              <li class="feature-item">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span><strong>L1: System Context:</strong> İstifadəçi, Abunəm platforması və kənar inteqrasiyaların (Email, Ödəniş Gateway) əlaqəsi.</span>
+              </li>
+              <li class="feature-item">
+                <i class="fa-solid fa-box-open"></i>
+                <span><strong>L2: Containers:</strong> Veb-tətbiq interfeysi, REST/Swagger API serveri və PostgreSQL verilənlər bazası.</span>
+              </li>
+              <li class="feature-item">
+                <i class="fa-solid fa-cubes"></i>
+                <span><strong>L3: Components:</strong> Auth, Subscription, Payment, Settings və Notification menecerləri.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="slide-visual" style="flex: 1.5;">
+            <div class="svg-embed-box">
+              <iframe src="/abunelik_c4_combined_architecture.svg"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5: Cybersecurity -->
+      <div class="slide" id="slide-5">
+        <div>
+          <span class="slide-subtitle">04 / TƏHLÜKƏSİZLİK</span>
+          <h2>Yüksək <span class="slide-title-gradient">Kiber-Təhlükəsizlik Qoruması</span></h2>
+        </div>
+        <div class="slide-body">
+          <div class="slide-grid">
+            <div class="grid-box">
+              <div class="gb-icon"><i class="fa-solid fa-mask"></i></div>
+              <div class="gb-title">Kart Nömrələrinin Maskalanması</div>
+              <div class="gb-desc">Müştərilərin 16 rəqəmli kart nömrələri (PAN) heç vaxt bazaya birbaşa yazılmır. Bazada və API cavablarında kartlar yalnız PCI-DSS uyğun maskalanmış formatda saxlanılır.</div>
+            </div>
+            <div class="grid-box">
+              <div class="gb-icon"><i class="fa-solid fa-shield-halved"></i></div>
+              <div class="gb-title">Helmet Təhlükəsizlik Headers</div>
+              <div class="gb-desc">Express serverimizdə Helmet modulu aktivdir. Bu başlıqlar vasitəsilə Clickjacking, MIME Sniffing və XSS (Cross-Site Scripting) kimi ümumi kiber hücumların qarşısı tamamilə alınır.</div>
+            </div>
+            <div class="grid-box">
+              <div class="gb-icon"><i class="fa-solid fa-user-lock"></i></div>
+              <div class="gb-title">Bruteforce & DDoS Qoruması</div>
+              <div class="gb-desc">Giriş və qeydiyyat API marşrutlarında Rate Limiter aktivləşdirilmişdir. Eyni IP-dən 15 dəqiqədə 30-dan çox sorğu göndərilərsə, sistem həmin IP ünvanı avtomatik olaraq müvəqqəti bloklayır.</div>
+            </div>
+            <div class="grid-box">
+              <div class="gb-icon"><i class="fa-solid fa-database"></i></div>
+              <div class="gb-title">SQL Injection Qoruması</div>
+              <div class="gb-desc">Bütün verilənlər bazası sorğuları tam olaraq parametrləşdirilmiş (SQL parameterization) formatda yazılmışdır. API üzərindən kənar SQL komandalarının göndərilməsi qeyri-mümkündür.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 6: Roadmap -->
+      <div class="slide" id="slide-6">
+        <div>
+          <span class="slide-subtitle">05 / GƏLƏCƏK</span>
+          <h2>Layihənin <span class="slide-title-gradient">Yol Xəritəsi (Roadmap)</span></h2>
+        </div>
+        <div class="slide-body">
+          <div class="slide-text">
+            <p class="slide-desc">Abunəm platformasının növbəti mərhələlərdə genişləndirilməsi planları:</p>
+            <div class="roadmap-list">
+              <div class="roadmap-step">
+                <div class="rs-num">1</div>
+                <div class="rs-info">
+                  <div class="rs-title">Open Bank İnteqrasiyası</div>
+                  <div class="rs-desc">Yerli və xarici bankların API-ləri vasitəsilə kart xərclərinin avtomatik sinxronizasiyası.</div>
+                </div>
+              </div>
+              <div class="roadmap-step">
+                <div class="rs-num">2</div>
+                <div class="rs-info">
+                  <div class="rs-title">Ödəniş Gateway İnteqrasiyası</div>
+                  <div class="rs-desc">Birbaşa tətbiq daxilindən abunəlik ödənişlərini həyata keçirmək üçün ödəniş sistemlərinin qoşulması.</div>
+                </div>
+              </div>
+              <div class="roadmap-step">
+                <div class="rs-num">3</div>
+                <div class="rs-info">
+                  <div class="rs-title">Mobil Tətbiqlər (iOS / Android)</div>
+                  <div class="rs-desc">Flutter və ya React Native vasitəsilə yerli mobil tətbiqlərin App Store və Play Store-da buraxılması.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 7: Thank You -->
+      <div class="slide" id="slide-7">
+        <div class="slide-body welcome-body">
+          <div class="badge-icon" style="color: var(--green);"><i class="fa-solid fa-circle-check"></i></div>
+          <h1 class="welcome-title">Diqqətiniz üçün Təşəkkürlər!</h1>
+          <p class="welcome-sub" style="margin-bottom: 20px;">Abunəm ilə maliyyənizi idarə edin, təhlükəsizliyinizi artırın və büdcənizə qənaət edin.</p>
+          <p style="font-size: 15px; color: var(--text-muted);">Sual və təklifləriniz?</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Footer (Navigation Controls) -->
+    <div class="footer">
+      <div class="slide-number"><span id="current-slide-num">1</span> / 7</div>
+      <div class="progress-bar-container">
+        <div class="progress-fill" id="progress-fill" style="width: 14.28%;"></div>
+      </div>
+      <div class="controls">
+        <button class="btn-ctrl" onclick="prevSlide()" title="Əvvəlki slayd"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="btn-ctrl" onclick="nextSlide()" title="Növbəti slayd"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Slide Navigation JS Logic -->
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 7;
+
+    function updatePresentation() {
+      // Deactivate all slides
+      for (let i = 1; i <= totalSlides; i++) {
+        const slide = document.getElementById(`slide-${i}`);
+        if (slide) slide.classList.remove('active');
+      }
+      
+      // Activate target slide
+      const activeSlide = document.getElementById(`slide-${currentSlide}`);
+      if (activeSlide) activeSlide.classList.add('active');
+
+      // Update Slide numbers and Progress bar
+      document.getElementById('current-slide-num').textContent = currentSlide;
+      const pct = (currentSlide / totalSlides) * 100;
+      document.getElementById('progress-fill').style.width = `${pct}%`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updatePresentation();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updatePresentation();
+      }
+    }
+
+    // Keyboard Arrow Keys support
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    // Touch Swipe support for Mobile Devices
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, false);
+
+    function handleSwipe() {
+      const threshold = 50;
+      if (touchStartX - touchEndX > threshold) {
+        nextSlide(); // Swipe Left -> Next Slide
+      }
+      if (touchEndX - touchStartX > threshold) {
+        prevSlide(); // Swipe Right -> Prev Slide
+      }
+    }
+  </script>
+</body>
+</html>
