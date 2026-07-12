@@ -228,11 +228,12 @@ function isValidUsername(username) {
   return /^[a-zA-Z0-9_.]{3,50}$/.test(trimmed);
 }
 
-// PAN-i cavablarda gostermek ucun maskalayir - yalniz son 4 reqem qalir.
+// PAN-i cavablarda gostermek ucun maskalayir - e.g. 4111 11** **** 1111
 function maskPan(pan) {
-  if (!pan || String(pan).length < 4) return null;
-  const last4 = String(pan).slice(-4);
-  return `**** **** **** ${last4}`;
+  if (!pan) return '';
+  const cleaned = String(pan).replace(/\s/g, '');
+  if (cleaned.length < 10) return cleaned;
+  return cleaned.substring(0, 4) + ' ' + cleaned.substring(4, 6) + '** **** ' + cleaned.slice(-4);
 }
 
 const ICAZE_VERILEN_VALYUTALAR = ['AZN', 'USD', 'EUR'];
@@ -1403,7 +1404,7 @@ app.get('/api/odenis-metodlari', async (req, res) => {
       card_id: row.id || row.ID,
       ad: row.ad || row.AD || 'Adsız Kart',
       kart_tipi: row.kart_tipi || row.KART_TIPI || 'visa',
-      pan: row.pan || row.PAN || '',
+      pan: maskPan(row.pan || row.PAN || ''),
       kart_istifade_tarixi: row.kart_istifade_tarixi || row.KART_ISTIFADE_TARIXI || ''
     }));
     if (cards.length === 0) {
@@ -1548,11 +1549,14 @@ app.post('/api/odenis-metodlari', async (req, res) => {
     const sql = `INSERT INTO odenis_metodlari (istifadeci_id, ad, kart_tipi, pan, kart_istifade_tarixi)
                  VALUES ($1, $2, $3, $4, $5) RETURNING id`;
     
+    // Mask PAN for database storage (6 digits visible, 6 masked, 4 visible)
+    const maskedPanForDb = trimmedPan.substring(0, 6) + '******' + trimmedPan.slice(-4);
+    
     const values = [
       userId,
       trimmedAd,
       detectedBrand,
-      trimmedPan,
+      maskedPanForDb,
       trimmedExpiry
     ];
     
