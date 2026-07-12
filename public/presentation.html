@@ -3,29 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Abunəm — Layihə Təqdimatı</title>
+  <title>Avrora Group & Bizon Energy — Strateji Əməkdaşlıq</title>
   <!-- Google Fonts: Outfit & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;800;900&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
     /* ==========================================================================
-       DESIGN SYSTEM & THEME
+       DESIGN SYSTEM & THEME (Avrora Blue & Bizon Energy Red/Green)
        ========================================================================== */
     :root {
-      --bg: #090d1a;
-      --bg-darker: #05070f;
-      --bg-card: rgba(15, 22, 41, 0.7);
-      --accent: #6366f1;
-      --accent-gradient: linear-gradient(135deg, #6366f1, #818cf8, #c4b5fd);
-      --green: #10b981;
+      --bg: #05070f;
+      --bg-light: #0d1127;
+      --bg-card: rgba(13, 17, 39, 0.85);
+      --avrora-blue: #1a73e8;
+      --bizon-red: #ff3b30;
+      --bizon-green: #10b981;
+      --accent-gradient: linear-gradient(135deg, #1a73e8, #6366f1, #ff3b30);
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --border: rgba(255, 255, 255, 0.08);
-      --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      --border: rgba(26, 115, 232, 0.15);
+      --border-focus: rgba(255, 59, 48, 0.4);
+      --shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
       --font-display: 'Outfit', sans-serif;
       --font-body: 'Inter', sans-serif;
     }
@@ -45,7 +47,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Animated background orbs */
+    /* Ambient Background Orbs representing Bizon Energy and Avrora Blue */
     .orb-bg {
       position: fixed;
       inset: 0;
@@ -56,32 +58,32 @@
     .orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(120px);
-      opacity: 0.15;
+      filter: blur(140px);
+      opacity: 0.12;
     }
     .orb-1 {
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, var(--accent), transparent);
-      top: -200px;
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, var(--avrora-blue), transparent);
+      top: -150px;
       left: -100px;
-      animation: float 12s ease-in-out infinite;
+      animation: floatOrb 15s ease-in-out infinite alternate;
     }
     .orb-2 {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, #10b981, transparent);
-      bottom: -150px;
-      right: -100px;
-      animation: float 15s ease-in-out infinite reverse;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, var(--bizon-red), transparent);
+      bottom: -100px;
+      right: -50px;
+      animation: floatOrb 18s ease-in-out infinite alternate-reverse;
     }
-    @keyframes float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-40px) scale(1.05); }
+    @keyframes floatOrb {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-50px) scale(1.08); }
     }
 
     /* ==========================================================================
-       SLIDE FRAMEWORK
+       PRESENTATION CONTAINER & FRAMEWORK
        ========================================================================== */
     .presentation-container {
       position: relative;
@@ -91,46 +93,60 @@
       z-index: 1;
     }
 
-    /* Top Navigation Header */
+    /* Header Styling */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 48px;
+      padding: 24px 60px;
       border-bottom: 1px solid var(--border);
+      background: rgba(5, 7, 15, 0.6);
+      backdrop-filter: blur(10px);
     }
-    .logo {
+    .logo-container {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
+    }
+    .brand-avrora {
       font-family: var(--font-display);
-      font-size: 24px;
-      font-weight: 700;
-    }
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--accent-gradient);
-      border-radius: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 1px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 20px;
+      gap: 6px;
     }
-    .project-tag {
-      font-size: 13px;
-      font-weight: 600;
+    .brand-avrora span {
+      color: var(--avrora-blue);
+    }
+    .brand-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+    }
+    .brand-bizon {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--bizon-red);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge-coop {
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
+      color: #fff;
+      background: linear-gradient(135deg, var(--avrora-blue), var(--bizon-red));
       padding: 6px 16px;
       border-radius: 100px;
-      background: rgba(255, 255, 255, 0.02);
+      box-shadow: 0 4px 15px rgba(26, 115, 232, 0.2);
     }
 
-    /* Slide Deck viewport */
+    /* Viewport Area */
     .slides-viewport {
       flex: 1;
       position: relative;
@@ -138,24 +154,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px 48px;
+      padding: 30px 60px;
     }
 
     .slide {
       position: absolute;
       width: 100%;
-      max-width: 1200px;
-      height: 85%;
+      max-width: 1300px;
+      height: 90%;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 60px;
+      border-radius: 28px;
+      padding: 50px 60px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(30px);
+      backdrop-filter: blur(40px);
       opacity: 0;
       pointer-events: none;
-      transform: scale(0.96) translateY(20px);
-      transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+      transform: scale(0.97) translateY(25px);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -167,305 +183,370 @@
       transform: scale(1) translateY(0);
     }
 
-    /* Slide contents layout */
+    /* Layout structure */
     .slide-body {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 60px;
-      margin-top: 40px;
+      margin-top: 25px;
+      overflow: hidden;
     }
     .slide-text {
-      flex: 1;
-      max-width: 650px;
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     .slide-visual {
-      flex: 1;
+      flex: 0.8;
       display: flex;
       justify-content: center;
       align-items: center;
       position: relative;
       height: 100%;
-      min-height: 350px;
+      min-height: 380px;
     }
 
-    /* Typography */
+    /* Titles & Typography */
+    .slide-subtitle {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--avrora-blue);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+      display: block;
+    }
     .slide h2 {
       font-family: var(--font-display);
-      font-size: 42px;
+      font-size: 40px;
       font-weight: 800;
       line-height: 1.2;
-      margin-bottom: 8px;
+      color: #fff;
     }
-    .slide-title-gradient {
-      background: var(--accent-gradient);
+    .title-gradient-bizon {
+      background: linear-gradient(135deg, #fff, var(--bizon-red));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .slide-subtitle {
-      font-size: 16px;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-weight: 600;
+    .title-gradient-avrora {
+      background: linear-gradient(135deg, #fff, var(--avrora-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .slide-desc {
-      font-size: 18px;
+      font-size: 17px;
       line-height: 1.7;
       color: var(--text-muted);
-      margin-bottom: 30px;
+      margin-bottom: 24px;
     }
 
-    /* Lists and grids */
-    .feature-list {
-      list-style: none;
+    /* Details Panel (Self-Explanatory Paragraphs) */
+    .details-panel {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 20px;
     }
-    .feature-item {
+    .detail-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 4px solid var(--avrora-blue);
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      transition: all 0.2s ease;
+    }
+    .detail-card.bizon-accent {
+      border-left-color: var(--bizon-red);
+    }
+    .detail-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateX(4px);
+    }
+    .dc-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
       display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      font-size: 17px;
-      line-height: 1.5;
+      align-items: center;
+      gap: 10px;
     }
-    .feature-item i {
-      color: var(--accent);
-      font-size: 18px;
-      margin-top: 4px;
+    .dc-title i {
+      color: var(--avrora-blue);
     }
-    .feature-item strong {
-      color: var(--text);
+    .detail-card.bizon-accent .dc-title i {
+      color: var(--bizon-red);
+    }
+    .dc-desc {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--text-muted);
     }
 
-    .slide-grid {
+    /* Grid for Statistics/Highlights */
+    .info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 24px;
       width: 100%;
     }
-    .grid-box {
+    .info-card {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 24px;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      transition: all 0.3s ease;
     }
-    .grid-box:hover {
-      border-color: rgba(99, 102, 241, 0.3);
-      transform: translateY(-2px);
+    .info-card:hover {
+      border-color: var(--avrora-blue);
+      transform: translateY(-3px);
     }
-    .gb-icon {
-      font-size: 24px;
-      color: var(--accent);
-      margin-bottom: 14px;
+    .info-card.bizon-hover:hover {
+      border-color: var(--bizon-red);
     }
-    .gb-title {
+    .ic-icon {
+      font-size: 28px;
+      color: var(--avrora-blue);
+      margin-bottom: 16px;
+    }
+    .info-card.bizon-hover .ic-icon {
+      color: var(--bizon-red);
+    }
+    .ic-title {
       font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
     }
-    .gb-desc {
+    .ic-desc {
       font-size: 14px;
       color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
-    /* Bottom Controller bar */
+    /* Stats Accent text */
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 44px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      background: linear-gradient(135deg, #fff, var(--avrora-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-number.bizon-stat {
+      background: linear-gradient(135deg, #fff, var(--bizon-red));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Bottom Footer Styling */
     .footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 48px;
+      padding: 24px 60px;
       border-top: 1px solid var(--border);
-      background: rgba(5, 7, 15, 0.4);
+      background: rgba(5, 7, 15, 0.8);
     }
-    .controls {
+    .slide-counter {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .progress-track {
+      flex: 1;
+      max-width: 500px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      margin: 0 40px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--avrora-blue), var(--bizon-red));
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+    .nav-buttons {
       display: flex;
       align-items: center;
       gap: 16px;
     }
-    .btn-ctrl {
-      width: 46px;
-      height: 46px;
-      background: rgba(255, 255, 255, 0.03);
+    .btn-nav {
+      width: 48px;
+      height: 48px;
       border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      color: #fff;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: var(--text);
       transition: all 0.2s ease;
     }
-    .btn-ctrl:hover {
-      background: var(--accent);
-      border-color: var(--accent);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    .btn-nav:hover {
+      background: var(--avrora-blue);
+      border-color: var(--avrora-blue);
+      box-shadow: 0 0 15px rgba(26, 115, 232, 0.4);
     }
-    .progress-bar-container {
-      flex: 1;
-      max-width: 400px;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 0 32px;
-    }
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--accent-gradient);
-      border-radius: 10px;
-      transition: width 0.3s ease;
-    }
-    .slide-number {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text-muted);
+    .btn-nav.bizon-btn:hover {
+      background: var(--bizon-red);
+      border-color: var(--bizon-red);
+      box-shadow: 0 0 15px rgba(255, 59, 48, 0.4);
     }
 
     /* ==========================================================================
-       SPECIFIC SLIDE STYLING
+       VISUAL ARTIFACTS / GRAPHICS
        ========================================================================== */
-    /* Slide 1: Welcome Slide */
-    .welcome-body {
-      flex-direction: column;
-      justify-content: center;
-      text-align: center;
-      margin-top: 0;
-    }
-    .welcome-title {
-      font-size: 64px;
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 20px;
-      font-family: var(--font-display);
-    }
-    .welcome-sub {
-      font-size: 20px;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin: 0 auto 40px;
-      line-height: 1.6;
-    }
-    .badge-icon {
-      font-size: 64px;
-      color: var(--accent);
-      margin-bottom: 24px;
-      animation: heartbeat 2s infinite ease-in-out;
-    }
-    @keyframes heartbeat {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    /* Card mockup visualization */
-    .card-mockup {
+    /* Partnership Logo Ring */
+    .visual-shield {
       width: 320px;
-      height: 190px;
-      background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transform: rotate(-5deg) translateY(-20px);
-      animation: cardFloatAnim 4s ease-in-out infinite alternate;
-    }
-    @keyframes cardFloatAnim {
-      from { transform: rotate(-5deg) translateY(-15px); }
-      to { transform: rotate(-3deg) translateY(5px); }
-    }
-    .cm-header { display: flex; justify-content: space-between; align-items: center; }
-    .cm-chip { width: 38px; height: 28px; background: #e2e8f0; border-radius: 4px; opacity: 0.8; }
-    .cm-logo { font-weight: bold; font-family: var(--font-display); font-size: 20px; color: #fff; }
-    .cm-pan { font-family: 'Courier New', monospace; font-size: 17px; letter-spacing: 2.5px; margin: 24px 0 10px; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.6); }
-    .cm-footer { display: flex; justify-content: space-between; font-size: 11px; text-transform: uppercase; color: var(--text-muted); }
-
-    /* SVG Integration container */
-    .svg-embed-box {
-      width: 100%;
-      height: 100%;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: #fff;
-      overflow: hidden;
+      height: 320px;
+      border: 2px dashed var(--border);
+      border-radius: 50%;
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      animation: rotateRing 30s linear infinite;
     }
-    .svg-embed-box iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+    @keyframes rotateRing {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
-    
-    .roadmap-list {
+    .shield-center {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--bg-light), var(--bg));
+      border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 20px;
-    }
-    .roadmap-step {
-      display: flex;
       align-items: center;
+      justify-content: center;
+      animation: counterRotate 30s linear infinite;
+      box-shadow: 0 0 40px rgba(26, 115, 232, 0.1);
+    }
+    @keyframes counterRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-360deg); }
+    }
+    .sc-title-1 { font-family: var(--font-display); font-weight: 800; font-size: 20px; color: #fff; }
+    .sc-title-x { font-size: 14px; font-weight: 600; color: var(--text-muted); margin: 4px 0; }
+    .sc-title-2 { font-family: var(--font-display); font-weight: 900; font-size: 24px; color: var(--bizon-red); }
+
+    /* Visual Graph Mockup */
+    .chart-box {
+      width: 360px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #fff; font-weight: 600; }
+    .chart-body { display: flex; align-items: flex-end; justify-content: space-between; height: 180px; padding-top: 20px; border-bottom: 1px solid var(--border); }
+    .chart-bar-container { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
+    .chart-bar { width: 32px; border-radius: 6px 6px 0 0; transition: height 1s ease; background: var(--avrora-blue); }
+    .chart-bar.bizon-bar { background: var(--bizon-red); }
+    .chart-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    
+    /* Roadmap Timeline */
+    .timeline-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+    .timeline-node {
+      display: flex;
       gap: 20px;
-      background: rgba(255,255,255,0.02);
+      align-items: flex-start;
+    }
+    .tn-dot-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+    }
+    .tn-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--avrora-blue);
+      border: 4px solid var(--bg);
+      box-shadow: 0 0 10px rgba(26, 115, 232, 0.4);
+    }
+    .timeline-node.bizon-node .tn-dot {
+      background: var(--bizon-red);
+      box-shadow: 0 0 10px rgba(255, 59, 48, 0.4);
+    }
+    .tn-line {
+      width: 2px;
+      flex: 1;
+      min-height: 40px;
+      background: var(--border);
+    }
+    .tn-content {
+      flex: 1;
+      background: rgba(255,255,255,0.01);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px 20px;
+      padding: 16px;
     }
-    .rs-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-family: var(--font-display);
-    }
-    .rs-info { flex: 1; }
-    .rs-title { font-weight: 600; color: #fff; font-size: 16px; margin-bottom: 4px;}
-    .rs-desc { font-size: 13px; color: var(--text-muted); }
+    .tn-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .tn-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
 
-    /* Keyboard hint */
-    .kb-hint {
+    /* Keyboard layout info */
+    .kb-info {
       font-size: 12px;
       color: var(--text-muted);
-      background: rgba(255,255,255,0.03);
-      padding: 6px 12px;
-      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.02);
       border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 8px;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
-    .kb-key {
-      background: #1e293b;
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 1px 6px;
+    .key-btn {
+      background: #10162f;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 2px 6px;
       border-radius: 4px;
       font-size: 10px;
-      font-family: monospace;
       color: #fff;
+      font-family: monospace;
     }
   </style>
 </head>
 <body>
 
-  <!-- Animated Background Orbs -->
+  <!-- Background Orbs -->
   <div class="orb-bg">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -473,201 +554,201 @@
 
   <div class="presentation-container">
     
-    <!-- Top Header -->
+    <!-- Header -->
     <div class="header">
-      <div class="logo">
-        <div class="logo-icon"><i class="fa-solid fa-rotate"></i></div>
-        <span>Abunəm</span>
+      <div class="logo-container">
+        <div class="brand-avrora">AVRORA<span>GROUP</span></div>
+        <div class="brand-divider"></div>
+        <div class="brand-bizon">Bizon Energy</div>
       </div>
-      <div class="project-tag">Layihə Təqdimatı</div>
+      <div class="badge-coop">Strateji Əməkdaşlıq</div>
     </div>
 
     <!-- Slides Viewport -->
     <div class="slides-viewport">
 
-      <!-- Slide 1: Welcome -->
+      <!-- Slide 1: Welcome Slide (Self-Explanatory Title) -->
       <div class="slide active" id="slide-1">
-        <div class="slide-body welcome-body">
-          <div class="badge-icon"><i class="fa-solid fa-circle-nodes"></i></div>
-          <h1 class="welcome-title">Abunəliklərin Ağıllı İdarəedilməsi</h1>
-          <p class="welcome-sub">Müasir subscription idarəetmə platforması: limitsiz nəzarət, təhlükəsizlik və dostlarla paylaşım.</p>
-          <div class="kb-hint">Naviqasiya üçün klaviaturanın <span class="kb-key">→</span> və <span class="kb-key">←</span> düymələrini və ya oxları sıxın</div>
+        <div class="slide-body" style="flex-direction: column; justify-content: center; text-align: center; margin-top: 0;">
+          <span class="slide-subtitle" style="font-size: 14px; margin-bottom: 12px;">AVRORA GROUP & BIZON ENERGY</span>
+          <h1 style="font-family: var(--font-display); font-size: 56px; font-weight: 900; line-height: 1.1; margin-bottom: 24px;">
+            Milli İstehsal və Distribusiyada<br>
+            <span class="title-gradient-bizon">Liderlik Tərəfdaşlığı</span>
+          </h1>
+          <p style="font-size: 19px; color: var(--text-muted); max-width: 800px; margin: 0 auto 36px; line-height: 1.6;">
+            Azərbaycanın ən böyük FMCG istehsalçı və distribütoru olan <strong>Avrora Group</strong> ilə ölkənin #1 nömrəli yerli energetik içki brendi <strong>Bizon Energy</strong>-nin strateji əməkdaşlıq və bazar inkişaf modeli.
+          </p>
+          <div class="kb-info">
+            Slaydları dəyişmək üçün klaviaturanın <span class="key-btn">→</span> və <span class="key-btn">←</span> düymələrini və ya oxları istifadə edin
+          </div>
         </div>
       </div>
 
-      <!-- Slide 2: Problem Statement -->
+      <!-- Slide 2: Strategic Alliance Overview -->
       <div class="slide" id="slide-2">
         <div>
-          <span class="slide-subtitle">01 / PROBLEM</span>
-          <h2>İdarə Olunmayan <span class="slide-title-gradient">Abunəlik Xərcləri</span></h2>
+          <span class="slide-subtitle">01 / STRATEJİ BİRLİK</span>
+          <h2>Bazarın Hədəflənməsi və <span class="title-gradient-avrora">Tərəfdaşlıq Modeli</span></h2>
         </div>
         <div class="slide-body">
           <div class="slide-text">
-            <p class="slide-desc">Bu gün hər bir istifadəçinin Netflix, Spotify, iCloud və s. kimi onlarla abunəliyi var. Bu sistemlərin idarə edilməməsi bir çox itkilərə yol açır:</p>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <i class="fa-solid fa-circle-xmark" style="color:var(--red);"></i>
-                <span><strong>Unudulan Ödənişlər:</strong> Vaxtı unudulan və kartdan avtomatik çıxılan pullar büdcə sızmalarına səbəb olur.</span>
-              </li>
-              <li class="feature-item">
-                <i class="fa-solid fa-circle-xmark" style="color:var(--red);"></i>
-                <span><strong>Ortalaşdırılmayan Xərclər:</strong> Ailə və dost paketlərində ortaq xərclərin ədalətli bölünməməsi.</span>
-              </li>
-              <li class="feature-item">
-                <i class="fa-solid fa-circle-xmark" style="color:var(--red);"></i>
-                <span><strong>Limitsiz Kart Təhlükəsi:</strong> Kənar xidmətlərə verilən kart nömrələrinin (PAN) kiber-təhlükə altında qalması.</span>
-              </li>
-            </ul>
+            <p class="slide-desc">
+              Bu əməkdaşlıq sadəcə məhsul satışı deyil, Azərbaycanın daxili istehsal gücünü artırmaq və Bizon brendini regional liderə çevirmək məqsədi daşıyır. Tərəfdaşlığın 3 əsas təməli:
+            </p>
+            <div class="details-panel">
+              <div class="detail-card">
+                <div class="dc-title"><i class="fa-solid fa-industry"></i>Milli İstehsalatın Gücləndirilməsi</div>
+                <div class="dc-desc">
+                  Bizon energetik içkiləri Avrora Industrial Parkının ən müasir içki istehsalı zavodunda, beynəlxalq keyfiyyət sertifikatlarına (ISO 22000, HACCP) tam uyğun şəkildə hazırlanır.
+                </div>
+              </div>
+              <div class="detail-card bizon-accent">
+                <div class="dc-title"><i class="fa-solid fa-truck-ramp-box"></i>Kütləvi Distribusiya Zənciri</div>
+                <div class="dc-desc">
+                  Avrora Group-un malik olduğu geniş logistika şəbəkəsi sayəsində Bizon brendi ölkənin ən ucqar kəndlərindəki kiçik mağazalardan tutmuş ən böyük supermarket şəbəkələrinədək hər yerdə əlçatandır.
+                </div>
+              </div>
+            </div>
           </div>
           <div class="slide-visual">
-            <div class="card-mockup" style="background: linear-gradient(135deg, #ef4444 0%, #7f1d1d 100%);">
-              <div class="cm-header">
-                <div class="cm-chip"></div>
-                <div class="cm-logo">Limit Aşıldı</div>
-              </div>
-              <div class="cm-pan">4111 11** **** 1111</div>
-              <div class="cm-footer">
-                <div>Abunəçi</div>
-                <div>Xəta: -₼15.00</div>
+            <div class="visual-shield">
+              <div class="shield-center">
+                <div class="sc-title-1">AVRORA</div>
+                <div class="sc-title-x">&</div>
+                <div class="sc-title-2">BIZON</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 3: The Solution -->
+      <!-- Slide 3: Industrial & Distribution Capacity -->
       <div class="slide" id="slide-3">
         <div>
-          <span class="slide-subtitle">02 / HƏLL</span>
-          <h2>Abunəm ile <span class="slide-title-gradient">Mərkəzi Nəzarət</span></h2>
+          <span class="slide-subtitle">02 / GÜC VƏ İMKANLAR</span>
+          <h2>İstehsalat Gücü və <span class="title-gradient-bizon">Distribusiya Şəbəkəsi</span></h2>
         </div>
         <div class="slide-body">
-          <div class="slide-text">
-            <p class="slide-desc">Abunəm bütün abunəlik xərclərini, limitlərini və ödəniş metodlarını vahid paneldən tam nəzarətdə saxlamağa imkan verir:</p>
-            <ul class="feature-list">
-              <li class="feature-item">
-                <i class="fa-solid fa-circle-check" style="color:var(--green);"></i>
-                <span><strong>Gecikməyən Xəbərdarlıqlar:</strong> Ödənişə 1-3 gün qalmış abunəçiyə avtomatik bildirişlər göndərilir.</span>
-              </li>
-              <li class="feature-item">
-                <i class="fa-solid fa-circle-check" style="color:var(--green);"></i>
-                <span><strong>Aylıq Büdcə Limiti:</strong> Limit aşılarsa, sistem sizi dərhal məlumatlandırır və yeni xərcləri tənzimləyir.</span>
-              </li>
-              <li class="feature-item">
-                <i class="fa-solid fa-circle-check" style="color:var(--green);"></i>
-                <span><strong>Ortaq İstifadə (Split Billing):</strong> Dostlarınızla abunəliklər yaradıb ödəniş faizlərini ədalətli şəkildə bölüşün.</span>
-              </li>
-            </ul>
-          </div>
-          <div class="slide-visual">
-            <div class="card-mockup" style="background: linear-gradient(135deg, #093c23 0%, #10b981 100%);">
-              <div class="cm-header">
-                <div class="cm-chip"></div>
-                <div class="cm-logo">Təsdiqləndi</div>
-              </div>
-              <div class="cm-pan">5577 38** **** 2291</div>
-              <div class="cm-footer">
-                <div>Limit: ₼300.00</div>
-                <div>Xərc: ₼145.00</div>
-              </div>
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="stat-number">12,000+</div>
+              <div class="stat-label">Aktiv Satış Nöqtəsi</div>
+              <p class="ic-desc" style="margin-top: 10px;">
+                Azərbaycan ərazisində Bizon məhsullarının mütəmadi tədarük edildiyi pərakəndə satış nöqtələrinin ümumi sayı. Ölkənin hər yerində eyni vaxtda mövcudluq təmin edilir.
+              </p>
+            </div>
+            <div class="info-card bizon-hover">
+              <div class="stat-number bizon-stat">8</div>
+              <div class="stat-label">Regional Logistika Filialı</div>
+              <p class="ic-desc" style="margin-top: 10px;">
+                Gəncə, Lənkəran, Şəki, Şirvan, Quba, Xaçmaz və digər strateji bölgələrdə yerləşən iri anbarlar vasitəsilə regional tələbatlar 24 saat ərzində qarşılanır.
+              </p>
+            </div>
+            <div class="info-card bizon-hover">
+              <div class="stat-number bizon-stat">250+</div>
+              <div class="stat-label">Logistik Nəqliyyat Vasitəsi</div>
+              <p class="ic-desc" style="margin-top: 10px;">
+                Məhsulların soyuq zəncir (temperatura nəzarət) qaydalarına uyğun və təzə şəkildə anbarlardan mağazalara çatdırılmasını təmin edən geniş yük avtomobili parkı.
+              </p>
+            </div>
+            <div class="info-card">
+              <div class="stat-number">ISO 22000</div>
+              <div class="stat-label">Qida Təhlükəsizliyi Sertifikatı</div>
+              <p class="ic-desc" style="margin-top: 10px;">
+                Zavodumuzda məhsulun tərkibindəki suyun təmizlənməsindən tutmuş, qablaşdırılma mərhələsinə qədər bütün addımlar ən sərt gigiyenik tələblərə uyğun aparılır.
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 4: System Architecture -->
+      <!-- Slide 4: Brand Line & Sponsorship Strategy -->
       <div class="slide" id="slide-4">
         <div>
-          <span class="slide-subtitle">03 / ARXİTEKTURA</span>
-          <h2>C4 Model — <span class="slide-title-gradient">Sistem Diaqramı</span></h2>
-        </div>
-        <div class="slide-body" style="margin-top: 20px;">
-          <div class="slide-text" style="max-width: 400px;">
-            <p class="slide-desc" style="font-size:16px;">Sistemimiz tamamilə genişlənə bilən, PCI-DSS standartlarına uyğun 3 layerli struktura malikdir:</p>
-            <ul class="feature-list" style="gap:12px; font-size:15px;">
-              <li class="feature-item">
-                <i class="fa-solid fa-diagram-project"></i>
-                <span><strong>L1: System Context:</strong> İstifadəçi, Abunəm platforması və kənar inteqrasiyaların (Email, Ödəniş Gateway) əlaqəsi.</span>
-              </li>
-              <li class="feature-item">
-                <i class="fa-solid fa-box-open"></i>
-                <span><strong>L2: Containers:</strong> Veb-tətbiq interfeysi, REST/Swagger API serveri və PostgreSQL verilənlər bazası.</span>
-              </li>
-              <li class="feature-item">
-                <i class="fa-solid fa-cubes"></i>
-                <span><strong>L3: Components:</strong> Auth, Subscription, Payment, Settings və Notification menecerləri.</span>
-              </li>
-            </ul>
-          </div>
-          <div class="slide-visual" style="flex: 1.5;">
-            <div class="svg-embed-box">
-              <iframe src="/abunelik_c4_combined_architecture.svg"></iframe>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 5: Cybersecurity -->
-      <div class="slide" id="slide-5">
-        <div>
-          <span class="slide-subtitle">04 / TƏHLÜKƏSİZLİK</span>
-          <h2>Yüksək <span class="slide-title-gradient">Kiber-Təhlükəsizlik Qoruması</span></h2>
-        </div>
-        <div class="slide-body">
-          <div class="slide-grid">
-            <div class="grid-box">
-              <div class="gb-icon"><i class="fa-solid fa-mask"></i></div>
-              <div class="gb-title">Kart Nömrələrinin Maskalanması</div>
-              <div class="gb-desc">Müştərilərin 16 rəqəmli kart nömrələri (PAN) heç vaxt bazaya birbaşa yazılmır. Bazada və API cavablarında kartlar yalnız PCI-DSS uyğun maskalanmış formatda saxlanılır.</div>
-            </div>
-            <div class="grid-box">
-              <div class="gb-icon"><i class="fa-solid fa-shield-halved"></i></div>
-              <div class="gb-title">Helmet Təhlükəsizlik Headers</div>
-              <div class="gb-desc">Express serverimizdə Helmet modulu aktivdir. Bu başlıqlar vasitəsilə Clickjacking, MIME Sniffing və XSS (Cross-Site Scripting) kimi ümumi kiber hücumların qarşısı tamamilə alınır.</div>
-            </div>
-            <div class="grid-box">
-              <div class="gb-icon"><i class="fa-solid fa-user-lock"></i></div>
-              <div class="gb-title">Bruteforce & DDoS Qoruması</div>
-              <div class="gb-desc">Giriş və qeydiyyat API marşrutlarında Rate Limiter aktivləşdirilmişdir. Eyni IP-dən 15 dəqiqədə 30-dan çox sorğu göndərilərsə, sistem həmin IP ünvanı avtomatik olaraq müvəqqəti bloklayır.</div>
-            </div>
-            <div class="grid-box">
-              <div class="gb-icon"><i class="fa-solid fa-database"></i></div>
-              <div class="gb-title">SQL Injection Qoruması</div>
-              <div class="gb-desc">Bütün verilənlər bazası sorğuları tam olaraq parametrləşdirilmiş (SQL parameterization) formatda yazılmışdır. API üzərindən kənar SQL komandalarının göndərilməsi qeyri-mümkündür.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 6: Roadmap -->
-      <div class="slide" id="slide-6">
-        <div>
-          <span class="slide-subtitle">05 / GƏLƏCƏK</span>
-          <h2>Layihənin <span class="slide-title-gradient">Yol Xəritəsi (Roadmap)</span></h2>
+          <span class="slide-subtitle">03 / BREND STRATEJİSİ</span>
+          <h2>Məhsul Çeşidləri və <span class="title-gradient-bizon">Aktiv Marketinq</span></h2>
         </div>
         <div class="slide-body">
           <div class="slide-text">
-            <p class="slide-desc">Abunəm platformasının növbəti mərhələlərdə genişləndirilməsi planları:</p>
-            <div class="roadmap-list">
-              <div class="roadmap-step">
-                <div class="rs-num">1</div>
-                <div class="rs-info">
-                  <div class="rs-title">Open Bank İnteqrasiyası</div>
-                  <div class="rs-desc">Yerli və xarici bankların API-ləri vasitəsilə kart xərclərinin avtomatik sinxronizasiyası.</div>
+            <p class="slide-desc">
+              Bizon Energy gənclər, idmançılar və aktiv həyat tərzi sürən insanlar arasında güclü brend bağlılığı yaradıb. Bu uğurun arxasında duran əsas amillər:
+            </p>
+            <div class="details-panel">
+              <div class="detail-card bizon-accent">
+                <div class="dc-title"><i class="fa-solid fa-bottle-water"></i>Geniş Məhsul Portfeli</div>
+                <div class="dc-desc">
+                  İstehlakçı zövqünə uyğun olaraq Bizon Classic (Qırmızı-Göy can), Bizon Green Line (Nanəli energetik) və xüsusi seriya olan Bizon Black Diamond kimi fərqli dad çeşidləri təklif edilir.
                 </div>
               </div>
-              <div class="roadmap-step">
-                <div class="rs-num">2</div>
-                <div class="rs-info">
-                  <div class="rs-title">Ödəniş Gateway İnteqrasiyası</div>
-                  <div class="rs-desc">Birbaşa tətbiq daxilindən abunəlik ödənişlərini həyata keçirmək üçün ödəniş sistemlərinin qoşulması.</div>
+              <div class="detail-card">
+                <div class="dc-title"><i class="fa-solid fa-trophy"></i>İdman Sponsorluqları və Tədbirlər</div>
+                <div class="dc-desc">
+                  Milli Karate Federasiyası, MMA döyüşləri, yerli futbol liqaları və gənclər festivallarının baş sponsoru olaraq brend, gənclərin enerji mənbəyinə çevrilmişdir.
                 </div>
               </div>
-              <div class="roadmap-step">
-                <div class="rs-num">3</div>
-                <div class="rs-info">
-                  <div class="rs-title">Mobil Tətbiqlər (iOS / Android)</div>
-                  <div class="rs-desc">Flutter və ya React Native vasitəsilə yerli mobil tətbiqlərin App Store və Play Store-da buraxılması.</div>
+            </div>
+          </div>
+          <div class="slide-visual">
+            <!-- Simulated Can Design Concept -->
+            <div class="card-mockup" style="background: linear-gradient(135deg, #10b981 0%, #064e3b 100%);">
+              <div class="cm-header">
+                <div class="cm-chip" style="background: #a7f3d0;"></div>
+                <div class="cm-logo">BIZON</div>
+              </div>
+              <div class="cm-pan" style="font-size: 14px; font-family: var(--font-display); letter-spacing: 1px;">GREEN LINE</div>
+              <div class="cm-footer">
+                <div>Mint & Lime</div>
+                <div>Vol: 250ml</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5: Technological & Operational Leadership -->
+      <div class="slide" id="slide-5">
+        <div>
+          <span class="slide-subtitle">04 / TEXNOLOJİ ÜSTÜNLÜK</span>
+          <h2>Avtomatlaşdırılmış İdarəetmə və <span class="title-gradient-avrora">Rəqəmsal Loqistika</span></h2>
+        </div>
+        <div class="slide-body">
+          <div class="slide-text">
+            <p class="slide-desc">
+              Distribusiyada xətaları minimuma endirmək və çatdırılmanı sürətləndirmək üçün ən müasir proqram təminatı və infrastrukturlar tətbiq edilir:
+            </p>
+            <div class="details-panel">
+              <div class="detail-card">
+                <div class="dc-title"><i class="fa-solid fa-laptop-code"></i>WMS (Warehouse Management System)</div>
+                <div class="dc-desc">
+                  Anbarlarımızda bütün məhsul partiyaları, son istifadə tarixləri və ehtiyat səviyyələri barkod sistemi ilə rəqəmsal idarə olunur. Bu da Bizon məhsullarının mağazalara həmişə ən təzə şəkildə çatmasını təmin edir.
+                </div>
+              </div>
+              <div class="detail-card bizon-accent">
+                <div class="dc-title"><i class="fa-solid fa-route"></i>GPS və Marşrut Optimizasiyası</div>
+                <div class="dc-desc">
+                  Satış nümayəndələrinin və yük maşınlarının hərəkət marşrutu xüsusi proqramlar vasitəsilə optimallaşdırılır. Bu, yanacaq sərfiyyatını azaldır və mağazaların sifarişlərini vaxtında tədarük edir.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-visual">
+            <div class="chart-box">
+              <div class="chart-header">
+                <span>Çatdırılma Sürəti (Dəqiqlik)</span>
+                <span style="color: var(--bizon-green);"><i class="fa-solid fa-arrow-trend-up"></i> 98.7%</span>
+              </div>
+              <div class="chart-body">
+                <div class="chart-bar-container">
+                  <div class="chart-bar" style="height: 60px;"></div>
+                  <span class="chart-label">Köhnə</span>
+                </div>
+                <div class="chart-bar-container">
+                  <div class="chart-bar" style="height: 110px;"></div>
+                  <span class="chart-label">WMS-dən sonra</span>
+                </div>
+                <div class="chart-bar-container">
+                  <div class="chart-bar bizon-bar" style="height: 150px;"></div>
+                  <span class="chart-label">Hədəf 2026</span>
                 </div>
               </div>
             </div>
@@ -675,36 +756,133 @@
         </div>
       </div>
 
-      <!-- Slide 7: Thank You -->
+      <!-- Slide 6: Financial Performance & Market Growth -->
+      <div class="slide" id="slide-6">
+        <div>
+          <span class="slide-subtitle">05 / BAZAR PAYI VƏ HƏDƏFLƏR</span>
+          <h2>Maliyyə Göstəriciləri və <span class="title-gradient-bizon">Böyümə Hədəfi</span></h2>
+        </div>
+        <div class="slide-body">
+          <div class="slide-text">
+            <p class="slide-desc">
+              Bizon Energy və Avrora Group tərəfdaşlığı sayəsində son 3 ildə daxili energetik içki bazarında rekord göstəricilər əldə edilib:
+            </p>
+            <div class="details-panel">
+              <div class="detail-card bizon-accent">
+                <div class="dc-title"><i class="fa-solid fa-percentage"></i>65%-dən çox Bazar Payı</div>
+                <div class="dc-desc">
+                  Azərbaycanda satılan yerli energetik içkilər seqmentində Bizon ən yaxın rəqiblərini böyük fərqlə geridə qoyaraq lider mövqeyini qoruyur.
+                </div>
+              </div>
+              <div class="detail-card">
+                <div class="dc-title"><i class="fa-solid fa-chart-line"></i>İllik 25% Satış Artımı Hədəfi</div>
+                <div class="dc-desc">
+                  2026-cı ilin sonuna qədər pərakəndə satış nöqtələrindəki rəf payını genişləndirmək və satış həcmini əlavə olaraq rüblük 15-25% civarında artırmaq planlaşdırılır.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-visual">
+            <div class="chart-box">
+              <div class="chart-header">
+                <span>İllik Satış Həcmi (Milyon Can)</span>
+                <span style="color: var(--bizon-red);"><i class="fa-solid fa-chart-line"></i> +25%</span>
+              </div>
+              <div class="chart-body">
+                <div class="chart-bar-container">
+                  <div class="chart-bar" style="height: 70px;"></div>
+                  <span class="chart-label">2024</span>
+                </div>
+                <div class="chart-bar-container">
+                  <div class="chart-bar" style="height: 120px;"></div>
+                  <span class="chart-label">2025</span>
+                </div>
+                <div class="chart-bar-container">
+                  <div class="chart-bar bizon-bar" style="height: 160px;"></div>
+                  <span class="chart-label">2026 (Hədəf)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 7: Future Strategic Vision (Roadmap) -->
       <div class="slide" id="slide-7">
+        <div>
+          <span class="slide-subtitle">06 / GƏLƏCƏK PERSPEKTİVLƏRİ</span>
+          <h2>5 İllik Strateji <span class="title-gradient-avrora">Yol Xəritəsi</span></h2>
+        </div>
+        <div class="slide-body">
+          <div class="timeline-container">
+            <div class="timeline-node">
+              <div class="tn-dot-box">
+                <div class="tn-dot"></div>
+                <div class="tn-line"></div>
+              </div>
+              <div class="tn-content">
+                <div class="tn-title">1. İxracat Sferasının Genişləndirilməsi (2026-2027)</div>
+                <div class="tn-desc">Bizon Energy məhsullarının qonşu Gürcüstan, Mərkəzi Asiya (Qazaxıstan, Özbəkistan) və Yaxın Şərq bazarlarına ixrac edilməsi və milli brend kimi tanıdılması.</div>
+              </div>
+            </div>
+            <div class="timeline-node bizon-node">
+              <div class="tn-dot-box">
+                <div class="tn-dot"></div>
+                <div class="tn-line"></div>
+              </div>
+              <div class="tn-content">
+                <div class="tn-title">2. Ekoloji Qablaşdırma və Yaşıl Enerji (2027-2028)</div>
+                <div class="tn-desc">İstehsalatda 100% təkrar emal edilə bilən alüminium qablardan istifadəyə keçid və zavodun elektrik ehtiyacının bir hissəsinin günəş panelləri ilə təmin edilməsi.</div>
+              </div>
+            </div>
+            <div class="timeline-node">
+              <div class="tn-dot-box">
+                <div class="tn-dot"></div>
+              </div>
+              <div class="tn-content">
+                <div class="tn-title">3. Təbii və Sağlam Enerji Xəttinin Yaradılması (2029)</div>
+                <div class="tn-desc">Şəkərsiz, təbii meyvə ekstraktları və əlavə vitamin kompleksləri (B6, B12, C) ilə zənginləşdirilmiş yeni nəsil sağlam Bizon energetik içkilərinin bazara çıxarılması.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 8: Strategic Summary / Thank You -->
+      <div class="slide" id="slide-8">
         <div class="slide-body welcome-body">
-          <div class="badge-icon" style="color: var(--green);"><i class="fa-solid fa-circle-check"></i></div>
-          <h1 class="welcome-title">Diqqətiniz üçün Təşəkkürlər!</h1>
-          <p class="welcome-sub" style="margin-bottom: 20px;">Abunəm ilə maliyyənizi idarə edin, təhlükəsizliyinizi artırın və büdcənizə qənaət edin.</p>
-          <p style="font-size: 15px; color: var(--text-muted);">Sual və təklifləriniz?</p>
+          <div class="badge-coop" style="font-size: 14px; margin-bottom: 24px; padding: 8px 24px;">LİDERLİK VƏ ETİBAR</div>
+          <h1 style="font-family: var(--font-display); font-size: 54px; font-weight: 900; line-height: 1.1; margin-bottom: 24px;">
+            Milli İqtisadiyyat üçün<br>
+            Birlikdə Daha <span class="title-gradient-bizon">Güclüyük!</span>
+          </h1>
+          <p style="font-size: 19px; color: var(--text-muted); max-width: 700px; margin: 0 auto 30px; line-height: 1.6;">
+            Avrora Group-un böyük distribütorluq gücü və daxili istehsalat imkanları ilə Bizon-un dinamikliyi birləşərək ölkəmizin yerli brendlərini zirvəyə daşıyır.
+          </p>
+          <p style="font-size: 15px; color: var(--text-muted); font-weight: 500;">Diqqətiniz üçün təşəkkür edirik!</p>
         </div>
       </div>
 
     </div>
 
-    <!-- Bottom Footer (Navigation Controls) -->
+    <!-- Footer / Nav Controls -->
     <div class="footer">
-      <div class="slide-number"><span id="current-slide-num">1</span> / 7</div>
-      <div class="progress-bar-container">
-        <div class="progress-fill" id="progress-fill" style="width: 14.28%;"></div>
+      <div class="slide-counter"><span id="current-slide-num">1</span> / 8</div>
+      <div class="progress-track">
+        <div class="progress-bar" id="progress-bar" style="width: 12.5%;"></div>
       </div>
-      <div class="controls">
-        <button class="btn-ctrl" onclick="prevSlide()" title="Əvvəlki slayd"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="btn-ctrl" onclick="nextSlide()" title="Növbəti slayd"><i class="fa-solid fa-chevron-right"></i></button>
+      <div class="nav-buttons">
+        <button class="btn-nav" onclick="prevSlide()" title="Əvvəlki slayd"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="btn-nav bizon-btn" onclick="nextSlide()" title="Növbəti slayd"><i class="fa-solid fa-chevron-right"></i></button>
       </div>
     </div>
 
   </div>
 
-  <!-- Slide Navigation JS Logic -->
+  <!-- Slide Navigation JS -->
   <script>
     let currentSlide = 1;
-    const totalSlides = 7;
+    const totalSlides = 8;
 
     function updatePresentation() {
       // Deactivate all slides
@@ -713,14 +891,14 @@
         if (slide) slide.classList.remove('active');
       }
       
-      // Activate target slide
+      // Activate active slide
       const activeSlide = document.getElementById(`slide-${currentSlide}`);
       if (activeSlide) activeSlide.classList.add('active');
 
-      // Update Slide numbers and Progress bar
+      // Update counters and progress
       document.getElementById('current-slide-num').textContent = currentSlide;
       const pct = (currentSlide / totalSlides) * 100;
-      document.getElementById('progress-fill').style.width = `${pct}%`;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
     }
 
     function nextSlide() {
