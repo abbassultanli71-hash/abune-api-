@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Avrora Group & Bizon Energy — Strateji Əməkdaşlıq</title>
+  <title>Avrora Group & Bizon Energy — Strateji Tərəfdaşlıq Təqdimatı</title>
   <!-- Google Fonts: Outfit & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,16 +18,16 @@
     :root {
       --bg: #05070f;
       --bg-light: #0d1127;
-      --bg-card: rgba(13, 17, 39, 0.85);
+      --bg-card: rgba(13, 17, 39, 0.9);
       --avrora-blue: #1a73e8;
       --bizon-red: #ff3b30;
       --bizon-green: #10b981;
       --accent-gradient: linear-gradient(135deg, #1a73e8, #6366f1, #ff3b30);
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --border: rgba(26, 115, 232, 0.15);
+      --border: rgba(26, 115, 232, 0.2);
       --border-focus: rgba(255, 59, 48, 0.4);
-      --shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      --shadow: 0 30px 70px rgba(0, 0, 0, 0.7);
       --font-display: 'Outfit', sans-serif;
       --font-body: 'Inter', sans-serif;
     }
@@ -47,7 +47,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Ambient Background Orbs representing Bizon Energy and Avrora Blue */
+    /* Ambient Background Orbs */
     .orb-bg {
       position: fixed;
       inset: 0;
@@ -62,16 +62,16 @@
       opacity: 0.12;
     }
     .orb-1 {
-      width: 650px;
-      height: 650px;
+      width: 700px;
+      height: 700px;
       background: radial-gradient(circle, var(--avrora-blue), transparent);
       top: -150px;
       left: -100px;
       animation: floatOrb 15s ease-in-out infinite alternate;
     }
     .orb-2 {
-      width: 550px;
-      height: 550px;
+      width: 600px;
+      height: 600px;
       background: radial-gradient(circle, var(--bizon-red), transparent);
       bottom: -100px;
       right: -50px;
@@ -79,7 +79,7 @@
     }
     @keyframes floatOrb {
       0% { transform: translateY(0) scale(1); }
-      100% { transform: translateY(-50px) scale(1.08); }
+      100% { transform: translateY(-40px) scale(1.06); }
     }
 
     /* ==========================================================================
@@ -98,41 +98,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 60px;
+      padding: 20px 60px;
       border-bottom: 1px solid var(--border);
-      background: rgba(5, 7, 15, 0.6);
-      backdrop-filter: blur(10px);
+      background: rgba(5, 7, 15, 0.7);
+      backdrop-filter: blur(15px);
     }
     .logo-container {
       display: flex;
       align-items: center;
       gap: 16px;
     }
-    .brand-avrora {
-      font-family: var(--font-display);
-      font-size: 20px;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .brand-avrora span {
-      color: var(--avrora-blue);
+    .logo-img {
+      height: 38px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(255,255,255,0.1));
     }
     .brand-divider {
       width: 1px;
-      height: 24px;
+      height: 28px;
       background: var(--border);
-    }
-    .brand-bizon {
-      font-family: var(--font-display);
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--bizon-red);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
     }
     .badge-coop {
       font-size: 11px;
@@ -141,9 +125,9 @@
       letter-spacing: 1.5px;
       color: #fff;
       background: linear-gradient(135deg, var(--avrora-blue), var(--bizon-red));
-      padding: 6px 16px;
+      padding: 6px 18px;
       border-radius: 100px;
-      box-shadow: 0 4px 15px rgba(26, 115, 232, 0.2);
+      box-shadow: 0 4px 15px rgba(26, 115, 232, 0.25);
     }
 
     /* Viewport Area */
@@ -154,18 +138,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 30px 60px;
+      padding: 25px 60px;
     }
 
     .slide {
       position: absolute;
       width: 100%;
-      max-width: 1300px;
-      height: 90%;
+      max-width: 1350px;
+      height: 92%;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 28px;
-      padding: 50px 60px;
+      padding: 40px 50px;
       box-shadow: var(--shadow);
       backdrop-filter: blur(40px);
       opacity: 0;
@@ -189,18 +173,19 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 60px;
-      margin-top: 25px;
+      gap: 50px;
+      margin-top: 20px;
       overflow: hidden;
     }
     .slide-text {
-      flex: 1.2;
+      flex: 1.3;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      height: 100%;
     }
     .slide-visual {
-      flex: 0.8;
+      flex: 0.9;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -216,14 +201,14 @@
       color: var(--avrora-blue);
       text-transform: uppercase;
       letter-spacing: 3px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: block;
     }
     .slide h2 {
       font-family: var(--font-display);
-      font-size: 40px;
+      font-size: 38px;
       font-weight: 800;
-      line-height: 1.2;
+      line-height: 1.25;
       color: #fff;
     }
     .title-gradient-bizon {
@@ -239,22 +224,22 @@
       background-clip: text;
     }
     .slide-desc {
-      font-size: 17px;
-      line-height: 1.7;
+      font-size: 16px;
+      line-height: 1.65;
       color: var(--text-muted);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     /* Details Panel (Self-Explanatory Paragraphs) */
     .details-panel {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
     .detail-card {
       background: rgba(255, 255, 255, 0.02);
       border-left: 4px solid var(--avrora-blue);
-      padding: 16px 20px;
+      padding: 14px 18px;
       border-radius: 0 12px 12px 0;
       transition: all 0.2s ease;
     }
@@ -266,7 +251,7 @@
       transform: translateX(4px);
     }
     .dc-title {
-      font-size: 16px;
+      font-size: 15.5px;
       font-weight: 700;
       color: #fff;
       margin-bottom: 6px;
@@ -281,8 +266,8 @@
       color: var(--bizon-red);
     }
     .dc-desc {
-      font-size: 14.5px;
-      line-height: 1.6;
+      font-size: 13.5px;
+      line-height: 1.55;
       color: var(--text-muted);
     }
 
@@ -290,50 +275,50 @@
     .info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 20px;
       width: 100%;
     }
     .info-card {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 24px;
+      padding: 20px;
       transition: all 0.3s ease;
     }
     .info-card:hover {
       border-color: var(--avrora-blue);
-      transform: translateY(-3px);
+      transform: translateY(-2px);
     }
     .info-card.bizon-hover:hover {
       border-color: var(--bizon-red);
     }
     .ic-icon {
-      font-size: 28px;
+      font-size: 24px;
       color: var(--avrora-blue);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     .info-card.bizon-hover .ic-icon {
       color: var(--bizon-red);
     }
     .ic-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       color: #fff;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .ic-desc {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-muted);
-      line-height: 1.6;
+      line-height: 1.55;
     }
 
     /* Stats Accent text */
     .stat-number {
       font-family: var(--font-display);
-      font-size: 44px;
+      font-size: 40px;
       font-weight: 800;
       color: #fff;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       display: flex;
       align-items: baseline;
       gap: 4px;
@@ -349,7 +334,7 @@
       background-clip: text;
     }
     .stat-label {
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       color: var(--text-muted);
@@ -361,9 +346,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 60px;
+      padding: 20px 60px;
       border-top: 1px solid var(--border);
-      background: rgba(5, 7, 15, 0.8);
+      background: rgba(5, 7, 15, 0.85);
     }
     .slide-counter {
       font-family: var(--font-display);
@@ -393,8 +378,8 @@
       gap: 16px;
     }
     .btn-nav {
-      width: 48px;
-      height: 48px;
+      width: 46px;
+      height: 46px;
       border: 1px solid var(--border);
       background: rgba(255, 255, 255, 0.02);
       color: #fff;
@@ -408,53 +393,37 @@
     .btn-nav:hover {
       background: var(--avrora-blue);
       border-color: var(--avrora-blue);
-      box-shadow: 0 0 15px rgba(26, 115, 232, 0.4);
+      box-shadow: 0 0 12px rgba(26, 115, 232, 0.4);
     }
     .btn-nav.bizon-btn:hover {
       background: var(--bizon-red);
       border-color: var(--bizon-red);
-      box-shadow: 0 0 15px rgba(255, 59, 48, 0.4);
+      box-shadow: 0 0 12px rgba(255, 59, 48, 0.4);
     }
 
-    /* ==========================================================================
-       VISUAL ARTIFACTS / GRAPHICS
-       ========================================================================== */
-    /* Partnership Logo Ring */
-    .visual-shield {
-      width: 320px;
-      height: 320px;
-      border: 2px dashed var(--border);
-      border-radius: 50%;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: rotateRing 30s linear infinite;
-    }
-    @keyframes rotateRing {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .shield-center {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: radial-gradient(circle, var(--bg-light), var(--bg));
+    /* Visual Showcase Images */
+    .showcase-img-box {
+      width: 100%;
+      height: 100%;
+      max-height: 400px;
+      border-radius: 20px;
       border: 1px solid var(--border);
+      background: rgba(0,0,0,0.4);
+      overflow: hidden;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      animation: counterRotate 30s linear infinite;
-      box-shadow: 0 0 40px rgba(26, 115, 232, 0.1);
+      box-shadow: var(--shadow);
     }
-    @keyframes counterRotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(-360deg); }
+    .showcase-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
     }
-    .sc-title-1 { font-family: var(--font-display); font-weight: 800; font-size: 20px; color: #fff; }
-    .sc-title-x { font-size: 14px; font-weight: 600; color: var(--text-muted); margin: 4px 0; }
-    .sc-title-2 { font-family: var(--font-display); font-weight: 900; font-size: 24px; color: var(--bizon-red); }
+    .showcase-img-box:hover .showcase-img {
+      transform: scale(1.03);
+    }
 
     /* Visual Graph Mockup */
     .chart-box {
@@ -469,7 +438,7 @@
       box-shadow: 0 15px 30px rgba(0,0,0,0.4);
     }
     .chart-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #fff; font-weight: 600; }
-    .chart-body { display: flex; align-items: flex-end; justify-content: space-between; height: 180px; padding-top: 20px; border-bottom: 1px solid var(--border); }
+    .chart-body { display: flex; align-items: flex-end; justify-content: space-between; height: 160px; padding-top: 20px; border-bottom: 1px solid var(--border); }
     .chart-bar-container { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
     .chart-bar { width: 32px; border-radius: 6px 6px 0 0; transition: height 1s ease; background: var(--avrora-blue); }
     .chart-bar.bizon-bar { background: var(--bizon-red); }
@@ -479,7 +448,7 @@
     .timeline-container {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       width: 100%;
     }
     .timeline-node {
@@ -494,8 +463,8 @@
       height: 100%;
     }
     .tn-dot {
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: var(--avrora-blue);
       border: 4px solid var(--bg);
@@ -516,12 +485,11 @@
       background: rgba(255,255,255,0.01);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px;
+      padding: 14px 18px;
     }
     .tn-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .tn-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+    .tn-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 
-    /* Keyboard layout info */
     .kb-info {
       font-size: 12px;
       color: var(--text-muted);
@@ -557,9 +525,9 @@
     <!-- Header -->
     <div class="header">
       <div class="logo-container">
-        <div class="brand-avrora">AVRORA<span>GROUP</span></div>
+        <img class="logo-img" src="/images/avrora_logo.png" alt="Avrora Group">
         <div class="brand-divider"></div>
-        <div class="brand-bizon">Bizon Energy</div>
+        <img class="logo-img" src="/images/bizon_logo.png" alt="Bizon Energy">
       </div>
       <div class="badge-coop">Strateji Əməkdaşlıq</div>
     </div>
@@ -571,14 +539,14 @@
       <div class="slide active" id="slide-1">
         <div class="slide-body" style="flex-direction: column; justify-content: center; text-align: center; margin-top: 0;">
           <span class="slide-subtitle" style="font-size: 14px; margin-bottom: 12px;">AVRORA GROUP & BIZON ENERGY</span>
-          <h1 style="font-family: var(--font-display); font-size: 56px; font-weight: 900; line-height: 1.1; margin-bottom: 24px;">
+          <h1 style="font-family: var(--font-display); font-size: 52px; font-weight: 900; line-height: 1.15; margin-bottom: 20px;">
             Milli İstehsal və Distribusiyada<br>
             <span class="title-gradient-bizon">Liderlik Tərəfdaşlığı</span>
           </h1>
-          <p style="font-size: 19px; color: var(--text-muted); max-width: 800px; margin: 0 auto 36px; line-height: 1.6;">
-            Azərbaycanın ən böyük FMCG istehsalçı və distribütoru olan <strong>Avrora Group</strong> ilə ölkənin #1 nömrəli yerli energetik içki brendi <strong>Bizon Energy</strong>-nin strateji əməkdaşlıq və bazar inkişaf modeli.
+          <p style="font-size: 18px; color: var(--text-muted); max-width: 850px; margin: 0 auto 30px; line-height: 1.65;">
+            Azərbaycanın ən böyük FMCG istehsalçı və distribütoru olan <strong>Avrora Group</strong> ilə ölkənin #1 nömrəli yerli energetik içki brendi <strong>Bizon Energy</strong>-nin strateji əməkdaşlıq, bazar payı böyüməsi və istehsalat mükəmməlliyi təqdimatı.
           </p>
-          <div class="kb-info">
+          <div class="kb-info" style="margin-bottom: 20px;">
             Slaydları dəyişmək üçün klaviaturanın <span class="key-btn">→</span> və <span class="key-btn">←</span> düymələrini və ya oxları istifadə edin
           </div>
         </div>
@@ -587,46 +555,85 @@
       <!-- Slide 2: Strategic Alliance Overview -->
       <div class="slide" id="slide-2">
         <div>
-          <span class="slide-subtitle">01 / STRATEJİ BİRLİK</span>
-          <h2>Bazarın Hədəflənməsi və <span class="title-gradient-avrora">Tərəfdaşlıq Modeli</span></h2>
+          <span class="slide-subtitle">01 / STRATEJİ ALYANS</span>
+          <h2>Bazarın Fəthi və <span class="title-gradient-avrora">Əməkdaşlıq Modeli</span></h2>
         </div>
         <div class="slide-body">
           <div class="slide-text">
             <p class="slide-desc">
-              Bu əməkdaşlıq sadəcə məhsul satışı deyil, Azərbaycanın daxili istehsal gücünü artırmaq və Bizon brendini regional liderə çevirmək məqsədi daşıyır. Tərəfdaşlığın 3 əsas təməli:
+              Bu əməkdaşlıq yalnız məhsul paylanmasından ibarət deyil. Məqsəd, ölkə daxilində daxili istehsalat potensialını maksimuma çatdırmaq, idxal edilən malları əvəzləmək və Bizon brendini regional səviyyədə möhkəmləndirməkdir:
             </p>
             <div class="details-panel">
               <div class="detail-card">
-                <div class="dc-title"><i class="fa-solid fa-industry"></i>Milli İstehsalatın Gücləndirilməsi</div>
+                <div class="dc-title"><i class="fa-solid fa-industry"></i>Yüksək Texnologiyalı Yerli İstehsal</div>
                 <div class="dc-desc">
-                  Bizon energetik içkiləri Avrora Industrial Parkının ən müasir içki istehsalı zavodunda, beynəlxalq keyfiyyət sertifikatlarına (ISO 22000, HACCP) tam uyğun şəkildə hazırlanır.
+                  Bizon məhsulları Avrora Industrial Parkının daxilində yerləşən ən son avtomatlaşdırılmış dolum zavodunda hazırlanır. Bu zavod ISO 22000 və HACCP beynəlxalq standartlarına tam uyğundur.
                 </div>
               </div>
               <div class="detail-card bizon-accent">
-                <div class="dc-title"><i class="fa-solid fa-truck-ramp-box"></i>Kütləvi Distribusiya Zənciri</div>
+                <div class="dc-title"><i class="fa-solid fa-truck-ramp-box"></i>Güclü Regional Distribusiya</div>
                 <div class="dc-desc">
-                  Avrora Group-un malik olduğu geniş logistika şəbəkəsi sayəsində Bizon brendi ölkənin ən ucqar kəndlərindəki kiçik mağazalardan tutmuş ən böyük supermarket şəbəkələrinədək hər yerdə əlçatandır.
+                  Avrora-nın sahib olduğu geniş anbar və logistika şəbəkəsi sayəsində Bizon energetik içkiləri Bakıdan ən ucqar dağ kəndlərinədək hər bir pərakəndə satış nöqtəsinə fasiləsiz çatdırılır.
                 </div>
               </div>
             </div>
           </div>
           <div class="slide-visual">
-            <div class="visual-shield">
-              <div class="shield-center">
-                <div class="sc-title-1">AVRORA</div>
-                <div class="sc-title-x">&</div>
-                <div class="sc-title-2">BIZON</div>
+            <div class="showcase-img-box">
+              <img class="showcase-img" src="/images/partnership.png" alt="Avrora Bizon Tərəfdaşlığı">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Industrial Capacity -->
+      <div class="slide" id="slide-3">
+        <div>
+          <span class="slide-subtitle">02 / İSTEHSALAT ZAVODU</span>
+          <h2>Avrora Sənaye Parkının <span class="title-gradient-avrora">Texniki Gücü</span></h2>
+        </div>
+        <div class="slide-body">
+          <div class="slide-text">
+            <p class="slide-desc">
+              Bizon Energy məhsullarının istehsal edildiyi sənaye kompleksi yüksək məhsuldarlığı və ekoloji nəzarəti ilə seçilir. Zavodda insan amili minimuma endirilmişdir:
+            </p>
+            <div class="details-panel">
+              <div class="detail-card">
+                <div class="dc-title"><i class="fa-solid fa-gauge-high"></i>Yüksək Sürətli Avtomatlaşdırılmış Xətlər</div>
+                <div class="dc-desc">
+                  İstehsalat xətti saatda 40,000 alüminium can doldurma və qablaşdırma gücünə malikdir. Bu, həm daxili bazarın, həm də artan ixracat tələblərinin tam və vaxtında ödənilməsinə imkan verir.
+                </div>
+              </div>
+              <div class="detail-card bizon-accent">
+                <div class="dc-title"><i class="fa-solid fa-flask"></i>Hərtərəfli Laborator Keyfiyyət Nəzarəti</div>
+                <div class="dc-desc">
+                  İçkinin hazırlanmasında istifadə edilən su 7 mərhələli filtrasiyadan keçir. Hər bir istehsal partiyasının tərkibi xüsusi laboratoriyada mikrobioloji və kimyəvi sınaqlardan keçirilir.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="slide-visual">
+            <div class="info-grid">
+              <div class="info-card">
+                <div class="stat-number">150M+</div>
+                <div class="stat-label">İllik Dolum Gücü</div>
+                <p class="ic-desc" style="margin-top: 8px;">Zavodun il ərzində ümumi energetik içki doldurma və qablaşdırma potensialı.</p>
+              </div>
+              <div class="info-card bizon-hover">
+                <div class="stat-number bizon-stat">100%</div>
+                <div class="stat-label">Avtomatlaşdırılma</div>
+                <p class="ic-desc" style="margin-top: 8px;">İstehsalat prosesində heç bir əl təması olmadan hermetik dolum və qablaşdırma zəmanəti.</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 3: Industrial & Distribution Capacity -->
-      <div class="slide" id="slide-3">
+      <!-- Slide 4: Regional Distribution Infrastructure -->
+      <div class="slide" id="slide-4">
         <div>
-          <span class="slide-subtitle">02 / GÜC VƏ İMKANLAR</span>
-          <h2>İstehsalat Gücü və <span class="title-gradient-bizon">Distribusiya Şəbəkəsi</span></h2>
+          <span class="slide-subtitle">03 / LOGİSTİKA VƏ DİSTRİBUSİYA</span>
+          <h2>Milli Şəbəkə və <span class="title-gradient-bizon">Daşınma İnframetodu</span></h2>
         </div>
         <div class="slide-body">
           <div class="info-grid">
@@ -634,99 +641,90 @@
               <div class="stat-number">12,000+</div>
               <div class="stat-label">Aktiv Satış Nöqtəsi</div>
               <p class="ic-desc" style="margin-top: 10px;">
-                Azərbaycan ərazisində Bizon məhsullarının mütəmadi tədarük edildiyi pərakəndə satış nöqtələrinin ümumi sayı. Ölkənin hər yerində eyni vaxtda mövcudluq təmin edilir.
+                Məhsulların hər həftə mütəmadi olaraq çatdırıldığı pərakəndə mağaza, kiosk və supermarketlərin ümumi sayı. Ölkənin 98%-dən çox ərazisini tam əhatə edir.
               </p>
             </div>
             <div class="info-card bizon-hover">
               <div class="stat-number bizon-stat">8</div>
-              <div class="stat-label">Regional Logistika Filialı</div>
+              <div class="stat-label">Böyük Regional Anbar</div>
               <p class="ic-desc" style="margin-top: 10px;">
-                Gəncə, Lənkəran, Şəki, Şirvan, Quba, Xaçmaz və digər strateji bölgələrdə yerləşən iri anbarlar vasitəsilə regional tələbatlar 24 saat ərzində qarşılanır.
+                Bakı, Gəncə, Lənkəran, Şəki, Şirvan, Quba, Xaçmaz və Bərdədəki regional anbarlar vasitəsilə yerli sifarişlər 24 saat ərzində sürətlə tədarük olunur.
               </p>
             </div>
             <div class="info-card bizon-hover">
               <div class="stat-number bizon-stat">250+</div>
-              <div class="stat-label">Logistik Nəqliyyat Vasitəsi</div>
+              <div class="stat-label">Logistik Yük Avtomobili</div>
               <p class="ic-desc" style="margin-top: 10px;">
-                Məhsulların soyuq zəncir (temperatura nəzarət) qaydalarına uyğun və təzə şəkildə anbarlardan mağazalara çatdırılmasını təmin edən geniş yük avtomobili parkı.
+                Fasiləsiz təchizatı təmin edən, xüsusi temperatur rejiminə malik olan və GPS peyk sistemi ilə real vaxt rejimində izlənilən geniş nəqliyyat donanması.
               </p>
             </div>
             <div class="info-card">
-              <div class="stat-number">ISO 22000</div>
-              <div class="stat-label">Qida Təhlükəsizliyi Sertifikatı</div>
+              <div class="stat-number">24 Saat</div>
+              <div class="stat-label">Çatdırılma Zəmanəti</div>
               <p class="ic-desc" style="margin-top: 10px;">
-                Zavodumuzda məhsulun tərkibindəki suyun təmizlənməsindən tutmuş, qablaşdırılma mərhələsinə qədər bütün addımlar ən sərt gigiyenik tələblərə uyğun aparılır.
+                Sifarişin qəbul edildiyi andan etibarən ən ucqar nöqtələrə belə məhsulun anbardan mağazaya çatdırılma müddəti.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 4: Brand Line & Sponsorship Strategy -->
-      <div class="slide" id="slide-4">
+      <!-- Slide 5: Brand Portfolio & Marketing -->
+      <div class="slide" id="slide-5">
         <div>
-          <span class="slide-subtitle">03 / BREND STRATEJİSİ</span>
-          <h2>Məhsul Çeşidləri və <span class="title-gradient-bizon">Aktiv Marketinq</span></h2>
+          <span class="slide-subtitle">04 / BREND VƏ MARKETİNQ</span>
+          <h2>Bizon Dad Çeşidləri və <span class="title-gradient-bizon">Gənclik Hədəfi</span></h2>
         </div>
         <div class="slide-body">
           <div class="slide-text">
             <p class="slide-desc">
-              Bizon Energy gənclər, idmançılar və aktiv həyat tərzi sürən insanlar arasında güclü brend bağlılığı yaradıb. Bu uğurun arxasında duran əsas amillər:
+              Bizon Energy ölkənin gəncləri, idmançıları və gərgin iş rejimində çalışanları arasında güclü brend sədaqəti qazanmışdır. Bu uğur məhsulun mükəmməl dadı və aktiv marketinq ilə dəstəklənir:
             </p>
             <div class="details-panel">
               <div class="detail-card bizon-accent">
-                <div class="dc-title"><i class="fa-solid fa-bottle-water"></i>Geniş Məhsul Portfeli</div>
+                <div class="dc-title"><i class="fa-solid fa-circle-nodes"></i>Genişləndirilmiş Məhsul Xətti</div>
                 <div class="dc-desc">
-                  İstehlakçı zövqünə uyğun olaraq Bizon Classic (Qırmızı-Göy can), Bizon Green Line (Nanəli energetik) və xüsusi seriya olan Bizon Black Diamond kimi fərqli dad çeşidləri təklif edilir.
+                  İstehlakçı seçimlərinə uyğun olaraq Bizon Classic (Qırmızı-Göy dizayn), Bizon Green Line (Nanə və Limon dadlı) və məhdud sayda buraxılan premium Bizon Black Diamond çeşidləri mövcuddur.
                 </div>
               </div>
               <div class="detail-card">
-                <div class="dc-title"><i class="fa-solid fa-trophy"></i>İdman Sponsorluqları və Tədbirlər</div>
+                <div class="dc-title"><i class="fa-solid fa-trophy"></i>Milli İdmana Güclü Dəstək</div>
                 <div class="dc-desc">
-                  Milli Karate Federasiyası, MMA döyüşləri, yerli futbol liqaları və gənclər festivallarının baş sponsoru olaraq brend, gənclərin enerji mənbəyinə çevrilmişdir.
+                  Bizon Energy Azərbaycan Karate Federasiyasının rəsmi tərəfdaşı, həmçinin milli MMA turnirlərinin, kibersport yarışlarının və gənclər festivallarının daimi baş sponsorudur.
                 </div>
               </div>
             </div>
           </div>
           <div class="slide-visual">
-            <!-- Simulated Can Design Concept -->
-            <div class="card-mockup" style="background: linear-gradient(135deg, #10b981 0%, #064e3b 100%);">
-              <div class="cm-header">
-                <div class="cm-chip" style="background: #a7f3d0;"></div>
-                <div class="cm-logo">BIZON</div>
-              </div>
-              <div class="cm-pan" style="font-size: 14px; font-family: var(--font-display); letter-spacing: 1px;">GREEN LINE</div>
-              <div class="cm-footer">
-                <div>Mint & Lime</div>
-                <div>Vol: 250ml</div>
-              </div>
+            <div class="showcase-img-box" style="border-color: var(--bizon-red);">
+              <img class="showcase-img" src="/images/bizon_logo.png" alt="Bizon Energy Logo" style="object-fit: contain; padding: 20px;">
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 5: Technological & Operational Leadership -->
-      <div class="slide" id="slide-5">
+      <!-- Slide 6: Digital Logistics & WMS Control -->
+      <div class="slide" id="slide-6">
         <div>
-          <span class="slide-subtitle">04 / TEXNOLOJİ ÜSTÜNLÜK</span>
-          <h2>Avtomatlaşdırılmış İdarəetmə və <span class="title-gradient-avrora">Rəqəmsal Loqistika</span></h2>
+          <span class="slide-subtitle">05 / RƏQƏMSAL LOQİSTİKA</span>
+          <h2>WMS Anbar Modulu və <span class="title-gradient-avrora">GPS İntellekti</span></h2>
         </div>
         <div class="slide-body">
           <div class="slide-text">
             <p class="slide-desc">
-              Distribusiyada xətaları minimuma endirmək və çatdırılmanı sürətləndirmək üçün ən müasir proqram təminatı və infrastrukturlar tətbiq edilir:
+              Bizon-un böyük satış həcmini idarə etmək üçün anbar və logistika idarəetməsində ən müasir rəqəmsal texnologiyalar tətbiq olunur:
             </p>
             <div class="details-panel">
               <div class="detail-card">
-                <div class="dc-title"><i class="fa-solid fa-laptop-code"></i>WMS (Warehouse Management System)</div>
+                <div class="dc-title"><i class="fa-solid fa-barcode"></i>WMS (Warehouse Management System)</div>
                 <div class="dc-desc">
-                  Anbarlarımızda bütün məhsul partiyaları, son istifadə tarixləri və ehtiyat səviyyələri barkod sistemi ilə rəqəmsal idarə olunur. Bu da Bizon məhsullarının mağazalara həmişə ən təzə şəkildə çatmasını təmin edir.
+                  Bütün məhsullar anbara daxil olduğu andan etibarən avtomatik olaraq barkodlaşdırılır. Proqram təminatı son istifadə tarixlərinə (FIFO qaydası) və ehtiyat limitlərinə avtomatik nəzarət edir.
                 </div>
               </div>
               <div class="detail-card bizon-accent">
-                <div class="dc-title"><i class="fa-solid fa-route"></i>GPS və Marşrut Optimizasiyası</div>
+                <div class="dc-title"><i class="fa-solid fa-map-location-dot"></i>GPS Peyk Marşrutlaşdırılması</div>
                 <div class="dc-desc">
-                  Satış nümayəndələrinin və yük maşınlarının hərəkət marşrutu xüsusi proqramlar vasitəsilə optimallaşdırılır. Bu, yanacaq sərfiyyatını azaldır və mağazaların sifarişlərini vaxtında tədarük edir.
+                  Çatdırılma maşınlarının marşrutları xüsusi süni intellekt alqoritmləri ilə hesablanır. Bu, tıxacları aşmağa, yanacaq sərfiyyatını 15% azaltmağa və mağazaların sifarişlərini gecikmədən təslim etməyə imkan verir.
                 </div>
               </div>
             </div>
@@ -734,8 +732,8 @@
           <div class="slide-visual">
             <div class="chart-box">
               <div class="chart-header">
-                <span>Çatdırılma Sürəti (Dəqiqlik)</span>
-                <span style="color: var(--bizon-green);"><i class="fa-solid fa-arrow-trend-up"></i> 98.7%</span>
+                <span>Marşrut Effektivliyi (Saniyə/Tədarük)</span>
+                <span style="color: var(--bizon-green);"><i class="fa-solid fa-arrow-trend-up"></i> +32%</span>
               </div>
               <div class="chart-body">
                 <div class="chart-bar-container">
@@ -744,7 +742,7 @@
                 </div>
                 <div class="chart-bar-container">
                   <div class="chart-bar" style="height: 110px;"></div>
-                  <span class="chart-label">WMS-dən sonra</span>
+                  <span class="chart-label">WMS Sistemi</span>
                 </div>
                 <div class="chart-bar-container">
                   <div class="chart-bar bizon-bar" style="height: 150px;"></div>
@@ -756,28 +754,28 @@
         </div>
       </div>
 
-      <!-- Slide 6: Financial Performance & Market Growth -->
-      <div class="slide" id="slide-6">
+      <!-- Slide 7: Financial Performance & Market Growth -->
+      <div class="slide" id="slide-7">
         <div>
-          <span class="slide-subtitle">05 / BAZAR PAYI VƏ HƏDƏFLƏR</span>
-          <h2>Maliyyə Göstəriciləri və <span class="title-gradient-bizon">Böyümə Hədəfi</span></h2>
+          <span class="slide-subtitle">06 / BAZAR GÖSTƏRİCİLƏRİ</span>
+          <h2>Bazar Payının Analizi və <span class="title-gradient-bizon">Satış Dinamikası</span></h2>
         </div>
         <div class="slide-body">
           <div class="slide-text">
             <p class="slide-desc">
-              Bizon Energy və Avrora Group tərəfdaşlığı sayəsində son 3 ildə daxili energetik içki bazarında rekord göstəricilər əldə edilib:
+              Avrora Group-un distribütorluq gücü və Bizon-un yüksək brend dəyəri sayəsində son illərdə ölkə daxilində çox böyük maliyyə uğurları əldə edilmişdir:
             </p>
             <div class="details-panel">
               <div class="detail-card bizon-accent">
-                <div class="dc-title"><i class="fa-solid fa-percentage"></i>65%-dən çox Bazar Payı</div>
+                <div class="dc-title"><i class="fa-solid fa-pie-chart"></i>65%-dən çox Bazar Payı</div>
                 <div class="dc-desc">
-                  Azərbaycanda satılan yerli energetik içkilər seqmentində Bizon ən yaxın rəqiblərini böyük fərqlə geridə qoyaraq lider mövqeyini qoruyur.
+                  Azərbaycanın yerli energetik içki bazarında Bizon rəqiblərini qabaqlayaraq stabil şəkildə liderliyini qoruyur və bazar payını artırır.
                 </div>
               </div>
               <div class="detail-card">
-                <div class="dc-title"><i class="fa-solid fa-chart-line"></i>İllik 25% Satış Artımı Hədəfi</div>
+                <div class="dc-title"><i class="fa-solid fa-chart-line-up"></i>İllik 25% Stabil Artım</div>
                 <div class="dc-desc">
-                  2026-cı ilin sonuna qədər pərakəndə satış nöqtələrindəki rəf payını genişləndirmək və satış həcmini əlavə olaraq rüblük 15-25% civarında artırmaq planlaşdırılır.
+                  Regional satış şəbəkələrinin genişləndirilməsi, yeni çeşidlərin buraxılması və pərakəndə satış nöqtələrində rəf sahəsinin artırılması hesabına satış həcmi hər il minimum 25% böyüyür.
                 </div>
               </div>
             </div>
@@ -790,7 +788,7 @@
               </div>
               <div class="chart-body">
                 <div class="chart-bar-container">
-                  <div class="chart-bar" style="height: 70px;"></div>
+                  <div class="chart-bar" style="height: 75px;"></div>
                   <span class="chart-label">2024</span>
                 </div>
                 <div class="chart-bar-container">
@@ -799,7 +797,7 @@
                 </div>
                 <div class="chart-bar-container">
                   <div class="chart-bar bizon-bar" style="height: 160px;"></div>
-                  <span class="chart-label">2026 (Hədəf)</span>
+                  <span class="chart-label">2026 (H)</span>
                 </div>
               </div>
             </div>
@@ -807,11 +805,11 @@
         </div>
       </div>
 
-      <!-- Slide 7: Future Strategic Vision (Roadmap) -->
-      <div class="slide" id="slide-7">
+      <!-- Slide 8: Future Strategic Vision (Roadmap) -->
+      <div class="slide" id="slide-8">
         <div>
-          <span class="slide-subtitle">06 / GƏLƏCƏK PERSPEKTİVLƏRİ</span>
-          <h2>5 İllik Strateji <span class="title-gradient-avrora">Yol Xəritəsi</span></h2>
+          <span class="slide-subtitle">07 / GƏLƏCƏK BAXIŞ</span>
+          <h2>5 İllik Strateji <span class="title-gradient-avrora">İnkişaf Yol Xəritəsi</span></h2>
         </div>
         <div class="slide-body">
           <div class="timeline-container">
@@ -821,8 +819,8 @@
                 <div class="tn-line"></div>
               </div>
               <div class="tn-content">
-                <div class="tn-title">1. İxracat Sferasının Genişləndirilməsi (2026-2027)</div>
-                <div class="tn-desc">Bizon Energy məhsullarının qonşu Gürcüstan, Mərkəzi Asiya (Qazaxıstan, Özbəkistan) və Yaxın Şərq bazarlarına ixrac edilməsi və milli brend kimi tanıdılması.</div>
+                <div class="tn-title">1. İxracat Coğrafiyasının Genişləndirilməsi (2026-2027)</div>
+                <div class="tn-desc">Bizon Energy məhsullarının qonşu Gürcüstan, həmçinin Mərkəzi Asiya (Qazaxıstan, Özbəkistan) və Yaxın Şərq ölkələrinə aktiv ixracına başlanılması və yerli brend kimi mövqeləndirilməsi.</div>
               </div>
             </div>
             <div class="timeline-node bizon-node">
@@ -831,8 +829,8 @@
                 <div class="tn-line"></div>
               </div>
               <div class="tn-content">
-                <div class="tn-title">2. Ekoloji Qablaşdırma və Yaşıl Enerji (2027-2028)</div>
-                <div class="tn-desc">İstehsalatda 100% təkrar emal edilə bilən alüminium qablardan istifadəyə keçid və zavodun elektrik ehtiyacının bir hissəsinin günəş panelləri ilə təmin edilməsi.</div>
+                <div class="tn-title">2. Ekoloji Standartlar və Yaşıl İstehsal (2027-2028)</div>
+                <div class="tn-desc">İstehsalatda 100% təkrar emal edilə bilən alüminium materiallara keçilməsi və istehsal kompleksinin enerji təminatının qismən günəş panelləri ilə əvəzlənməsi.</div>
               </div>
             </div>
             <div class="timeline-node">
@@ -840,26 +838,26 @@
                 <div class="tn-dot"></div>
               </div>
               <div class="tn-content">
-                <div class="tn-title">3. Təbii və Sağlam Enerji Xəttinin Yaradılması (2029)</div>
-                <div class="tn-desc">Şəkərsiz, təbii meyvə ekstraktları və əlavə vitamin kompleksləri (B6, B12, C) ilə zənginləşdirilmiş yeni nəsil sağlam Bizon energetik içkilərinin bazara çıxarılması.</div>
+                <div class="tn-title">3. Təbii və Sağlam Enerji Çeşidləri (2029)</div>
+                <div class="tn-desc">Şəkərsiz, təbii meyvə konsentratları, Jenşen (Ginseng) və B6, B12 vitamin kompleksləri ilə zənginləşdirilmiş yeni nəsil orqanik Bizon içkilərinin buraxılması.</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 8: Strategic Summary / Thank You -->
-      <div class="slide" id="slide-8">
+      <!-- Slide 9: Strategic Summary / Thank You -->
+      <div class="slide" id="slide-9">
         <div class="slide-body welcome-body">
-          <div class="badge-coop" style="font-size: 14px; margin-bottom: 24px; padding: 8px 24px;">LİDERLİK VƏ ETİBAR</div>
-          <h1 style="font-family: var(--font-display); font-size: 54px; font-weight: 900; line-height: 1.1; margin-bottom: 24px;">
+          <div class="badge-coop" style="font-size: 13px; margin-bottom: 20px; padding: 8px 24px;">LİDERLİK VƏ ETİBAR</div>
+          <h1 style="font-family: var(--font-display); font-size: 50px; font-weight: 900; line-height: 1.15; margin-bottom: 20px;">
             Milli İqtisadiyyat üçün<br>
             Birlikdə Daha <span class="title-gradient-bizon">Güclüyük!</span>
           </h1>
-          <p style="font-size: 19px; color: var(--text-muted); max-width: 700px; margin: 0 auto 30px; line-height: 1.6;">
-            Avrora Group-un böyük distribütorluq gücü və daxili istehsalat imkanları ilə Bizon-un dinamikliyi birləşərək ölkəmizin yerli brendlərini zirvəyə daşıyır.
+          <p style="font-size: 18px; color: var(--text-muted); max-width: 750px; margin: 0 auto 24px; line-height: 1.65;">
+            Avrora Group-un böyük distribütorluq gücü, yüksək texnoloji istehsal infrastrukturu və Bizon Energy brendinin daxili enerjisi birləşərək ölkəmizin sənaye gücünü zirvəyə daşıyır.
           </p>
-          <p style="font-size: 15px; color: var(--text-muted); font-weight: 500;">Diqqətiniz üçün təşəkkür edirik!</p>
+          <p style="font-size: 15px; color: var(--text-muted); font-weight: 600;">Diqqətiniz üçün təşəkkür edirik!</p>
         </div>
       </div>
 
@@ -867,9 +865,9 @@
 
     <!-- Footer / Nav Controls -->
     <div class="footer">
-      <div class="slide-counter"><span id="current-slide-num">1</span> / 8</div>
+      <div class="slide-counter"><span id="current-slide-num">1</span> / 9</div>
       <div class="progress-track">
-        <div class="progress-bar" id="progress-bar" style="width: 12.5%;"></div>
+        <div class="progress-bar" id="progress-bar" style="width: 11.11%;"></div>
       </div>
       <div class="nav-buttons">
         <button class="btn-nav" onclick="prevSlide()" title="Əvvəlki slayd"><i class="fa-solid fa-chevron-left"></i></button>
@@ -882,7 +880,7 @@
   <!-- Slide Navigation JS -->
   <script>
     let currentSlide = 1;
-    const totalSlides = 8;
+    const totalSlides = 9;
 
     function updatePresentation() {
       // Deactivate all slides
