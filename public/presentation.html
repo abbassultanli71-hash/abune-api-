@@ -18,16 +18,16 @@
     :root {
       --bg: #05070f;
       --bg-light: #0d1127;
-      --bg-card: rgba(13, 17, 39, 0.9);
+      --bg-card: rgba(13, 17, 39, 0.93);
       --avrora-blue: #1a73e8;
       --bizon-red: #ff3b30;
       --bizon-green: #10b981;
       --accent-gradient: linear-gradient(135deg, #1a73e8, #6366f1, #ff3b30);
       --text: #f8fafc;
-      --text-muted: #94a3b8;
+      --text-muted: #a6b4c9;
       --border: rgba(26, 115, 232, 0.2);
       --border-focus: rgba(255, 59, 48, 0.4);
-      --shadow: 0 30px 70px rgba(0, 0, 0, 0.7);
+      --shadow: 0 30px 70px rgba(0, 0, 0, 0.75);
       --font-display: 'Outfit', sans-serif;
       --font-body: 'Inter', sans-serif;
     }
@@ -100,7 +100,7 @@
       align-items: center;
       padding: 20px 60px;
       border-bottom: 1px solid var(--border);
-      background: rgba(5, 7, 15, 0.7);
+      background: rgba(5, 7, 15, 0.75);
       backdrop-filter: blur(15px);
     }
     .logo-container {
@@ -109,7 +109,7 @@
       gap: 16px;
     }
     .logo-img {
-      height: 38px;
+      height: 36px;
       object-fit: contain;
       filter: drop-shadow(0 2px 8px rgba(255,255,255,0.1));
     }
@@ -138,14 +138,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 25px 60px;
+      padding: 20px 60px;
     }
 
     .slide {
       position: absolute;
       width: 100%;
       max-width: 1350px;
-      height: 92%;
+      height: 94%;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 28px;
@@ -171,44 +171,42 @@
     .slide-body {
       flex: 1;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 50px;
-      margin-top: 20px;
-      overflow: hidden;
-    }
-    .slide-text {
-      flex: 1.3;
-      display: flex;
       flex-direction: column;
-      justify-content: center;
-      height: 100%;
+      justify-content: flex-start;
+      gap: 20px;
+      margin-top: 20px;
+      overflow-y: auto;
+      padding-right: 10px;
     }
-    .slide-visual {
-      flex: 0.9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      height: 100%;
-      min-height: 380px;
+    
+    /* Scrollbar Styling for Slide Body */
+    .slide-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .slide-body::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+    }
+    .slide-body::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
     }
 
     /* Titles & Typography */
     .slide-subtitle {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--avrora-blue);
       text-transform: uppercase;
       letter-spacing: 3px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       display: block;
     }
     .slide h2 {
       font-family: var(--font-display);
-      font-size: 38px;
+      font-size: 34px;
       font-weight: 800;
-      line-height: 1.25;
+      line-height: 1.2;
       color: #fff;
     }
     .title-gradient-bizon {
@@ -224,10 +222,10 @@
       background-clip: text;
     }
     .slide-desc {
-      font-size: 16px;
+      font-size: 15.5px;
       line-height: 1.65;
       color: var(--text-muted);
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
 
     /* Details Panel (Self-Explanatory Paragraphs) */
@@ -235,11 +233,12 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      width: 100%;
     }
     .detail-card {
       background: rgba(255, 255, 255, 0.02);
       border-left: 4px solid var(--avrora-blue);
-      padding: 14px 18px;
+      padding: 18px 24px;
       border-radius: 0 12px 12px 0;
       transition: all 0.2s ease;
     }
@@ -251,23 +250,24 @@
       transform: translateX(4px);
     }
     .dc-title {
-      font-size: 15.5px;
+      font-size: 16px;
       font-weight: 700;
       color: #fff;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .dc-title i {
       color: var(--avrora-blue);
+      font-size: 18px;
     }
     .detail-card.bizon-accent .dc-title i {
       color: var(--bizon-red);
     }
     .dc-desc {
-      font-size: 13.5px;
-      line-height: 1.55;
+      font-size: 14.5px;
+      line-height: 1.65;
       color: var(--text-muted);
     }
 
@@ -307,15 +307,15 @@
       margin-bottom: 8px;
     }
     .ic-desc {
-      font-size: 13px;
+      font-size: 13.5px;
       color: var(--text-muted);
-      line-height: 1.55;
+      line-height: 1.6;
     }
 
     /* Stats Accent text */
     .stat-number {
       font-family: var(--font-display);
-      font-size: 40px;
+      font-size: 38px;
       font-weight: 800;
       color: #fff;
       margin-bottom: 4px;
@@ -334,7 +334,7 @@
       background-clip: text;
     }
     .stat-label {
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       color: var(--text-muted);
@@ -401,54 +401,37 @@
       box-shadow: 0 0 12px rgba(255, 59, 48, 0.4);
     }
 
-    /* Visual Showcase Images */
-    .showcase-img-box {
+    /* Split layout for Welcome Slide */
+    .split-layout {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
       width: 100%;
       height: 100%;
-      max-height: 400px;
+    }
+    .split-text {
+      flex: 1.2;
+    }
+    .split-img-box {
+      flex: 0.8;
       border-radius: 20px;
       border: 1px solid var(--border);
       background: rgba(0,0,0,0.4);
       overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       box-shadow: var(--shadow);
     }
-    .showcase-img {
+    .split-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s ease;
-    }
-    .showcase-img-box:hover .showcase-img {
-      transform: scale(1.03);
     }
 
-    /* Visual Graph Mockup */
-    .chart-box {
-      width: 360px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-    }
-    .chart-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #fff; font-weight: 600; }
-    .chart-body { display: flex; align-items: flex-end; justify-content: space-between; height: 160px; padding-top: 20px; border-bottom: 1px solid var(--border); }
-    .chart-bar-container { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
-    .chart-bar { width: 32px; border-radius: 6px 6px 0 0; transition: height 1s ease; background: var(--avrora-blue); }
-    .chart-bar.bizon-bar { background: var(--bizon-red); }
-    .chart-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
-    
     /* Roadmap Timeline */
     .timeline-container {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
       width: 100%;
     }
     .timeline-node {
@@ -485,10 +468,10 @@
       background: rgba(255,255,255,0.01);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 14px 18px;
+      padding: 18px 24px;
     }
-    .tn-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .tn-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    .tn-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .tn-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
 
     .kb-info {
       font-size: 12px;
@@ -535,52 +518,58 @@
     <!-- Slides Viewport -->
     <div class="slides-viewport">
 
-      <!-- Slide 1: Welcome Slide (Bizon Campus Ambassador Program) -->
+      <!-- Slide 1: Welcome Slide -->
       <div class="slide active" id="slide-1">
-        <div class="slide-body" style="flex-direction: column; justify-content: center; text-align: center; margin-top: 0;">
-          <span class="slide-subtitle" style="font-size: 14px; margin-bottom: 12px;">STRATEJİ GƏNCLƏR MARKETİNQİ LAYİHƏSİ</span>
-          <h1 style="font-family: var(--font-display); font-size: 52px; font-weight: 900; line-height: 1.15; margin-bottom: 20px;">
-            Bizon Campus<br>
-            <span class="title-gradient-bizon">Ambassador Program</span>
-          </h1>
-          <p style="font-size: 18px; color: var(--text-muted); max-width: 850px; margin: 0 auto 30px; line-height: 1.65;">
-            Bizon brendinin universitet ekosistemində uzunmüddətli və davamlı mövcudluğunu təmin etmək məqsədilə hazırlanmış strateji gənclər marketinqi platforması. Təhsil ocaqlarında brend icmasının formalaşdırılması modeli.
-          </p>
-          <div class="kb-info" style="margin-bottom: 20px;">
-            Slaydları dəyişmək üçün klaviaturanın <span class="key-btn">→</span> və <span class="key-btn">←</span> düymələrini və ya oxları istifadə edin
+        <div class="slide-body" style="margin-top: 0; justify-content: center;">
+          <div class="split-layout">
+            <div class="split-text">
+              <span class="slide-subtitle" style="font-size: 14px; margin-bottom: 12px;">STRATEJİ GƏNCLƏR MARKETİNQİ LAYİHƏSİ</span>
+              <h1 style="font-family: var(--font-display); font-size: 48px; font-weight: 900; line-height: 1.2; margin-bottom: 20px;">
+                Bizon Campus<br>
+                <span class="title-gradient-bizon">Ambassador Program</span>
+              </h1>
+              <p style="font-size: 16.5px; color: var(--text-muted); line-height: 1.65; margin-bottom: 30px;">
+                Bizon brendinin universitet ekosistemində uzunmüddətli və davamlı mövcudluğunu təmin etmək məqsədilə hazırlanmış strateji gənclər marketinqi layihəsidir. Bu təqdimat, seçilmiş tələbə nümayəndələri vasitəsilə brend dəyərinin ali təhsil müəssisələrində təbii yolla artırılması və aktiv gənclik icmasının qurulması modelini əhatə edir.
+              </p>
+              <div class="kb-info">
+                Keçid üçün klaviaturanın <span class="key-btn">→</span> və <span class="key-btn">←</span> düymələrindən istifadə edin
+              </div>
+            </div>
+            <div class="split-img-box">
+              <img class="split-img" src="/images/partnership.png" alt="Avrora Bizon Tərəfdaşlığı">
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 2: Project Overview -->
+      <!-- Slide 2: Project Essence -->
       <div class="slide" id="slide-2">
         <div>
           <span class="slide-subtitle">01 / LAYİHƏNİN MAHİYYƏTİ</span>
-          <h2>Universitetlərdə <span class="title-gradient-bizon">Rəsmi Təmsilçilik</span></h2>
+          <h2>Universitetlərdə <span class="title-gradient-bizon">Rəsmi Təmsilçilik Modeli</span></h2>
         </div>
         <div class="slide-body">
-          <div class="slide-text">
-            <p class="slide-desc">
-              Bizon Campus Ambassador Program sıradan bir reklam layihəsi deyil. Bu proqram tələbə nümayəndələri vasitəsilə Bizon-un gənclər arasında tanınırlığını, əlçatanlığını və emosional əlaqəsini gücləndirmək üçün qurulmuşdur:
-            </p>
-            <div class="details-panel">
-              <div class="detail-card bizon-accent">
-                <div class="dc-title"><i class="fa-solid fa-graduation-cap"></i>Tələbə Nümayəndəliyi (Ambassadors)</div>
-                <div class="dc-desc">
-                  Hər universitet üzrə xüsusi seçilmiş aktiv tələbələr Bizon brendinin rəsmi səfirləri kimi çıxış edir və tələbə mühiti ilə birbaşa canlı ünsiyyət qururlar.
-                </div>
-              </div>
-              <div class="detail-card">
-                <div class="dc-title"><i class="fa-solid fa-handshake"></i>Kommunikasiya Körpüsü</div>
-                <div class="dc-desc">
-                  Nümayəndələr universitet tələbələri ilə Bizon arasında birbaşa əlaqə yaradaraq brend haqqında davamlı kommunikasiya qurur, tələbələrin maraq və tələblərini şirkətə çatdırırlar.
-                </div>
+          <p class="slide-desc">
+            Bizon Campus Ambassador Program sadəcə qısamüddətli bir reklam kampaniyası deyil. Bu proqram tələbə nümayəndələri vasitəsilə Bizon brendinin gənclər arasında tanınırlığını, əlçatanlığını və tələbələrin gündəlik həyatı ilə emosional bağlılığını gücləndirmək üçün qurulmuş uzunmüddətli strateji platformadır:
+          </p>
+          <div class="details-panel">
+            <div class="detail-card">
+              <div class="dc-title"><i class="fa-solid fa-graduation-cap"></i>Campus Ambassadors (Tələbə Səfirləri)</div>
+              <div class="dc-desc">
+                Universitetlərdə seçilmiş aktiv, təşəbbüskar və liderlik potensialı olan tələbə nümayəndələri Bizon brendinin rəsmi təmsilçiləri kimi fəaliyyət göstərir, tələbə ekosistemi ilə brend arasında birbaşa canlı ünsiyyət qururlar.
               </div>
             </div>
-          </div>
-          <div class="slide-visual">
-            <div class="showcase-img-box">
-              <img class="showcase-img" src="/images/partnership.png" alt="Bizon Campus Ambassador">
+            <div class="detail-card bizon-accent">
+              <div class="dc-title"><i class="fa-solid fa-circle-nodes"></i>Çoxşaxəli Tədbirlər və Fəaliyyətlər</div>
+              <div class="dc-desc">
+                Seçilmiş nümayəndələr universitet daxilində müxtəlif əyləncəli və maarifləndirici tədbirlər, müsabiqələr, idman yarışları, məhsul tanıtımları, sosial layihələr və rəqəmsal kampaniyaların təşkilində aktiv və yaradıcı rol alırlar.
+              </div>
+            </div>
+            <div class="detail-card">
+              <div class="dc-title"><i class="fa-solid fa-comments"></i>İkitərəfli Kommunikasiya Körpüsü</div>
+              <div class="dc-desc">
+                Səfirlər tələbə mühiti ilə şirkət rəhbərliyi arasında birbaşa əlaqə yaradaraq tələbələrin maraq, istək və ehtiyaclarını şirkətə çatdırır, brend haqqında davamlı və etibarlı kommunikasiya formalaşdırırlar.
+              </div>
             </div>
           </div>
         </div>
@@ -589,221 +578,188 @@
       <!-- Slide 3: Strategic Goals -->
       <div class="slide" id="slide-3">
         <div>
-          <span class="slide-subtitle">02 / BİZİM MƏQSƏDLƏRİMİZ</span>
-          <h2>İcma Quruculuğu və <span class="title-gradient-avrora">Rəqəmsal Görünürlük</span></h2>
+          <span class="slide-subtitle">02 / STRATEJİ HƏDƏFLƏR</span>
+          <h2>İcma Quruculuğu və <span class="title-gradient-avrora">Sosial Medianın Gücü</span></h2>
         </div>
         <div class="slide-body">
-          <div class="slide-text">
-            <p class="slide-desc">
-              Proqramın əsas hədəfi Bizon energetik içkisini tələbələrin gündəlik həyatının və universitet mədəniyyətinin ayrılmaz bir hissəsinə çevirməkdir:
-            </p>
-            <div class="details-panel">
-              <div class="detail-card">
-                <div class="dc-title"><i class="fa-solid fa-users"></i>Aktiv Brend İcması (Community)</div>
-                <div class="dc-desc">
-                  Gənclər ənənəvi reklamlardan daha çox öz mühitlərində gördükləri, etibar etdikləri fəaliyyətlərə inanırlar. Proqram brend ətrafında aktiv, dinamik tələbə icması formalaşdırır.
-                </div>
-              </div>
-              <div class="detail-card bizon-accent">
-                <div class="dc-title"><i class="fa-solid fa-share-nodes"></i>UGC (User Generated Content) İnteqrasiyası</div>
-                <div class="dc-desc">
-                  Universitet tədbirləri tələbələr tərəfindən sosial mediada könüllü paylaşıldığı üçün Bizon-un rəqəmsal görünürlüyü daha aşağı marketinq büdcəsi ilə geniş kütlələrə yayılır.
-                </div>
+          <p class="slide-desc">
+            Bizon Campus Ambassador proqramının əsas hədəfi brendi tələbə mədəniyyətinin və onların gündəlik həyat tərzinin ayrılmaz bir hissəsinə çevirməkdir. Müasir gənclər ənənəvi reklamlara deyil, öz mühitlərində gördükləri fəaliyyətlərə inanırlar:
+          </p>
+          <div class="details-panel">
+            <div class="detail-card bizon-accent">
+              <div class="dc-title"><i class="fa-solid fa-users"></i>Aktiv Tələbə İcmasının (Community) Yaradılması</div>
+              <div class="dc-desc">
+                Məhsulun sadəcə birtərəfli tanıdılması əvəzinə, universitetlərdə Bizon brendi ətrafında aktiv, yaradıcı və dinamik bir tələbə icması formalaşdırılır. Bu icma brend bağlılığını təbii yolla artırır.
               </div>
             </div>
-          </div>
-          <div class="slide-visual">
-            <div class="info-grid">
-              <div class="info-card bizon-hover">
-                <div class="stat-number bizon-stat">100%</div>
-                <div class="stat-label">Tələbə Fokuslu</div>
-                <p class="ic-desc" style="margin-top: 8px;">Bütün layihələrin və aksiyaların birbaşa tələbə mühitinə uyğunlaşdırılması.</p>
+            <div class="detail-card">
+              <div class="dc-title"><i class="fa-solid fa-hashtag"></i>UGC (User Generated Content) və Rəqəmsal Görünürlük</div>
+              <div class="dc-desc">
+                Universitetlərdə təşkil edilən tədbirlər tələbələr tərəfindən könüllü şəkildə sosial şəbəkələrdə paylaşılır. Bu isə istifadəçilər tərəfindən yaradılan məzmunun həcmini artırır və rəqəmsal görünürlüyü minimum xərclə maksimuma çatdırır.
               </div>
-              <div class="info-card">
-                <div class="stat-number">UGC</div>
-                <div class="stat-label">Sosial Media Artımı</div>
-                <p class="ic-desc" style="margin-top: 8px;">Tələbələrin öz hekayələrində Bizon məhsulunu paylaşmaqla yaratdığı təbii reklam dalğası.</p>
+            </div>
+            <div class="detail-card bizon-accent">
+              <div class="dc-title"><i class="fa-solid fa-chart-line"></i>Uzunmüddətli Brend Sadiqliyi</div>
+              <div class="dc-desc">
+                Universitet illərində qurulan bu emosional bağ tələbələrin məzun olduqdan sonra da brendə sadiq qalmasını təmin edərək gələcəyin sadiq istehlakçı bazasını indidən formalaşdırır.
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 4: How the Model Works -->
+      <!-- Slide 4: Operational Model -->
       <div class="slide" id="slide-4">
         <div>
-          <span class="slide-subtitle">03 / FƏALİYYƏT MODELİ</span>
-          <h2>Campus Ambassador <span class="title-gradient-bizon">Necə İşləyəcək?</span></h2>
+          <span class="slide-subtitle">03 / PROQRAMIN İŞLƏMƏ MODELİ</span>
+          <h2>Çevik İdarəetmə və <span class="title-gradient-bizon">Şəbəkə Koordinasiyası</span></h2>
         </div>
         <div class="slide-body">
+          <p class="slide-desc">
+            Bizon Campus Ambassador Program, mərkəzləşdirilmiş şirkət dəstəyi ilə tələbələrin yerli yaradıcı təşəbbüslərinin birləşdiyi çox çevik və effektiv idarəetmə modeli əsasında fəaliyyət göstərir:
+          </p>
           <div class="info-grid">
             <div class="info-card">
-              <div class="ic-icon"><i class="fa-solid fa-bullhorn"></i></div>
-              <div class="ic-title">Tədbirlərin Təşkili</div>
+              <div class="ic-icon"><i class="fa-solid fa-chess-knight"></i></div>
+              <div class="ic-title">Tələbə Səlahiyyətləri</div>
               <p class="ic-desc">
-                Nümayəndələr universitet daxilində Bizon-un dəstəyi ilə idman yarışları, müsabiqələr, rəqəmsal kampaniyalar və tələbə klubları ilə birgə layihələr həyata keçirirlər.
+                Campus Ambassador-lar öz universitetlərində Bizon brendinin rəsmi nümayəndələri kimi çıxış edir. Onlar yerli tələbə klubları, idman dərnəkləri ilə əməkdaşlıq qurur, tədbirlər və sosial media kontentləri planlaşdırırlar.
               </p>
             </div>
             <div class="info-card bizon-hover">
-              <div class="ic-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
-              <div class="ic-title">Məhsul Tanıtımları</div>
+              <div class="ic-icon"><i class="fa-solid fa-handshake-angle"></i></div>
+              <div class="ic-title">Şirkət Tərəfinin Təminatı</div>
               <p class="ic-desc">
-                Yeni buraxılan Bizon dadlarının (Green Line, Black Diamond) tələbələrə pulsuz dequstasiyası və universitet daxilində rəy sorğularının aparılması.
+                Bizon və Avrora komandası nümayəndələri lazımi reklam materialları, məhsullar, layihə büdcələri, professional mentorluq və daimi koordinasiya ilə təmin edir, proseslərin rəsmi icrasına şərait yaradır.
               </p>
             </div>
             <div class="info-card bizon-hover">
-              <div class="ic-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-              <div class="ic-title">Şirkət Dəstəyi</div>
+              <div class="ic-icon"><i class="fa-solid fa-rotate-right"></i></div>
+              <div class="ic-title">Dinamik Əlaqə Modeli</div>
               <p class="ic-desc">
-                Avrora və Bizon tərəfi nümayəndələrə rəsmi marketinq materialları, məhsul təminatı, tədbir büdcəsi və mentor köməkliyi göstərir.
+                Hər bir nümayəndə mütəmadi olaraq görülən işlər barədə hesabat hazırlayır, tələbələrin rəy və təkliflərini şirkətin marketinq departamentinə ötürərək növbəti addımların formalaşmasında iştirak edir.
               </p>
             </div>
             <div class="info-card">
-              <div class="ic-icon"><i class="fa-solid fa-network-wired"></i></div>
-              <div class="ic-title">Çevik İdarəetmə</div>
+              <div class="ic-icon"><i class="fa-solid fa-users-gear"></i></div>
+              <div class="ic-title">Resursların Optimizasiyası</div>
               <p class="ic-desc">
-                Mərkəzi marketinq strategiyası ilə yerli tələbə təşəbbüslərinin birləşdiyi dinamik və sürətli qərarvermə mexanizmi.
+                Hər universitetin öz mühitinə uyğun olaraq məhsul təminatı və reklam büdcələri fərdi şəkildə ayrılır ki, bu da resurslardan maksimum səmərəli istifadə edilməsinə imkan verir.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 5: Selection Criteria -->
+      <!-- Slide 5: Selection Process -->
       <div class="slide" id="slide-5">
         <div>
-          <span class="slide-subtitle">04 / SEÇİM PROSESİ</span>
-          <h2>Nümayəndələrin Seçilməsi və <span class="title-gradient-avrora">Dəyərləndirilməsi</span></h2>
+          <span class="slide-subtitle">04 / SEÇİM VƏ QİYMƏTLƏNDİRMƏ</span>
+          <h2>Ambassador-ların Seçilməsi və <span class="title-gradient-avrora">Liderlik Kriteriyaları</span></h2>
         </div>
         <div class="slide-body">
-          <div class="slide-text">
-            <p class="slide-desc">
-              Layihənin uğuru birbaşa seçilən Campus Ambassador-ların liderlik keyfiyyətlərindən asılıdır. Seçim prosesi yalnız dərslərlə məhdudlaşmır, tələbənin sosial aktivliyinə əsaslanır:
-            </p>
-            <div class="details-panel">
-              <div class="detail-card">
-                <div class="dc-title"><i class="fa-solid fa-clipboard-user"></i>Çoxmərhələli Seçim Mərhələsi</div>
-                <div class="dc-desc">
-                  Namizədlər ilk öncə onlayn müraciət forması doldurur, motivasiya məktubu təqdim edir və yekun olaraq HR və Marketinq komandası ilə fərdi müsahibə mərhələsindən keçirlər.
-                </div>
-              </div>
-              <div class="detail-card bizon-accent">
-                <div class="dc-title"><i class="fa-solid fa-star"></i>Əsas Qiymətləndirmə Meyarları</div>
-                <div class="dc-desc">
-                  Tələbənin universitet mühitindəki nüfuzu, liderlik potensialı, tədbir təşkilatçılığı təcrübəsi, tələbə təşkilatlarındakı fəallığı və sosial media aktivliyi əsas götürülür.
-                </div>
+          <p class="slide-desc">
+            Layihənin uğuru birbaşa seçilən Campus Ambassador-ların şəxsi keyfiyyətlərindən asılıdır. Buna görə də seçim prosesi olduqca ciddi, ədalətli və çoxmərhələli şəkildə təşkil edilir:
+          </p>
+          <div class="details-panel">
+            <div class="detail-card">
+              <div class="dc-title"><i class="fa-solid fa-user-check"></i>Akademik Qiymətlərdən Kənar Dəyərləndirmə</div>
+              <div class="dc-desc">
+                Seçim zamanı yalnız akademik qiymətlərə baxılmır; tələbənin liderlik potensialı, təşəbbüskarlığı, kommunikasiya bacarıqları və universitet mühitindəki nüfuzu əsas götürülür.
               </div>
             </div>
-          </div>
-          <div class="slide-visual">
-            <div class="showcase-img-box" style="border-color: var(--avrora-blue);">
-              <img class="showcase-img" src="/images/avrora_logo.png" alt="Avrora Group" style="object-fit: contain; padding: 30px;">
+            <div class="detail-card bizon-accent">
+              <div class="dc-title"><i class="fa-solid fa-filter"></i>Üç Mərhələli Seçim Süzgəci</div>
+              <div class="dc-desc">
+                Namizədlər ilk öncə ətraflı onlayn müraciət forması doldurur, motivasiya məktubu təqdim edirlər. İkinci mərhələdə onların sosial media aktivliyi və təşkilatçılıq təcrübələri yoxlanılır. Son mərhələdə isə fərdi müsahibə aparılır.
+              </div>
+            </div>
+            <div class="detail-card">
+              <div class="dc-title"><i class="fa-solid fa-bullseye"></i>Tədbir və Klub Təcrübəsi</div>
+              <div class="dc-desc">
+                Universitetin Tələbə Gənclər Təşkilatında (TGT), tələbə klublarında fəallıq göstərən, əvvəllər tədbir təşkil etmiş və komanda ilə işləmə bacarığı olan namizədlərə üstünlük verilir.
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 6: Ambassador Benefits -->
+      <!-- Slide 6: Incentives & Benefits -->
       <div class="slide" id="slide-6">
         <div>
-          <span class="slide-subtitle">05 / BİZİM TƏKLİFİMİZ</span>
-          <h2>Ambassador-lar üçün <span class="title-gradient-bizon">İnkişaf və Motivasiya</span></h2>
+          <span class="slide-subtitle">05 / SƏFİRLƏRİN QAZANCLARI</span>
+          <h2>Şəxsi İnkişaf, Təqaüd və <span class="title-gradient-bizon">Motivasiya Sistemi</span></h2>
         </div>
         <div class="slide-body">
-          <div class="slide-text">
-            <p class="slide-desc">
-              Bizon Campus Ambassador Program gənclərin şəxsi və peşəkar inkişafını dəstəkləyən, onlara real iş mühiti təcrübəsi qazandıran bir platformadır:
-            </p>
-            <div class="details-panel">
-              <div class="detail-card bizon-accent">
-                <div class="dc-title"><i class="fa-solid fa-sack-dollar"></i>Aylıq Maliyyə Dəstəyi (Təqaüd)</div>
-                <div class="dc-desc">
-                  Proqram çərçivəsində sərf edilən vaxt və əməyin qarşılığı olaraq hər bir Campus Ambassador-a aylıq maliyyə təqaüdü ödənilir. Bu, gənclərin layihəyə bağlılığını artırır.
-                </div>
-              </div>
-              <div class="detail-card">
-                <div class="dc-title"><i class="fa-solid fa-users-gear"></i>Professional Network & Festivallar</div>
-                <div class="dc-desc">
-                  Nümayəndələr ölkə səviyyəli iri idman tədbirlərində, festivallarda və brend təqdimatlarında iştirak edir, peşəkar mütəxəssislərlə geniş əlaqələr qururlar.
-                </div>
+          <p class="slide-desc">
+            Bizon Campus Ambassador Program sadəcə bir könüllülük layihəsi deyil. Bu proqram gənclərin gələcək karyeralarına böyük töhfə verən və onları maddi-mənəvi olaraq stimullaşdıran real inkişaf platformasıdır:
+          </p>
+          <div class="details-panel">
+            <div class="detail-card bizon-accent">
+              <div class="dc-title"><i class="fa-solid fa-hand-holding-dollar"></i>Aylıq Maliyyə Təqaüdü (Stipend)</div>
+              <div class="dc-desc">
+                Nümayəndələrin layihəyə ayırdıqları vaxtı, əməyi və göstərdikləri aktiv fəaliyyəti qiymətləndirmək və onların uzunmüddətli motivasiyasını saxlamaq üçün hər birinə aylıq rəsmi maliyyə dəstəyi təqdim olunur.
               </div>
             </div>
-          </div>
-          <div class="slide-visual">
-            <div class="info-grid">
-              <div class="info-card">
-                <div class="stat-number">Stipend</div>
-                <div class="stat-label">Aylıq Ödəniş</div>
-                <p class="ic-desc" style="margin-top: 8px;">Tələbənin əməyini qiymətləndirmək və motivasiyanı saxlamaq üçün ayrılan maddi dəstək.</p>
+            <div class="detail-card">
+              <div class="dc-title"><i class="fa-solid fa-compass-drafting"></i>Professional Karyera və Mentorluq</div>
+              <div class="dc-desc">
+                Uğurlu tələbələrə Avrora Group daxilində təcrübə (internship) keçmək və gələcəkdə birbaşa işə qəbul olmaq imkanı yaradılır. Şirkətin peşəkar marketoloqları tərəfindən onlara daimi mentorluq dəstəyi verilir.
               </div>
-              <div class="info-card bizon-hover">
-                <div class="stat-number bizon-stat">Awards</div>
-                <div class="stat-label">İlin Ən Yaxşıları</div>
-                <p class="ic-desc" style="margin-top: 8px;">"Best Ambassador", "Best Event" üzrə pul mükafatları və şirkət rəhbərliyi ilə görüş imkanı.</p>
+            </div>
+            <div class="detail-card bizon-accent">
+              <div class="dc-title"><i class="fa-solid fa-award"></i>İlin Ən Yaxşılarının Mükafatlandırılması</div>
+              <div class="dc-desc">
+                Tədris ilinin sonunda "Best Campus Ambassador", "Best Event" və "Best Innovation" nominasiyaları üzrə fərqlənən qaliblər xüsusi qiymətli hədiyyələr, sertifikatlar, bonuslar və şirkət rəhbərliyi ilə görüş şansı qazanırlar.
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 7: Event Support Mechanism -->
+      <!-- Slide 7: Event Support & Budgeting -->
       <div class="slide" id="slide-7">
         <div>
-          <span class="slide-subtitle">06 / TƏŞKİLATİ DƏSTƏK</span>
-          <h2>Tədbirlərin Keçirilməsi və <span class="title-gradient-avrora">Maliyyə Mexanizmi</span></h2>
+          <span class="slide-subtitle">06 / RESURS TƏMİNATI</span>
+          <h2>Tədbirlərin Keçirilməsi və <span class="title-gradient-avrora">Bizon Dəstək Mexanizmi</span></h2>
         </div>
         <div class="slide-body">
-          <div class="slide-text">
-            <p class="slide-desc">
-              Bizon sadəcə təşəbbüskar deyil, həm də tədbirlərin təşkilində, maliyyələşməsində və material təminatında əsas tərəfdaşdır:
-            </p>
-            <div class="details-panel">
-              <div class="detail-card">
-                <div class="dc-title"><i class="fa-solid fa-palette"></i>Vizual və Brend Material Dəstəyi</div>
-                <div class="dc-desc">
-                  Hər bir tədbir üçün xüsusi roll-up bannerlər, stendlər, geyimlər, hədiyyəlik promo məhsullar və çap materialları Bizon tərəfindən tam qarşılanır.
-                </div>
-              </div>
-              <div class="detail-card bizon-accent">
-                <div class="dc-title"><i class="fa-solid fa-wallet"></i>Təsdiqlənmiş Tədbir Büdcələri</div>
-                <div class="dc-desc">
-                  Tədbirin miqyasına, məqsədinə və gözlənilən iştirakçı sayına uyğun olaraq layihələr qiymətləndirilir və təsdiqlənmiş tədbirlər üçün birbaşa maliyyə büdcəsi ayrılır.
-                </div>
+          <p class="slide-desc">
+            Bizon, tələbə nümayəndələrinin təklif etdiyi hər bir yaradıcı layihəyə sadəcə ideya səviyyəsində yanaşmır, həm də onların tam rəsmi maliyyələşdirilməsi və təşkilatı koordinasiyasında əsas tərəfdaş kimi çıxış edir:
+          </p>
+          <div class="details-panel">
+            <div class="detail-card">
+              <div class="dc-title"><i class="fa-solid fa-shirt"></i>Brending və Vizual Material Təminatı</div>
+              <div class="dc-desc">
+                Tədbirlər üçün lazım olan bütün növ roll-up bannerlər, stendlər, geyimlər (Bizon t-shirt, papaqlar), tələbələr üçün xüsusi promo hədiyyələr, dekorasiya elementləri və çap materialları şirkət tərəfindən tam təmin edilir.
               </div>
             </div>
-          </div>
-          <div class="slide-visual">
-            <div class="chart-box">
-              <div class="chart-header">
-                <span>Tədbir Dəstək Payı</span>
-                <span style="color: var(--bizon-green);"><i class="fa-solid fa-circle-check"></i> 100% Sponsorluq</span>
+            <div class="detail-card bizon-accent">
+              <div class="dc-title"><i class="fa-solid fa-wallet"></i>Fərdi Büdcə və Maliyyələşdirmə</div>
+              <div class="dc-desc">
+                Hər bir tədbirin miqyasına, gözlənilən iştirakçı sayına və verəcəyi faydaya uyğun olaraq əvvəlcədən xərclər qiymətləndirilir. Təsdiq edilmiş layihələr üçün Bizon tərəfindən xüsusi tədbir büdcəsi ayrılır.
               </div>
-              <div class="chart-body">
-                <div class="chart-bar-container">
-                  <div class="chart-bar" style="height: 60px;"></div>
-                  <span class="chart-label">Brending</span>
-                </div>
-                <div class="chart-bar-container">
-                  <div class="chart-bar" style="height: 100px;"></div>
-                  <span class="chart-label">Məhsul</span>
-                </div>
-                <div class="chart-bar-container">
-                  <div class="chart-bar bizon-bar" style="height: 140px;"></div>
-                  <span class="chart-label">Maliyyə</span>
-                </div>
+            </div>
+            <div class="detail-card">
+              <div class="dc-title"><i class="fa-solid fa-users-viewfinder"></i>Peşəkar Komanda və Spiker Dəstəyi</div>
+              <div class="dc-desc">
+                Ehtiyac olduqda, Avrora Group-un daxili departamentlərinin rəhbərləri (marketinq, satış, HR) və dəvət olunmuş tanınmış spikerlər bu tədbirlərdə iştirak edərək öz təcrübələrini tələbələrlə bölüşürlər.
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 8: 5-Year Strategic Vision (Roadmap) -->
+      <!-- Slide 8: Strategic Vision -->
       <div class="slide" id="slide-8">
         <div>
-          <span class="slide-subtitle">07 / YOL XƏRİTƏSİ</span>
-          <h2>Proqramın 5 İllik <span class="title-gradient-avrora">Strateji İnkişaf Planı</span></h2>
+          <span class="slide-subtitle">07 / İNKİŞAF STRATEJİSİ</span>
+          <h2>Proqramın 5 İllik <span class="title-gradient-avrora">İnkişaf Yol Xəritəsi</span></h2>
         </div>
         <div class="slide-body">
+          <p class="slide-desc">
+            Bizon Campus Ambassador Program Azərbaycanın gənclər marketinqi sahəsində ən uğurlu və uzunmüddətli model olmaq üçün mərhələli şəkildə inkişaf etdirilir:
+          </p>
           <div class="timeline-container">
             <div class="timeline-node">
               <div class="tn-dot-box">
@@ -811,8 +767,8 @@
                 <div class="tn-line"></div>
               </div>
               <div class="tn-content">
-                <div class="tn-title">Mərhələ 1: Pilot Mərhələ və Seçim (2026)</div>
-                <div class="tn-desc">Bakı şəhərində yerləşən 5 əsas universitetdə Campus Ambassador-ların seçilməsi, təlimatlandırılması və ilk tələbə tədbirlərinin keçirilməsi.</div>
+                <div class="tn-title">Mərhələ 1: Pilot Layihə və Bakı Universitetləri (2026)</div>
+                <div class="tn-desc">Bakı şəhərində yerləşən 5 ən böyük dövlət və özəl universitetdə proqramın başladılması, nümayəndələrin seçilməsi və ilk tədbirlərin təşkil olunaraq sistemin sınaqdan keçirilməsi.</div>
               </div>
             </div>
             <div class="timeline-node bizon-node">
@@ -821,8 +777,8 @@
                 <div class="tn-line"></div>
               </div>
               <div class="tn-content">
-                <div class="tn-title">Mərhələ 2: Regional Universitetlərin Əhatə Olunması (2027-2028)</div>
-                <div class="tn-desc">Gəncə, Lənkəran, Sumqayıt və digər şəhərlərdə yerləşən bütün regional universitetlərin proqrama qoşulması və şəbəkənin 20+ ali təhsil müəssisəsinə çatdırılması.</div>
+                <div class="tn-title">Mərhələ 2: Regional Universitetlərin İnteqrasiyası (2027-2028)</div>
+                <div class="tn-desc">Gəncə, Sumqayıt, Lənkəran, Mingəçevir, Naxçıvan və digər regional şəhərlərdə yerləşən bütün universitetlərin proqrama daxil edilməsi ilə şəbəkənin 20-dən çox ali məktəbə çatdırılması.</div>
               </div>
             </div>
             <div class="timeline-node">
@@ -830,8 +786,8 @@
                 <div class="tn-dot"></div>
               </div>
               <div class="tn-content">
-                <div class="tn-title">Mərhələ 3: Rəqəmsal Səfirlər və Beynəlxalq Tələbə Şəbəkəsi (2029)</div>
-                <div class="tn-desc">Bizon təmsilçilərinin brend üçün sosial mediada rəqəmsal kontent yaradıcılarına (content creators) çevrilməsi və qonşu ölkələrin tələbə şəbəkələri ilə beynəlxalq mübadilə.</div>
+                <div class="tn-title">Mərhələ 3: Rəqəmsal Səfirlər və Beynəlxalq Layihələr (2029)</div>
+                <div class="tn-desc">Tələbə səfirlərinin sosial şəbəkələrdə Bizon brendi üçün əsas rəqəmsal kontent yaradıcılarına (influencer/creator) çevrilməsi və qonşu ölkələrin tələbələri ilə beynəlxalq təcrübə mübadiləsi proqramlarının yaradılması.</div>
               </div>
             </div>
           </div>
@@ -840,14 +796,14 @@
 
       <!-- Slide 9: Strategic Summary / Thank You -->
       <div class="slide" id="slide-9">
-        <div class="slide-body welcome-body">
-          <div class="badge-coop" style="font-size: 13px; margin-bottom: 20px; padding: 8px 24px;">AVRORA & BIZON ORTAQLIĞI</div>
-          <h1 style="font-family: var(--font-display); font-size: 50px; font-weight: 900; line-height: 1.15; margin-bottom: 20px;">
+        <div class="slide-body welcome-body" style="justify-content: center;">
+          <div class="badge-coop" style="font-size: 13px; margin-bottom: 20px; padding: 8px 24px;">AVRORA & BIZON BİRLİYİ</div>
+          <h1 style="font-family: var(--font-display); font-size: 46px; font-weight: 900; line-height: 1.2; margin-bottom: 20px;">
             Gələcəyin Enerjisini<br>
             Birlikdə <span class="title-gradient-bizon">Qururuq!</span>
           </h1>
-          <p style="font-size: 18px; color: var(--text-muted); max-width: 750px; margin: 0 auto 24px; line-height: 1.65;">
-            Avrora Group-un böyük distribütorluq, maliyyə və logistik dəstəyi ilə Bizon Energy-nin gənclik ruhunu birləşdirərək gələcək nəsillərə daha sadiq və etibarlı bir brend təqdim edirik.
+          <p style="font-size: 17.5px; color: var(--text-muted); max-width: 800px; margin: 0 auto 24px; line-height: 1.65;">
+            Avrora Group-un güclü maliyyə, istehsalat və logistik imkanları ilə Bizon Energy brendinin gənclik dinamikasını birləşdirərək gələcək nəsillərə daha sadiq, daha etibarlı və daxili istehsala söykənən qlobal bir tələbə şəbəkəsi qazandırırıq.
           </p>
           <p style="font-size: 15px; color: var(--text-muted); font-weight: 600;">Diqqətiniz üçün təşəkkür edirik!</p>
         </div>
