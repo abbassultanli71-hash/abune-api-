@@ -1081,8 +1081,13 @@
               <label>Şifrə</label>
               <input type="password" id="reg-password" placeholder="ən azı 6 simvol" autocomplete="new-password">
             </div>
+            <!-- OTP input container (hidden by default) -->
+            <div class="field" id="reg-otp-container" style="display: none;">
+              <label>Təsdiq Kodu (OTP)</label>
+              <input type="text" id="reg-otp" placeholder="6 rəqəmli kod">
+            </div>
             <div class="field-error" id="auth-register-error" style="margin-bottom: 8px;"></div>
-            <button class="btn btn-primary" style="width: 100%;" onclick="handleRegister()">Qeydiyyatdan Keç</button>
+            <button class="btn btn-primary" id="reg-submit-btn" style="width: 100%;" onclick="handleRegister()">Qeydiyyatdan Keç</button>
           </div>
         </div>
       </div>
@@ -1793,6 +1798,8 @@
     }
   }
 
+  let isOtpVerificationStep = false;
+
   // Handle Auth tab switching
   function toggleAuthTab(mode) {
     document.getElementById('tab-login-btn').classList.toggle('active', mode === 'login');
@@ -1801,6 +1808,18 @@
     document.getElementById('auth-register-view').style.display = mode === 'register' ? 'block' : 'none';
     document.getElementById('auth-login-error').classList.remove('show');
     document.getElementById('auth-register-error').classList.remove('show');
+
+    // Reset registration form state if tab changes
+    if (mode === 'login' || mode === 'register') {
+      isOtpVerificationStep = false;
+      document.getElementById('reg-otp-container').style.display = 'none';
+      document.getElementById('reg-username').parentElement.style.display = 'block';
+      document.getElementById('reg-ad').parentElement.style.display = 'block';
+      document.getElementById('reg-email').parentElement.style.display = 'block';
+      document.getElementById('reg-password').parentElement.style.display = 'block';
+      document.getElementById('reg-submit-btn').textContent = 'Qeydiyyatdan Keç';
+      document.getElementById('auth-register-error').style.color = '#ef4444'; // Reset color to red
+    }
   }
 
   // Login handler
@@ -1825,38 +1844,100 @@
     }
   }
 
-  // Register handler
+  // Register handler with 2-step OTP flow
   async function handleRegister() {
     const username = document.getElementById('reg-username').value.trim();
     const ad = document.getElementById('reg-ad').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
+    const otpContainer = document.getElementById('reg-otp-container');
+    const otpInput = document.getElementById('reg-otp');
+    const submitBtn = document.getElementById('reg-submit-btn');
     const errorEl = document.getElementById('auth-register-error');
 
     if (!username || !ad || !email || !password) {
+      errorEl.style.color = '#ef4444';
       errorEl.textContent = 'Bütün sahələr doldurulmalıdır.';
       errorEl.classList.add('show');
       return;
     }
     if (password.length < 6) {
+      errorEl.style.color = '#ef4444';
       errorEl.textContent = 'Şifrə ən azı 6 simvol olmalıdır.';
       errorEl.classList.add('show');
       return;
     }
 
-    const res = await apiFetch('POST', '/api/istifadeciler', { username, ad, email, password });
-    if (res.ok) {
-      const loginRes = await apiFetch('POST', '/api/istifadeciler/login', { username, password });
-      if (loginRes.ok && loginRes.data && loginRes.data.data && loginRes.data.data.user) {
-        currentUser = loginRes.data.data.user;
-        localStorage.setItem('abunelik_user', JSON.stringify(currentUser));
-        showApp();
+    if (!isOtpVerificationStep) {
+      // Step 1: Initiate registration (send OTP)
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Kod göndərilir...';
+      
+      const res = await apiFetch('POST', '/api/istifadeciler/register/initiate', { username, ad, email, password });
+      submitBtn.disabled = false;
+
+      if (res.ok) {
+        isOtpVerificationStep = true;
+        // Hide regular inputs to keep layout clean
+        document.getElementById('reg-username').parentElement.style.display = 'none';
+        document.getElementById('reg-ad').parentElement.style.display = 'none';
+        document.getElementById('reg-email').parentElement.style.display = 'none';
+        document.getElementById('reg-password').parentElement.style.display = 'none';
+        
+        // Show OTP field
+        otpContainer.style.display = 'block';
+        submitBtn.textContent = 'Kodu Təsdiqlə';
+        errorEl.textContent = 'Təsdiq kodu email ünvanınıza göndərildi. Zəhmət olmasa daxil edin.';
+        errorEl.style.color = '#10b981'; // Green message color
+        errorEl.classList.add('show');
       } else {
-        toggleAuthTab('login');
+        submitBtn.textContent = 'Qeydiyyatdan Keç';
+        errorEl.style.color = '#ef4444'; // Red error color
+        errorEl.textContent = res.data?.error?.message || 'Qeydiyyat zamanı xəta baş verdi.';
+        errorEl.classList.add('show');
       }
     } else {
-      errorEl.textContent = res.data?.error?.message || 'Qeydiyyat zamanı xəta baş verdi.';
-      errorEl.classList.add('show');
+      // Step 2: Verify OTP and complete registration
+      const otp = otpInput.value.trim();
+      if (!otp) {
+        errorEl.style.color = '#ef4444';
+        errorEl.textContent = 'Təsdiq kodunu daxil edin.';
+        errorEl.classList.add('show');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Təsdiqlənir...';
+
+      const res = await apiFetch('POST', '/api/istifadeciler/register/verify', { email, otp });
+      if (res.ok) {
+        // Auto login on successful registration
+        const loginRes = await apiFetch('POST', '/api/istifadeciler/login', { username, password });
+        submitBtn.disabled = false;
+        
+        // Reset registration fields state
+        isOtpVerificationStep = false;
+        otpContainer.style.display = 'none';
+        document.getElementById('reg-username').parentElement.style.display = 'block';
+        document.getElementById('reg-ad').parentElement.style.display = 'block';
+        document.getElementById('reg-email').parentElement.style.display = 'block';
+        document.getElementById('reg-password').parentElement.style.display = 'block';
+        submitBtn.textContent = 'Qeydiyyatdan Keç';
+
+        if (loginRes.ok && loginRes.data && loginRes.data.data && loginRes.data.data.user) {
+          currentUser = loginRes.data.data.user;
+          localStorage.setItem('abunelik_user', JSON.stringify(currentUser));
+          showApp();
+        } else {
+          toggleAuthTab('login');
+        }
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Kodu Təsdiqlə';
+        errorEl.style.color = '#ef4444';
+        errorEl.textContent = res.data?.error?.message || 'Təsdiq kodu yanlışdır və ya vaxtı bitib.';
+        errorEl.classList.add('show');
+      }
     }
   }
 
