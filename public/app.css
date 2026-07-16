@@ -33,7 +33,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); overflow: hidden; -webkit-font-smoothing: antialiased; }
 button { cursor: pointer; border: none; background: none; font-family: inherit; color: inherit; }
-input, select, textarea { font-family: inherit; color: inherit; }
+input, select, textarea { font-family: inherit; color: inherit; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
 a { cursor: pointer; }
 
 ::-webkit-scrollbar { width: 4px; }
@@ -102,8 +102,8 @@ a { cursor: pointer; }
 /* ==========================================================================
    MAIN APP LAYOUT
    ========================================================================== */
-.app-content { flex: 1; overflow-y: auto; padding-bottom: 80px; }
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(9,13,26,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0 12px; }
+.app-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(85px + env(safe-area-inset-bottom)); }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(9,13,26,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0 calc(12px + env(safe-area-inset-bottom)); }
 .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 12px; border-radius: var(--r-sm); font-size: 10px; font-weight: 500; color: var(--text3); transition: var(--transition); }
 .bnav-item i { width: 22px; height: 22px; }
 .bnav-item.active { color: var(--accent2); }
@@ -210,7 +210,7 @@ a { cursor: pointer; }
    ========================================================================== */
 .modal-overlay { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-end; background: rgba(4,7,18,0.6); backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
 .modal-overlay.open { opacity: 1; pointer-events: auto; }
-.modal-sheet { width: 100%; max-width: 600px; margin: 0 auto; background: var(--bg2); border: 1px solid var(--border2); border-radius: 24px 24px 0 0; padding: 0 20px 32px; max-height: 92vh; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
+.modal-sheet { width: 100%; max-width: 600px; margin: 0 auto; background: var(--bg2); border: 1px solid var(--border2); border-radius: 24px 24px 0 0; padding: 0 20px calc(32px + env(safe-area-inset-bottom)); max-height: 92vh; overflow-y: auto; -webkit-overflow-scrolling: touch; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
 .modal-overlay.open .modal-sheet { transform: translateY(0); }
 .modal-handle { width: 40px; height: 4px; background: var(--border2); border-radius: 4px; margin: 14px auto 20px; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
@@ -257,7 +257,8 @@ a { cursor: pointer; }
    ========================================================================== */
 .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
 .form-group label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); }
-.form-group input, .form-group select { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--r-sm); outline: none; transition: var(--transition); font-size: 14px; }
+.form-group input, .form-group select { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--r-sm); outline: none; transition: var(--transition); font-size: 16px; }
+.form-group select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 16px; padding-right: 40px !important; }
 .form-group input:focus, .form-group select:focus { border-color: var(--accent); background: rgba(255,255,255,0.05); box-shadow: 0 0 0 3px var(--accent-glow); }
 .input-icon-wrap { position: relative; }
 .input-icon-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text3); pointer-events: none; }

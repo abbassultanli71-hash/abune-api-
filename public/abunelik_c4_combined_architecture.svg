@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3800 1350" width="3800" height="1350" style="background:#0b0914; font-family:'Inter', sans-serif;">
+  <!-- Title Header -->
+  <text x="1900" y="70" fill="#FFFFFF" font-size="36" font-weight="bold" text-anchor="middle">Abunəm - Full System Architecture Suite (C4 Model)</text>
+  <text x="1900" y="110" fill="#a7a9c8" font-size="18" text-anchor="middle">Unified System Context, Container and Component Diagram</text>
+
+  <!-- L1 System Context Group -->
+  <g>
+    <rect x="30" y="160" width="1140" height="1140" rx="15" fill="rgba(255,255,255,0.01)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+    <text x="600" y="210" fill="#8B5CF6" font-size="24" font-weight="bold" text-anchor="middle">Level 1: System Context Diagram</text>
+    <image href="/Abunelik_C4_L1_Context_HD.svg" x="50" y="240" width="1100" height="1000" />
+  </g>
+
+  <!-- L2 Container Diagram Group -->
+  <g>
+    <rect x="1200" y="160" width="1240" height="1140" rx="15" fill="rgba(255,255,255,0.01)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+    <text x="1820" y="210" fill="#00D2FF" font-size="24" font-weight="bold" text-anchor="middle">Level 2: Container Diagram</text>
+    <image href="/Abunelik_C4_L2_Container_HD.svg" x="1220" y="240" width="1200" height="1000" />
+  </g>
+
+  <!-- L3 Component Diagram Group -->
+  <g>
+    <rect x="2470" y="160" width="1300" height="1140" rx="15" fill="rgba(255,255,255,0.01)" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+    <text x="3120" y="210" fill="#FFB800" font-size="24" font-weight="bold" text-anchor="middle">Level 3: Component Diagram</text>
+    <image href="/Abunelik_C4_L3_Components_HD.svg" x="2490" y="240" width="1260" height="1000" />
+  </g>
+</svg>

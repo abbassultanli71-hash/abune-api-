@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="1100" viewBox="0 0 750 1100">
+  <!-- Background -->
+  <rect width="750" height="1100" fill="#ffffff" />
+  
+  <defs>
+    <!-- Solid Line Arrowhead -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 2 L 10 5 L 0 8 Z" fill="#333333" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="375" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#333333">Subscription Platform — Container Diagram (Portrait)</text>
+
+  <!-- ================= ACTOR (Person - Dark Blue) ================= -->
+  <g transform="translate(100, 60)">
+    <rect width="180" height="85" fill="#08427b" stroke="#05325c" stroke-width="1.5" rx="3" />
+    <!-- Stick Figure / Person Icon -->
+    <circle cx="90" cy="22" r="7" fill="#ffffff" />
+    <path d="M 80 40 Q 90 28 100 40 Z" fill="#ffffff" />
+    <text x="90" y="54" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff">Müştəri / İstifadəçi</text>
+    <text x="90" y="67" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.5" fill="#e2e8f0">Abunəliklərini idarə edir</text>
+  </g>
+
+  <!-- ================= SYSTEM BOUNDARIES ================= -->
+  <!-- 1. Client Browser Boundary -->
+  <rect x="80" y="180" width="460" height="130" fill="none" stroke="#b5b5b5" stroke-dasharray="4,4" stroke-width="1.2" rx="3" />
+  <text x="95" y="198" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333333">Müştəri Cihazı və Brauzer <tspan font-weight="normal" fill="#666666" font-size="9">[SYSTEM]</tspan></text>
+
+  <!-- 2. Main Software System Boundary -->
+  <rect x="80" y="340" width="460" height="720" fill="none" stroke="#b5b5b5" stroke-dasharray="4,4" stroke-width="1.2" rx="3" />
+  <text x="95" y="358" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333333">Abunəlik Platforması (Abunəm) <tspan font-weight="normal" fill="#666666" font-size="9">[SYSTEM]</tspan></text>
+
+  <!-- 3. External Mail Boundary -->
+  <rect x="560" y="600" width="160" height="100" fill="none" stroke="#b5b5b5" stroke-dasharray="4,4" stroke-width="1.2" rx="3" />
+  <text x="575" y="618" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#333333">E-poçt Xidməti <tspan font-weight="normal" fill="#666666" font-size="8">[SYSTEM]</tspan></text>
+
+  <!-- 4. External Telegram Boundary -->
+  <rect x="560" y="720" width="160" height="100" fill="none" stroke="#b5b5b5" stroke-dasharray="4,4" stroke-width="1.2" rx="3" />
+  <text x="575" y="738" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#333333">Telegram Bot API <tspan font-weight="normal" fill="#666666" font-size="8">[SYSTEM]</tspan></text>
+
+  <!-- ================= CONTAINERS (Blue) ================= -->
+  <!-- 1. Web UI (Inside Browser) -->
+  <g transform="translate(100, 210)">
+    <rect width="180" height="70" fill="#378ADD" stroke="#185FA5" stroke-width="1.5" rx="3" />
+    <text x="90" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.5" fill="#e2e8f0">&lt;&lt;container&gt;&gt;</text>
+    <text x="90" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#ffffff">Web/Mobile Frontend</text>
+    <text x="90" y="49" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">[HTML, CSS, JS]</text>
+    <text x="90" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.5" fill="#ffffff">İstifadəçi interfeysi</text>
+  </g>
+
+  <!-- 2. API Gateway (Inside Browser - Right) -->
+  <g transform="translate(320, 210)">
+    <rect width="180" height="70" fill="#378ADD" stroke="#185FA5" stroke-width="1.5" rx="3" />
+    <text x="90" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.5" fill="#e2e8f0">&lt;&lt;container&gt;&gt;</text>
+    <text x="90" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#ffffff">REST API</text>
+    <text x="90" y="49" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">[Node.js + Express]</text>
+    <text x="90" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.5" fill="#ffffff">Mərkəzi API gateway</text>
+  </g>
+
+  <!-- ================= SERVICES (Inside Main Boundary) ================= -->
+  <!-- Column 1 (Left) -->
+  <!-- 3. User & Auth Service -->
+  <g transform="translate(100, 380)">
+    <rect width="180" height="70" fill="#378ADD" stroke="#185FA5" stroke-width="1.5" rx="3" />
+    <text x="90" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">&lt;&lt;container&gt;&gt;</text>
+    <text x="90" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#ffffff">Auth Module</text>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">[Node.js]</text>
+    <text x="90" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.5" fill="#ffffff">Giriş və qeydiyyat</text>
+  </g>
+
+  <!-- 4. Subscription Service -->
+  <g transform="translate(100, 490)">
+    <rect width="180" height="70" fill="#378ADD" stroke="#185FA5" stroke-width="1.5" rx="3" />
+    <text x="90" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">&lt;&lt;container&gt;&gt;</text>
+    <text x="90" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#ffffff">Subscription Module</text>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">[Node.js]</text>
+    <text x="90" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.5" fill="#ffffff">Abunəliklərin izlənməsi</text>
+  </g>
+
+  <!-- Column 2 (Right) -->
+  <!-- 5. Budget Service -->
+  <g transform="translate(320, 380)">
+    <rect width="180" height="70" fill="#378ADD" stroke="#185FA5" stroke-width="1.5" rx="3" />
+    <text x="90" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">&lt;&lt;container&gt;&gt;</text>
+    <text x="90" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#ffffff">Budget Module</text>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">[Node.js]</text>
+    <text x="90" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.5" fill="#ffffff">Büdcə limitləri</text>
+  </g>
+
+  <!-- 6. Cron Task Scheduler -->
+  <g transform="translate(320, 490)">
+    <rect width="180" height="70" fill="#378ADD" stroke="#185FA5" stroke-width="1.5" rx="3" />
+    <text x="90" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">&lt;&lt;container&gt;&gt;</text>
+    <text x="90" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#ffffff">Scheduler</text>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">[Cron Job]</text>
+    <text x="90" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.5" fill="#ffffff">Dövri yoxlanış tətikçisi</text>
+  </g>
+
+  <!-- 7. Notification Service -->
+  <g transform="translate(320, 600)">
+    <rect width="180" height="70" fill="#378ADD" stroke="#185FA5" stroke-width="1.5" rx="3" />
+    <text x="90" y="20" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">&lt;&lt;container&gt;&gt;</text>
+    <text x="90" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#ffffff">Notification Module</text>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#e2e8f0">[Node.js]</text>
+    <text x="90" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.5" fill="#ffffff">Xəbərdarlıqların hazırlanması</text>
+  </g>
+
+  <!-- ================= DATABASES (Cylinders - Grey) ================= -->
+  <!-- 8. PostgreSQL Database -->
+  <g transform="translate(100, 720)">
+    <path d="M 0 12 L 0 63 A 90 12 0 0 0 180 63 L 180 12 Z" fill="#888780" stroke="#5F5E5A" stroke-width="1.5" />
+    <ellipse cx="90" cy="12" rx="90" ry="12" fill="#888780" stroke="#5F5E5A" stroke-width="1.5" />
+    <text x="90" y="32" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" fill="#e2e8f0">&lt;&lt;container_db&gt;&gt;</text>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff">PostgreSQL DB</text>
+    <text x="90" y="59" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#e2e8f0">[DB / PostgreSQL]</text>
+  </g>
+
+  <!-- 9. Payment History / Audit DB -->
+  <g transform="translate(320, 720)">
+    <path d="M 0 12 L 0 63 A 90 12 0 0 0 180 63 L 180 12 Z" fill="#888780" stroke="#5F5E5A" stroke-width="1.5" />
+    <ellipse cx="90" cy="12" rx="90" ry="12" fill="#888780" stroke="#5F5E5A" stroke-width="1.5" />
+    <text x="90" y="32" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" fill="#e2e8f0">&lt;&lt;container_db&gt;&gt;</text>
+    <text x="90" y="47" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff">Payment Audit DB</text>
+    <text x="90" y="59" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#e2e8f0">[DB / Append-only]</text>
+  </g>
+
+  <!-- ================= EXTERNAL CONTAINERS (Orange) ================= -->
+  <!-- 10. SMTP Mail Service -->
+  <g transform="translate(570, 615)">
+    <rect width="140" height="70" fill="#EF9F27" stroke="#BA7517" stroke-width="1.5" rx="3" />
+    <text x="70" y="22" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" fill="#412402">Email Service</text>
+    <text x="70" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#412402">E-poçt Xidməti</text>
+    <text x="70" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#412402">Xəbərdarlıq emailləri</text>
+  </g>
+
+  <!-- 11. Telegram Bot API -->
+  <g transform="translate(570, 735)">
+    <rect width="140" height="70" fill="#EF9F27" stroke="#BA7517" stroke-width="1.5" rx="3" />
+    <text x="70" y="22" text-anchor="middle" font-family="Arial, sans-serif" font-size="9.5" fill="#412402">Telegram Bot API</text>
+    <text x="70" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#412402">Telegram Bot</text>
+    <text x="70" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#412402">Telegram bildirişləri</text>
+  </g>
+
+  <!-- ================= CONNECTIONS (Zero Intersections) ================= -->
+  <g stroke="#333333" stroke-width="1.1" fill="none">
+    <!-- User to Web UI -->
+    <path d="M 190 145 L 190 205" marker-end="url(#arrow)" />
+    
+    <!-- Web UI to API Gateway -->
+    <line x1="300" y1="245" x2="315" y2="245" marker-end="url(#arrow)" stroke-dasharray="2,2" />
+    
+    <!-- API Gateway to Services -->
+    <!-- to Auth Service -->
+    <path d="M 350 280 L 350 325 L 190 325 L 190 375" marker-end="url(#arrow)" />
+    <!-- to Subscription Service -->
+    <path d="M 350 280 L 350 325 L 70 325 L 70 440 L 190 440 L 190 485" marker-end="url(#arrow)" />
+    <!-- to Budget Service -->
+    <path d="M 440 280 L 440 325 L 410 325 L 410 375" marker-end="url(#arrow)" />
+    <!-- to Cron Task Scheduler -->
+    <path d="M 440 280 L 440 325 L 490 325 L 490 440 L 410 440 L 410 485" marker-end="url(#arrow)" />
+    <!-- to Notification Service -->
+    <path d="M 440 280 L 440 325 L 510 325 L 510 560 L 410 560 L 410 595" marker-end="url(#arrow)" />
+
+    <!-- Services to PostgreSQL DB (Unique Non-Overlapping Paths) -->
+    <!-- Auth to DB (Bypasses Subscription Service at Left Track X:70) -->
+    <path d="M 190 450 L 190 470 L 70 470 L 70 700 L 150 700 L 150 715" marker-end="url(#arrow)" />
+    <!-- Sub to DB (Straight vertical) -->
+    <line x1="190" y1="560" x2="190" y2="715" marker-end="url(#arrow)" />
+    <!-- Budget to DB (Bypasses at X:290) -->
+    <path d="M 410 450 L 410 470 L 290 470 L 290 700 L 230 700 L 230 715" marker-end="url(#arrow)" />
+    <!-- Cron to DB (Bypasses at X:290) -->
+    <path d="M 410 560 L 410 580 L 290 580 L 290 700 L 210 700 L 210 715" marker-end="url(#arrow)" />
+    <!-- Notification to DB (Bypasses at X:290) -->
+    <path d="M 410 670 L 410 690 L 290 690 L 290 700 L 170 700 L 170 715" marker-end="url(#arrow)" />
+
+    <!-- Sub to Payment DB (Bypasses at X:290) -->
+    <path d="M 230 560 L 230 580 L 290 580 L 290 700 L 370 700 L 370 715" marker-end="url(#arrow)" />
+
+    <!-- Cron Scheduler to Notification Service (Straight vertical) -->
+    <line x1="410" y1="560" x2="410" y2="595" marker-end="url(#arrow)" />
+
+    <!-- Notification Service to SMTP (Straight horizontal) -->
+    <line x1="500" y1="650" x2="565" y2="650" marker-end="url(#arrow)" />
+    <!-- Notification Service to Telegram Bot (Orthogonal path) -->
+    <path d="M 500 650 L 520 650 L 520 770 L 565 770" marker-end="url(#arrow)" />
+  </g>
+
+  <!-- Labels -->
+  <g font-family="Arial, sans-serif" font-size="8.5" fill="#333333" font-weight="bold">
+    <text x="200" y="170">İdarə edir [HTTPS]</text>
+    <text x="325" y="235">API sorğuları [JSON]</text>
+    
+    <text x="210" y="315">validate/create</text>
+    <text x="375" y="315">accept</text>
+    <text x="475" y="315">check</text>
+    
+    <text x="95" y="475">read/write [db]</text>
+    <text x="245" y="575">read/write [db]</text>
+    <text x="315" y="575">read [db]</text>
+    
+    <text x="420" y="582">trigger [internal]</text>
+    <text x="512" y="642">send [SMTP]</text>
+    <text x="512" y="742">send [Bot API]</text>
+  </g>
+</svg>

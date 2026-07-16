@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="az" data-theme="dark">
 <head>
@@ -13,36 +12,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b0d10;
-    --surface: #14171c;
-    --surface-2: #191d24;
-    --surface-3: #22272f;
-    --border: rgba(232,236,244,0.07);
-    --border-strong: rgba(232,236,244,0.16);
+    --bg: #0b0914;
+    --surface: rgba(22, 20, 36, 0.65);
+    --surface-2: rgba(30, 28, 50, 0.7);
+    --surface-3: rgba(45, 42, 75, 0.75);
+    --border: rgba(255, 255, 255, 0.07);
+    --border-strong: rgba(255, 255, 255, 0.15);
     --ink: #f5f7fa;
-    --ink-muted: #9aa3b2;
-    --ink-faint: #626b7a;
+    --ink-muted: #a5a6c2;
+    --ink-faint: #737599;
     --gold: #f5c46b;
-    --teal: #4fd1c5;
-    --coral: #ff7a6b;
-    --purple: #b39dff;
+    --teal: #1fe0c2;
+    --coral: #ff5b45;
+    --purple: #6952e0;
     --pink: #ff8fb8;
-    --blue: #7cb8ff;
-    --lime: #c8f560;
-    --gold-soft: rgba(245,196,107,0.14);
-    --teal-soft: rgba(79,209,197,0.14);
-    --coral-soft: rgba(255,122,107,0.15);
-    --purple-soft: rgba(179,157,255,0.16);
-    --pink-soft: rgba(255,143,184,0.15);
-    --blue-soft: rgba(124,184,255,0.16);
-    --lime-soft: rgba(200,245,96,0.18);
-    --accent: var(--lime);
-    --accent-soft: var(--lime-soft);
-    --accent-grad: linear-gradient(135deg, #e6ffb0 0%, #c8f560 45%, #9fdb2e 100%);
-    --hero-grad: linear-gradient(140deg, #1a1f2a 0%, #232a38 55%, #2f3a4d 100%);
-    --glow-accent: 0 12px 32px -10px rgba(200,245,96,0.42);
-    --glow-coral: 0 12px 32px -10px rgba(255,122,107,0.45);
-    --shadow: 0 24px 60px -24px rgba(0,0,0,0.75);
+    --blue: #00c9ff;
+    --lime: #1fe0c2;
+    --gold-soft: rgba(245, 196, 107, 0.12);
+    --teal-soft: rgba(31, 224, 194, 0.12);
+    --coral-soft: rgba(255, 91, 69, 0.12);
+    --purple-soft: rgba(105, 82, 224, 0.15);
+    --pink-soft: rgba(255, 143, 184, 0.12);
+    --blue-soft: rgba(0, 201, 255, 0.12);
+    --lime-soft: rgba(31, 224, 194, 0.15);
+    --accent: var(--teal);
+    --accent-soft: var(--teal-soft);
+    --accent-grad: linear-gradient(135deg, #1fe0c2 0%, #00c9ff 100%);
+    --hero-grad: linear-gradient(140deg, #1d1836 0%, #120e23 60%, #0b0914 100%);
+    --glow-accent: 0 12px 32px -10px rgba(31, 224, 194, 0.35);
+    --glow-coral: 0 12px 32px -10px rgba(255, 91, 69, 0.38);
+    --shadow: 0 20px 48px -18px rgba(0,0,0,0.65);
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Inter', -apple-system, system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
@@ -246,6 +245,36 @@
   }
   .icon-round svg { width: 17px; height: 17px; }
 
+  /* ---- Dashboard Budget Card (Figma Style) ---- */
+  .dashboard-budget-card {
+    margin: 0 20px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .db-left { display: flex; flex-direction: column; gap: 4px; }
+  .db-eyebrow { font-size: 11px; color: var(--ink-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .db-spent { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--ink); }
+  .db-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); }
+  .db-action {
+    margin-top: 8px; font-size: 11.5px; color: var(--teal); font-weight: 600;
+    display: flex; align-items: center; gap: 4px; cursor: pointer;
+  }
+  .db-action svg { width: 12px; height: 12px; transition: transform 0.2s; }
+  .db-action:hover svg { transform: translateX(2px); }
+  .db-right { width: 90px; height: 90px; position: relative; }
+  .db-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .db-ring-track { fill: none; stroke: var(--surface-3); stroke-width: 10; }
+  .db-ring-fill { fill: none; stroke: url(#dbRingGrad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset 0.6s ease; }
+  .db-ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
+
   /* ---- Horizontal scroll stat cards ---- */
   .stat-scroll {
     display: flex; gap: 10px; padding: 0 20px 4px;
@@ -257,6 +286,8 @@
     padding: 14px 16px; min-width: 148px; flex-shrink: 0;
     display: flex; flex-direction: column; gap: 8px;
     box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .stat-icon { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
   .stat-icon svg { width: 14px; height: 14px; }
@@ -270,13 +301,15 @@
   .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .stat-value small { font-size: 12px; color: var(--ink-faint); font-weight: 500; }
   .stat-card-accent { border-color: var(--purple-soft); box-shadow: var(--shadow), inset 0 0 0 1px rgba(167,139,250,0.12); }
-
+ 
   /* ---- Signature: payment ruler ---- */
   .ruler-card {
     margin: 18px 20px 6px;
     background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
     padding: 18px 18px 20px;
     box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     position: relative;
     overflow: hidden;
   }
@@ -325,6 +358,8 @@
     border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
     cursor: pointer;
     box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition: background 0.2s ease, transform 0.15s ease, border-color 0.15s ease;
   }
   .sub-row:active { background: var(--surface-2); transform: scale(0.99); }
@@ -391,12 +426,15 @@
   .badge-success { background: var(--teal-soft); color: var(--teal); font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
   .badge-fail { background: var(--coral-soft); color: var(--coral); font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
 
-  /* ---- Notifications ---- */
   .notif-item {
     display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 14px; padding: 13px 14px; margin-bottom: 8px;
     box-shadow: var(--shadow);
+    transition: background-color 0.15s ease, transform 0.1s ease;
   }
+  .notif-item.clickable { cursor: pointer; }
+  .notif-item.clickable:hover { background: var(--surface-2); }
+  .notif-item.clickable:active { transform: scale(0.98); }
   .notif-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
   .notif-title { font-size: 12.5px; font-weight: 600; }
   .notif-msg { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
@@ -467,6 +505,8 @@
     display: flex;
     padding: 8px 6px;
     box-shadow: 0 16px 36px -14px rgba(105,82,224,0.35), var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .tab-item {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
@@ -578,14 +618,19 @@
     transform: scale(1.2);
   }
 
+  body.sheet-open {
+    overflow: hidden;
+  }
+
   /* ---- Modal (bottom sheet) ---- */
   .sheet-overlay {
     position: absolute; inset: 0; background: rgba(6,6,8,0.55);
     display: none; align-items: flex-end; z-index: 40;
+    overflow: hidden;
   }
   .sheet-overlay.open { display: flex; }
   .sheet {
-    width: 100%; background: var(--surface); border-radius: 24px 24px 0 0;
+    width: 100%; background: #110f20; border-radius: 24px 24px 0 0;
     padding: 10px 20px calc(22px + var(--safe-bottom));
     max-height: 82%; overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -616,6 +661,15 @@
   }
   .field-error.show { display: block; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-row-inline { display: flex; gap: 8px; align-items: stretch; }
+  .field-row-inline select { flex: 1; min-width: 0; }
+  .add-card-inline-btn {
+    flex-shrink: 0; width: 42px; display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 10px; cursor: pointer; font-size: 21px; font-weight: 600; line-height: 1;
+    transition: transform 0.12s ease;
+  }
+  .add-card-inline-btn:active { transform: scale(0.92); }
   .sheet-actions { display: flex; gap: 10px; margin-top: 8px; }
   .btn {
     flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -661,10 +715,13 @@
   }
   .logo-badge {
     width: 64px; height: 64px; border-radius: 20px;
-    background: var(--accent-grad);
+    background: rgba(20, 20, 35, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 12px;
-    box-shadow: var(--glow-accent);
+    box-shadow: 0 12px 32px rgba(105, 82, 224, 0.28), inset 0 0 12px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     animation: logoPop 0.45s cubic-bezier(.16,.84,.44,1) both, glowBreathe 3.2s ease-in-out 0.45s infinite;
   }
   .auth-logo-area h2 { animation: riseIn 0.4s ease 0.12s both; }
@@ -720,6 +777,8 @@
     border-radius: 20px;
     padding: 20px;
     box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   /* ---- Real mobil ekranlarda: telefon çərçivəsini ləğv et, tam ekran ol ---- */
@@ -728,8 +787,205 @@
     .phone {
       width: 100%; height: 100vh; height: 100dvh;
       border: none; border-radius: 0; box-shadow: none;
+      padding-top: calc(10px + var(--safe-top));
     }
     .notch { display: none; }
+    .statusbar { display: none; }
+
+    /* Mobil ekranlar üçün yığcam ölçülər (HD/Scale down) */
+    .hero-panel { margin: 8px 16px 12px; padding: 18px 16px 18px; }
+    .hero-title { font-size: 21px; }
+    .stat-scroll { padding: 0 16px 4px; gap: 8px; }
+    .stat-card { padding: 10px 12px; min-width: 132px; gap: 6px; border-radius: 12px; }
+    .stat-icon { width: 24px; height: 24px; border-radius: 6px; }
+    .stat-value { font-size: 17px; }
+    .ruler-card { margin: 12px 16px 6px; padding: 14px 14px 16px; border-radius: 16px; }
+    .section { padding: 12px 16px 4px; }
+    .sub-row { padding: 10px 12px; margin-bottom: 6px; border-radius: 12px; gap: 10px; }
+    .sub-icon { width: 36px; height: 36px; border-radius: 10px; }
+    .sub-price { font-size: 13px; }
+    .tabbar {
+      left: 10px; right: 10px; bottom: calc(6px + var(--safe-bottom));
+      padding: 6px 4px; border-radius: 18px;
+    }
+    .tab-item { padding: 4px 0; gap: 2px; }
+    .tab-item svg { width: 18px; height: 18px; }
+    .tab-item.active::before { height: 30px; border-radius: 10px; }
+    .screen { padding-bottom: 84px; }
+  }
+
+  /* ---- Live Preview Card Mockup Styles ---- */
+  .preview-card-container {
+    perspective: 1000px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 10px 0 20px;
+  }
+  .preview-card {
+    width: 290px;
+    height: 170px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 16px;
+  }
+  .preview-card.flipped {
+    transform: rotateY(180deg);
+  }
+  .preview-card-front, .preview-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 16px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  }
+  .preview-card-front {
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.03) 60%, rgba(255,255,255,0.0) 100%), 
+                linear-gradient(210deg, #1e1948 0%, #110e25 100%);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.65), inset 0 1px 1px rgba(255,255,255,0.25);
+  }
+  .preview-card-front::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+    transform: skewX(-25deg);
+    transition: 0.75s ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .preview-card:hover .preview-card-front::before {
+    left: 150%;
+  }
+  .preview-card-glow {
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .preview-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+  }
+  .preview-bank-name {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--ink);
+    opacity: 0.85;
+    text-transform: uppercase;
+  }
+  .preview-brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 22px;
+    z-index: 2;
+  }
+  .preview-card-chip {
+    width: 32px;
+    height: 24px;
+    background: transparent;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+    z-index: 2;
+  }
+  .preview-card-number {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--ink);
+    margin: 12px 0 6px;
+    z-index: 2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .preview-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    z-index: 2;
+  }
+  .preview-label {
+    font-size: 7px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .preview-value {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .preview-card-back {
+    background: rgba(16, 14, 30, 0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px 0;
+  }
+  .preview-card-strip {
+    width: 100%;
+    height: 34px;
+    background: #070510;
+    margin-top: 10px;
+  }
+  .preview-card-signature-area {
+    padding: 0 20px;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .preview-card-signature {
+    width: 100%;
+    height: 28px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    position: relative;
+  }
+  .preview-card-cvv-box {
+    position: absolute;
+    right: 30px;
+    background: #ffffff;
+    color: #070510;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+    margin-top: 2px;
+  }
+  .preview-card-back-text {
+    font-size: 7px;
+    color: var(--ink-faint);
+    text-align: center;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
   }
 </style>
 </head>
@@ -754,7 +1010,35 @@
         <div class="auth-container">
           <div class="auth-logo-area">
             <div class="logo-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="logo-mark"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" class="logo-mark">
+                <defs>
+                  <linearGradient id="logo-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FF5B45" />
+                    <stop offset="100%" stop-color="#6952E0" />
+                  </linearGradient>
+                  <linearGradient id="logo-grad-2" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#1FE0C2" />
+                    <stop offset="100%" stop-color="#00C9FF" />
+                  </linearGradient>
+                </defs>
+                <!-- 3D Loop - Back portion -->
+                <path d="M4 12a8 8 0 0 1 12.8-6.4" stroke="url(#logo-grad-2)" stroke-width="2.2" stroke-linecap="round" />
+                
+                <!-- The Credit Card -->
+                <g style="filter: drop-shadow(0 4px 10px rgba(105, 82, 224, 0.25))">
+                  <rect x="5" y="8" width="14" height="9" rx="1.8" stroke="url(#logo-grad-1)" stroke-width="2" fill="rgba(20, 20, 35, 0.85)" />
+                  <!-- Card Stripe -->
+                  <line x1="5" y1="11" x2="19" y2="11" stroke="url(#logo-grad-1)" stroke-width="1.8" />
+                  <!-- Chip / Details -->
+                  <rect x="7" y="14" width="2" height="1.5" rx="0.5" fill="#1FE0C2" opacity="0.8" />
+                  <line x1="14" y1="14" x2="17" y2="14" stroke="#FFF" stroke-width="1" opacity="0.6" />
+                </g>
+                
+                <!-- 3D Loop - Front portion wrapping around the card with an arrow head -->
+                <path d="M20 12a8 8 0 0 1-12.8 6.4" stroke="url(#logo-grad-2)" stroke-width="2.2" stroke-linecap="round" />
+                <!-- Arrow tip on the front loop -->
+                <path d="M8 15.5l-2.5 3 3 2.5" stroke="url(#logo-grad-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
             </div>
             <h2>Abunəm</h2>
             <p data-i18n="auth_subtitle">Abunəliklərinizi asanlıqla idarə edin</p>
@@ -815,6 +1099,31 @@
               <div class="hero-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
             </div>
             <div class="hero-avatar" id="hero-avatar-initials" onclick="switchScreen('settings')" title="Ayarlar">U.U</div>
+          </div>
+        </div>
+
+        <div class="dashboard-budget-card" onclick="switchScreen('budget')" style="cursor:pointer;" title="Büdcəyə keç">
+          <div class="db-left">
+            <div class="db-eyebrow" data-i18n="stat_monthly">Aylıq Xərc</div>
+            <div class="db-spent" id="db-budget-spent">₼0.00</div>
+            <div class="db-limit" id="db-budget-limit">/ ₼300.00</div>
+            <div class="db-action">
+              <span data-i18n="budget_details">Büdcə təfərrüatı</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+          </div>
+          <div class="db-right">
+            <svg class="db-ring" viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="dbRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#1fe0c2"/>
+                  <stop offset="100%" stop-color="#00c9ff"/>
+                </linearGradient>
+              </defs>
+              <circle class="db-ring-track" cx="50" cy="50" r="40"></circle>
+              <circle class="db-ring-fill" id="db-ring-fill" cx="50" cy="50" r="40" stroke="url(#dbRingGrad)"></circle>
+            </svg>
+            <div class="db-ring-pct" id="db-ring-pct">0%</div>
           </div>
         </div>
 
@@ -933,9 +1242,8 @@
             <svg class="budget-ring" viewBox="0 0 120 120">
               <defs>
                 <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#a78bfa"/>
-                  <stop offset="55%" stop-color="#f472b6"/>
-                  <stop offset="100%" stop-color="#ffb020"/>
+                  <stop offset="0%" stop-color="#1fe0c2"/>
+                  <stop offset="100%" stop-color="#00c9ff"/>
                 </linearGradient>
               </defs>
               <circle class="budget-ring-track" cx="60" cy="60" r="52"></circle>
@@ -977,10 +1285,9 @@
             <label data-i18n="budget_limit_label">Limit məbləği</label>
             <input type="number" id="budget-limit-input" step="0.01" placeholder="300.00">
           </div>
-          <div class="field" style="padding:0 16px;">
-            <label data-i18n="budget_spent_label">Xərclənib (hesab_mebleqi)</label>
-            <input type="number" id="budget-spent-input" step="0.01" placeholder="0.00" readonly>
-          </div>
+          <!-- hesab_mebleqi avtomatik hesablanır — istifadəçi redaktə edə bilməz -->
+          <input type="hidden" id="budget-spent-input" value="0">
+
           <div class="field" style="padding:0 16px 14px;">
             <label data-i18n="budget_currency_label">Valyuta</label>
             <select id="budget-currency-input">
@@ -1147,6 +1454,17 @@
           <button class="sheet-close" onclick="closeSheet()">✕</button>
         </div>
         <div class="field"><label data-i18n="field_name">Ad</label><input type="text" id="new-sub-name" placeholder="məs. Netflix"></div>
+        <!-- Account Credentials for validation -->
+        <div class="field-row">
+          <div class="field">
+            <label>Hesab Email</label>
+            <input type="email" id="new-sub-email" placeholder="netflix@test.com">
+          </div>
+          <div class="field">
+            <label>Hesab Şifrə</label>
+            <input type="password" id="new-sub-password" placeholder="••••••••">
+          </div>
+        </div>
         <div class="field-row">
           <div class="field">
             <label data-i18n="field_price">Qiymət</label>
@@ -1193,9 +1511,12 @@
         </div>
         <div class="field">
           <label data-i18n="field_card">Ödəniş kartı</label>
-          <select id="new-sub-card">
-            <option value="">-- Kart seçilməyib --</option>
-          </select>
+          <div class="field-row-inline">
+            <select id="new-sub-card">
+              <option value="">-- Kart seçilməyib --</option>
+            </select>
+            <button type="button" class="add-card-inline-btn" onclick="openCardSheet('new-sub-card')" title="Yeni kart əlavə et">+</button>
+          </div>
         </div>
         <div id="budget-exceeded-banner" style="display:none; margin:0 0 10px; background:rgba(255,91,69,0.16); border:1px solid var(--coral,#ff5b45); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#ff5b45); line-height:1.5;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
@@ -1224,16 +1545,19 @@
         </div>
         <input type="hidden" id="manage-sub-id">
         <input type="hidden" id="manage-sub-orig-name">
-        <div id="manage-budget-exceeded-banner" style="display:none; margin:10px 0; background:rgba(255,91,69,0.16); border:1px solid var(--coral,#ff5b45); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#ff5b45); line-height:1.5;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-            <div>
-              <strong>⚠️ Büdcə limiti keçilir!</strong>
-              <div id="manage-budget-exceeded-msg" style="margin-top:4px; font-size:12px; opacity:0.9;"></div>
-            </div>
-            <button onclick="document.getElementById('manage-budget-exceeded-banner').style.display='none'" style="background:none;border:none;cursor:pointer;color:inherit;font-size:16px;padding:0;line-height:1;">✕</button>
+        <!-- Account Credentials for validation -->
+        <div class="field-row">
+          <div class="field">
+            <label>Hesab Email</label>
+            <input type="email" id="manage-sub-email" placeholder="netflix@test.com">
+          </div>
+          <div class="field">
+            <label>Hesab Şifrə</label>
+            <input type="password" id="manage-sub-password" placeholder="••••••••">
           </div>
         </div>
         <div class="field"><label data-i18n="field_name">Ad</label><input type="text" id="manage-sub-name"></div>
+
         <div class="field-row">
           <div class="field">
             <label data-i18n="field_price">Qiymət</label>
@@ -1287,9 +1611,22 @@
         </div>
         <div class="field">
           <label data-i18n="field_card">Ödəniş kartı</label>
-          <select id="manage-sub-card">
-            <option value="">-- Kart seçilməyib --</option>
-          </select>
+          <div class="field-row-inline">
+            <select id="manage-sub-card">
+              <option value="">-- Kart seçilməyib --</option>
+            </select>
+            <button type="button" class="add-card-inline-btn" onclick="openCardSheet('manage-sub-card')" title="Yeni kart əlavə et">+</button>
+          </div>
+        </div>
+        <div id="manage-budget-exceeded-banner" style="display:none; margin:0 0 10px; background:rgba(226,104,90,0.13); border:1px solid var(--coral,#e2685a); border-radius:12px; padding:12px 14px; font-size:13px; color:var(--coral,#e2685a); line-height:1.5;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+            <div>
+              <strong>⚠️ Büdcə limiti keçilir!</strong>
+              <div id="manage-budget-exceeded-msg" style="margin-top:4px; font-size:12px; opacity:0.9;"></div>
+            </div>
+            <button onclick="document.getElementById('manage-budget-exceeded-banner').style.display='none'" style="background:none;border:none;cursor:pointer;color:inherit;font-size:16px;padding:0;line-height:1;">✕</button>
+          </div>
+          <button onclick="closeManageSheet();switchScreen('budget')" style="margin-top:8px; background:none; border:1px solid currentColor; border-radius:8px; padding:4px 10px; font-size:11.5px; color:inherit; cursor:pointer; font-family:var(--font-body);">Büdcəyə keç →</button>
         </div>
         <div class="sheet-actions" style="flex-direction:column; gap:8px;">
           <div style="display:flex; gap:10px; width:100%;">
@@ -1301,69 +1638,110 @@
       </div>
     </div>
 
-      <!-- ============ ÖDƏNİŞ TARİXÇƏSİ ============ -->
-      <div class="screen" id="scr-history">
-        <div class="scr-header">
-          <div class="h-row">
-            <div>
-              <div class="eyebrow">Ödənişlər</div>
-              <h1 class="page-title">Tarixçə</h1>
-              <div class="page-sub" id="history-sub">Yüklənir...</div>
+    <!-- ============ KARTLAR ============ -->
+    <div class="screen" id="scr-cards">
+      <div class="scr-header">
+        <div class="h-row">
+          <div>
+            <div class="eyebrow">Ödəniş</div>
+            <h1 class="page-title">Kartlarım</h1>
+            <div class="page-sub" id="cards-sub">Ödəniş metodları</div>
+          </div>
+        </div>
+      </div>
+      <div class="section" style="padding-top:6px; padding-bottom:20px;">
+        <div id="cards-list"><div class="hint">Yüklənir...</div></div>
+      </div>
+    </div>
+
+    <!-- Bottom sheet: Add card (NO manual cardType selection) -->
+    <div class="sheet-overlay" id="card-sheet-overlay">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head">
+          <div class="sheet-title">Yeni Kart</div>
+          <button class="sheet-close" onclick="closeCardSheet()">✕</button>
+        </div>
+
+        <!-- Live Preview Card Mockup -->
+        <div class="preview-card-container">
+          <div class="preview-card" id="live-preview-card">
+            <!-- Front of the card -->
+            <div class="preview-card-front">
+              <div class="preview-card-glow"></div>
+              <!-- Futuristic background mesh -->
+              <svg class="card-bg-mesh" viewBox="0 0 290 170" fill="none" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.12; pointer-events: none; z-index: 1;">
+                <path d="M0 30h290M0 60h290M0 90h290M0 120h290M0 150h290M50 0v170M100 0v170M150 0v170M200 0v170M250 0v170" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>
+                <circle cx="145" cy="85" r="50" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+                <circle cx="145" cy="85" r="80" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+              </svg>
+              <div class="preview-card-header">
+                <span class="preview-bank-name" id="preview-bank-name">BANK ADI</span>
+                <span class="preview-brand-logo" id="preview-brand-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></span>
+              </div>
+              <div class="preview-card-chip">
+                <svg viewBox="0 0 32 24" fill="none" style="width: 100%; height: 100%;">
+                  <rect width="32" height="24" rx="4" fill="url(#chip-grad)" />
+                  <path d="M0 8h32M0 16h32M10 0v24M22 0v24" stroke="rgba(0,0,0,0.2)" stroke-width="1" />
+                  <rect x="10" y="8" width="12" height="8" rx="2" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>
+                  <defs>
+                    <linearGradient id="chip-grad" x1="0" y1="0" x2="32" y2="24" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffe8a3"/>
+                      <stop offset="0.5" stop-color="#ffd066"/>
+                      <stop offset="1" stop-color="#d49a17"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="preview-card-number" id="preview-card-number">•••• •••• •••• ••••</div>
+              <div class="preview-card-footer">
+                <div class="preview-card-holder">
+                  <div class="preview-label">KART SAHİBİ</div>
+                  <div class="preview-value" id="preview-card-name">ABBAS SULTANLI</div>
+                </div>
+                <div class="preview-card-expiry">
+                  <div class="preview-label">SON TARİX</div>
+                  <div class="preview-value" id="preview-card-expiry">AA/İİ</div>
+                </div>
+              </div>
+            </div>
+            <!-- Back of the card -->
+            <div class="preview-card-back">
+              <!-- Futuristic background mesh back -->
+              <svg class="card-bg-mesh" viewBox="0 0 290 170" fill="none" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.05; pointer-events: none; z-index: 1;">
+                <path d="M0 30h290M0 60h290M0 90h290M0 120h290M0 150h290M50 0v170M100 0v170M150 0v170M200 0v170M250 0v170" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>
+              </svg>
+              <div class="preview-card-strip"></div>
+              <div class="preview-card-signature-area">
+                <div class="preview-card-signature"></div>
+                <div class="preview-card-cvv-box" id="preview-card-cvv">•••</div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="section" style="padding-top:6px;">
-          <div id="history-list"><div class="hint">Yüklənir...</div></div>
-        </div>
-      </div>
 
-      <!-- ============ KARTLAR ============ -->
-      <div class="screen" id="scr-cards">
-        <div class="scr-header">
-          <div class="h-row">
-            <div>
-              <div class="eyebrow">Ödəniş</div>
-              <h1 class="page-title">Kartlarım</h1>
-              <div class="page-sub" id="cards-sub">Ödəniş metodları</div>
-            </div>
+        <div class="field"><label>Kart adı *</label><input type="text" id="card-name" placeholder="məs. Kapital Bank" required></div>
+        <!-- Card brand is auto-detected from PAN, no manual selection -->
+        <div class="field">
+          <label>Kart nömrəsi (PAN) *</label>
+          <div style="position:relative;">
+            <input type="text" id="card-pan" placeholder="4111 1111 1111 1111" maxlength="19" oninput="formatCardNum(this); detectCardBrandUI(this.value);">
+            <span id="card-brand-badge" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:11px; font-weight:600; padding:2px 8px; border-radius:12px; background:var(--surface-3); color:var(--ink-muted); display:none;"></span>
           </div>
+          <div class="field-error" id="card-pan-error" style="display:none;">Dəstəklənməyən kart növü.</div>
         </div>
-        <div class="section" style="padding-top:6px; padding-bottom:20px;">
-          <div id="cards-list"><div class="hint">Yüklənir...</div></div>
+        <div class="field-row">
+          <div class="field"><label>Son tarix (AA/İİ) *</label><input type="text" id="card-expiry" placeholder="12/28" maxlength="5"></div>
+          <div class="field"><label>CVV *</label><input type="password" id="card-cvv" placeholder="•••" maxlength="3"></div>
+        </div>
+        <div class="field-error" id="card-error"></div>
+        <div class="sheet-actions">
+          <button class="btn" onclick="closeCardSheet()">İmtina</button>
+          <button class="btn btn-primary" onclick="handleAddCard()">Əlavə et</button>
         </div>
       </div>
-
     </div>
 
-  </div>
-</div>
-
-<!-- Bottom sheet: Add card -->
-<div class="sheet-overlay" id="card-sheet-overlay">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-head">
-      <div class="sheet-title">Yeni Kart</div>
-      <button class="sheet-close" onclick="closeCardSheet()">✕</button>
-    </div>
-    <div class="field"><label>Kart adı *</label><input type="text" id="card-name" placeholder="məs. Kapital Bank" required></div>
-    <div class="field">
-      <label>Kart növü</label>
-      <select id="card-type">
-        <option value="visa">Visa</option>
-        <option value="mastercard">Mastercard</option>
-      </select>
-    </div>
-    <div class="field"><label>Kart nömrəsi (PAN) *</label><input type="text" id="card-pan" placeholder="4111 1111 1111 1111" maxlength="19" oninput="formatCardNum(this)"></div>
-    <div class="field-row">
-      <div class="field"><label>Son tarix (AA/İİ) *</label><input type="text" id="card-expiry" placeholder="12/28" maxlength="5"></div>
-      <div class="field"><label>CVV *</label><input type="password" id="card-cvv" placeholder="•••" maxlength="3"></div>
-    </div>
-    <div class="field-error" id="card-error"></div>
-    <div class="sheet-actions">
-      <button class="btn" onclick="closeCardSheet()">İmtina</button>
-      <button class="btn btn-primary" onclick="handleAddCard()">Əlavə et</button>
-    </div>
   </div>
 </div>
 
@@ -1563,14 +1941,15 @@
         title: n.basliq,
         msg: n.mesaj,
         urgency: getUrgency(n.basliq, n.mesaj),
-        time: n.gonderilme_tarixi
+        time: n.gonderilme_tarixi,
+        is_read: n.is_read || false
       }));
     } else {
       notifications = [];
     }
 
     // 4. Budget
-    const budgetRes = await apiFetch('GET', `/api/budceler?username=${currentUser.username}`);
+    const budgetRes = await apiFetch('GET', `/api/budceler/${currentUser.username}`);
     const activeSubs = subscriptions.filter(s => s.status === 'active');
     
     // Calculate total spend (converting to AZN or keep as is? Let's just sum raw values for now as simple presentation)
@@ -1579,21 +1958,33 @@
       totalSpend += s.price;
     });
 
-    if (budgetRes.ok && budgetRes.data && budgetRes.data.data && budgetRes.data.data.budgets && budgetRes.data.data.budgets.length > 0) {
-      const b = budgetRes.data.data.budgets[0];
-      budgetState = {
-        limit: parseFloat(b.limit_mebleq),
-        spent: totalSpend, // dynamically count spent
-        currency: b.valyuta || 'AZN',
-        exists: true
-      };
-      // update backend spent count if different
-      if (parseFloat(b.hesab_mebleqi) !== totalSpend) {
-        apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
-          limit_mebleq: budgetState.limit,
-          valyuta: budgetState.currency,
-          hesab_mebleqi: totalSpend
-        });
+    if (budgetRes.ok && budgetRes.data && budgetRes.data.data) {
+      const b = budgetRes.data.data.budget || (budgetRes.data.data.budgets && budgetRes.data.data.budgets[0]);
+      if (b) {
+        const dbLimit = b.LIMIT_MEBLEQ !== undefined ? b.LIMIT_MEBLEQ : b.limit_mebleq;
+        const dbValyuta = b.VALYUTA !== undefined ? b.VALYUTA : b.valyuta;
+        const dbSpent = b.HESAB_MEBLEQI !== undefined ? b.HESAB_MEBLEQI : b.hesab_mebleqi;
+        budgetState = {
+          limit: parseFloat(dbLimit) || 300.00,
+          spent: totalSpend, // dynamically count spent
+          currency: dbValyuta || 'AZN',
+          exists: true
+        };
+        // update backend spent count if different
+        if (parseFloat(dbSpent) !== totalSpend) {
+          apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
+            limit_mebleq: budgetState.limit,
+            valyuta: budgetState.currency,
+            hesab_mebleqi: totalSpend
+          });
+        }
+      } else {
+        budgetState = {
+          limit: 300.00,
+          spent: totalSpend,
+          currency: 'AZN',
+          exists: false
+        };
       }
     } else {
       budgetState = {
@@ -1667,6 +2058,30 @@
     return `<div class="sub-icon ${color}">${icon}</div>`;
   }
 
+  function getBrandIconHTML(name, category) {
+    const lowerName = (name || '').toLowerCase();
+    
+    // Netflix / Neftlix
+    if (lowerName.includes('netflix') || lowerName.includes('neftlix')) {
+      return `<div class="sub-icon" style="background: rgba(229, 9, 20, 0.12); border-color: rgba(229, 9, 20, 0.25);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><path d="M4 2v20h4V13.6L16 22h4V2h-4v8.4L8 2H4z" fill="#E50914"/></svg></div>`;
+    }
+    // Spotify
+    if (lowerName.includes('spotify')) {
+      return `<div class="sub-icon" style="background: rgba(29, 185, 84, 0.12); border-color: rgba(29, 185, 84, 0.25);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><circle cx="12" cy="12" r="10" fill="#1DB954"/><path d="M7 9a11 11 0 0 1 10 0M8 12a8 8 0 0 1 8 0M9 15a5 5 0 0 1 6 0" stroke="#FFF" stroke-width="1.8" stroke-linecap="round"/></svg></div>`;
+    }
+    // YouTube
+    if (lowerName.includes('youtube')) {
+      return `<div class="sub-icon" style="background: rgba(255, 0, 0, 0.12); border-color: rgba(255, 0, 0, 0.25);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/><polygon points="10 9 15 12 10 15" fill="#FFF"/></svg></div>`;
+    }
+    // Apple / iCloud / iTunes
+    if (lowerName.includes('apple') || lowerName.includes('icloud') || lowerName.includes('itunes')) {
+      return `<div class="sub-icon" style="background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.12);"><svg viewBox="0 0 24 24" fill="currentColor" style="width:20px; height:20px; color:#fff;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-.96.04-2.13.64-2.82 1.45-.6.69-1.12 1.84-.98 2.94 1.07.08 2.15-.52 2.81-1.33z"/></svg></div>`;
+    }
+    
+    // Fallback to Category Icon
+    return categoryIconHTML(category);
+  }
+
   function currencySymbol(code) {
     return code === 'USD' ? '$' : code === 'EUR' ? '€' : '₼';
   }
@@ -1679,7 +2094,7 @@
     const sym = currencySymbol(s.currency);
     return `
       <div class="sub-row" onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
-        ${categoryIconHTML(s.category)}
+        ${getBrandIconHTML(s.name, s.category)}
         <div class="sub-info">
           <div class="sub-name">${s.name}</div>
           <div class="sub-meta">${s.category}<span class="sep">·</span>${dateFmt}</div>
@@ -1704,6 +2119,12 @@
     // Update sub title counts
     document.querySelector('.hero-sub[data-i18n="dashboard_sub"]').textContent = `${activeSubs.length} aktiv abunəlik izlənilir`;
     document.getElementById('subs-screen-sub').textContent = `${subscriptions.length} abunəlik · ${activeSubs.length} aktiv`;
+    
+    // Update dashboard active count stat card
+    const activeCountEl = document.getElementById('dashboard-active-count');
+    if (activeCountEl) {
+      activeCountEl.textContent = activeSubs.length;
+    }
 
     // Render full list with filter
     filterSubscriptionsList();
@@ -1736,31 +2157,39 @@
 
   function notifRowHTML(n) {
     const color = n.urgency === 'urgent' ? 'var(--coral)' : n.urgency === 'soon' ? 'var(--gold)' : 'var(--teal)';
+    const dotHtml = n.is_read ? '' : `<span class="notif-dot" style="background:${color}"></span>`;
+    const clickableClass = n.is_read ? '' : 'clickable';
+    const clickHandler = n.is_read ? '' : `onclick="handleMarkNotificationRead(${n.id})"`;
     return `
-      <div class="notif-item">
-        <span class="notif-dot" style="background:${color}"></span>
+      <div class="notif-item ${clickableClass}" ${clickHandler} style="${n.is_read ? 'opacity:0.6;' : ''}">
+        ${dotHtml}
         <div style="flex: 1;">
           <div class="notif-title">${n.title}</div>
           <div class="notif-msg">${n.msg}</div>
           <div class="notif-time">${n.time}</div>
         </div>
-        <button class="sheet-close" style="font-size:12px; padding: 2px 6px;" onclick="handleDeleteNotification(${n.id})">✕</button>
       </div>`;
   }
   
   function renderNotifs() {
+    const unreadCount = notifications.filter(n => !n.is_read).length;
     document.getElementById('notif-preview-list').innerHTML = notifications.slice(0,2).map(notifRowHTML).join('');
     document.getElementById('notif-full-list').innerHTML = notifications.map(notifRowHTML).join('');
     
     // Toggle tab badge dot
-    document.getElementById('notif-badge').style.display = notifications.length > 0 ? 'block' : 'none';
+    document.getElementById('notif-badge').style.display = unreadCount > 0 ? 'block' : 'none';
   }
 
-  async function handleDeleteNotification(id) {
-    const res = await apiFetch('DELETE', `/api/bildirisler/${id}`);
+  // Mark notification as read (PATCH instead of DELETE)
+  async function handleMarkNotificationRead(id) {
+    const res = await apiFetch('PATCH', `/api/bildirisler/${id}/read`);
     if (res.ok) {
-      notifications = notifications.filter(n => n.id !== id);
+      notifications = notifications.map(n => 
+        n.id === id ? { ...n, is_read: true } : n
+      );
       renderNotifs();
+    } else {
+      alert(res.data?.error?.message || 'Bildiriş oxunmuş kimi işarələnə bilmədi.');
     }
   }
 
@@ -1805,13 +2234,13 @@
   function switchScreen(name) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const targetScreen = document.getElementById('scr-' + name);
-    targetScreen.classList.add('active');
+    if (targetScreen) targetScreen.classList.add('active');
 
     if (name !== 'auth') {
       document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
       const activeTab = document.querySelector(`.tab-item[data-screen="${name}"]`);
       if (activeTab) activeTab.classList.add('active');
-      targetScreen.scrollTop = 0;
+      if (targetScreen) targetScreen.scrollTop = 0;
 
       // Show FAB on dashboard, subs, and cards screens, configure dynamically
       const fab = document.querySelector('.fab');
@@ -1832,9 +2261,11 @@
 
       // Attach scroll-to-top listener on this screen
       const scrollBtn = document.getElementById('scroll-top-btn');
-      if (scrollBtn) {
+      if (scrollBtn && targetScreen) {
         // Remove previous listener to avoid duplicates
-        targetScreen._scrollHandler && targetScreen.removeEventListener('scroll', targetScreen._scrollHandler);
+        if (targetScreen._scrollHandler) {
+          targetScreen.removeEventListener('scroll', targetScreen._scrollHandler);
+        }
         targetScreen._scrollHandler = () => {
           if (targetScreen.scrollTop > 120) {
             scrollBtn.classList.add('visible');
@@ -1854,15 +2285,37 @@
     document.getElementById('scroll-top-btn').classList.remove('visible');
   }
 
+  function updateBodyScrollLock() {
+    const anyOpen = document.querySelectorAll('.sheet-overlay.open').length > 0;
+    if (anyOpen) {
+      document.body.classList.add('sheet-open');
+    } else {
+      document.body.classList.remove('sheet-open');
+    }
+  }
+
   function openSheet() { 
     // Set start date to today's date formatted as YYYY-MM-DD
     const yyyy = TODAY.getFullYear();
     const mm = String(TODAY.getMonth() + 1).padStart(2, '0');
     const dd = String(TODAY.getDate()).padStart(2, '0');
     document.getElementById('new-sub-start').value = `${yyyy}-${mm}-${dd}`;
-    document.getElementById('sheet-overlay').classList.add('open'); 
+    document.getElementById('new-sub-email').value = '';
+    document.getElementById('new-sub-password').value = '';
+    // Set default currency to primary currency
+    document.getElementById('new-sub-currency').value = currentSettings.esas_valyuta || 'AZN';
+    const overlay = document.getElementById('sheet-overlay');
+    overlay.classList.add('open'); 
+    updateBodyScrollLock();
+    const sheet = overlay.querySelector('.sheet');
+    if (sheet) sheet.scrollTop = 0;
   }
-  function closeSheet() { document.getElementById('sheet-overlay').classList.remove('open'); }
+  function closeSheet() {
+    document.getElementById('sheet-overlay').classList.remove('open');
+    updateBodyScrollLock();
+    if (document.activeElement) document.activeElement.blur();
+    setTimeout(() => { window.scrollTo(0, window.scrollY); }, 80);
+  }
   document.getElementById('sheet-overlay').addEventListener('click', e => {
     if (e.target.id === 'sheet-overlay') closeSheet();
   });
@@ -1881,6 +2334,8 @@
     const startInput = document.getElementById('new-sub-start');
     const catInput = document.getElementById('new-sub-category');
     const cardInput = document.getElementById('new-sub-card');
+    const emailInput = document.getElementById('new-sub-email');
+    const passwordInput = document.getElementById('new-sub-password');
 
     const name = nameInput.value.trim();
     const price = Number(priceInput.value);
@@ -1889,11 +2344,22 @@
     const start = startInput.value;
     const category = catInput.value;
     const cardId = cardInput.value || null;
+    const accountEmail = emailInput.value.trim();
+    const accountPassword = passwordInput.value.trim();
 
     if (!name) {
       nameInput.focus();
       return;
     }
+
+    if (!accountEmail || !accountPassword) {
+      emailInput.classList.add('invalid');
+      passwordInput.classList.add('invalid');
+      emailInput.focus();
+      return;
+    }
+    emailInput.classList.remove('invalid');
+    passwordInput.classList.remove('invalid');
 
     if (!priceInput.value || isNaN(price) || price <= 0) {
       document.getElementById('price-error').classList.add('show');
@@ -1911,6 +2377,27 @@
 
     clearPriceError();
 
+    // ── CLIENT-SIDE büdcə limiti yoxlaması ──────────────────────────────────
+    // budgetState.limit - cari limit (hətta default 300 olsa belə)
+    // budgetState.spent - mövcud aktiv abunəliklərin cəmi
+    {
+      const effectiveLimit = budgetState.limit > 0 ? budgetState.limit : 300;
+      const currentSpent   = budgetState.spent  || 0;
+      const projectedTotal = currentSpent + price;
+
+      if (projectedTotal > effectiveLimit) {
+        const remaining = Math.max(0, effectiveLimit - currentSpent);
+        const sym = currencySymbol(budgetState.currency || 'AZN');
+        const errMsg = `Büdcə limiti keçilir! Mövcud xərc: ${sym}${currentSpent.toFixed(2)}, yeni abunəlik: +${sym}${price.toFixed(2)}, cəmi: ${sym}${projectedTotal.toFixed(2)} — limit: ${sym}${effectiveLimit.toFixed(2)}. (Qalan boş büdcə: ${sym}${remaining.toFixed(2)})`;
+        document.getElementById('budget-exceeded-msg').textContent = errMsg;
+        const banner = document.getElementById('budget-exceeded-banner');
+        banner.style.display = 'block';
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     const payload = {
       username: currentUser.username,
       ad: name,
@@ -1919,7 +2406,9 @@
       odenis_tezliyi: freq,
       baslama_tarixi: start,
       kateqoriya: category,
-      odenis_metodu_id: cardId
+      odenis_metodu_id: cardId,
+      accountemail: accountEmail,
+      accountpassword: accountPassword
     };
 
     // Budget banner sıfırla
@@ -1931,6 +2420,8 @@
       closeSheet();
       nameInput.value = '';
       priceInput.value = '';
+      emailInput.value = '';
+      passwordInput.value = '';
       loadAllData();
     } else {
       const errCode = res.data?.error?.code;
@@ -1941,6 +2432,8 @@
         const banner = document.getElementById('budget-exceeded-banner');
         banner.style.display = 'block';
         banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else if (errCode === 'ACCOUNT_NOT_FOUND') {
+        alert('Abunəlik hesabı tapılmadı! Email və şifrəni yoxlayın.');
       } else {
         alert(errMsg);
       }
@@ -1959,14 +2452,23 @@
     document.getElementById('manage-sub-category').value = sub.category;
     document.getElementById('manage-sub-status').value = sub.status;
     document.getElementById('manage-sub-card').value = sub.odenis_metodu_id || '';
+    document.getElementById('manage-sub-email').value = '';
+    document.getElementById('manage-sub-password').value = '';
 
     document.getElementById('manage-budget-exceeded-banner').style.display = 'none';
     clearManagePriceError();
-    document.getElementById('sub-manage-overlay').classList.add('open');
+    const overlay = document.getElementById('sub-manage-overlay');
+    overlay.classList.add('open');
+    updateBodyScrollLock();
+    const sheet = overlay.querySelector('.sheet');
+    if (sheet) sheet.scrollTop = 0;
   }
 
   function closeManageSheet() {
     document.getElementById('sub-manage-overlay').classList.remove('open');
+    updateBodyScrollLock();
+    if (document.activeElement) document.activeElement.blur();
+    setTimeout(() => { window.scrollTo(0, window.scrollY); }, 80);
   }
   document.getElementById('sub-manage-overlay').addEventListener('click', e => {
     if (e.target.id === 'sub-manage-overlay') closeManageSheet();
@@ -1990,11 +2492,22 @@
     const category = document.getElementById('manage-sub-category').value;
     const status = document.getElementById('manage-sub-status').value;
     const cardId = document.getElementById('manage-sub-card').value || null;
+    const accountEmail = document.getElementById('manage-sub-email').value.trim();
+    const accountPassword = document.getElementById('manage-sub-password').value.trim();
 
     if (!name) {
       document.getElementById('manage-sub-name').focus();
       return;
     }
+
+    if (!accountEmail || !accountPassword) {
+      document.getElementById('manage-sub-email').classList.add('invalid');
+      document.getElementById('manage-sub-password').classList.add('invalid');
+      document.getElementById('manage-sub-email').focus();
+      return;
+    }
+    document.getElementById('manage-sub-email').classList.remove('invalid');
+    document.getElementById('manage-sub-password').classList.remove('invalid');
 
     if (!priceInput.value || isNaN(price) || price <= 0) {
       document.getElementById('manage-price-error').classList.add('show');
@@ -2004,6 +2517,7 @@
     }
 
     clearManagePriceError();
+    document.getElementById('manage-budget-exceeded-banner').style.display = 'none';
 
     const updatePayload = {
       ad: name,
@@ -2013,7 +2527,9 @@
       baslama_tarixi: start,
       kateqoriya: category,
       status: status,
-      odenis_metodu_id: cardId
+      odenis_metodu_id: cardId,
+      accountemail: accountEmail,
+      accountpassword: accountPassword
     };
 
     const res = await apiFetch('PUT', `/api/abunelikler?username=${currentUser.username}&ad=${origName}`, updatePayload);
@@ -2030,6 +2546,8 @@
         const banner = document.getElementById('manage-budget-exceeded-banner');
         banner.style.display = 'block';
         banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else if (errCode === 'ACCOUNT_NOT_FOUND') {
+        alert('Abunəlik hesabı tapılmadı! Email və şifrəni yoxlayın.');
       } else {
         alert(errMsg);
       }
@@ -2058,10 +2576,10 @@
   }
 
   function cardRowHTML(c) {
-    // Show last 4 digits of pan in **** XXXX format, or dots if no pan stored
     const panDisplay = c.pan
       ? '**** ' + String(c.pan).replace(/\s/g, '').slice(-4)
       : '&#9679;&#9679;&#9679;&#9679;';
+    const brandLabel = (c.kart_tipi || '').toLowerCase() === 'visa' ? 'Visa' : 'Mastercard';
     return `
       <div class="card-row">
         ${cardIconHTML(c.kart_tipi)}
@@ -2069,6 +2587,7 @@
           <div class="card-name">${c.ad}</div>
           <div class="card-meta">
             <span style="font-family:var(--font-mono);letter-spacing:0.04em;">${panDisplay}</span>
+            <span style="margin-left:8px;font-size:10px;color:var(--ink-faint);background:var(--surface-2);padding:1px 8px;border-radius:10px;">${brandLabel}</span>
           </div>
         </div>
         <div class="card-right">
@@ -2095,7 +2614,13 @@
     const list = document.getElementById('cards-list');
     const sub = document.getElementById('cards-sub');
     if (cards.length === 0) {
-      list.innerHTML = '<div class="hint">Hələ kart əlavə edilməyib. + düyməsini istifadə edin.</div>';
+      list.innerHTML = `
+        <div class="hint" style="padding:20px 0;">
+          <div style="font-size:40px;margin-bottom:12px;">💳</div>
+          Hələ kart əlavə edilməyib.<br>
+          <span style="color:var(--ink-muted);font-size:12px;">Yeni kart əlavə etmək üçün <strong style="color:var(--accent);">+</strong> düyməsini istifadə edin.</span>
+        </div>
+      `;
       if (sub) sub.textContent = '0 ödəniş metodu';
     } else {
       list.innerHTML = cards.map(cardRowHTML).join('');
@@ -2112,11 +2637,61 @@
       cards.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.card_id;
-        opt.textContent = `${c.ad} (${c.kart_tipi} ${c.pan || ''})`;
+        const brandLabel = (c.kart_tipi || '').toLowerCase() === 'visa' ? 'Visa' : 'Mastercard';
+        opt.textContent = `${c.ad} (${brandLabel} ${c.pan ? '****' + String(c.pan).slice(-4) : ''})`;
         sel.appendChild(opt);
       });
       if (currentVal) sel.value = currentVal;
     });
+  }
+
+  // Card Brand Detection UI
+  function detectCardBrandUI(pan) {
+    const badge = document.getElementById('card-brand-badge');
+    const errorEl = document.getElementById('card-pan-error');
+    const cleaned = String(pan).replace(/\s/g, '');
+    const logoEl = document.getElementById('preview-brand-logo');
+    
+    if (cleaned.length < 2) {
+      badge.style.display = 'none';
+      errorEl.style.display = 'none';
+      if (logoEl) logoEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
+      return;
+    }
+    
+    let brand = null;
+    if (cleaned.startsWith('4')) {
+      brand = 'Visa';
+    } else if (cleaned.startsWith('51') || cleaned.startsWith('52') || cleaned.startsWith('53') || 
+               cleaned.startsWith('54') || cleaned.startsWith('55')) {
+      brand = 'Mastercard';
+    } else if (cleaned.length >= 4) {
+      const prefix = parseInt(cleaned.substring(0, 4));
+      if (prefix >= 2221 && prefix <= 2720) {
+        brand = 'Mastercard';
+      }
+    }
+    
+    if (brand) {
+      badge.textContent = brand;
+      badge.style.display = 'block';
+      badge.style.background = brand === 'Visa' ? 'var(--teal-soft)' : 'var(--gold-soft)';
+      badge.style.color = brand === 'Visa' ? 'var(--teal)' : 'var(--gold)';
+      errorEl.style.display = 'none';
+      if (logoEl) {
+        logoEl.innerHTML = brand === 'Visa' ? 
+          `<img src="/visa.svg?v=1.2" style="height: 15px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Visa">` : 
+          `<img src="/mastercard.svg?v=1.2" style="height: 20px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Mastercard">`;
+      }
+    } else {
+      badge.style.display = 'none';
+      if (logoEl) logoEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
+      if (cleaned.length >= 4) {
+        errorEl.style.display = 'block';
+      } else {
+        errorEl.style.display = 'none';
+      }
+    }
   }
 
   async function handleDeleteCard(id) {
@@ -2124,15 +2699,19 @@
     const res = await apiFetch('DELETE', `/api/odenis-metodlari/${id}`);
     if (res.ok) {
       await loadCards();
+    } else if (res.status === 409) {
+      // Payment method in use
+      alert('Bu kart aktiv abunəliklərdə istifadə olunur. Əvvəlcə abunəliyi başqa karta keçirin və ya silin.');
     } else {
       alert(res.data?.error?.message || 'Kart silinə bilmədi.');
     }
   }
 
-  function openCardSheet() {
+  let cardSheetReturnTarget = null;
+  function openCardSheet(returnTargetSelectId) {
+    cardSheetReturnTarget = returnTargetSelectId || null;
     document.getElementById('card-name').value = '';
     document.getElementById('card-name').classList.remove('invalid');
-    document.getElementById('card-type').value = 'visa';
     document.getElementById('card-pan').value = '';
     document.getElementById('card-pan').classList.remove('invalid');
     document.getElementById('card-expiry').value = '';
@@ -2141,9 +2720,30 @@
     document.getElementById('card-cvv').classList.remove('invalid');
     document.getElementById('card-error').textContent = '';
     document.getElementById('card-error').classList.remove('show');
-    document.getElementById('card-sheet-overlay').classList.add('open');
+    document.getElementById('card-brand-badge').style.display = 'none';
+    document.getElementById('card-pan-error').style.display = 'none';
+
+    // Reset Live Preview Card Mockup
+    document.getElementById('preview-bank-name').textContent = 'BANK ADI';
+    document.getElementById('preview-brand-logo').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`;
+    document.getElementById('preview-card-number').textContent = '•••• •••• •••• ••••';
+    document.getElementById('preview-card-expiry').textContent = 'AA/İİ';
+    document.getElementById('preview-card-name').textContent = (currentUser && currentUser.ad ? currentUser.ad.toUpperCase() : 'ABUNƏÇİ');
+    document.getElementById('preview-card-cvv').textContent = '•••';
+    document.getElementById('live-preview-card').classList.remove('flipped');
+
+    const overlay = document.getElementById('card-sheet-overlay');
+    overlay.classList.add('open');
+    updateBodyScrollLock();
+    const sheet = overlay.querySelector('.sheet');
+    if (sheet) sheet.scrollTop = 0;
   }
-  function closeCardSheet() { document.getElementById('card-sheet-overlay').classList.remove('open'); }
+  function closeCardSheet() {
+    document.getElementById('card-sheet-overlay').classList.remove('open');
+    updateBodyScrollLock();
+    if (document.activeElement) document.activeElement.blur();
+    setTimeout(() => { window.scrollTo(0, window.scrollY); }, 80);
+  }
   document.getElementById('card-sheet-overlay').addEventListener('click', e => {
     if (e.target.id === 'card-sheet-overlay') closeCardSheet();
   });
@@ -2153,100 +2753,164 @@
     input.value = v.replace(/(\d{4})(?=\d)/g, '$1 ');
   }
 
-  async function handleAddCard() {
-    const nameEl = document.getElementById('card-name');
-    const name = nameEl.value.trim();
-    const kart_tipi = document.getElementById('card-type').value;
-    const panEl = document.getElementById('card-pan');
-    const panRaw = panEl.value.replace(/\s/g, '');
-    const expiryEl = document.getElementById('card-expiry');
-    const expiry = expiryEl.value.trim();
-    const cvvEl = document.getElementById('card-cvv');
-    const cvv = cvvEl.value.trim();
-    const errEl = document.getElementById('card-error');
+async function handleAddCard() {
+  const nameEl = document.getElementById('card-name');
+  const name = nameEl.value.trim();
+  const panEl = document.getElementById('card-pan');
+  const panRaw = panEl.value.replace(/\s/g, '');
+  const expiryEl = document.getElementById('card-expiry');
+  const expiry = expiryEl.value.trim();
+  const cvvEl = document.getElementById('card-cvv');
+  const cvv = cvvEl.value.trim();
+  const errEl = document.getElementById('card-error');
 
-    if (!name) {
-      errEl.textContent = 'Kart adı məcburidir.';
-      errEl.classList.add('show');
-      nameEl.classList.add('invalid');
-      nameEl.focus();
-      return;
-    }
-    nameEl.classList.remove('invalid');
+  console.log('🔵 ========== KART ƏLAVƏ ETMƏ ==========');
+  console.log('🔵 Name:', name);
+  console.log('🔵 PAN:', panRaw ? panRaw.substring(0,4) + '****' + panRaw.slice(-4) : 'EMPTY');
+  console.log('🔵 Expiry:', expiry);
+  console.log('🔵 CVV:', cvv ? '***' : 'EMPTY');
 
-    if (!kart_tipi) {
-      errEl.textContent = 'Kart növü seçilməlidir.';
-      errEl.classList.add('show');
-      return;
-    }
+  // Auto-detect card brand from PAN
+  const detectedBrand = detectCardBrandFromPan(panRaw);
+  console.log('🔵 Aşkarlanan brend:', detectedBrand);
+  
+  if (!detectedBrand) {
+    errEl.textContent = 'Dəstəklənməyən kart nömrəsi. Visa (4) və ya Mastercard (51-55, 2221-2720) daxil edin.';
+    errEl.classList.add('show');
+    panEl.classList.add('invalid');
+    panEl.focus();
+    console.log('❌ Dəstəklənməyən brend');
+    return;
+  }
 
-    if (!panRaw) {
-      errEl.textContent = 'Kart nömrəsi (PAN) məcburidir.';
-      errEl.classList.add('show');
-      panEl.classList.add('invalid');
-      panEl.focus();
-      return;
-    }
-    panEl.classList.remove('invalid');
+  if (!name) {
+    errEl.textContent = 'Kart adı məcburidir.';
+    errEl.classList.add('show');
+    nameEl.classList.add('invalid');
+    nameEl.focus();
+    console.log('❌ Ad boşdur');
+    return;
+  }
+  nameEl.classList.remove('invalid');
 
-    if (!expiry) {
-      errEl.textContent = 'Son tarix (AA/İİ) məcburidir.';
-      errEl.classList.add('show');
-      expiryEl.classList.add('invalid');
-      expiryEl.focus();
-      return;
-    }
-    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-      errEl.textContent = 'Son tarix formatı yanlışdır. Format: AA/İİ (məs: 12/28).';
-      errEl.classList.add('show');
-      expiryEl.classList.add('invalid');
-      expiryEl.focus();
-      return;
-    }
-    expiryEl.classList.remove('invalid');
+  if (!panRaw) {
+    errEl.textContent = 'Kart nömrəsi (PAN) məcburidir.';
+    errEl.classList.add('show');
+    panEl.classList.add('invalid');
+    panEl.focus();
+    console.log('❌ PAN boşdur');
+    return;
+  }
+  if (panRaw.length < 12) {
+    errEl.textContent = 'Kart nömrəsi ən azı 12 rəqəm olmalıdır.';
+    errEl.classList.add('show');
+    panEl.classList.add('invalid');
+    panEl.focus();
+    console.log('❌ PAN çox qısadır:', panRaw.length);
+    return;
+  }
+  panEl.classList.remove('invalid');
 
-    if (!cvv) {
-      errEl.textContent = 'CVV məcburidir.';
-      errEl.classList.add('show');
-      cvvEl.classList.add('invalid');
-      cvvEl.focus();
-      return;
-    }
-    if (!/^\d{3}$/.test(cvv)) {
-      errEl.textContent = 'CVV yalnız 3 rəqəmdən ibarət olmalıdır.';
-      errEl.classList.add('show');
-      cvvEl.classList.add('invalid');
-      cvvEl.focus();
-      return;
-    }
-    cvvEl.classList.remove('invalid');
+  if (!expiry) {
+    errEl.textContent = 'Son tarix (AA/İİ) məcburidir.';
+    errEl.classList.add('show');
+    expiryEl.classList.add('invalid');
+    expiryEl.focus();
+    console.log('❌ Expiry boşdur');
+    return;
+  }
+  if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+    errEl.textContent = 'Son tarix formatı yanlışdır. Format: AA/İİ (məs: 12/28).';
+    errEl.classList.add('show');
+    expiryEl.classList.add('invalid');
+    expiryEl.focus();
+    console.log('❌ Expiry formatı yanlışdır:', expiry);
+    return;
+  }
+  expiryEl.classList.remove('invalid');
 
-    errEl.classList.remove('show');
+  if (!cvv) {
+    errEl.textContent = 'CVV məcburidir.';
+    errEl.classList.add('show');
+    cvvEl.classList.add('invalid');
+    cvvEl.focus();
+    console.log('❌ CVV boşdur');
+    return;
+  }
+  if (!/^\d{3}$/.test(cvv)) {
+    errEl.textContent = 'CVV yalnız 3 rəqəmdən ibarət olmalıdır.';
+    errEl.classList.add('show');
+    cvvEl.classList.add('invalid');
+    cvvEl.focus();
+    console.log('❌ CVV formatı yanlışdır:', cvv);
+    return;
+  }
+  cvvEl.classList.remove('invalid');
 
-    const payload = {
-      username: currentUser.username,
-      ad: name,
-      kart_tipi: kart_tipi,
-      pan: panRaw,
-      kart_istifade_tarixi: expiry,
-      cvv: cvv
-    };
+  errEl.classList.remove('show');
 
+  const payload = {
+    username: currentUser.username,
+    ad: name,
+    pan: panRaw,
+    kart_istifade_tarixi: expiry,
+    cvv: cvv
+  };
+
+  console.log('🔵 Göndərilən payload:', {
+    username: payload.username,
+    ad: payload.ad,
+    pan: payload.pan.substring(0,4) + '****' + payload.pan.slice(-4),
+    kart_istifade_tarixi: payload.kart_istifade_tarixi,
+    cvv: '***'
+  });
+
+  try {
     const res = await apiFetch('POST', '/api/odenis-metodlari', payload);
+    console.log('🔵 Server cavabı:', res);
+    
     if (res.ok) {
+      console.log('✅ Kart uğurla əlavə edildi!');
+      const newCardId = res.data?.data?.card_id ?? res.data?.card_id ?? null;
       closeCardSheet();
       await loadCards();
+      if (cardSheetReturnTarget && newCardId) {
+        const targetSel = document.getElementById(cardSheetReturnTarget);
+        if (targetSel) {
+          targetSel.value = String(newCardId);
+          targetSel.classList.remove('invalid');
+        }
+      }
+      cardSheetReturnTarget = null;
     } else {
-      errEl.textContent = res.data?.error?.message || 'Kart əlavə edilə bilmədi.';
+      const errorMsg = res.data?.error?.message || res.data?.message || 'Kart əlavə edilə bilmədi.';
+      console.log('❌ Server xətası:', errorMsg);
+      console.log('❌ Tam xəta:', JSON.stringify(res.data, null, 2));
+      errEl.textContent = errorMsg;
       errEl.classList.add('show');
     }
+  } catch (error) {
+    console.error('❌ Fetch xətası:', error);
+    errEl.textContent = 'Serverlə əlaqə qurulmadı.';
+    errEl.classList.add('show');
+  }
+}
+  // Card brand detection helper (client-side)
+  function detectCardBrandFromPan(pan) {
+    const cleaned = String(pan).replace(/\s/g, '');
+    if (cleaned.startsWith('4')) return 'visa';
+    if (cleaned.startsWith('51') || cleaned.startsWith('52') || cleaned.startsWith('53') || 
+        cleaned.startsWith('54') || cleaned.startsWith('55')) return 'mastercard';
+    if (cleaned.length >= 4) {
+      const prefix = parseInt(cleaned.substring(0, 4));
+      if (prefix >= 2221 && prefix <= 2720) return 'mastercard';
+    }
+    return null;
   }
 
   // ---- Payment History ----
-  function historyIconHTML(category) {
-    const icon = CATEGORY_ICONS[category] || CATEGORY_ICONS['Other'];
-    const color = CATEGORY_COLORS[category] || 'neutral';
-    return `<div class="history-icon sub-icon ${color}">${icon}</div>`;
+  function historyIconHTML(name, category) {
+    return getBrandIconHTML(name, category);
   }
 
   function historyRowHTML(h) {
@@ -2257,7 +2921,7 @@
     const badgeTxt = h.status === 'success' ? '✓ uğurlu' : '✗ uğursuz';
     return `
       <div class="history-row">
-        ${historyIconHTML(h.kateqoriya || 'Other')}
+        ${historyIconHTML(h.app_adi, h.kateqoriya || 'Other')}
         <div class="history-info">
           <div class="history-name">${h.app_adi}</div>
           <div class="history-meta">${dateFmt}</div>
@@ -2282,6 +2946,7 @@
   function renderPaymentHistory() {
     const list = document.getElementById('history-list');
     const sub = document.getElementById('history-sub');
+    if (!list) return;
     if (paymentHistory.length === 0) {
       list.innerHTML = '<div class="hint">Hələ ödəniş tarixçəsi yoxdur.</div>';
       if (sub) sub.textContent = '0 ödəniş';
@@ -2370,6 +3035,17 @@
     
     // Update stats cards in dashboard
     document.getElementById('dashboard-monthly-spend').textContent = sym + budgetState.spent.toFixed(2);
+
+    // Update new figma-style dashboard budget card
+    const dbSpent = document.getElementById('db-budget-spent');
+    if (dbSpent) dbSpent.textContent = sym + budgetState.spent.toFixed(2);
+    const dbLimit = document.getElementById('db-budget-limit');
+    if (dbLimit) dbLimit.textContent = '/ ' + sym + budgetState.limit.toFixed(2);
+    
+    const dbRingFill = document.getElementById('db-ring-fill');
+    if (dbRingFill) dbRingFill.style.strokeDashoffset = 251.2 * (1 - pct / 100);
+    const dbRingPct = document.getElementById('db-ring-pct');
+    if (dbRingPct) dbRingPct.textContent = pct + '%';
     
     document.querySelector('.budget-note').innerHTML =
       `Limitin <strong style="color:var(--ink)">%${pct}</strong>-i istifadə olunub · ${sym}${free.toFixed(2)} sərbəst qalıb.`;
@@ -2619,6 +3295,54 @@
     } else {
       hideApp();
     }
+
+    // Real-time Card Preview Listeners
+    const cardNameInp = document.getElementById('card-name');
+    const cardPanInp = document.getElementById('card-pan');
+    const cardExpiryInp = document.getElementById('card-expiry');
+    const cardCvvInp = document.getElementById('card-cvv');
+    const livePreviewCard = document.getElementById('live-preview-card');
+
+    if (cardNameInp) {
+      cardNameInp.addEventListener('input', (e) => {
+        document.getElementById('preview-bank-name').textContent = e.target.value.toUpperCase() || 'BANK ADI';
+      });
+    }
+    if (cardPanInp) {
+      cardPanInp.addEventListener('input', (e) => {
+        document.getElementById('preview-card-number').textContent = e.target.value || '•••• •••• •••• ••••';
+      });
+    }
+    if (cardExpiryInp) {
+      cardExpiryInp.addEventListener('input', (e) => {
+        let val = e.target.value;
+        if (val.length === 2 && !val.includes('/')) {
+          val = val + '/';
+          e.target.value = val;
+        }
+        document.getElementById('preview-card-expiry').textContent = val || 'AA/İİ';
+      });
+    }
+    if (cardCvvInp) {
+      cardCvvInp.addEventListener('input', (e) => {
+        document.getElementById('preview-card-cvv').textContent = e.target.value || '•••';
+      });
+      cardCvvInp.addEventListener('focus', () => {
+        livePreviewCard.classList.add('flipped');
+      });
+      cardCvvInp.addEventListener('blur', () => {
+        livePreviewCard.classList.remove('flipped');
+      });
+    }
+
+    // iOS/iPhone scroll and rubber-banding fix for modals
+    document.querySelectorAll('.sheet-overlay').forEach(overlay => {
+      overlay.addEventListener('touchmove', e => {
+        if (!e.target.closest('.sheet')) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    });
   });
 </script>
 
