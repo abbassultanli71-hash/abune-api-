@@ -64,6 +64,12 @@ async function ensureOtpTableExists() {
       console.log('Database check: verified column is already verified.');
     }
 
+    try {
+      await executeQuery(`ALTER TABLE otp_verifications DROP COLUMN IF EXISTS username`);
+    } catch (err) {
+      console.log('Database check: dropped legacy username column from otp_verifications.');
+    }
+
     console.log('Database Boot check: Table otp_verifications verified/created.');
   } catch (error) {
     console.error('Database Boot check failure for otp_verifications table:', error);
