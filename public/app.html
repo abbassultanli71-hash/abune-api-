@@ -1907,15 +1907,8 @@
           </div>`;
         errorEl.style.color = '#10b981';
         errorEl.classList.add('show');
-        submitBtn.style.display = 'none';
-        // Show verify button separately
-        const verifyBtn = document.createElement('button');
-        verifyBtn.className = 'btn btn-primary';
-        verifyBtn.style.cssText = 'width:100%; margin-top:8px;';
-        verifyBtn.textContent = 'Kodu Təsdiqlə';
-        verifyBtn.id = 'reg-verify-btn';
-        verifyBtn.onclick = handleRegister;
-        submitBtn.parentElement.appendChild(verifyBtn);
+        submitBtn.style.display = 'block';
+        submitBtn.textContent = 'Kodu Təsdiqlə';
       } else {
         submitBtn.textContent = 'Qeydiyyatdan Keç';
         errorEl.style.color = '#ef4444'; // Red error color
@@ -1932,14 +1925,15 @@
         return;
       }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Təsdiqlənir...';
+      const activeBtn = document.getElementById('reg-submit-btn');
+      activeBtn.disabled = true;
+      activeBtn.textContent = 'Təsdiqlənir...';
 
       const res = await apiFetch('POST', '/api/istifadeciler/register/verify', { email, otp });
       if (res.ok) {
         // Auto login on successful registration
         const loginRes = await apiFetch('POST', '/api/istifadeciler/login', { username, password });
-        submitBtn.disabled = false;
+        activeBtn.disabled = false;
         
         // Reset registration fields state
         isOtpVerificationStep = false;
@@ -1948,7 +1942,7 @@
         document.getElementById('reg-ad').parentElement.style.display = 'block';
         document.getElementById('reg-email').parentElement.style.display = 'block';
         document.getElementById('reg-password').parentElement.style.display = 'block';
-        submitBtn.textContent = 'Qeydiyyatdan Keç';
+        activeBtn.textContent = 'Qeydiyyatdan Keç';
 
         if (loginRes.ok && loginRes.data && loginRes.data.data && loginRes.data.data.user) {
           currentUser = loginRes.data.data.user;
@@ -1958,8 +1952,8 @@
           toggleAuthTab('login');
         }
       } else {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Kodu Təsdiqlə';
+        activeBtn.disabled = false;
+        activeBtn.textContent = 'Kodu Təsdiqlə';
         errorEl.style.color = '#ef4444';
         errorEl.textContent = res.data?.error?.message || 'Təsdiq kodu yanlışdır və ya vaxtı bitib.';
         errorEl.classList.add('show');
