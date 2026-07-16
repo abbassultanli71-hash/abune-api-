@@ -38,7 +38,7 @@ function sendTelegramMessage(chatId, text) {
 }
 
 function initTelegramWebhook() {
-  const webhookUrl = `https://abune-api.onrender.com/api/telegram-webhook`;
+  const webhookUrl = `https://abune-api.onrender.com/telegram-webhook`;
   const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/setWebhook?url=${encodeURIComponent(webhookUrl)}`;
   
   https.get(url, (res) => {

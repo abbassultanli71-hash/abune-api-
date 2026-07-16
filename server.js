@@ -203,9 +203,9 @@ app.get('/', (req, res) => { res.redirect('/app'); });
 app.get('/app', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
 app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 
-// Telegram webhook - must be registered BEFORE authMiddleware so it is never blocked
+// Telegram webhook - registered WITHOUT /api prefix so authMiddleware NEVER touches it
 const telegramBot = require('./telegramBot');
-app.post('/api/telegram-webhook', telegramBot.handleTelegramUpdate);
+app.post('/telegram-webhook', telegramBot.handleTelegramUpdate);
 
 // Protected routes
 app.use('/api-docs', authMiddleware, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
