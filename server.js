@@ -40,6 +40,12 @@ async function ensureOtpTableExists() {
       console.log('Database check: payload column is already verified.');
     }
 
+    try {
+      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT FALSE`);
+    } catch (err) {
+      console.log('Database check: verified column is already verified.');
+    }
+
     console.log('Database Boot check: Table otp_verifications verified/created.');
   } catch (error) {
     console.error('Database Boot check failure for otp_verifications table:', error);
