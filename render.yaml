@@ -14,3 +14,7 @@ services:
         sync: false
       - key: PORT
         value: 3000
+      - key: BREVO_API_KEY
+        sync: false
+      - key: SMTP_FROM
+        value: abbassultanli71@gmail.com
