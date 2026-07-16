@@ -62,7 +62,7 @@ async function handleTelegramUpdate(req, res) {
   const text = (update.message.text || '').trim();
 
   if (text.startsWith('/start')) {
-    sendTelegramMessage(chatId, 'Salam! <b>Abunəm</b> OTP botuna xoş gəlmisiniz.\n\nTəsdiq kodunu almaq üçün zəhmət olmasa saytda qeydiyyatdan keçdiyiniz <b>email ünvanınızı</b> yazın:');
+    sendTelegramMessage(chatId, 'Salam! <b>Abunəm</b> OTP botuna xoş gəlmisiniz.\n\nQeydiyyat kodunu almaq üçün saytda daxil etdiyiniz <b>email ünvanınızı</b> yazın:');
     return;
   }
 
@@ -70,34 +70,53 @@ async function handleTelegramUpdate(req, res) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (emailRegex.test(text)) {
     const email = text.toLowerCase().trim();
-    
-    // Generate 6-digit OTP
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const codeHash = hashOtp(code);
-    
-    const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 10); // 10 minutes expiration
 
     try {
-      // 1. Delete previous active OTPs for the same email and purpose to prevent database bloat
-      await executeQuery(`
-        DELETE FROM otp_verifications 
-        WHERE email = :email AND purpose = 'REGISTER' AND verified = FALSE
-      `, { email }, { autoCommit: true });
+      // Look up pending registration data stored by /register/initiate
+      const pendingResult = await executeQuery(
+        `SELECT payload, expires_at FROM otp_verifications WHERE email = $1 AND purpose = 'REGISTER_PENDING' ORDER BY created_at DESC LIMIT 1`,
+        [email]
+      );
 
-      // 2. Insert new OTP verification record
-      await executeQuery(`
-        INSERT INTO otp_verifications (email, code_hash, purpose, payload, expires_at)
-        VALUES (:email, :codeHash, 'REGISTER', :payload, :expiresAt)
-      `, {
-        email,
-        codeHash,
-        payload: JSON.stringify({ chatId, source: 'telegram' }),
-        expiresAt
-      }, { autoCommit: true });
+      if (pendingResult.rows.length === 0) {
+        sendTelegramMessage(chatId, '❌ Bu email ilə aktiv qeydiyyat tapılmadı.\n\nZəhmət olmasa əvvəlcə saytda qeydiyyat formasını doldurun, sonra bura gəlin.');
+        return;
+      }
 
-      // Send the code to the user in Telegram
-      sendTelegramMessage(chatId, `Sizin Abunəm qeydiyyat təsdiq kodunuz:\n\n<code>${code}</code>\n\nBu kodu saytdakı qeydiyyat xanasına daxil edin. Kod 10 dəqiqə ərzində etibarlıdır.`);
+      const pendingRow = pendingResult.rows[0];
+
+      // Check if pending record is expired
+      if (new Date() > new Date(pendingRow.EXPIRES_AT)) {
+        sendTelegramMessage(chatId, '⏰ Qeydiyyat sessiyasının vaxtı bitib. Zəhmət olmasa saytda yenidən qeydiyyat formasını doldurun.');
+        return;
+      }
+
+      const payload = pendingRow.PAYLOAD;
+
+      // Generate 6-digit OTP
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const codeHash = hashOtp(code);
+
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+
+      // Delete old REGISTER OTPs for this email
+      await executeQuery(
+        `DELETE FROM otp_verifications WHERE email = $1 AND purpose = 'REGISTER' AND verified = FALSE`,
+        [email],
+        { autoCommit: true }
+      );
+
+      // Insert new OTP with the registration payload
+      await executeQuery(
+        `INSERT INTO otp_verifications (email, code_hash, purpose, payload, expires_at) VALUES ($1, $2, 'REGISTER', $3, $4)`,
+        [email, codeHash, payload, expiresAt],
+        { autoCommit: true }
+      );
+
+      // Send the code to the user
+      sendTelegramMessage(chatId, `✅ Sizin <b>Abunəm</b> qeydiyyat kodunuz:\n\n<code>${code}</code>\n\nBu kodu saytdakı OTP xanasına daxil edin.\n⏱ Kod <b>10 dəqiqə</b> ərzində etibarlıdır.`);
+
     } catch (err) {
       console.error('Telegram Bot: DB error during OTP generation:', err);
       sendTelegramMessage(chatId, 'Sistemdə texniki xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.');

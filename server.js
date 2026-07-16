@@ -13,13 +13,8 @@ const { generateDueMessage } = require('./services/notificationService');
 // Ensure database contains the otp_verifications table on server boot
 async function ensureOtpTableExists() {
   try {
-    // Drop legacy table to clear any old conflicting schema definitions (e.g. NOT NULL columns like username, ad, etc.)
-    // Since it only contains transient OTP codes, recreating it on boot guarantees a clean schema.
-    await executeQuery(`DROP TABLE IF EXISTS otp_verifications CASCADE`, {}, { autoCommit: true });
-
-    // Recreate the table with the correct schema
     await executeQuery(`
-      CREATE TABLE otp_verifications (
+      CREATE TABLE IF NOT EXISTS otp_verifications (
         id SERIAL PRIMARY KEY,
         email VARCHAR(100) NOT NULL,
         code_hash VARCHAR(100) NOT NULL,
@@ -30,8 +25,7 @@ async function ensureOtpTableExists() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `, {}, { autoCommit: true });
-
-    console.log('Database Boot check: Table otp_verifications successfully recreated with clean schema.');
+    console.log('Database Boot check: otp_verifications table is ready.');
   } catch (error) {
     console.error('Database Boot check failure for otp_verifications table:', error);
   }
@@ -693,18 +687,28 @@ app.post('/api/istifadeciler/register/initiate', async (req, res) => {
 
     const passwordHash = await bcrypt.hash(trimmedPassword, 10);
 
-    // Generate OTP code and store registration payload
-    await otpService.generateOtp(trimmedEmail, 'REGISTER', {
-      username: trimmedUsername,
-      ad: trimmedAd,
-      passwordHash
-    });
+    // Store pending registration data — OTP will be delivered via Telegram bot
+    // Delete any previous pending record for this email first
+    await executeQuery(
+      `DELETE FROM otp_verifications WHERE email = $1 AND purpose = 'REGISTER_PENDING'`,
+      [trimmedEmail],
+      { autoCommit: true }
+    );
+    const pendingExpiresAt = new Date();
+    pendingExpiresAt.setMinutes(pendingExpiresAt.getMinutes() + 30);
+    await executeQuery(
+      `INSERT INTO otp_verifications (email, code_hash, purpose, payload, expires_at) VALUES ($1, 'pending', 'REGISTER_PENDING', $2, $3)`,
+      [trimmedEmail, JSON.stringify({ username: trimmedUsername, ad: trimmedAd, passwordHash }), pendingExpiresAt],
+      { autoCommit: true }
+    );
 
-    return successResponse(res, 200, 'OK', { message: 'Qeydiyyatı tamamlamaq üçün email-ə göndərilən təsdiq kodunu daxil edin.' });
+    return successResponse(res, 200, 'OK', { message: 'Məlumatlar qəbul edildi. Telegram botuna emailinizi yazaraq OTP kodunu alın.' });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
 });
+
+
 
 /**
  * @swagger
