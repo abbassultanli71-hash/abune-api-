@@ -29,6 +29,18 @@ async function ensureOtpTableExists() {
 
     // 2. Add columns if table existed prior without them (to handle schema updates safely)
     try {
+      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS email VARCHAR(100)`);
+    } catch (err) {
+      console.log('Database check: email column verified.');
+    }
+
+    try {
+      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS code_hash VARCHAR(100)`);
+    } catch (err) {
+      console.log('Database check: code_hash column verified.');
+    }
+
+    try {
       await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS purpose VARCHAR(50)`);
     } catch (err) {
       console.log('Database check: purpose column is already verified.');
@@ -38,6 +50,12 @@ async function ensureOtpTableExists() {
       await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS payload TEXT`);
     } catch (err) {
       console.log('Database check: payload column is already verified.');
+    }
+
+    try {
+      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP`);
+    } catch (err) {
+      console.log('Database check: expires_at column verified.');
     }
 
     try {
