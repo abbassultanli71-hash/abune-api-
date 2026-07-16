@@ -28,16 +28,16 @@ if (host && user && pass) {
 }
 
 async function sendOtpEmail(email, code, purposeText) {
-  const subject = `Abunəlik Portalı - ${purposeText} üçün Təsdiq Kodu`;
-  const text = `Sizin təsdiq kodunuz: ${code}. Kod 10 dəqiqə ərzində etibarlıdır.`;
+  const subject = `Subscription Portal - ${purposeText} Verification Code`;
+  const text = `Your verification code is: ${code}. It is valid for 10 minutes.`;
   const html = `
     <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 5px; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #4f46e5; margin-top: 0;">Təsdiq Kodu (OTP)</h2>
-      <p>Siz <strong>${purposeText}</strong> əməliyyatını tamamlamaq üçün təsdiq kodu tələb etdiniz.</p>
+      <h2 style="color: #4f46e5; margin-top: 0;">Verification Code (OTP)</h2>
+      <p>You requested a verification code to complete your <strong>${purposeText}</strong> process.</p>
       <div style="font-size: 28px; font-weight: bold; background-color: #f3f4f6; padding: 15px; text-align: center; border-radius: 8px; border: 1px dashed #cbd5e1; letter-spacing: 6px; margin: 20px 0; color: #1f2937;">
         ${code}
       </div>
-      <p style="font-size: 14px; color: #4b5563;">Bu kod 10 dəqiqə ərzində etibarlıdır. Əgər bu əməliyyatı siz başlatmamısınızsa, bu məktubu silə bilərsiniz.</p>
+      <p style="font-size: 14px; color: #4b5563;">This code is valid for 10 minutes. If you did not initiate this action, you can safely ignore this email.</p>
     </div>
   `;
 
@@ -95,7 +95,7 @@ async function generateOtp(email, purpose, payloadObj) {
   }, { autoCommit: true });
 
   // 3. Send email asynchronously
-  const purposeText = purpose === 'REGISTER' ? 'Qeydiyyat' : 'Şifrə Dəyişdirilməsi';
+  const purposeText = purpose === 'REGISTER' ? 'Registration' : 'Password Reset';
   module.exports.sendOtpEmail(normalizedEmail, code, purposeText).catch(err => {
     console.error('OtpService: Async sendOtpEmail error:', err);
   });
