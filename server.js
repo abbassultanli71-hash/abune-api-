@@ -63,25 +63,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/test-email-direct', async (req, res) => {
   try {
-    const nodemailer = require('nodemailer');
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: 'abbassultanli71@gmail.com',
-        pass: 'qola uijf dzur ylwp'
-      }
-    });
+    const otpService = require('./otpService');
+    const success = await otpService.sendOtpEmail('abbas.sultanli@mail.ru', '123456', 'Debug Direct Test');
     
-    const info = await transporter.sendMail({
-      from: '"Abunəm" <abbassultanli71@gmail.com>',
-      to: 'abbas.sultanli@mail.ru',
-      subject: 'Abunəm - Port 465 Live Debug Test ✔',
-      text: 'Direct test from Render server using port 465'
-    });
+    const brevoKeyExists = !!process.env.BREVO_API_KEY;
+    const smtpFrom = process.env.SMTP_FROM || 'abbassultanli71@gmail.com';
     
-    return res.status(200).json({ success: true, info });
+    return res.status(200).json({ 
+      success, 
+      brevoKeyExists, 
+      senderEmailUsed: smtpFrom,
+      message: success ? 'Email sent successfully!' : 'Email failed. Check server console logs for details.' 
+    });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message, stack: err.stack });
   }
