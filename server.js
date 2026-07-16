@@ -60,6 +60,33 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/api/test-email-direct', async (req, res) => {
+  try {
+    const nodemailer = require('nodemailer');
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'abbassultanli71@gmail.com',
+        pass: 'qola uijf dzur ylwp'
+      }
+    });
+    
+    const info = await transporter.sendMail({
+      from: '"Abunəm" <abbassultanli71@gmail.com>',
+      to: 'abbas.sultanli@mail.ru',
+      subject: 'Abunəm - Live Debug Test ✔',
+      text: 'Direct test from Render server'
+    });
+    
+    return res.status(200).json({ success: true, info });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message, stack: err.stack });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 
 const authMiddleware = (req, res, next) => {
