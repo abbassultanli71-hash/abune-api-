@@ -66,8 +66,8 @@ app.get('/api/test-email-direct', async (req, res) => {
     const nodemailer = require('nodemailer');
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
+      port: 465,
+      secure: true,
       auth: {
         user: 'abbassultanli71@gmail.com',
         pass: 'qola uijf dzur ylwp'
@@ -77,8 +77,8 @@ app.get('/api/test-email-direct', async (req, res) => {
     const info = await transporter.sendMail({
       from: '"Abunəm" <abbassultanli71@gmail.com>',
       to: 'abbas.sultanli@mail.ru',
-      subject: 'Abunəm - Live Debug Test ✔',
-      text: 'Direct test from Render server'
+      subject: 'Abunəm - Port 465 Live Debug Test ✔',
+      text: 'Direct test from Render server using port 465'
     });
     
     return res.status(200).json({ success: true, info });
