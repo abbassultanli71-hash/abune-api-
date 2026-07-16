@@ -73,6 +73,10 @@ db.executeQuery = async (sql, binds = {}, options = {}) => {
     return { rows: [], rowsAffected: 1 };
   }
   
+  if (sqlClean.startsWith('DROP TABLE IF EXISTS otp_verifications') || sqlClean.startsWith('CREATE TABLE otp_verifications')) {
+    return { rows: [], rowsAffected: 0 };
+  }
+  
   if (sqlClean.startsWith('SELECT id FROM istifadeciler WHERE username =')) {
     const user = mockUsers.find(u => u.username === binds.username);
     return { rows: user ? [{ ID: user.id }] : [], rowsAffected: user ? 1 : 0 };

@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const https = require('https');
 const { executeQuery } = require('./db');
 require('dotenv').config();
 
@@ -8,25 +8,18 @@ function hashOtp(code) {
   return crypto.createHash('sha256').update(code).digest('hex');
 }
 
-// Mail transporter initialization
-const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-const port = parseInt(process.env.SMTP_PORT || '587', 10);
-const user = process.env.SMTP_USER || 'abbassultanli71@gmail.com';
-const pass = process.env.SMTP_PASS || 'qola uijf dzur ylwp';
-const fromMail = process.env.SMTP_FROM || 'abbassultanli71@gmail.com';
-
-const transporter = nodemailer.createTransport({
-  host,
-  port,
-  secure: port === 465,
-  auth: { user, pass }
-});
-console.log('OtpService: SMTP Mailer Transporter initialized with sender:', user);
+// Brevo Web API configuration
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+const SENDER_EMAIL = process.env.SMTP_FROM || 'abbassultanli71@gmail.com';
 
 async function sendOtpEmail(email, code, purposeText) {
+  if (!BREVO_API_KEY) {
+    console.error('OtpService: BREVO_API_KEY environment variable is not defined!');
+    return false;
+  }
+
   const subject = `Subscription Portal - ${purposeText} Verification Code`;
-  const text = `Your verification code is: ${code}. It is valid for 10 minutes.`;
-  const html = `
+  const htmlContent = `
     <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 5px; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #4f46e5; margin-top: 0;">Verification Code (OTP)</h2>
       <p>You requested a verification code to complete your <strong>${purposeText}</strong> process.</p>
@@ -44,22 +37,56 @@ async function sendOtpEmail(email, code, purposeText) {
   console.log(`OTP Code: ${code}`);
   console.log(`==================================================\n`);
 
-  if (transporter) {
-    try {
-      await transporter.sendMail({
-        from: `"Abunəm" <${fromMail}>`,
-        to: email,
-        subject,
-        text,
-        html
-      });
-      return true;
-    } catch (error) {
-      console.error('OtpService: Mail sending failed:', error);
-      return false;
+  const postData = JSON.stringify({
+    sender: {
+      name: 'Abunəm',
+      email: SENDER_EMAIL
+    },
+    to: [
+      {
+        email: email
+      }
+    ],
+    subject: subject,
+    htmlContent: htmlContent
+  });
+
+  const options = {
+    hostname: 'api.brevo.com',
+    port: 443,
+    path: '/v3/smtp/email',
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'api-key': BREVO_API_KEY,
+      'content-type': 'application/json',
+      'content-length': Buffer.byteLength(postData)
     }
-  }
-  return true;
+  };
+
+  return new Promise((resolve) => {
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          console.log('OtpService: Email sent successfully via Brevo API.');
+          resolve(true);
+        } else {
+          console.error(`OtpService: Brevo API failed with status ${res.statusCode}:`, data);
+          resolve(false);
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      console.error('OtpService: Brevo HTTP Request error:', error);
+      resolve(false);
+    });
+
+    req.write(postData);
+    req.end();
+  });
 }
 
 async function generateOtp(email, purpose, payloadObj) {
