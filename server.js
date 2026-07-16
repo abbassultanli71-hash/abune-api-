@@ -434,6 +434,53 @@ function detectCardBrand(pan) {
  *         description: Uğurlu əməliyyat
  *       404:
  *         description: İstifadəçi tapılmadı
+ * 
+ *   put:
+ *     summary: İstifadəçi məlumatlarını yeniləyir (istəyə görə username də dəyişdirilə bilər)
+ *     tags: [İstifadəçilər]
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [ad, email]
+ *             properties:
+ *               ad:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 example: abbas@example.com
+ *               username:
+ *                 type: string
+ *                 description: Yalnız username-i dəyişmək istəyəndə göndərin.
+ *                 example: abbas.new
+ *     responses:
+ *       200:
+ *         description: Yeniləndi
+ *       404:
+ *         description: Tapılmadı
+ * 
+ *   delete:
+ *     summary: İstifadəçini silir
+ *     tags: [İstifadəçilər]
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Silindi
+ *       404:
+ *         description: Tapılmadı
  */
 app.get('/api/istifadeciler/:username', async (req, res) => {
   const { username } = req.params;
@@ -910,41 +957,7 @@ app.post('/api/istifadeciler/login', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/istifadeciler/{username}:
- *   put:
- *     summary: İstifadəçi məlumatlarını yeniləyir (istəyə görə username də dəyişdirilə bilər)
- *     tags: [İstifadəçilər]
- *     parameters:
- *       - in: path
- *         name: username
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [ad, email]
- *             properties:
- *               ad:
- *                 type: string
- *               email:
- *                 type: string
- *                 example: abbas@example.com
- *               username:
- *                 type: string
- *                 description: Yalnız username-i dəyişmək istəyəndə göndərin.
- *                 example: abbas.new
- *     responses:
- *       200:
- *         description: Yeniləndi
- *       404:
- *         description: Tapılmadı
- */
+// PUT Swagger docs merged into single path definition block at the top
 app.put('/api/istifadeciler/:username', async (req, res) => {
   const { username } = req.params;
   const { ad, email, username: yeniUsername } = req.body;
@@ -991,24 +1004,7 @@ app.put('/api/istifadeciler/:username', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/istifadeciler/{username}:
- *   delete:
- *     summary: İstifadəçini silir
- *     tags: [İstifadəçilər]
- *     parameters:
- *       - in: path
- *         name: username
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Silindi
- *       404:
- *         description: Tapılmadı
- */
+// DELETE Swagger docs merged into single path definition block at the top
 app.delete('/api/istifadeciler/:username', async (req, res) => {
   const { username } = req.params;
   try {
