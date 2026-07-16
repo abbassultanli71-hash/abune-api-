@@ -83,6 +83,10 @@ app.get('/api/test-email-direct', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 const authMiddleware = (req, res, next) => {
+  // Bypass authentication for Telegram webhook endpoint
+  if (req.path === '/api/telegram-webhook') {
+    return next();
+  }
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     res.setHeader('WWW-Authenticate', 'Basic realm="Secure API"');

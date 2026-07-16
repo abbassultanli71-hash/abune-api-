@@ -1091,6 +1091,33 @@
             </div>
             <div class="field-error" id="auth-register-error" style="margin-bottom: 8px;"></div>
             <button class="btn btn-primary" id="reg-submit-btn" style="width: 100%;" onclick="handleRegister()">Qeydiyyatdan Keç</button>
+
+            <!-- Telegram OTP option -->
+            <div id="reg-telegram-hint" style="margin-top: 12px; text-align: center;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.15);"></div>
+                <span style="font-size: 12px; color: rgba(255,255,255,0.45); white-space: nowrap;">və ya OTP-ni birbaşa alın</span>
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.15);"></div>
+              </div>
+              <a href="https://t.me/Abunem_bot" target="_blank" id="reg-telegram-btn"
+                style="display: flex; align-items: center; justify-content: center; gap: 10px;
+                       background: linear-gradient(135deg, #229ED9, #1a7ab8);
+                       color: #fff; font-weight: 600; font-size: 14px;
+                       padding: 11px 20px; border-radius: 10px;
+                       text-decoration: none; transition: opacity 0.2s, transform 0.15s;
+                       box-shadow: 0 4px 14px rgba(34,158,217,0.35);"
+                onmouseover="this.style.opacity='0.85'; this.style.transform='translateY(-1px)';"
+                onmouseout="this.style.opacity='1'; this.style.transform='translateY(0)';"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.284c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.92 14.41l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.896.176z"/>
+                </svg>
+                Telegram Botundan OTP Al
+              </a>
+              <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 7px; line-height: 1.5;">
+                @Abunem_bot-a emailinizi yazın → kod dərhal gəlir
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -1890,7 +1917,7 @@
         // Show OTP field
         otpContainer.style.display = 'block';
         submitBtn.textContent = 'Kodu Təsdiqlə';
-        errorEl.innerHTML = 'Təsdiq kodu email ünvanınıza göndərildi. Gecikmə olarsa, kodu saniyəsində almaq üçün <a href="https://t.me/Abunem_bot" target="_blank" style="color: #4f46e5; text-decoration: underline; font-weight: bold;">Telegram Botumuza</a> daxil olub emailinizi yazın.';
+        errorEl.innerHTML = '✅ Təsdiq kodu <b>email</b> ünvanınıza göndərildi. Gecikmə olarsa, aşağıdakı <b>Telegram</b> düyməsindən dərhal alın.';
         errorEl.style.color = '#10b981'; // Green message color
         errorEl.classList.add('show');
       } else {
