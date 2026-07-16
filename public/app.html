@@ -1890,7 +1890,7 @@
         // Show OTP field
         otpContainer.style.display = 'block';
         submitBtn.textContent = 'Kodu Təsdiqlə';
-        errorEl.textContent = 'Təsdiq kodu email ünvanınıza göndərildi. Zəhmət olmasa daxil edin.';
+        errorEl.innerHTML = 'Təsdiq kodu email ünvanınıza göndərildi. Gecikmə olarsa, kodu saniyəsində almaq üçün <a href="https://t.me/Abunem_bot" target="_blank" style="color: #4f46e5; text-decoration: underline; font-weight: bold;">Telegram Botumuza</a> daxil olub emailinizi yazın.';
         errorEl.style.color = '#10b981'; // Green message color
         errorEl.classList.add('show');
       } else {

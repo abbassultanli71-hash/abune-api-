@@ -2369,8 +2369,13 @@ app.put('/api/budceler/:username', async (req, res) => {
   }
 });
 
+// Telegram Bot Webhook Route
+const telegramBot = require('./telegramBot');
+app.post('/api/telegram-webhook', telegramBot.handleTelegramUpdate);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   startDueSubscriptionNotifierJob();
+  telegramBot.initTelegramWebhook();
 });
