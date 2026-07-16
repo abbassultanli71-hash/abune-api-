@@ -13,9 +13,13 @@ const { generateDueMessage } = require('./services/notificationService');
 // Ensure database contains the otp_verifications table on server boot
 async function ensureOtpTableExists() {
   try {
-    // 1. Create table if not exists
+    // Drop legacy table to clear any old conflicting schema definitions (e.g. NOT NULL columns like username, ad, etc.)
+    // Since it only contains transient OTP codes, recreating it on boot guarantees a clean schema.
+    await executeQuery(`DROP TABLE IF EXISTS otp_verifications CASCADE`, {}, { autoCommit: true });
+
+    // Recreate the table with the correct schema
     await executeQuery(`
-      CREATE TABLE IF NOT EXISTS otp_verifications (
+      CREATE TABLE otp_verifications (
         id SERIAL PRIMARY KEY,
         email VARCHAR(100) NOT NULL,
         code_hash VARCHAR(100) NOT NULL,
@@ -25,52 +29,9 @@ async function ensureOtpTableExists() {
         verified BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `);
+    `, {}, { autoCommit: true });
 
-    // 2. Add columns if table existed prior without them (to handle schema updates safely)
-    try {
-      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS email VARCHAR(100)`);
-    } catch (err) {
-      console.log('Database check: email column verified.');
-    }
-
-    try {
-      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS code_hash VARCHAR(100)`);
-    } catch (err) {
-      console.log('Database check: code_hash column verified.');
-    }
-
-    try {
-      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS purpose VARCHAR(50)`);
-    } catch (err) {
-      console.log('Database check: purpose column is already verified.');
-    }
-
-    try {
-      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS payload TEXT`);
-    } catch (err) {
-      console.log('Database check: payload column is already verified.');
-    }
-
-    try {
-      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP`);
-    } catch (err) {
-      console.log('Database check: expires_at column verified.');
-    }
-
-    try {
-      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT FALSE`);
-    } catch (err) {
-      console.log('Database check: verified column is already verified.');
-    }
-
-    try {
-      await executeQuery(`ALTER TABLE otp_verifications DROP COLUMN IF EXISTS username`);
-    } catch (err) {
-      console.log('Database check: dropped legacy username column from otp_verifications.');
-    }
-
-    console.log('Database Boot check: Table otp_verifications verified/created.');
+    console.log('Database Boot check: Table otp_verifications successfully recreated with clean schema.');
   } catch (error) {
     console.error('Database Boot check failure for otp_verifications table:', error);
   }
