@@ -26,7 +26,7 @@ async function sendOtpEmail(email, code, purposeText) {
       <div style="font-size: 28px; font-weight: bold; background-color: #f3f4f6; padding: 15px; text-align: center; border-radius: 8px; border: 1px dashed #cbd5e1; letter-spacing: 6px; margin: 20px 0; color: #1f2937;">
         ${code}
       </div>
-      <p style="font-size: 14px; color: #4b5563;">This code is valid for 10 minutes. If you did not initiate this action, you can safely ignore this email.</p>
+      <p style="font-size: 14px; color: #4b5563;">This code is valid for 1 minute. If you did not initiate this action, you can safely ignore this email.</p>
     </div>
   `;
 
@@ -94,7 +94,7 @@ async function generateOtp(email, purpose, payloadObj) {
   const codeHash = hashOtp(code);
 
   const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+  expiresAt.setMinutes(expiresAt.getMinutes() + 1);
 
   const normalizedEmail = email.toLowerCase().trim();
   const payloadStr = JSON.stringify(payloadObj);

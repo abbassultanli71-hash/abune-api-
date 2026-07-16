@@ -1085,6 +1085,9 @@
             <div class="field" id="reg-otp-container" style="display: none;">
               <label>Təsdiq Kodu (OTP)</label>
               <input type="text" id="reg-otp" placeholder="6 rəqəmli kod">
+              <div style="text-align: right; margin-top: 4px;">
+                <a href="#" style="font-size: 12px; color: #4f46e5; text-decoration: underline;" onclick="resendRegisterOtp(event)">Kodu yenidən göndər</a>
+              </div>
             </div>
             <div class="field-error" id="auth-register-error" style="margin-bottom: 8px;"></div>
             <button class="btn btn-primary" id="reg-submit-btn" style="width: 100%;" onclick="handleRegister()">Qeydiyyatdan Keç</button>
@@ -1939,6 +1942,12 @@
         errorEl.classList.add('show');
       }
     }
+  }
+
+  async function resendRegisterOtp(event) {
+    if (event) event.preventDefault();
+    isOtpVerificationStep = false;
+    await handleRegister();
   }
 
   function handleLogout() {
