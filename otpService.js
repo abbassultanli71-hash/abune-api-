@@ -117,13 +117,15 @@ async function generateOtp(email, purpose, payloadObj) {
     expiresAt
   }, { autoCommit: true });
 
-  // 3. Send email asynchronously
+  // 3. Send email and await it
   const purposeText = purpose === 'REGISTER' ? 'Registration' : 'Password Reset';
-  module.exports.sendOtpEmail(normalizedEmail, code, purposeText).catch(err => {
-    console.error('OtpService: Async sendOtpEmail error:', err);
-  });
-
-  return true;
+  try {
+    const isSent = await module.exports.sendOtpEmail(normalizedEmail, code, purposeText);
+    return isSent;
+  } catch (err) {
+    console.error('OtpService: sendOtpEmail failed inside generateOtp:', err);
+    return false;
+  }
 }
 
 async function verifyOtp(email, purpose, code) {
