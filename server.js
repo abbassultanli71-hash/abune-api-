@@ -13,6 +13,7 @@ const { generateDueMessage } = require('./services/notificationService');
 // Ensure database contains the otp_verifications table on server boot
 async function ensureOtpTableExists() {
   try {
+    // 1. Create table if not exists
     await executeQuery(`
       CREATE TABLE IF NOT EXISTS otp_verifications (
         id SERIAL PRIMARY KEY,
@@ -25,6 +26,20 @@ async function ensureOtpTableExists() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // 2. Add columns if table existed prior without them (to handle schema updates safely)
+    try {
+      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS purpose VARCHAR(50)`);
+    } catch (err) {
+      console.log('Database check: purpose column is already verified.');
+    }
+
+    try {
+      await executeQuery(`ALTER TABLE otp_verifications ADD COLUMN IF NOT EXISTS payload TEXT`);
+    } catch (err) {
+      console.log('Database check: payload column is already verified.');
+    }
+
     console.log('Database Boot check: Table otp_verifications verified/created.');
   } catch (error) {
     console.error('Database Boot check failure for otp_verifications table:', error);
