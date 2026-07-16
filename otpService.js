@@ -9,23 +9,19 @@ function hashOtp(code) {
 }
 
 // Mail transporter initialization
-let transporter = null;
-const host = process.env.SMTP_HOST;
+const host = process.env.SMTP_HOST || 'smtp.gmail.com';
 const port = parseInt(process.env.SMTP_PORT || '587', 10);
-const user = process.env.SMTP_USER;
-const pass = process.env.SMTP_PASS;
+const user = process.env.SMTP_USER || 'abbassultanli71@gmail.com';
+const pass = process.env.SMTP_PASS || 'qola uijf dzur ylwp';
+const fromMail = process.env.SMTP_FROM || 'abbassultanli71@gmail.com';
 
-if (host && user && pass) {
-  transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass }
-  });
-  console.log('OtpService: SMTP Mailer Transporter initialized.');
-} else {
-  console.log('OtpService: SMTP credentials not set in .env. OTP will be printed to console.');
-}
+const transporter = nodemailer.createTransport({
+  host,
+  port,
+  secure: port === 465,
+  auth: { user, pass }
+});
+console.log('OtpService: SMTP Mailer Transporter initialized with sender:', user);
 
 async function sendOtpEmail(email, code, purposeText) {
   const subject = `Subscription Portal - ${purposeText} Verification Code`;
@@ -51,7 +47,7 @@ async function sendOtpEmail(email, code, purposeText) {
   if (transporter) {
     try {
       await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'noreply@example.com',
+        from: `"Abunəm" <${fromMail}>`,
         to: email,
         subject,
         text,
