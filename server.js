@@ -5,9 +5,32 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const { executeQuery } = require('./db');
 const bcrypt = require('bcryptjs');
+const otpService = require('./otpService');
 require('dotenv').config();
 const { startDueSubscriptionNotifierJob } = require('./jobs/dueSubscriptionNotifier');
 const { generateDueMessage } = require('./services/notificationService');
+
+// Ensure database contains the otp_verifications table on server boot
+async function ensureOtpTableExists() {
+  try {
+    await executeQuery(`
+      CREATE TABLE IF NOT EXISTS otp_verifications (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(100) NOT NULL,
+        code_hash VARCHAR(100) NOT NULL,
+        purpose VARCHAR(50) NOT NULL,
+        payload TEXT NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        verified BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('Database Boot check: Table otp_verifications verified/created.');
+  } catch (error) {
+    console.error('Database Boot check failure for otp_verifications table:', error);
+  }
+}
+ensureOtpTableExists();
 
 const app = express();
 app.use(cors());
@@ -392,7 +415,320 @@ app.post('/api/istifadeciler', async (req, res) => {
   }
 });
 
+// ── OTP Registration & Password Change Routes ────────────────────────────────
+
 /**
+ * @swagger
+ * /api/istifadeciler/register/initiate:
+ *   post:
+ *     summary: Qeydiyyatı başladır və təsdiq kodunu (OTP) email-ə göndərir
+ *     tags: [İstifadəçilər]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - ad
+ *               - email
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
+ *               ad:
+ *                 type: string
+ *                 example: Abbas Abbasov
+ *               email:
+ *                 type: string
+ *                 example: abbas@example.com
+ *               password:
+ *                 type: string
+ *                 example: SifremGizli123
+ *     responses:
+ *       200:
+ *         description: OTP təsdiq kodu göndərildi
+ */
+app.post('/api/istifadeciler/register/initiate', async (req, res) => {
+  const { username, ad, email, password } = req.body;
+
+  if (!username || !ad || !email || !password) {
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad, email və password sahələri məcburidir.');
+  }
+
+  const trimmedUsername = String(username).trim();
+  const trimmedAd = String(ad).trim();
+  const trimmedEmail = String(email).trim();
+  const trimmedPassword = String(password);
+
+  if (trimmedUsername.length === 0 || trimmedAd.length === 0 || trimmedEmail.length === 0 || trimmedPassword.length === 0) {
+    return errorResponse(res, 400, 'Bad Request', 'EMPTY_FIELDS', 'username, ad, email və password sahələri boş qoyula bilməz.');
+  }
+  if (!isValidUsername(trimmedUsername)) {
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_USERNAME', 'Username yalnız hərf, rəqəm, "_" və "." ola bilər və 3-50 simvol aralığında olmalıdır.');
+  }
+  if (trimmedAd.length < 3 || trimmedAd.length > 100) {
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_NAME_LENGTH', 'Ad ən azı 3 və ən çoxu 100 simvoldan ibarət olmalıdır.');
+  }
+  if (!isValidEmail(trimmedEmail)) {
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_EMAIL', 'Email ünvanının formatı yanlışdır (nümunə: ad@example.com).');
+  }
+  if (trimmedEmail.length > 100) {
+    return errorResponse(res, 400, 'Bad Request', 'EMAIL_TOO_LONG', 'Email ən çoxu 100 simvoldan ibarət olmalıdır.');
+  }
+  if (trimmedPassword.length < 6 || trimmedPassword.length > 72) {
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_PASSWORD_LENGTH', 'Şifrə ən azı 6 və ən çoxu 72 simvoldan ibarət olmalıdır.');
+  }
+
+  try {
+    const usernameCheck = await executeQuery(`SELECT username FROM istifadeciler WHERE username = :username`, { username: trimmedUsername });
+    if (usernameCheck.rows.length > 0) {
+      return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_USERNAME', 'Bu username ilə artıq istifadəçi mövcuddur.');
+    }
+
+    const emailCheck = await executeQuery(`SELECT email FROM istifadeciler WHERE email = :email`, { email: trimmedEmail });
+    if (emailCheck.rows.length > 0) {
+      return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_EMAIL', 'Bu email ünvanı ilə artıq istifadəçi mövcuddur.');
+    }
+
+    const passwordHash = await bcrypt.hash(trimmedPassword, 10);
+
+    // Generate OTP code and store registration payload
+    await otpService.generateOtp(trimmedEmail, 'REGISTER', {
+      username: trimmedUsername,
+      ad: trimmedAd,
+      passwordHash
+    });
+
+    return successResponse(res, 200, 'OK', { message: 'Qeydiyyatı tamamlamaq üçün email-ə göndərilən təsdiq kodunu daxil edin.' });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
+ * /api/istifadeciler/register/verify:
+ *   post:
+ *     summary: OTP kodu ilə qeydiyyatı tamamlayır
+ *     tags: [İstifadəçilər]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - otp
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: abbas@example.com
+ *               otp:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       201:
+ *         description: Qeydiyyat uğurla tamamlandı
+ */
+app.post('/api/istifadeciler/register/verify', async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'email və otp sahələri məcburidir.');
+  }
+
+  try {
+    const verification = await otpService.verifyOtp(email, 'REGISTER', otp);
+    if (!verification.isValid) {
+      return errorResponse(res, 400, 'Bad Request', 'INVALID_OTP', verification.message);
+    }
+
+    const { username, ad, passwordHash } = verification.payload;
+
+    // Extra duplicate checks to handle potential parallel requests
+    const usernameCheck = await executeQuery(`SELECT username FROM istifadeciler WHERE username = :username`, { username });
+    if (usernameCheck.rows.length > 0) {
+      await otpService.deleteOtp(email, 'REGISTER');
+      return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_USERNAME', 'Bu username ilə artıq istifadəçi mövcuddur.');
+    }
+
+    const emailCheck = await executeQuery(`SELECT email FROM istifadeciler WHERE email = :email`, { email });
+    if (emailCheck.rows.length > 0) {
+      await otpService.deleteOtp(email, 'REGISTER');
+      return errorResponse(res, 400, 'Bad Request', 'DUPLICATE_EMAIL', 'Bu email ünvanı ilə artıq istifadəçi mövcuddur.');
+    }
+
+    // Insert user into DB
+    await executeQuery(
+      `INSERT INTO istifadeciler (username, ad, email, password) VALUES (:username, :ad, :email, :password)`,
+      { username, ad, email: email.toLowerCase().trim(), password: passwordHash },
+      { autoCommit: true }
+    );
+
+    const userResult = await executeQuery(`SELECT id FROM istifadeciler WHERE username = :username`, { username });
+    const userId = userResult.rows[0].ID;
+
+    // Create default settings & budget for new user
+    await executeQuery(
+      `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema, tema_rengi) VALUES (:userId, 'AZN', 'email', 'az', 'dark', 'gold')`,
+      { userId }, { autoCommit: true }
+    );
+    await executeQuery(
+      `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, hesab_mebleqi) VALUES (:userId, 300.00, 'AZN', 0.00)`,
+      { userId }, { autoCommit: true }
+    );
+
+    // Clean up OTP record
+    await otpService.deleteOtp(email, 'REGISTER');
+
+    return successResponse(res, 201, 'Created', { message: 'İstifadəçi və onun ilkin ayarları uğurla yaradıldı.' });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
+ * /api/istifadeciler/change-password/initiate:
+ *   post:
+ *     summary: Şifrə dəyişdirmə sorğusunu başladır və email-ə OTP göndərir
+ *     tags: [İstifadəçilər]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
+ *               currentPassword:
+ *                 type: string
+ *                 example: SifremGizli123
+ *               newPassword:
+ *                 type: string
+ *                 example: YeniSifre456
+ *     responses:
+ *       200:
+ *         description: OTP təsdiq kodu göndərildi
+ */
+app.post('/api/istifadeciler/change-password/initiate', async (req, res) => {
+  const { username, currentpassword, newpassword } = req.body;
+
+  if (!username || !currentpassword || !newpassword) {
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, currentpassword və newpassword sahələri məcburidir.');
+  }
+
+  const trimmedUsername = String(username).trim();
+  const trimmedCurrentPassword = String(currentpassword);
+  const trimmedNewPassword = String(newpassword);
+
+  if (trimmedNewPassword.length < 6 || trimmedNewPassword.length > 72) {
+    return errorResponse(res, 400, 'Bad Request', 'INVALID_PASSWORD_LENGTH', 'Yeni şifrə ən azı 6 və ən çoxu 72 simvoldan ibarət olmalıdır.');
+  }
+
+  if (trimmedCurrentPassword === trimmedNewPassword) {
+    return errorResponse(res, 400, 'Bad Request', 'SAME_PASSWORD', 'Yeni şifrə köhnə şifrədən fərqli olmalıdır.');
+  }
+
+  try {
+    const userCheck = await executeQuery(`SELECT id, email, password FROM istifadeciler WHERE username = :username`, { username: trimmedUsername });
+    if (userCheck.rows.length === 0) {
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    }
+
+    const user = userCheck.rows[0];
+    const isMatch = await bcrypt.compare(trimmedCurrentPassword, user.PASSWORD);
+    if (!isMatch) {
+      return errorResponse(res, 401, 'Unauthorized', 'WRONG_PASSWORD', 'Cari şifrə yanlışdır.');
+    }
+
+    const newPasswordHash = await bcrypt.hash(trimmedNewPassword, 10);
+
+    // Save in OTP verification session
+    await otpService.generateOtp(user.EMAIL, 'PASSWORD_CHANGE', { newPasswordHash });
+
+    return successResponse(res, 200, 'OK', { message: 'Şifrə dəyişdirilməsini təsdiqləmək üçün email-ə göndərilən kodu daxil edin.' });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
+ * /api/istifadeciler/change-password/verify:
+ *   post:
+ *     summary: OTP kodu ilə şifrəni yeniləyir
+ *     tags: [İstifadəçilər]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - otp
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: abbas.abbasov
+ *               otp:
+ *                 type: string
+ *                 example: "654321"
+ *     responses:
+ *       200:
+ *         description: Şifrə uğurla yeniləndi
+ */
+app.post('/api/istifadeciler/change-password/verify', async (req, res) => {
+  const { username, otp } = req.body;
+
+  if (!username || !otp) {
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username və otp sahələri məcburidir.');
+  }
+
+  try {
+    const userCheck = await executeQuery(`SELECT id, email FROM istifadeciler WHERE username = :username`, { username: String(username).trim() });
+    if (userCheck.rows.length === 0) {
+      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    }
+
+    const user = userCheck.rows[0];
+
+    const verification = await otpService.verifyOtp(user.EMAIL, 'PASSWORD_CHANGE', otp);
+    if (!verification.isValid) {
+      return errorResponse(res, 400, 'Bad Request', 'INVALID_OTP', verification.message);
+    }
+
+    const { newPasswordHash } = verification.payload;
+
+    // Update user's password in the database
+    await executeQuery(
+      `UPDATE istifadeciler SET password = :newPasswordHash WHERE id = :userId`,
+      { newPasswordHash, userId: user.ID },
+      { autoCommit: true }
+    );
+
+    // Clean up OTP record
+    await otpService.deleteOtp(user.EMAIL, 'PASSWORD_CHANGE');
+
+    return successResponse(res, 200, 'OK', { message: 'Şifrə uğurla yeniləndi.' });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
  * @swagger
  * /api/istifadeciler/login:
  *   post:

@@ -1,6 +1,7 @@
 -- PostgreSQL Database Schema for Subscription Management Platform
 
 -- Drop tables if they exist (dependency order: children first)
+DROP TABLE IF EXISTS otp_verifications CASCADE;
 DROP TABLE IF EXISTS istifadeci_ayarlari CASCADE;
 DROP TABLE IF EXISTS budceler CASCADE;
 DROP TABLE IF EXISTS abunelik_ortaqlar CASCADE;
@@ -117,6 +118,18 @@ CREATE TABLE istifadeci_ayarlari (
     dil VARCHAR(5) DEFAULT 'az',
     tema VARCHAR(10) DEFAULT 'dark',
     tema_rengi VARCHAR(30) DEFAULT 'gold'
+);
+
+-- 11. OTP_VERIFICATIONS Table
+CREATE TABLE otp_verifications (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    code_hash VARCHAR(100) NOT NULL,
+    purpose VARCHAR(50) NOT NULL,
+    payload TEXT NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    verified BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Test Seed Data
