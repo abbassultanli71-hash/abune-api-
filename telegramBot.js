@@ -117,6 +117,13 @@ async function handleTelegramUpdate(req, res) {
       // Send the code to the user
       sendTelegramMessage(chatId, `✅ Sizin <b>Abunəm</b> qeydiyyat kodunuz:\n\n<code>${code}</code>\n\nBu kodu saytdakı OTP xanasına daxil edin.\n⏱ Kod <b>10 dəqiqə</b> ərzində etibarlıdır.`);
 
+      // Save chat_id to user's profile for future push notifications
+      await executeQuery(
+        `UPDATE istifadeciler SET telegram_chat_id = $1 WHERE email = $2`,
+        [chatId, email],
+        { autoCommit: true }
+      ).catch(() => {});
+
     } catch (err) {
       console.error('Telegram Bot: DB error during OTP generation:', err);
       sendTelegramMessage(chatId, 'Sistemdə texniki xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.');
@@ -128,5 +135,6 @@ async function handleTelegramUpdate(req, res) {
 
 module.exports = {
   initTelegramWebhook,
-  handleTelegramUpdate
+  handleTelegramUpdate,
+  sendTelegramMessage
 };

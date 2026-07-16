@@ -25,6 +25,12 @@ async function ensureOtpTableExists() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `, {}, { autoCommit: true });
+
+    // Add telegram_chat_id column to istifadeciler if it doesn't exist
+    await executeQuery(`
+      ALTER TABLE istifadeciler ADD COLUMN IF NOT EXISTS telegram_chat_id BIGINT
+    `, {}, { autoCommit: true });
+
     console.log('Database Boot check: otp_verifications table is ready.');
   } catch (error) {
     console.error('Database Boot check failure for otp_verifications table:', error);
@@ -1304,6 +1310,29 @@ app.post('/api/abunelikler', async (req, res) => {
     }
 
     await syncBudgetSpent(userId);
+
+    // Send Telegram push notification if user has linked Telegram
+    try {
+      const tgRow = await executeQuery(
+        `SELECT telegram_chat_id, email FROM istifadeciler WHERE id = :userId`,
+        { userId }
+      );
+      if (tgRow.rows.length > 0 && tgRow.rows[0].TELEGRAM_CHAT_ID) {
+        const chatId = tgRow.rows[0].TELEGRAM_CHAT_ID;
+        const valyutaStr = getValidCurrency(valyuta);
+        const tgBot = require('./telegramBot');
+        const freqMap = { monthly: 'ayliq', yearly: 'illik', quarterly: 'rüblük', weekly: 'həftəlik' };
+        tgBot.sendTelegramMessage(chatId,
+          `✅ <b>Yeni abunəlik yaradıldı!</b>\n\n` +
+          `📦 <b>${ad}</b>\n` +
+          `💰 ${parsedQiymet.toFixed(2)} ${valyutaStr} / ${freqMap[odenisTezliyi] || odenisTezliyi}\n` +
+          `📅 Növbəti ödəniş: <b>${novbetiOdenisTarixi}</b>\n\n` +
+          `Abunəliyiniz uğurla aktivləşdirildi! 🎉`
+        );
+      }
+    } catch (tgErr) {
+      console.error('Telegram push notification error:', tgErr.message);
+    }
 
     return successResponse(res, 201, 'Created', {
       message: 'Abunəlik uğurla əlavə edildi. Bildiriş və ödəniş tarixçəsi avtomatik yaradıldı.',
