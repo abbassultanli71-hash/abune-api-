@@ -84,7 +84,7 @@ const PORT = process.env.PORT || 3000;
 
 const authMiddleware = (req, res, next) => {
   // Bypass authentication for Telegram webhook endpoint
-  if (req.path === '/api/telegram-webhook') {
+  if (req.originalUrl === '/api/telegram-webhook' || req.path === '/telegram-webhook') {
     return next();
   }
   const authHeader = req.headers.authorization;
@@ -202,6 +202,10 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.get('/', (req, res) => { res.redirect('/app'); });
 app.get('/app', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
 app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
+
+// Telegram webhook - must be registered BEFORE authMiddleware so it is never blocked
+const telegramBot = require('./telegramBot');
+app.post('/api/telegram-webhook', telegramBot.handleTelegramUpdate);
 
 // Protected routes
 app.use('/api-docs', authMiddleware, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
@@ -2373,9 +2377,7 @@ app.put('/api/budceler/:username', async (req, res) => {
   }
 });
 
-// Telegram Bot Webhook Route
-const telegramBot = require('./telegramBot');
-app.post('/api/telegram-webhook', telegramBot.handleTelegramUpdate);
+// Telegram Bot Webhook Route is registered earlier (before authMiddleware) - see top of file
 
 // Start server
 app.listen(PORT, () => {
