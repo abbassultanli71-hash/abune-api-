@@ -2076,6 +2076,13 @@
     if (body) options.body = JSON.stringify(body);
     try {
       const response = await fetch(`${API_BASE}${endpoint}`, options);
+      
+      // Auto logout if session expired / unauthorized
+      if (response.status === 401 && endpoint !== '/api/istifadeciler/login') {
+        handleLogout();
+        return { ok: false, status: 401, data: { error: 'Oturum vaxtı bitdi. Yenidən giriş edin.' } };
+      }
+
       const data = await response.json();
       return { ok: response.ok, status: response.status, data: normalizeKeys(data) };
     } catch (e) {
@@ -3898,15 +3905,16 @@ async function handleAddCard() {
   window.addEventListener('DOMContentLoaded', () => {
     // Read local storage for logged user
     const storedUser = localStorage.getItem('abunelik_user');
-    if (storedUser) {
+    const storedToken = localStorage.getItem('abunelik_token');
+    if (storedUser && storedToken) {
       try {
         currentUser = JSON.parse(storedUser);
         showApp();
       } catch (e) {
-        hideApp();
+        handleLogout();
       }
     } else {
-      hideApp();
+      handleLogout();
     }
 
     // Real-time Card Preview Listeners
