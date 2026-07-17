@@ -12,43 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #120e29;
-    --surface: rgba(29, 23, 62, 0.65);
-    --surface-2: rgba(42, 33, 86, 0.75);
-    --surface-3: rgba(60, 48, 120, 0.8);
-    --border: rgba(165, 142, 255, 0.08);
-    --border-strong: rgba(165, 142, 255, 0.18);
-    --ink: #f5f7fa;
-    --ink-muted: #b5b7da;
-    --ink-faint: #8a8cae;
-    --gold: #f5c46b;
-    --teal: #1fe0c2;
-    --coral: #ff5b45;
-    --purple: #8b5cf6;
-    --pink: #ff8fb8;
-    --blue: #00c9ff;
-    --lime: #1fe0c2;
-    --gold-soft: rgba(245, 196, 107, 0.12);
-    --teal-soft: rgba(31, 224, 194, 0.12);
-    --coral-soft: rgba(255, 91, 69, 0.12);
-    --purple-soft: rgba(139, 92, 246, 0.18);
-    --pink-soft: rgba(255, 143, 184, 0.12);
-    --blue-soft: rgba(0, 201, 255, 0.12);
-    --lime-soft: rgba(31, 224, 194, 0.15);
-    --accent: var(--purple);
-    --accent-soft: var(--purple-soft);
-    --accent-grad: linear-gradient(135deg, #a58eff 0%, #6952e0 100%);
-    --hero-grad: linear-gradient(135deg, #a58eff 0%, #6952e0 100%);
-    --glow-accent: 0 12px 32px -10px rgba(105, 82, 224, 0.35);
-    --glow-coral: 0 12px 32px -10px rgba(255, 91, 69, 0.38);
-    --shadow: 0 20px 48px -18px rgba(0,0,0,0.65);
-    --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
-    --font-body: 'Outfit', -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  [data-theme="light"] {
     --bg: #ebedfa;
     --surface: #ffffff;
     --surface-2: #f5f6fc;
@@ -58,6 +21,13 @@
     --ink: #1d1836;
     --ink-muted: #665f8a;
     --ink-faint: #9b96ba;
+    --gold: #f5c46b;
+    --teal: #1fe0c2;
+    --coral: #ff5b45;
+    --purple: #8b5cf6;
+    --pink: #ff8fb8;
+    --blue: #00c9ff;
+    --lime: #1fe0c2;
     --gold-soft: rgba(245, 196, 107, 0.15);
     --teal-soft: rgba(31, 224, 194, 0.15);
     --coral-soft: rgba(255, 91, 69, 0.15);
@@ -65,9 +35,39 @@
     --pink-soft: rgba(255, 143, 184, 0.15);
     --blue-soft: rgba(0, 201, 255, 0.15);
     --lime-soft: rgba(31, 224, 194, 0.18);
+    --accent: var(--purple);
+    --accent-soft: var(--purple-soft);
     --accent-grad: linear-gradient(135deg, #a58eff 0%, #6952e0 100%);
     --hero-grad: linear-gradient(135deg, #a58eff 0%, #6952e0 100%);
+    --glow-accent: 0 12px 32px -10px rgba(105, 82, 224, 0.35);
+    --glow-coral: 0 12px 32px -10px rgba(255, 91, 69, 0.38);
     --shadow: 0 18px 40px -12px rgba(105, 82, 224, 0.22);
+    --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    --font-body: 'Outfit', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  [data-theme="dark"] {
+    --bg: #120e29;
+    --surface: rgba(29, 23, 62, 0.65);
+    --surface-2: rgba(42, 33, 86, 0.75);
+    --surface-3: rgba(60, 48, 120, 0.8);
+    --border: rgba(165, 142, 255, 0.08);
+    --border-strong: rgba(165, 142, 255, 0.18);
+    --ink: #f5f7fa;
+    --ink-muted: #b5b7da;
+    --ink-faint: #8a8cae;
+    --gold-soft: rgba(245, 196, 107, 0.12);
+    --teal-soft: rgba(31, 224, 194, 0.12);
+    --coral-soft: rgba(255, 91, 69, 0.12);
+    --purple-soft: rgba(139, 92, 246, 0.18);
+    --pink-soft: rgba(255, 143, 184, 0.12);
+    --blue-soft: rgba(0, 201, 255, 0.12);
+    --lime-soft: rgba(31, 224, 194, 0.15);
+    --accent-grad: linear-gradient(135deg, #a58eff 0%, #6952e0 100%);
+    --hero-grad: linear-gradient(135deg, #a58eff 0%, #6952e0 100%);
+    --shadow: 0 20px 48px -18px rgba(0,0,0,0.65);
   }
 
 
@@ -91,6 +91,12 @@
     align-items: center;
     justify-content: center;
     padding: 30px 0;
+    background:
+      radial-gradient(circle at 10% 20%, rgba(139,92,246,0.18), transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(31,224,194,0.14), transparent 50%),
+      #ebeeFA;
+  }
+  [data-theme="dark"] .device-stage {
     background:
       radial-gradient(circle at 10% 20%, rgba(105,82,224,0.22), transparent 50%),
       radial-gradient(circle at 90% 80%, rgba(31,224,194,0.18), transparent 50%),
@@ -118,30 +124,30 @@
     content: '';
     position: absolute; inset: -8% -8%; z-index: 0; pointer-events: none;
     background:
-      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(105,82,224,0.36), transparent 60%),
-      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(31,224,194,0.24), transparent 55%),
-      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(244,114,182,0.20), transparent 55%),
-      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(0,201,255,0.18), transparent 60%);
+      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(139, 92, 246, 0.22), transparent 60%),
+      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(31, 224, 194, 0.18), transparent 55%),
+      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(244, 114, 182, 0.16), transparent 55%),
+      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(0, 201, 255, 0.14), transparent 60%);
     animation: blobDrift 22s ease-in-out infinite;
   }
   .phone::after {
     content: '';
     position: absolute; inset: 0; z-index: 0; pointer-events: none;
-    opacity: 0.5; mix-blend-mode: overlay;
+    opacity: 0.15; mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
   }
   .phone > * { position: relative; z-index: 1; }
   @media (prefers-reduced-motion: reduce) {
     .phone::before { animation: none; }
   }
-  [data-theme="light"] .phone::before {
+  [data-theme="dark"] .phone::before {
     background:
-      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(139, 92, 246, 0.22), transparent 60%),
-      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(31, 224, 194, 0.18), transparent 55%),
-      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(244, 114, 182, 0.16), transparent 55%),
-      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(0, 201, 255, 0.14), transparent 60%);
+      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(105,82,224,0.36), transparent 60%),
+      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(31,224,194,0.24), transparent 55%),
+      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(244,114,182,0.20), transparent 55%),
+      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(0,201,255,0.18), transparent 60%);
   }
-  [data-theme="light"] .phone::after { opacity: 0.15; }
+  [data-theme="dark"] .phone::after { opacity: 0.5; }
   .notch {
     position: absolute;
     top: 10px; left: 50%; transform: translateX(-50%);
@@ -899,6 +905,12 @@
     .device-stage {
       padding: 0;
       align-items: stretch;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(139,92,246,0.18), transparent 55%),
+        radial-gradient(circle at 90% 80%, rgba(31,224,194,0.14), transparent 55%),
+        #ebeeFA;
+    }
+    [data-theme="dark"] .device-stage {
       background:
         radial-gradient(circle at 10% 20%, rgba(105,82,224,0.25), transparent 55%),
         radial-gradient(circle at 90% 80%, rgba(31,224,194,0.20), transparent 55%),
