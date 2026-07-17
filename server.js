@@ -1784,7 +1784,8 @@ app.get('/api/bildirisler', async (req, res) => {
           basliq: row.BASLIQ,
           mesaj: row.MESAJ,
           is_read: row.IS_READ || false,
-          gonderilme_tarixi: row.GONDERILME_TARIXI
+          gonderilme_tarixi: row.GONDERILME_TARIXI,
+          abunelik_id: row.ABUNELIK_ID || row.abunelik_id
         };
       }
 
@@ -1820,7 +1821,8 @@ app.get('/api/bildirisler', async (req, res) => {
         basliq,
         mesaj,
         is_read: row.IS_READ || false,
-        gonderilme_tarixi: finalGonderilmeTarixi
+        gonderilme_tarixi: finalGonderilmeTarixi,
+        abunelik_id: row.ABUNELIK_ID || row.abunelik_id
       };
     });
 

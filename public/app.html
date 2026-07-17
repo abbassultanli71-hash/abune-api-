@@ -2235,6 +2235,37 @@
     }
   }
 
+  // ─── Renewal reminder push with "Cancel Subscription" action button ─────────
+  function triggerRenewalNotification(title, body, abunelikId) {
+    // 1. Always show iOS-style in-app toast banner
+    showInAppToast(title, body);
+
+    // 2. Browser native push with action buttons (SW-backed)
+    if (window.Notification && Notification.permission === 'granted') {
+      const token = localStorage.getItem('abunelik_token');
+      const options = {
+        body,
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        vibrate: [200, 100, 200, 100, 200],
+        requireInteraction: true,   // stays on screen until user acts
+        actions: [
+          { action: 'cancel_sub', title: 'Abunəliyi Ləğv Et ❌' },
+          { action: 'dismiss',    title: 'Bağla' }
+        ],
+        data: { abunelikId, token }
+      };
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready
+          .then(reg => reg.showNotification(title, options))
+          .catch(() => new Notification(title, { body }));
+      } else {
+        new Notification(title, { body });
+      }
+    }
+  }
+
   let isOtpVerificationStep = false;
 
   // Handle Auth tab switching
@@ -2428,6 +2459,14 @@
       navigator.serviceWorker.register('/sw.js')
         .then(reg => console.log('Service Worker registered successfully:', reg.scope))
         .catch(err => console.error('Service Worker registration failed:', err));
+
+      // 🔄 Listen for "refresh_data" message when user cancels from push notification
+      navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data && event.data.action === 'refresh_data') {
+          console.log('[SW Message] Abunəlik ləğv edildi — data yenilənir...');
+          loadAllData();
+        }
+      });
     }
     
     // Set profile names
@@ -2513,8 +2552,24 @@
         msg: n.mesaj,
         urgency: getUrgency(n.basliq, n.mesaj),
         time: n.gonderilme_tarixi,
-        is_read: n.is_read || false
+        is_read: n.is_read || false,
+        abunelik_id: n.abunelik_id || null  // linked subscription for push action
       }));
+
+      // 🔔 Auto-fire push notification for any unread renewal reminders
+      const today = new Date().toISOString().split('T')[0];
+      const freshReminders = notifsRes.data.data.notifications.filter(n =>
+        !n.is_read &&
+        n.abunelik_id &&
+        (n.basliq || '').match(/Xatırlatması|Məlumatı|Yaxınlaşan|Bildirişi/)
+      );
+      freshReminders.forEach(n => {
+        triggerRenewalNotification(
+          n.basliq || 'Abunəlik Xatırlatması 🔔',
+          n.mesaj  || 'Abunəliyinizin yenilənmə tarixi yaxınlaşır.',
+          n.abunelik_id
+        );
+      });
     } else {
       notifications = [];
     }
