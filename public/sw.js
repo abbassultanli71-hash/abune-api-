@@ -83,17 +83,19 @@ self.addEventListener('notificationclick', (event) => {
   }
 
   // ── "Dismiss" action or bare notification tap ──────────────────────────────
-  // Focus an existing open tab, or open the app
+  // Find an already-open /app tab and focus it; otherwise open /app fresh
+  const APP_URL = '/app';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      if (clientList.length > 0) {
-        let client = clientList[0];
-        for (let i = 0; i < clientList.length; i++) {
-          if (clientList[i].focused) { client = clientList[i]; break; }
+      // Look for a tab that is already on the /app page
+      for (const client of clientList) {
+        const url = new URL(client.url);
+        if (url.pathname === APP_URL || url.pathname.startsWith(APP_URL)) {
+          return client.focus();
         }
-        return client.focus();
       }
-      return clients.openWindow('/');
+      // No /app tab open — open a fresh one
+      return clients.openWindow(APP_URL);
     })
   );
 });
