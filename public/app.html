@@ -2266,6 +2266,11 @@
     document.getElementById('scr-auth').classList.remove('active');
     document.getElementById('app-tabbar').style.display = 'flex';
     document.querySelector('.fab').style.display = 'flex';
+
+    // Request notification permission for native push alerts
+    if (window.Notification && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
     
     // Set profile names
     document.getElementById('profile-fullname').textContent = currentUser.ad;
@@ -2858,6 +2863,15 @@
     const res = await apiFetch('POST', '/api/abunelikler', payload);
 
     if (res.ok) {
+      // Trigger native push notification on success
+      if (window.Notification && Notification.permission === 'granted') {
+        const sym = currencySymbol(currency);
+        new Notification('Yeni abunəlik yaradıldı! 🎉', {
+          body: `"${name}" abunəliyi uğurla əlavə edildi. Qiymət: ${sym}${price.toFixed(2)}`,
+          icon: '/favicon.ico'
+        });
+      }
+
       closeSheet();
       nameInput.value = '';
       priceInput.value = '';
