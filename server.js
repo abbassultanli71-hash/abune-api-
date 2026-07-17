@@ -108,31 +108,75 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-change-me-in-production';
+
 const authMiddleware = (req, res, next) => {
-  // Bypass authentication for Telegram webhook endpoint
-  if (req.originalUrl === '/api/telegram-webhook' || req.path === '/telegram-webhook') {
+  // 1. Bypass authentication for Telegram webhook and Swagger docs
+  if (req.originalUrl === '/api/telegram-webhook' || req.path === '/telegram-webhook' || req.path.startsWith('/api-docs') || req.path === '/swagger.json') {
     return next();
   }
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    res.setHeader('WWW-Authenticate', 'Basic realm="Secure API"');
-    return res.status(401).send('Giriş qadağandır: İstifadəçi adı və şifrə tələb olunur.');
+
+  // 2. Bypass for public endpoints (login, register, signup)
+  const isPublicPost = req.method === 'POST' && (
+    req.path === '/api/istifadeciler/login' ||
+    req.path === '/api/istifadeciler/register/initiate' ||
+    req.path === '/api/istifadeciler/register/verify' ||
+    req.path === '/api/istifadeciler'
+  );
+  if (isPublicPost) {
+    return next();
   }
+
+  // 3. Extract and verify JWT
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      code: 401,
+      message: 'Unauthorized',
+      error: {
+        code: 'TOKEN_REQUIRED',
+        message: 'Giriş qadağandır: Token tələb olunur.'
+      }
+    });
+  }
+
+  const token = authHeader.split(' ')[1];
   try {
-    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    const user = auth[0];
-    const pass = auth[1];
-    const API_USER = process.env.API_USER || 'admin';
-    const API_PASSWORD = process.env.API_PASSWORD || 'admin123';
-    if (user === API_USER && pass === API_PASSWORD) {
-      next();
-    } else {
-      res.setHeader('WWW-Authenticate', 'Basic realm="Secure API"');
-      return res.status(401).send('Giriş qadağandır: İstifadəçi adı və ya şifrə yanlışdır.');
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded; // Attach user payload ({ id, username }) to request
+
+    // 🔒 Authorization Hardening (Prevent IDOR / Cross-user access)
+    // Extract username from query, body, or URL path segments
+    let reqUsername = req.query.username || (req.body && req.body.username);
+    
+    // Parse username from path if route parameters are not parsed yet (e.g. /api/ayarlar/username)
+    const pathParts = req.path.split('/');
+    if (!reqUsername && pathParts.length >= 4 && (pathParts[2] === 'istifadeciler' || pathParts[2] === 'ayarlar' || pathParts[2] === 'budceler')) {
+      reqUsername = pathParts[3];
     }
+
+    if (reqUsername && String(reqUsername).trim().toLowerCase() !== req.user.username.toLowerCase()) {
+      return res.status(403).json({
+        code: 403,
+        message: 'Forbidden',
+        error: {
+          code: 'FORBIDDEN_ACCESS',
+          message: 'Giriş qadağandır: Yalnız öz məlumatlarınızı idarə edə bilərsiniz.'
+        }
+      });
+    }
+
+    next();
   } catch (err) {
-    res.setHeader('WWW-Authenticate', 'Basic realm="Secure API"');
-    return res.status(401).send('Giriş qadağandır: Giriş formatı yanlışdır.');
+    return res.status(401).json({
+      code: 401,
+      message: 'Unauthorized',
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Giriş qadağandır: Token etibarsızdır və ya vaxtı bitib.'
+      }
+    });
   }
 };
 
@@ -1040,7 +1084,12 @@ app.post('/api/istifadeciler/login', authLimiter, async (req, res) => {
     }
 
     const { PASSWORD, ...userWithoutPassword } = userRow;
-    return successResponse(res, 200, 'Success', { user: userWithoutPassword });
+    const token = jwt.sign(
+      { id: userWithoutPassword.id || userWithoutPassword.ID, username: userWithoutPassword.username || userWithoutPassword.USERNAME },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    return successResponse(res, 200, 'Success', { token, user: userWithoutPassword });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
@@ -1619,7 +1668,10 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
     if (subCheck.rows.length === 0)
       return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
 
-    const ownerId = subCheck.rows[0].ISTIFADECI_ID;
+    const ownerId = subCheck.rows[0].ISTIFADECI_ID !== undefined ? Number(subCheck.rows[0].ISTIFADECI_ID) : Number(subCheck.rows[0].istifadeci_id);
+    if (ownerId !== req.user.id) {
+      return errorResponse(res, 403, 'Forbidden', 'FORBIDDEN_ACCESS', 'Giriş qadağandır: Yalnız öz abunəliklərinizi silə bilərsiniz.');
+    }
 
     // Əvvəlcə həmin abunəliyə aid bildirişləri sil
     await executeQuery(`DELETE FROM bildirisler WHERE abunelik_id = :id`, { id });
@@ -2066,6 +2118,19 @@ app.delete('/api/odenis-metodlari/:id', async (req, res) => {
     );
     if (usageCheck.rows.length > 0) {
       return errorResponse(res, 409, 'Conflict', 'PAYMENT_METHOD_IN_USE', 'This payment method is linked to active subscriptions.');
+    }
+
+    // Verify that the card exists and belongs to the authenticated user
+    const cardOwnerCheck = await executeQuery(
+      `SELECT istifadeci_id FROM odenis_metodlari WHERE id = :id`,
+      { id }
+    );
+    if (cardOwnerCheck.rows.length === 0) {
+      return errorResponse(res, 404, 'Not Found', 'PAYMENT_METHOD_NOT_FOUND', 'Ödəniş metodu tapılmadı.');
+    }
+    const cardOwnerId = cardOwnerCheck.rows[0].ISTIFADECI_ID !== undefined ? Number(cardOwnerCheck.rows[0].ISTIFADECI_ID) : Number(cardOwnerCheck.rows[0].istifadeci_id);
+    if (cardOwnerId !== req.user.id) {
+      return errorResponse(res, 403, 'Forbidden', 'FORBIDDEN_ACCESS', 'Giriş qadağandır: Yalnız öz ödəniş metodlarınızı silə bilərsiniz.');
     }
 
     const result = await executeQuery(

@@ -2035,8 +2035,6 @@
 
 <script>
   const API_BASE = '';
-  const API_AUTH = 'Basic ' + btoa('admin:admin123');
-
   let currentUser = null; // { id, username, ad, email }
   let subscriptions = [];
   let cards = [];
@@ -2061,14 +2059,19 @@
     return obj;
   }
 
-  // API Request Wrapper
+  // API Request Wrapper using JWT Bearer authentication
   async function apiFetch(method, endpoint, body = null) {
+    const token = localStorage.getItem('abunelik_token');
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    if (token) {
+      headers['Authorization'] = 'Bearer ' + token;
+    }
+
     const options = {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': API_AUTH
-      }
+      headers
     };
     if (body) options.body = JSON.stringify(body);
     try {
@@ -2120,6 +2123,9 @@
     if (res.ok && res.data && res.data.data && res.data.data.user) {
       currentUser = res.data.data.user;
       localStorage.setItem('abunelik_user', JSON.stringify(currentUser));
+      if (res.data.data.token) {
+        localStorage.setItem('abunelik_token', res.data.data.token);
+      }
       showApp();
     } else {
       errorEl.textContent = res.data?.error?.message || 'Xəta baş verdi.';
@@ -2226,6 +2232,9 @@
         if (loginRes.ok && loginRes.data && loginRes.data.data && loginRes.data.data.user) {
           currentUser = loginRes.data.data.user;
           localStorage.setItem('abunelik_user', JSON.stringify(currentUser));
+          if (loginRes.data.data.token) {
+            localStorage.setItem('abunelik_token', loginRes.data.data.token);
+          }
           showApp();
         } else {
           toggleAuthTab('login');
@@ -2248,6 +2257,7 @@
 
   function handleLogout() {
     localStorage.removeItem('abunelik_user');
+    localStorage.removeItem('abunelik_token');
     currentUser = null;
     hideApp();
   }
