@@ -2162,6 +2162,8 @@
       console.error('API Fetch error:', e);
       return { ok: false, status: 0, data: { error: 'Server ilə əlaqə qurulmadı.' } };
     }
+  }
+
   // iOS-style In-App Toast Notification
   function showInAppToast(title, body) {
     const phoneContainer = document.querySelector('.phone');
