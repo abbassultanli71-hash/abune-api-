@@ -318,6 +318,37 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function calculateMonthlyEquivalentSpend(subs, targetCurrency) {
+  const BASE_RATES = {
+    AZN: 1.0,
+    USD: 1.70,
+    EUR: 1.85
+  };
+  
+  function convertCurrency(amount, from, to) {
+    const fromUpper = String(from || 'AZN').toUpperCase();
+    const toUpper = String(to || 'AZN').toUpperCase();
+    if (fromUpper === toUpper) return amount;
+    const amountInAzn = amount * (BASE_RATES[fromUpper] || 1.0);
+    return amountInAzn / (BASE_RATES[toUpper] || 1.0);
+  }
+
+  let total = 0;
+  for (const s of subs) {
+    const price = Number(s.qiymet !== undefined ? s.qiymet : (s.QIYMET !== undefined ? s.QIYMET : 0));
+    const currency = s.valyuta !== undefined ? s.valyuta : (s.VALYUTA !== undefined ? s.VALYUTA : 'AZN');
+    const freq = s.odenis_tezliyi !== undefined ? s.odenis_tezliyi : (s.ODENIS_TEZLIYI !== undefined ? s.ODENIS_TEZLIYI : 'monthly');
+    
+    let monthlyEquiv = price;
+    if (freq === 'weekly') monthlyEquiv = price * 4;
+    else if (freq === 'yearly') monthlyEquiv = price / 12;
+    else if (freq === 'quarterly') monthlyEquiv = price / 3;
+
+    total += convertCurrency(monthlyEquiv, currency, targetCurrency);
+  }
+  return total;
+}
+
 
 // Luhn alqoritmi ilə kart nömrəsinin (PAN) düzgünlüyünü yoxlayır.
 function isValidPanLuhn(pan) {
@@ -1355,29 +1386,26 @@ app.post('/api/abunelikler', async (req, res) => {
     );
 
     {
-      const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
-      const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || 'AZN') : 'AZN';
+      const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ || budgetRow.rows[0].limit_mebleq) : 300;
+      const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || budgetRow.rows[0].valyuta || 'AZN') : 'AZN';
 
-      // Mövcud aktiv abunəliklərin qiymətlərini sadəcə topla (tezlik çevrilməsi yoxdur)
+      // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq (tezlik çevrilməsi və valyuta conversion daxil olmaqla)
       const activeSubs = await executeQuery(
-        `SELECT qiymet FROM abunelikler
+        `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler
           WHERE istifadeci_id = :userId AND status = 'active'`,
         { userId }
       );
 
-      let currentTotal = 0;
-      for (const row of activeSubs.rows) {
-        currentTotal += Number(row.QIYMET);
-      }
-
-      const projectedTotal = currentTotal + parsedQiymet;
+      const currentTotal = calculateMonthlyEquivalentSpend(activeSubs.rows, budgetValyuta);
+      const convertedNewSub = calculateMonthlyEquivalentSpend([{ qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi }], budgetValyuta);
+      const projectedTotal = currentTotal + convertedNewSub;
 
       if (projectedTotal > budgetLimit) {
         const remaining = Math.max(0, budgetLimit - currentTotal);
         return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
           `Büdcə limiti keçilir! ` +
-          `Mövcud xərc: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
-          `yeni abunəlik: +${parsedQiymet.toFixed(2)} ${budgetValyuta}, ` +
+          `Mövcud aylıq xərc: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
+          `yeni abunəlik aylıq ekvivalenti: +${convertedNewSub.toFixed(2)} ${budgetValyuta}, ` +
           `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
           `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})` 
         );
@@ -1573,28 +1601,25 @@ app.put('/api/abunelikler', async (req, res) => {
       );
 
       {
-        const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ) : 300;
-        const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || 'AZN') : 'AZN';
+        const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ || budgetRow.rows[0].limit_mebleq) : 300;
+        const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || budgetRow.rows[0].valyuta || 'AZN') : 'AZN';
 
         const activeSubs = await executeQuery(
-          `SELECT qiymet FROM abunelikler
+          `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler
             WHERE istifadeci_id = :userId AND status = 'active' AND id != :subId`,
           { userId, subId: subCheck.rows[0].id || subCheck.rows[0].ID }
         );
 
-        let currentTotal = 0;
-        for (const row of activeSubs.rows) {
-          currentTotal += Number(row.QIYMET || row.qiymet);
-        }
-
-        const projectedTotal = currentTotal + parsedQiymet;
+        const currentTotal = calculateMonthlyEquivalentSpend(activeSubs.rows, budgetValyuta);
+        const convertedNewSub = calculateMonthlyEquivalentSpend([{ qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi }], budgetValyuta);
+        const projectedTotal = currentTotal + convertedNewSub;
 
         if (projectedTotal > budgetLimit) {
           const remaining = Math.max(0, budgetLimit - currentTotal);
           return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
             `Büdcə limiti keçilir! ` +
-            `Digər aktiv abunəliklər: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
-            `yenilənən abunəlik: +${parsedQiymet.toFixed(2)} ${budgetValyuta}, ` +
+            `Digər aktiv abunəliklər (aylıq): ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
+            `yenilənən abunəlik aylıq ekvivalenti: +${convertedNewSub.toFixed(2)} ${budgetValyuta}, ` +
             `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
             `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})` 
           );
@@ -2412,20 +2437,18 @@ app.post('/api/budceler', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq
+    // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq (aylıq ekvivalent və valyuta conversion ilə)
     const activeSubs = await executeQuery(
-      `SELECT qiymet FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
+      `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
       { userId }
     );
 
-    let totalSpend = 0;
-    for (const row of activeSubs.rows) {
-      totalSpend += Number(row.QIYMET);
-    }
+    const targetValyuta = valyuta || 'AZN';
+    const totalSpend = calculateMonthlyEquivalentSpend(activeSubs.rows, targetValyuta);
 
     if (totalSpend > parsedLimit) {
       return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
-        `Mövcud abunəlik xərcləri (${totalSpend.toFixed(2)}) yeni limitdən (${parsedLimit.toFixed(2)}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
+        `Mövcud aylıq abunəlik xərcləri (${totalSpend.toFixed(2)} ${targetValyuta}) yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
     }
 
     await executeQuery(
@@ -2434,7 +2457,7 @@ app.post('/api/budceler', async (req, res) => {
       {
         istifadeci_id: userId,
         limit_mebleq: parsedLimit,
-        valyuta: valyuta || 'AZN',
+        valyuta: targetValyuta,
         hesab_mebleqi: totalSpend
       },
       { autoCommit: true }
@@ -2489,20 +2512,18 @@ app.put('/api/budceler/:username', async (req, res) => {
     if (isNaN(parsedLimit) || parsedLimit <= 0)
       return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'Limit 0-dan böyük olmalıdır.');
 
-    // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq
+    // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq (aylıq ekvivalent və valyuta conversion ilə)
     const activeSubs = await executeQuery(
-      `SELECT qiymet FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
+      `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
       { userId }
     );
 
-    let totalSpend = 0;
-    for (const row of activeSubs.rows) {
-      totalSpend += Number(row.QIYMET);
-    }
+    const targetValyuta = valyuta || 'AZN';
+    const totalSpend = calculateMonthlyEquivalentSpend(activeSubs.rows, targetValyuta);
 
     if (totalSpend > parsedLimit) {
       return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
-        `Mövcud abunəlik xərcləri (${totalSpend.toFixed(2)}) yeni limitdən (${parsedLimit.toFixed(2)}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
+        `Mövcud aylıq abunəlik xərcləri (${totalSpend.toFixed(2)} ${targetValyuta}) yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
     }
 
     await executeQuery(
@@ -2510,7 +2531,7 @@ app.put('/api/budceler/:username', async (req, res) => {
        SET limit_mebleq = :limit_mebleq, valyuta = :valyuta, hesab_mebleqi = :hesab_mebleqi
        WHERE istifadeci_id = :istifadeci_id`,
       {
-        limit_mebleq: parsedLimit, valyuta: valyuta || 'AZN', hesab_mebleqi: totalSpend, istifadeci_id: userId
+        limit_mebleq: parsedLimit, valyuta: targetValyuta, hesab_mebleqi: totalSpend, istifadeci_id: userId
       },
       { autoCommit: true }
     );
