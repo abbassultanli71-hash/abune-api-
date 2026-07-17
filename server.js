@@ -1695,7 +1695,8 @@ app.delete('/api/abunelikler/:id', async (req, res) => {
       return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
 
     const ownerId = subCheck.rows[0].ISTIFADECI_ID !== undefined ? Number(subCheck.rows[0].ISTIFADECI_ID) : Number(subCheck.rows[0].istifadeci_id);
-    if (ownerId !== req.user.id) {
+    const requesterId = Number(req.user.id);
+    if (ownerId !== requesterId) {
       return errorResponse(res, 403, 'Forbidden', 'FORBIDDEN_ACCESS', 'Giriş qadağandır: Yalnız öz abunəliklərinizi silə bilərsiniz.');
     }
 

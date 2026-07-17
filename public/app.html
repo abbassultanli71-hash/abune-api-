@@ -532,6 +532,17 @@
   .notif-title { font-size: 12.5px; font-weight: 600; }
   .notif-msg { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
   .notif-time { font-size: 10px; color: var(--ink-faint); margin-top: 4px; font-family: var(--font-mono); }
+  .notif-cancel-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 10px; padding: 7px 14px; border-radius: 12px; border: none; cursor: pointer;
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.3px;
+    background: linear-gradient(135deg, rgba(239,68,68,0.18), rgba(239,68,68,0.08));
+    color: #ef4444; border: 1.5px solid rgba(239,68,68,0.35);
+    transition: all 0.2s ease;
+  }
+  .notif-cancel-btn:hover { background: rgba(239,68,68,0.28); transform: translateY(-1px); }
+  .notif-cancel-btn:active { transform: scale(0.95); }
+  .notif-cancel-btn.loading { opacity: 0.5; pointer-events: none; }
 
   /* ---- Budget card ---- */
   .budget-card {
@@ -2817,16 +2828,24 @@
   function notifRowHTML(n) {
     const color = n.urgency === 'urgent' ? 'var(--coral)' : n.urgency === 'soon' ? 'var(--gold)' : 'var(--teal)';
     const dotHtml = n.is_read ? '' : `<span class="notif-dot" style="background:${color}"></span>`;
-    const clickableClass = n.is_read ? '' : 'clickable';
-    const clickHandler = n.is_read ? '' : `onclick="handleMarkNotificationRead(${n.id})"`;
+    // If this notification is linked to a subscription, show Cancel button
+    const cancelBtn = n.abunelik_id
+      ? `<button class="notif-cancel-btn" id="notif-cancel-${n.id}" onclick="event.stopPropagation(); handleCancelSubscriptionFromNotif(${n.abunelik_id}, ${n.id}, this)">
+           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+           Abunəliyi Ləğv Et
+         </button>`
+      : '';
     return `
-      <div class="notif-item ${clickableClass}" ${clickHandler} style="${n.is_read ? 'opacity:0.6;' : ''}">
+      <div class="notif-item" style="${n.is_read ? 'opacity:0.6;' : ''}">
         ${dotHtml}
         <div style="flex: 1;">
           <div class="notif-title">${n.title}</div>
           <div class="notif-msg">${n.msg}</div>
           <div class="notif-time">${n.time}</div>
+          ${cancelBtn}
         </div>
+        ${!n.is_read ? `<button onclick="handleMarkNotificationRead(${n.id})" title="Oxundu işarələ"
+          style="border:none;background:none;cursor:pointer;color:var(--ink-faint);padding:4px;font-size:16px;flex-shrink:0;">✓</button>` : ''}
       </div>`;
   }
   
@@ -2843,12 +2862,36 @@
   async function handleMarkNotificationRead(id) {
     const res = await apiFetch('PATCH', `/api/bildirisler/${id}/read`);
     if (res.ok) {
-      notifications = notifications.map(n => 
+      notifications = notifications.map(n =>
         n.id === id ? { ...n, is_read: true } : n
       );
       renderNotifs();
     } else {
       alert(res.data?.error?.message || 'Bildiriş oxunmuş kimi işarələnə bilmədi.');
+    }
+  }
+
+  // ── Cancel subscription directly from notification card ────────────────────
+  async function handleCancelSubscriptionFromNotif(abunelikId, notifId, btnEl) {
+    if (!abunelikId) return;
+    if (!confirm('Bu abunəliyi həqiqətən ləğv etmək istəyirsiniz?')) return;
+
+    // Show loading state on button
+    btnEl.classList.add('loading');
+    btnEl.textContent = 'Silinir...';
+
+    const res = await apiFetch('DELETE', `/api/abunelikler/${abunelikId}`);
+
+    if (res.ok) {
+      // Remove this notification from local list + refresh everything
+      notifications = notifications.filter(n => n.id !== notifId);
+      renderNotifs();
+      triggerSubscriptionNotification('Abunəlik Ləğv Edildi ✅', 'Abunəliyiniz uğurla sistemdən silindi.');
+      await loadAllData();
+    } else {
+      btnEl.classList.remove('loading');
+      btnEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Abunəliyi Ləğv Et`;
+      alert(res.data?.error?.message || 'Abunəlik silinə bilmədi. Yenidən cəhd edin.');
     }
   }
 
