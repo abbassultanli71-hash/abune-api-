@@ -7,6 +7,7 @@ const { executeQuery } = require('./db');
 const bcrypt = require('bcryptjs');
 const otpService = require('./otpService');
 require('dotenv').config();
+const PORT = process.env.PORT || 3000;
 const { startDueSubscriptionNotifierJob } = require('./jobs/dueSubscriptionNotifier');
 const { generateDueMessage } = require('./services/notificationService');
 
@@ -38,9 +39,55 @@ async function ensureOtpTableExists() {
 }
 ensureOtpTableExists();
 
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
 const app = express();
+
+// 🛡️ Secure HTTP headers with Helmet (disabling CSP to ensure Swagger UI functions correctly)
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
+
+// 🚫 Prevent technology fingerprinting
+app.disable('x-powered-by');
+
 app.use(cors());
 app.use(express.json());
+
+// ⚡ General Rate Limiter (maximum 300 requests per 15 minutes per IP)
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  message: {
+    code: 429,
+    message: 'Too Many Requests',
+    error: {
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Həddindən artıq sorğu göndərildi. Zəhmət olmasa 15 dəqiqə sonra yenidən cəhd edin.'
+    }
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', generalLimiter);
+
+// 🔒 Stricter Rate Limiter for Authentication & OTP (maximum 15 requests per 15 minutes per IP)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  message: {
+    code: 429,
+    message: 'Too Many Requests',
+    error: {
+      code: 'AUTH_RATE_LIMIT_EXCEEDED',
+      message: 'Təhlükəsizlik cəhətdən qeydiyyat, giriş və şifrə dəyişmə cəhdləri məhdudlaşdırıldı. 15 dəqiqə sonra cəhd edin.'
+    }
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 function lowercaseKeys(obj) {
   if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
@@ -60,27 +107,6 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/api/test-email-direct', async (req, res) => {
-  try {
-    const otpService = require('./otpService');
-    const success = await otpService.sendOtpEmail('abbas.sultanli@mail.ru', '123456', 'Debug Direct Test');
-    
-    const brevoKeyExists = !!process.env.BREVO_API_KEY;
-    const smtpFrom = process.env.SMTP_FROM || 'abbassultanli71@gmail.com';
-    
-    return res.status(200).json({ 
-      success, 
-      brevoKeyExists, 
-      senderEmailUsed: smtpFrom,
-      message: success ? 'Email sent successfully!' : 'Email failed. Check server console logs for details.' 
-    });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message, stack: err.stack });
-  }
-});
-
-const PORT = process.env.PORT || 3000;
 
 const authMiddleware = (req, res, next) => {
   // Bypass authentication for Telegram webhook endpoint
@@ -109,6 +135,25 @@ const authMiddleware = (req, res, next) => {
     return res.status(401).send('Giriş qadağandır: Giriş formatı yanlışdır.');
   }
 };
+
+app.get('/api/test-email-direct', authMiddleware, async (req, res) => {
+  try {
+    const otpService = require('./otpService');
+    const success = await otpService.sendOtpEmail('abbas.sultanli@mail.ru', '123456', 'Debug Direct Test');
+    
+    const brevoKeyExists = !!process.env.BREVO_API_KEY;
+    const smtpFrom = process.env.SMTP_FROM || 'abbassultanli71@gmail.com';
+    
+    return res.status(200).json({ 
+      success, 
+      brevoKeyExists, 
+      senderEmailUsed: smtpFrom,
+      message: success ? 'Email sent successfully!' : 'Email failed. Check server console logs for details.' 
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message, stack: err.stack });
+  }
+});
 
 const swaggerOptions = {
   definition: {
@@ -564,7 +609,7 @@ app.get('/api/istifadeciler/:username', async (req, res) => {
  *       201:
  *         description: İstifadəçi yaradıldı
  */
-app.post('/api/istifadeciler', async (req, res) => {
+app.post('/api/istifadeciler', authLimiter, async (req, res) => {
   const { username, ad, email, password } = req.body;
 
   if (!username || !ad || !email || !password) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username, ad, email və password sahələri məcburidir.');
@@ -649,7 +694,7 @@ app.post('/api/istifadeciler', async (req, res) => {
  *       200:
  *         description: OTP təsdiq kodu göndərildi
  */
-app.post('/api/istifadeciler/register/initiate', async (req, res) => {
+app.post('/api/istifadeciler/register/initiate', authLimiter, async (req, res) => {
   const { username, ad, email, password } = req.body;
 
   if (!username || !ad || !email || !password) {
@@ -742,7 +787,7 @@ app.post('/api/istifadeciler/register/initiate', async (req, res) => {
  *       201:
  *         description: Qeydiyyat uğurla tamamlandı
  */
-app.post('/api/istifadeciler/register/verify', async (req, res) => {
+app.post('/api/istifadeciler/register/verify', authLimiter, async (req, res) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
@@ -829,7 +874,7 @@ app.post('/api/istifadeciler/register/verify', async (req, res) => {
  *       200:
  *         description: OTP təsdiq kodu göndərildi
  */
-app.post('/api/istifadeciler/change-password/initiate', async (req, res) => {
+app.post('/api/istifadeciler/change-password/initiate', authLimiter, async (req, res) => {
   const { username, currentpassword, newpassword } = req.body;
 
   if (!username || !currentpassword || !newpassword) {
@@ -897,7 +942,7 @@ app.post('/api/istifadeciler/change-password/initiate', async (req, res) => {
  *       200:
  *         description: Şifrə uğurla yeniləndi
  */
-app.post('/api/istifadeciler/change-password/verify', async (req, res) => {
+app.post('/api/istifadeciler/change-password/verify', authLimiter, async (req, res) => {
   const { username, otp } = req.body;
 
   if (!username || !otp) {
@@ -966,7 +1011,7 @@ app.post('/api/istifadeciler/change-password/verify', async (req, res) => {
  *       401:
  *         description: Şifrə səhvdir
  */
-app.post('/api/istifadeciler/login', async (req, res) => {
+app.post('/api/istifadeciler/login', authLimiter, async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) return errorResponse(res, 400, 'Bad Request', 'MISSING_FIELDS', 'username və password sahələri məcburidir.');
