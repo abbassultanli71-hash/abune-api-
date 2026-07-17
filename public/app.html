@@ -92,9 +92,9 @@
     justify-content: center;
     padding: 30px 0;
     background:
-      radial-gradient(circle at 30% 20%, rgba(139,124,246,0.14), transparent 45%),
-      radial-gradient(circle at 80% 80%, rgba(31,224,194,0.08), transparent 45%),
-      #0c0a16;
+      radial-gradient(circle at 10% 20%, rgba(105,82,224,0.22), transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(31,224,194,0.18), transparent 50%),
+      #090710;
   }
   .phone {
     width: 390px;
@@ -118,10 +118,10 @@
     content: '';
     position: absolute; inset: -8% -8%; z-index: 0; pointer-events: none;
     background:
-      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(139,124,246,0.22), transparent 60%),
-      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(31,224,194,0.14), transparent 55%),
-      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(244,114,182,0.13), transparent 55%),
-      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(96,165,250,0.10), transparent 60%);
+      radial-gradient(ellipse 480px 320px at 8% -5%, rgba(105,82,224,0.36), transparent 60%),
+      radial-gradient(ellipse 520px 380px at 100% 18%, rgba(31,224,194,0.24), transparent 55%),
+      radial-gradient(ellipse 460px 420px at -5% 70%, rgba(244,114,182,0.20), transparent 55%),
+      radial-gradient(ellipse 600px 500px at 105% 100%, rgba(0,201,255,0.18), transparent 60%);
     animation: blobDrift 22s ease-in-out infinite;
   }
   .phone::after {
@@ -796,11 +796,19 @@
 
   /* ---- Real mobil ekranlarda: telefon çərçivəsini ləğv et, tam ekran ol ---- */
   @media (max-width: 480px), (max-height: 860px) {
-    .device-stage { padding: 0; align-items: stretch; background: var(--bg); }
+    .device-stage {
+      padding: 0;
+      align-items: stretch;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(105,82,224,0.25), transparent 55%),
+        radial-gradient(circle at 90% 80%, rgba(31,224,194,0.20), transparent 55%),
+        #090710;
+    }
     .phone {
       width: 100%; height: 100vh; height: 100dvh;
       border: none; border-radius: 0; box-shadow: none;
       padding-top: calc(10px + var(--safe-top));
+      background: transparent;
     }
     .notch { display: none; }
     .statusbar { display: none; }
