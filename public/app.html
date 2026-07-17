@@ -1459,9 +1459,19 @@
             <div class="icon-round" onclick="openSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
           </div>
         </div>
-        <div class="search-bar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-          <input type="text" id="sub-search-input" placeholder="Abunəlik axtar…" data-i18n-placeholder="search_placeholder" oninput="filterSubscriptionsList()">
+        <div class="h-row" style="padding: 0 20px 14px; gap: 10px;">
+          <div class="search-bar" style="margin: 0; flex: 1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="sub-search-input" placeholder="Abunəlik axtar…" data-i18n-placeholder="search_placeholder" oninput="filterSubscriptionsList()">
+          </div>
+          <div class="select-wrap" style="background: var(--surface); border: 2px solid var(--border); border-radius: 18px; padding: 10px 16px; box-shadow: var(--shadow); height: 42px; display: flex; align-items: center; justify-content: center;">
+            <select id="sub-sort-select" onchange="filterSubscriptionsList()" style="background:none; border:none; color:var(--ink-muted); font-size:12px; font-weight:700; outline:none; cursor:pointer; padding-right:12px;">
+              <option value="next_asc">Ödəniş (Tez)</option>
+              <option value="price_desc">Qiymət (Azalan)</option>
+              <option value="price_asc">Qiymət (Artan)</option>
+              <option value="name_asc">Ad (A-Z)</option>
+            </select>
+          </div>
         </div>
         <div class="chip-row" id="category-filter-row">
           <div class="filter-chip selected" data-category="All" onclick="filterCategory('All')" data-i18n="filter_all">Hamısı</div>
@@ -1547,6 +1557,15 @@
         </div>
         <div style="padding:0 20px;" id="budget-update-wrap">
           <button class="btn btn-primary" style="width:100%;" onclick="openBudgetEdit()" data-i18n="budget_update_btn">Limiti yenilə</button>
+        </div>
+
+        <!-- Advanced Insights & Category Breakdown -->
+        <div class="section" style="padding-top: 15px; padding-bottom: 20px;">
+          <div class="section-title" style="margin-bottom: 12px; font-size: 15px; font-weight: 700;">Ağıllı Təhlil & Proqnozlar</div>
+          <div id="budget-insights-panel" style="margin-bottom: 18px;"></div>
+          
+          <div class="section-title" style="margin-bottom: 12px; font-size: 15px; font-weight: 700;">Kateqoriyalar üzrə bölgü</div>
+          <div id="budget-breakdown-list" class="settings-group" style="margin: 0; padding: 4px 0;"></div>
         </div>
 
         <div class="settings-group" id="budget-edit" style="display:none;">
@@ -2263,6 +2282,18 @@
     document.getElementById('auth-password-input').value = '';
   }
 
+  // Dynamic currency conversion base rates (with AZN as anchor)
+  const BASE_RATES = {
+    AZN: 1.0,
+    USD: 1.70,
+    EUR: 1.85
+  };
+  function convertCurrency(amount, from, to) {
+    if (!from || !to || from === to) return amount;
+    const amountInAzn = amount * (BASE_RATES[from] || 1.0);
+    return amountInAzn / (BASE_RATES[to] || 1.0);
+  }
+
   // Load all user data from API
   async function loadAllData() {
     if (!currentUser) return;
@@ -2271,8 +2302,8 @@
     const settingsRes = await apiFetch('GET', `/api/ayarlar/${currentUser.username}`);
     if (settingsRes.ok && settingsRes.data && settingsRes.data.data && settingsRes.data.data.settings) {
       currentSettings = settingsRes.data.data.settings;
-      setTheme(currentSettings.tema || 'dark');
-      applyAccentColor(currentSettings.tema_rengi || 'gold', currentSettings.tema || 'dark');
+      setTheme(currentSettings.tema || 'light');
+      applyAccentColor(currentSettings.tema_rengi || 'purple', currentSettings.tema || 'light');
       applyLanguage(currentSettings.dil || 'az');
       document.getElementById('setting-currency').value = currentSettings.esas_valyuta || 'AZN';
       document.getElementById('setting-notif').value = currentSettings.bildiris_metodu || 'email';
@@ -2319,47 +2350,45 @@
     const budgetRes = await apiFetch('GET', `/api/budceler/${currentUser.username}`);
     const activeSubs = subscriptions.filter(s => s.status === 'active');
     
-    // Calculate total spend (converting to AZN or keep as is? Let's just sum raw values for now as simple presentation)
-    let totalSpend = 0;
-    activeSubs.forEach(s => {
-      totalSpend += s.price;
-    });
+    // Read the budget currency first to do dynamic conversion
+    let targetCurrency = 'AZN';
+    let rawLimit = 300.00;
+    let budgetExists = false;
 
     if (budgetRes.ok && budgetRes.data && budgetRes.data.data) {
       const b = budgetRes.data.data.budget || (budgetRes.data.data.budgets && budgetRes.data.data.budgets[0]);
       if (b) {
-        const dbLimit = b.LIMIT_MEBLEQ !== undefined ? b.LIMIT_MEBLEQ : b.limit_mebleq;
-        const dbValyuta = b.VALYUTA !== undefined ? b.VALYUTA : b.valyuta;
-        const dbSpent = b.HESAB_MEBLEQI !== undefined ? b.HESAB_MEBLEQI : b.hesab_mebleqi;
-        budgetState = {
-          limit: parseFloat(dbLimit) || 300.00,
-          spent: totalSpend, // dynamically count spent
-          currency: dbValyuta || 'AZN',
-          exists: true
-        };
-        // update backend spent count if different
-        if (parseFloat(dbSpent) !== totalSpend) {
-          apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
-            limit_mebleq: budgetState.limit,
-            valyuta: budgetState.currency,
-            hesab_mebleqi: totalSpend
-          });
-        }
-      } else {
-        budgetState = {
-          limit: 300.00,
-          spent: totalSpend,
-          currency: 'AZN',
-          exists: false
-        };
+        targetCurrency = (b.VALYUTA !== undefined ? b.VALYUTA : b.valyuta) || 'AZN';
+        rawLimit = parseFloat(b.LIMIT_MEBLEQ !== undefined ? b.LIMIT_MEBLEQ : b.limit_mebleq) || 300.00;
+        budgetExists = true;
       }
-    } else {
-      budgetState = {
-        limit: 300.00,
-        spent: totalSpend,
-        currency: 'AZN',
-        exists: false
-      };
+    }
+
+    // Calculate total spent (converting to targetCurrency using monthly equivalence)
+    let totalSpend = 0;
+    activeSubs.forEach(s => {
+      let monthlyEquiv = s.price;
+      if (s.freqRaw === 'weekly') monthlyEquiv = s.price * 4;
+      else if (s.freqRaw === 'yearly') monthlyEquiv = s.price / 12;
+      else if (s.freqRaw === 'quarterly') monthlyEquiv = s.price / 3;
+
+      totalSpend += convertCurrency(monthlyEquiv, s.currency, targetCurrency);
+    });
+
+    budgetState = {
+      limit: rawLimit,
+      spent: totalSpend,
+      currency: targetCurrency,
+      exists: budgetExists
+    };
+
+    // Update backend spent count if different and budget exists
+    if (budgetExists) {
+      apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
+        limit_mebleq: budgetState.limit,
+        valyuta: budgetState.currency,
+        hesab_mebleqi: totalSpend
+      });
     }
 
     // Render components
@@ -2534,8 +2563,18 @@
       filtered = filtered.filter(s => s.name.toLowerCase().includes(query) || s.category.toLowerCase().includes(query));
     }
 
+    // Sort order based on dropdown selection
+    const sortVal = document.getElementById('sub-sort-select').value;
+    filtered.sort((a, b) => {
+      if (sortVal === 'price_desc') return b.price - a.price;
+      if (sortVal === 'price_asc') return a.price - b.price;
+      if (sortVal === 'name_asc') return a.name.localeCompare(b.name);
+      // default: next_asc (earliest next payment date)
+      return daysUntil(a.next) - daysUntil(b.next);
+    });
+
     document.getElementById('subs-full-list').innerHTML = filtered.length > 0 ?
-      filtered.sort((a,b) => daysUntil(a.next) - daysUntil(b.next)).map(subRowHTML).join('') :
+      filtered.map(subRowHTML).join('') :
       '<div class="hint">Abunəlik tapılmadı.</div>';
   }
 
@@ -3508,6 +3547,99 @@ async function handleAddCard() {
       `Limitin <strong style="color:var(--ink)">%${pct}</strong>-i istifadə olunub · ${sym}${free.toFixed(2)} sərbəst qalıb.`;
     document.getElementById('budget-limit-display').textContent = sym + budgetState.limit.toFixed(2);
     document.getElementById('budget-currency-display').textContent = budgetState.currency;
+
+    // Advanced: Calculate Category Breakdown
+    const categoryTotals = {};
+    const activeSubs = subscriptions.filter(s => s.status === 'active');
+    activeSubs.forEach(s => {
+      let monthlyEquiv = s.price;
+      if (s.freqRaw === 'weekly') monthlyEquiv = s.price * 4;
+      else if (s.freqRaw === 'yearly') monthlyEquiv = s.price / 12;
+      else if (s.freqRaw === 'quarterly') monthlyEquiv = s.price / 3;
+
+      const converted = convertCurrency(monthlyEquiv, s.currency, budgetState.currency);
+      categoryTotals[s.category] = (categoryTotals[s.category] || 0) + converted;
+    });
+
+    // Render Category Breakdown List
+    const breakdownListEl = document.getElementById('budget-breakdown-list');
+    if (breakdownListEl) {
+      if (Object.keys(categoryTotals).length === 0) {
+        breakdownListEl.innerHTML = '<div class="hint" style="padding: 14px 16px;">Hələ aktiv abunəlik yoxdur.</div>';
+      } else {
+        breakdownListEl.innerHTML = Object.entries(categoryTotals)
+          .map(([cat, total]) => {
+            const catPct = budgetState.limit > 0 ? Math.min(100, Math.round((total / budgetState.limit) * 100)) : 0;
+            const colorClass = CATEGORY_COLORS[cat] || 'neutral';
+            return `
+              <div class="settings-row" style="border-bottom: 1px solid var(--border); padding: 14px 16px; flex-direction:column; align-items:stretch;">
+                <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700; margin-bottom:6px; color:var(--ink);">
+                  <span>${cat}</span>
+                  <span>${sym}${total.toFixed(2)} (${catPct}%)</span>
+                </div>
+                <div class="budget-bar-track" style="height: 6px; background:var(--surface-3); border-radius:10px; overflow:hidden;">
+                  <div class="budget-bar-fill" style="width: ${catPct}%; background: var(--${colorClass === 'neutral' ? 'ink-faint' : colorClass}); height:100%; border-radius:10px;"></div>
+                </div>
+              </div>`;
+          }).join('');
+      }
+    }
+
+    // Render AI Smart Insights
+    const insightsEl = document.getElementById('budget-insights-panel');
+    if (insightsEl) {
+      let insightHTML = '';
+      if (pct >= 100) {
+        insightHTML = `
+          <div style="background: rgba(255, 91, 69, 0.06); border: 2px solid var(--coral); border-radius: 22px; padding: 18px; font-size:13px; line-height:1.5; color: var(--ink); box-shadow: 0 10px 24px -8px rgba(255, 91, 69, 0.12);">
+            <div style="display:flex; align-items:center; gap:8px; font-weight:800; color:var(--coral); margin-bottom:8px; font-family:var(--font-display); font-size:12px; letter-spacing:0.5px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-top:-1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>LİMİT AŞILIB</span>
+            </div>
+            Aylıq limitinizi tamamilə aşmısınız! Ümumi abunəlik xərcləriniz təyin etdiyiniz limitdən <strong>${sym}${(budgetState.spent - budgetState.limit).toFixed(2)}</strong> çoxdur. Xərclərinizi azaltmaq üçün bəzi lazımsız xidmətləri dayandırmağı tövsiyə edirik.
+          </div>`;
+      } else if (pct >= 80) {
+        insightHTML = `
+          <div style="background: rgba(245, 196, 107, 0.06); border: 2px solid var(--gold); border-radius: 22px; padding: 18px; font-size:13px; line-height:1.5; color: var(--ink); box-shadow: 0 10px 24px -8px rgba(245, 196, 107, 0.12);">
+            <div style="display:flex; align-items:center; gap:8px; font-weight:800; color:var(--gold); margin-bottom:8px; font-family:var(--font-display); font-size:12px; letter-spacing:0.5px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-top:-1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span>KRİTİK HƏDD</span>
+            </div>
+            Büdcə limitiniz dolmaq üzrədir (%${pct} istifadə olunub). Yeni bir abunəlik qoşulsa, müəyyən etdiyiniz limiti keçəcəksiniz. Qalan sərbəst məbləğ: <strong>${sym}${free.toFixed(2)}</strong>.
+          </div>`;
+      } else {
+        // Find top category
+        let topCat = '';
+        let topVal = 0;
+        Object.entries(categoryTotals).forEach(([cat, val]) => {
+          if (val > topVal) {
+            topVal = val;
+            topCat = cat;
+          }
+        });
+        
+        if (topCat) {
+          insightHTML = `
+            <div style="background: rgba(139, 92, 246, 0.06); border: 2px solid var(--purple); border-radius: 22px; padding: 18px; font-size:13px; line-height:1.5; color: var(--ink); box-shadow: 0 10px 24px -8px rgba(139, 92, 246, 0.12);">
+              <div style="display:flex; align-items:center; gap:8px; font-weight:800; color:var(--purple); margin-bottom:8px; font-family:var(--font-display); font-size:12px; letter-spacing:0.5px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-top:-1px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                <span>AĞILLI TƏHLİL</span>
+              </div>
+              Büdcəniz hazırda stabil vəziyyətdədir. Ən çox xərciniz <strong>${topCat}</strong> kateqoriyasınadır (aylıq <strong>${sym}${topVal.toFixed(2)}</strong>). Digər abunəliklər üçün hələ <strong>${sym}${free.toFixed(2)}</strong> sərbəst limitiniz var.
+            </div>`;
+        } else {
+          insightHTML = `
+            <div style="background: rgba(31, 224, 194, 0.06); border: 2px solid var(--teal); border-radius: 22px; padding: 18px; font-size:13px; line-height:1.5; color: var(--ink); box-shadow: 0 10px 24px -8px rgba(31, 224, 194, 0.12);">
+              <div style="display:flex; align-items:center; gap:8px; font-weight:800; color:var(--teal); margin-bottom:8px; font-family:var(--font-display); font-size:12px; letter-spacing:0.5px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-top:-1px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>HƏR ŞEY ƏLA</span>
+              </div>
+              Büdcəniz tam sərbəstdir! İlk abunəliyinizi əlavə etdikdən sonra burada ağıllı maliyyə təhlilləri və proqnozları göstəriləcəkdir.
+            </div>`;
+        }
+      }
+      insightsEl.innerHTML = insightHTML;
+    }
   }
 
   function openBudgetEdit() {
