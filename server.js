@@ -113,16 +113,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-change-me-in-prod
 
 const authMiddleware = (req, res, next) => {
   // 1. Bypass authentication for Telegram webhook and Swagger docs
-  if (req.originalUrl === '/api/telegram-webhook' || req.path === '/telegram-webhook' || req.path.startsWith('/api-docs') || req.path === '/swagger.json') {
+  const normalizedUrl = req.originalUrl.split('?')[0];
+  if (normalizedUrl === '/api/telegram-webhook' || normalizedUrl === '/telegram-webhook' || normalizedUrl.startsWith('/api-docs') || normalizedUrl === '/swagger.json') {
     return next();
   }
 
   // 2. Bypass for public endpoints (login, register, signup)
   const isPublicPost = req.method === 'POST' && (
-    req.path === '/api/istifadeciler/login' ||
-    req.path === '/api/istifadeciler/register/initiate' ||
-    req.path === '/api/istifadeciler/register/verify' ||
-    req.path === '/api/istifadeciler'
+    normalizedUrl === '/api/istifadeciler/login' ||
+    normalizedUrl === '/api/istifadeciler/register/initiate' ||
+    normalizedUrl === '/api/istifadeciler/register/verify' ||
+    normalizedUrl === '/api/istifadeciler'
   );
   if (isPublicPost) {
     return next();
