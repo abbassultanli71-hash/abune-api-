@@ -2798,16 +2798,28 @@
     const days = daysUntil(s.next);
     const urg = s.status === 'deactive' ? 'paused' : urgencyFor(days);
     const badgeText = s.status === 'deactive' ? 'dayandırılıb' : badgeLabel(days);
-    const dateFmt = s.next.split('-').reverse().join('.');
     const sym = currencySymbol(s.currency);
+
+    const badgeTailwind = urg === 'urgent'
+      ? 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20'
+      : urg === 'soon'
+      ? 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20'
+      : urg === 'paused'
+      ? 'bg-slate-100 text-slate-600 ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400'
+      : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20';
+
     return `
-      <div class="sub-row transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:border-purple-500/30 active:scale-[0.98]" onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
-        <div class="sub-icon-wrap">
-          ${getBrandIconHTML(s.name, s.category)}
+      <div class="sub-row flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/80 shadow-sm transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:border-purple-500/40 active:scale-[0.98] cursor-pointer" onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="sub-icon-wrap flex-shrink-0">
+            ${getBrandIconHTML(s.name, s.category)}
+          </div>
+          <div class="sub-name font-semibold text-slate-900 dark:text-slate-100 truncate text-sm">${s.name}</div>
         </div>
-        <div class="sub-name">${s.name}</div>
-        <div class="sub-price-badge">${sym}${s.price.toFixed(2)}</div>
-        <span class="sub-badge ${urg}">${badgeText}</span>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <div class="inline-flex items-center rounded-xl bg-purple-50 dark:bg-purple-500/10 px-2.5 py-1 text-xs font-bold text-purple-700 dark:text-purple-300 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-500/20">${sym}${s.price.toFixed(2)}</div>
+          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${badgeTailwind}">${badgeText}</span>
+        </div>
       </div>`;
   }
 
