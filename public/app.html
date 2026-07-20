@@ -1447,17 +1447,27 @@
               <div class="hero-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
             </div>
             <div style="display: flex; align-items: center; gap: 14px;">
-              <div class="hero-illustration">
-                <svg viewBox="0 0 100 100" class="floating-illustration" style="width: 50px; height: 50px;">
-                  <g filter="drop-shadow(0 4px 10px rgba(105, 82, 224, 0.4))">
-                    <path d="M50 15 L62 45 L50 40 L38 45 Z" fill="#FF5B45" />
-                    <path d="M50 15 L50 40 L38 45 Z" fill="#CC4030" />
-                    <rect x="47" y="40" width="6" height="15" fill="#f5f7fa" />
-                    <path d="M46 55 L50 72 L54 55 Z" fill="#FFB020" />
-                    <path d="M38 45 L28 56 L38 52 Z" fill="#a58eff" />
-                    <path d="M62 45 L72 56 L62 52 Z" fill="#a58eff" />
-                    <circle cx="50" cy="30" r="3" fill="#FFF" />
-                  </g>
+              <div class="hero-illustration p-1.5 rounded-2xl bg-slate-900/80 border border-indigo-500/30 shadow-lg shadow-indigo-500/20 backdrop-blur-md transition-transform hover:scale-105" title="Abunəm Logo">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 44px; height: 44px;">
+                  <defs>
+                    <linearGradient id="dashLogoGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#4F46E5" />
+                      <stop offset="50%" stop-color="#3B82F6" />
+                      <stop offset="100%" stop-color="#06B6D4" />
+                    </linearGradient>
+                    <linearGradient id="dashLogoGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#10B981" />
+                      <stop offset="100%" stop-color="#3B82F6" />
+                    </linearGradient>
+                    <filter id="dashLogoGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="4" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+                  <rect x="10" y="10" width="80" height="80" rx="24" fill="rgba(15, 23, 42, 0.9)" stroke="url(#dashLogoGrad1)" stroke-width="3"/>
+                  <path d="M 50 22 L 76 72 H 60 L 50 50 L 40 72 H 24 Z" fill="url(#dashLogoGrad1)" filter="url(#dashLogoGlow)"/>
+                  <path d="M 36 60 C 42 48, 58 48, 64 60 C 58 72, 42 72, 36 60 Z" stroke="url(#dashLogoGrad2)" stroke-width="4" stroke-linecap="round" fill="none"/>
+                  <circle cx="50" cy="36" r="4.5" fill="#10B981"/>
                 </svg>
               </div>
               <div class="hero-avatar" id="hero-avatar-initials" onclick="switchScreen('settings')" title="Ayarlar">U.U</div>
