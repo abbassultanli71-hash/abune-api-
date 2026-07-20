@@ -319,31 +319,13 @@ function isValidEmail(email) {
 }
 
 function calculateMonthlyEquivalentSpend(subs, targetCurrency) {
-  const BASE_RATES = {
-    AZN: 1.0,
-    USD: 1.70,
-    EUR: 1.85
-  };
-  
-  function convertCurrency(amount, from, to) {
-    const fromUpper = String(from || 'AZN').toUpperCase();
-    const toUpper = String(to || 'AZN').toUpperCase();
-    if (fromUpper === toUpper) return amount;
-    const amountInAzn = amount * (BASE_RATES[fromUpper] || 1.0);
-    return amountInAzn / (BASE_RATES[toUpper] || 1.0);
-  }
-
   let total = 0;
   for (const s of subs) {
     const price = Number(s.qiymet !== undefined ? s.qiymet : (s.QIYMET !== undefined ? s.QIYMET : 0));
     const currency = s.valyuta !== undefined ? s.valyuta : (s.VALYUTA !== undefined ? s.VALYUTA : 'AZN');
     const freq = s.odenis_tezliyi !== undefined ? s.odenis_tezliyi : (s.ODENIS_TEZLIYI !== undefined ? s.ODENIS_TEZLIYI : 'monthly');
     
-    let monthlyEquiv = price;
-    if (freq === 'weekly') monthlyEquiv = price * 4;
-    else if (freq === 'yearly') monthlyEquiv = price / 12;
-    else if (freq === 'quarterly') monthlyEquiv = price / 3;
-
+    const monthlyEquiv = toMonthlyAmount(price, freq);
     total += convertCurrency(monthlyEquiv, currency, targetCurrency);
   }
   return total;
@@ -419,10 +401,10 @@ const ICAZE_VERILEN_ODENIS_TEZLIKLERI = ['monthly', 'yearly', 'quarterly', 'week
 const ICAZE_VERILEN_KATEQORIYALAR = ['Entertainment', 'Music', 'Education', 'Health & Fitness', 'Productivity', 'Gaming', 'Cloud Storage', 'News', 'Food & Delivery', 'Shopping', 'Finance', 'Other'];
 const ICAZE_VERILEN_STATUSLAR = ['active', 'deactive'];
 
-const VALYUTA_MEZARBELERI_TO_USD = {
-  USD: 1.0,
-  AZN: 1.70,
-  EUR: 0.92
+const VALYUTA_RATES_AZN = {
+  AZN: 1.0,
+  USD: 1.70,
+  EUR: 1.85
 };
 
 function getValidCurrency(valyuta) {
@@ -439,12 +421,12 @@ function isValidCurrency(valyuta) {
 function convertCurrency(mebleq, fromValyuta, toValyuta) {
   const from = getValidCurrency(fromValyuta);
   const to = getValidCurrency(toValyuta);
-  if (from === to) return Number(mebleq);
+  if (from === to) return Number(mebleq) || 0;
 
-  const fromRate = VALYUTA_MEZARBELERI_TO_USD[from] || 1.0;
-  const toRate = VALYUTA_MEZARBELERI_TO_USD[to] || 1.0;
+  const fromRate = VALYUTA_RATES_AZN[from] || 1.0;
+  const toRate = VALYUTA_RATES_AZN[to] || 1.0;
 
-  return Number(mebleq) * (toRate / fromRate);
+  return ((Number(mebleq) || 0) * fromRate) / toRate;
 }
 
 function toMonthlyAmount(qiymet, odenisTezliyi) {

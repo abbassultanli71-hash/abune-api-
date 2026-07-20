@@ -3942,6 +3942,8 @@ async function handleAddCard() {
     }
   }
 
+  let currentBudgetCurrencyInModal = 'AZN';
+
   function openBudgetEdit() {
     document.getElementById('budget-view').style.display = 'none';
     document.getElementById('budget-update-wrap').style.display = 'none';
@@ -3950,8 +3952,26 @@ async function handleAddCard() {
     document.getElementById('budget-limit-input').value = budgetState.limit;
     document.getElementById('budget-spent-input').value = budgetState.spent;
     document.getElementById('budget-currency-input').value = budgetState.currency;
+    currentBudgetCurrencyInModal = budgetState.currency;
     clearBudgetError();
   }
+
+  // Auto-convert limit input value when user selects a different currency in Budget section
+  document.addEventListener('DOMContentLoaded', () => {
+    const curSelect = document.getElementById('budget-currency-input');
+    if (curSelect) {
+      curSelect.addEventListener('change', (e) => {
+        const newCurrency = e.target.value;
+        const limitInput = document.getElementById('budget-limit-input');
+        const currentVal = parseFloat(limitInput.value);
+        if (!isNaN(currentVal) && currentVal > 0 && currentBudgetCurrencyInModal) {
+          const converted = convertCurrency(currentVal, currentBudgetCurrencyInModal, newCurrency);
+          limitInput.value = converted.toFixed(2);
+        }
+        currentBudgetCurrencyInModal = newCurrency;
+      });
+    }
+  });
 
   function closeBudgetEdit() {
     document.getElementById('budget-edit').style.display = 'none';
