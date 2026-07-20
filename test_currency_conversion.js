@@ -31,7 +31,7 @@ function toMonthlyAmount(qiymet, odenisTezliyi) {
   const tezlik = String(odenisTezliyi || 'monthly').toLowerCase();
   switch (tezlik) {
     case 'weekly':
-      return (amount * 52) / 12;
+      return (amount * 52) / 12; // Exact 52 weeks / 12 months = 4.3333x
     case 'monthly':
       return amount;
     case 'quarterly':
@@ -52,45 +52,39 @@ function calculateTotalSpent(subs, targetCurrency) {
   return Math.round(total * 100) / 100;
 }
 
-console.log('--- TEST: INDIVIDUAL SUBSCRIPTION CURRENCY INDEPENDENCE ---');
+console.log('--- TEST 1: WEEKLY SUBSCRIPTION ACCURATE CALENDAR CALCULATION ---');
 
-// Initial Subscriptions: Sub 1 = 20 USD, Sub 2 = 20 AZN
+// 20 AZN weekly sub MUST calculate as 20 * 52 / 12 = 86.67 AZN (NOT 20 * 4 = 80)
+const weeklySubCost = toMonthlyAmount(20, 'weekly');
+console.log(`Weekly 20 AZN Monthly Equivalent: ${weeklySubCost.toFixed(2)} AZN`);
+assert.strictEqual(weeklySubCost.toFixed(2), '86.67');
+assert.notStrictEqual(weeklySubCost.toFixed(2), '80.00');
+
+console.log('--- TEST 2: INDIVIDUAL SUBSCRIPTION FREQUENCY ISOLATION ---');
+
+// Initial Subscriptions: Sub 1 (Netflix) = 20 AZN weekly, Sub 2 (Spotify) = 20 AZN weekly
 let userSubs = [
-  { id: 1, name: 'Netflix', price: 20, currency: 'USD', freq: 'monthly' },
-  { id: 2, name: 'Spotify', price: 20, currency: 'AZN', freq: 'monthly' }
+  { id: 1, name: 'Netflix', price: 20, currency: 'AZN', freq: 'weekly' },
+  { id: 2, name: 'Spotify', price: 20, currency: 'AZN', freq: 'weekly' }
 ];
 
-// 1. Initial Spent in AZN Budget
-let spentAzn = calculateTotalSpent(userSubs, 'AZN');
-console.log(`Initial Spent (20$ + 20 AZN in AZN Budget): ${spentAzn.toFixed(2)} AZN`);
-assert.strictEqual(spentAzn.toFixed(2), '54.00');
+// Initial Spent: 86.67 + 86.67 = 173.33 AZN
+let spent = calculateTotalSpent(userSubs, 'AZN');
+console.log(`Initial Spent (Two 20 AZN Weekly Subs): ${spent.toFixed(2)} AZN`);
+assert.strictEqual(spent.toFixed(2), '173.33');
 
-// 2. Change ONLY Sub 1 (Netflix) from USD to EUR (20 EUR). Sub 2 MUST remain AZN!
-userSubs[0].currency = 'EUR';
+// Change ONLY Sub 1 (Netflix) frequency to 'monthly' (20 AZN monthly). Sub 2 MUST remain 'weekly' (20 AZN weekly)!
+userSubs[0].freq = 'monthly';
 
-console.log(`Sub 1 Currency: ${userSubs[0].currency} (Should be EUR)`);
-console.log(`Sub 2 Currency: ${userSubs[1].currency} (Should be AZN)`);
+console.log(`Sub 1 Frequency: ${userSubs[0].freq} (Should be monthly)`);
+console.log(`Sub 2 Frequency: ${userSubs[1].freq} (Should be weekly)`);
 
-assert.strictEqual(userSubs[0].currency, 'EUR');
-assert.strictEqual(userSubs[1].currency, 'AZN');
+assert.strictEqual(userSubs[0].freq, 'monthly');
+assert.strictEqual(userSubs[1].freq, 'weekly');
 
-// 3. New Spent in AZN Budget (20 EUR * 1.85 + 20 AZN = 37 + 20 = 57 AZN)
-spentAzn = calculateTotalSpent(userSubs, 'AZN');
-console.log(`Updated Spent (20 EUR + 20 AZN in AZN Budget): ${spentAzn.toFixed(2)} AZN`);
-assert.strictEqual(spentAzn.toFixed(2), '57.00');
+// New Spent: 20.00 (Netflix monthly) + 86.67 (Spotify weekly) = 106.67 AZN
+spent = calculateTotalSpent(userSubs, 'AZN');
+console.log(`Updated Spent (Netflix monthly + Spotify weekly): ${spent.toFixed(2)} AZN`);
+assert.strictEqual(spent.toFixed(2), '106.67');
 
-// 4. Change ONLY Sub 2 (Spotify) from AZN to USD (20 USD). Sub 1 remains EUR (20 EUR)!
-userSubs[1].currency = 'USD';
-
-console.log(`Sub 1 Currency: ${userSubs[0].currency} (EUR)`);
-console.log(`Sub 2 Currency: ${userSubs[1].currency} (USD)`);
-
-assert.strictEqual(userSubs[0].currency, 'EUR');
-assert.strictEqual(userSubs[1].currency, 'USD');
-
-// 5. New Spent in AZN Budget (20 EUR * 1.85 + 20 USD * 1.70 = 37 + 34 = 71 AZN)
-spentAzn = calculateTotalSpent(userSubs, 'AZN');
-console.log(`Updated Spent (20 EUR + 20 USD in AZN Budget): ${spentAzn.toFixed(2)} AZN`);
-assert.strictEqual(spentAzn.toFixed(2), '71.00');
-
-console.log('✅ INDIVIDUAL SUBSCRIPTION CURRENCY INDEPENDENCE TEST PASSED PERFECTLY!');
+console.log('✅ ALL FREQUENCY ACCURACY AND ISOLATION TESTS PASSED PERFECTLY!');

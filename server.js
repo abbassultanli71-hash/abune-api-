@@ -1568,10 +1568,14 @@ app.post('/api/abunelikler', async (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/AccountNotFoundError'
  */
-app.put('/api/abunelikler', async (req, res) => {
-  const { username, ad: queryAd } = req.query;
-  if (!username || !queryAd)
-    return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'username və ad query parametrləri məcburidir.');
+app.put('/api/abunelikler/:id?', async (req, res) => {
+  const paramId = req.params.id || req.query.id;
+  const username = req.query.username || req.body.username;
+  const queryAd = req.query.ad || req.body.ad;
+
+  if (!paramId && (!username || !queryAd)) {
+    return errorResponse(res, 400, 'Bad Request', 'MISSING_PARAMETER', 'id və ya username və ad query parametrləri məcburidir.');
+  }
 
   const { ad, qiymet, valyuta, odenis_tezliyi, baslama_tarixi, kateqoriya, status, odenis_metodu_id, accountemail, accountpassword } = req.body;
 
@@ -1607,22 +1611,40 @@ app.put('/api/abunelikler', async (req, res) => {
   const novbetiOdenisTarixi = hesablaNovbetiOdenisTarixi(baslama_tarixi, odenisTezliyi);
 
   try {
-    const userId = await getUserIdByUsername(username);
-    if (userId === null)
-      return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
+    let userId = null;
+    let subCheck = { rows: [] };
 
-    const subCheck = await executeQuery(
-      `SELECT id, qiymet, status FROM abunelikler WHERE istifadeci_id = :istifadeci_id AND ad = :ad`,
-      { istifadeci_id: userId, ad: queryAd }
-    );
+    if (paramId) {
+      subCheck = await executeQuery(
+        `SELECT id, istifadeci_id, ad, qiymet, status FROM abunelikler WHERE id = :id`,
+        { id: Number(paramId) }
+      );
+      if (subCheck.rows.length > 0) {
+        userId = subCheck.rows[0].ISTIFADECI_ID || subCheck.rows[0].istifadeci_id;
+      }
+    } else if (username && queryAd) {
+      userId = await getUserIdByUsername(username);
+      if (userId !== null) {
+        subCheck = await executeQuery(
+          `SELECT id, istifadeci_id, ad, qiymet, status FROM abunelikler WHERE istifadeci_id = :istifadeci_id AND ad = :ad`,
+          { istifadeci_id: userId, ad: queryAd }
+        );
+      }
+    }
+
     if (subCheck.rows.length === 0)
       return errorResponse(res, 404, 'Not Found', 'SUBSCRIPTION_NOT_FOUND', 'Abunəlik tapılmadı.');
 
-    const originalPrice = subCheck.rows[0].QIYMET !== undefined ? Number(subCheck.rows[0].QIYMET) : Number(subCheck.rows[0].qiymet);
-    const originalStatus = (subCheck.rows[0].STATUS !== undefined ? subCheck.rows[0].STATUS : subCheck.rows[0].status || '').toLowerCase();
+    const subRecord = subCheck.rows[0];
+    const targetSubId = Number(subRecord.ID || subRecord.id);
+    const targetSubName = subRecord.AD || subRecord.ad || queryAd;
+    userId = userId || Number(subRecord.ISTIFADECI_ID || subRecord.istifadeci_id);
+
+    const originalPrice = subRecord.QIYMET !== undefined ? Number(subRecord.QIYMET) : Number(subRecord.qiymet);
+    const originalStatus = (subRecord.STATUS !== undefined ? subRecord.STATUS : subRecord.status || '').toLowerCase();
 
     // Validate subscription account credentials (mock validation)
-    const isValidAccount = await validateSubscriptionAccount(queryAd, accountemail, accountpassword);
+    const isValidAccount = await validateSubscriptionAccount(targetSubName, accountemail, accountpassword);
     if (!isValidAccount) {
       return errorResponse(res, 404, 'Not Found', 'ACCOUNT_NOT_FOUND', 'Application account not found or credentials are incorrect.');
     }
@@ -1644,7 +1666,7 @@ app.put('/api/abunelikler', async (req, res) => {
         const activeSubs = await executeQuery(
           `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler
             WHERE istifadeci_id = :userId AND status = 'active' AND id != :subId`,
-          { userId, subId: subCheck.rows[0].id || subCheck.rows[0].ID }
+          { userId, subId: targetSubId }
         );
 
         const currentTotal = calculateMonthlyEquivalentSpend(activeSubs.rows, budgetValyuta);
@@ -1679,17 +1701,17 @@ app.put('/api/abunelikler', async (req, res) => {
       }
     }
 
-    const finalAd = ad || queryAd;
+    const finalAd = ad || targetSubName;
     await executeQuery(
       `UPDATE abunelikler SET ad=:ad, qiymet=:qiymet, valyuta=:valyuta, odenis_tezliyi=:odenis_tezliyi,
        baslama_tarixi=:baslama_tarixi::DATE, novbeti_odenis_tarixi=:novbeti_odenis_tarixi::DATE,
        kateqoriya=:kateqoriya, status=:status, odenis_metodu_id=:odenis_metodu_id
-       WHERE istifadeci_id=:istifadeci_id AND ad=:queryAd`,
+       WHERE id=:targetSubId`,
       {
         ad: finalAd, qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta),
         odenis_tezliyi: odenisTezliyi, baslama_tarixi, novbeti_odenis_tarixi: novbetiOdenisTarixi,
         kateqoriya: kateqoriya || null, status: statusValue, odenis_metodu_id: finalOdenisMetoduId,
-        istifadeci_id: userId, queryAd
+        targetSubId
       },
       { autoCommit: true }
     );
