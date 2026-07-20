@@ -463,7 +463,7 @@ async function calculateTotalMonthlySpentInBudgetCurrency(userId, targetValyuta)
 
     totalSpent += monthlyCostInBudgetCurrency;
   }
-  return totalSpent;
+  return Math.round(totalSpent * 100) / 100;
 }
 
 // İstifadəçinin username-inə görə daxili (PostgreSQL) ID-sini tapır.

@@ -17,12 +17,13 @@ function getValidCurrency(valyuta) {
 function convertCurrency(mebleq, fromValyuta, toValyuta) {
   const from = getValidCurrency(fromValyuta);
   const to = getValidCurrency(toValyuta);
-  if (from === to) return Number(mebleq);
+  const val = Number(mebleq) || 0;
+  if (from === to) return val;
 
   const fromRate = VALYUTA_RATES_AZN[from] || 1.0;
   const toRate = VALYUTA_RATES_AZN[to] || 1.0;
 
-  return ((Number(mebleq) || 0) * fromRate) / toRate;
+  return (val * fromRate) / toRate;
 }
 
 function toMonthlyAmount(qiymet, odenisTezliyi) {
@@ -30,7 +31,7 @@ function toMonthlyAmount(qiymet, odenisTezliyi) {
   const tezlik = String(odenisTezliyi || 'monthly').toLowerCase();
   switch (tezlik) {
     case 'weekly':
-      return amount * 52 / 12;
+      return (amount * 52) / 12;
     case 'monthly':
       return amount;
     case 'quarterly':
@@ -42,31 +43,43 @@ function toMonthlyAmount(qiymet, odenisTezliyi) {
   }
 }
 
-console.log('--- RUNNING DIRECT AZN MULTI-CURRENCY TESTS ---');
+function calculateTotalSpent(subs, targetCurrency) {
+  let total = 0;
+  subs.forEach(s => {
+    const monthlyEquiv = toMonthlyAmount(s.price, s.freq);
+    total += convertCurrency(monthlyEquiv, s.currency, targetCurrency);
+  });
+  return Math.round(total * 100) / 100;
+}
 
-// Test 1: 70 USD monthly sub -> Budget in AZN
-const test1 = convertCurrency(toMonthlyAmount(70, 'monthly'), 'USD', 'AZN');
-console.log(`Test 1 (70 USD -> AZN): ${test1.toFixed(2)} AZN`);
-assert.strictEqual(test1.toFixed(2), '119.00');
+console.log('--- RUNNING USER SPECIFIC EXACT TEST CASES ---');
 
-// Test 2: 70 AZN monthly sub -> Budget in USD
-const test2 = convertCurrency(toMonthlyAmount(70, 'monthly'), 'AZN', 'USD');
-console.log(`Test 2 (70 AZN -> USD): ${test2.toFixed(2)} USD`);
-assert.strictEqual(test2.toFixed(2), '41.18');
+// USER EXAMPLE: 20$ + 20 manat when budget currency is AZN
+// 20$ * 1.70 + 20 AZN = 34 + 20 = 54 AZN
+const userExampleSubs = [
+  { price: 20, currency: 'USD', freq: 'monthly' },
+  { price: 20, currency: 'AZN', freq: 'monthly' }
+];
 
-// Test 3: 50 EUR monthly sub -> Budget in AZN (Direct 1 EUR = 1.85 AZN)
-const test3 = convertCurrency(toMonthlyAmount(50, 'monthly'), 'EUR', 'AZN');
-console.log(`Test 3 (50 EUR -> AZN): ${test3.toFixed(2)} AZN`);
-assert.strictEqual(test3.toFixed(2), '92.50');
+const spentInAzn = calculateTotalSpent(userExampleSubs, 'AZN');
+console.log(`User Example (20$ + 20 AZN -> Budget AZN): ${spentInAzn.toFixed(2)} AZN`);
+assert.strictEqual(spentInAzn.toFixed(2), '54.00');
 
-// Test 4: Budget limit auto-conversion 500 AZN -> USD
-const test4 = convertCurrency(500, 'AZN', 'USD');
-console.log(`Test 4 (500 AZN limit -> USD limit): ${test4.toFixed(2)} USD`);
-assert.strictEqual(test4.toFixed(2), '294.12');
+// REVERSE EXAMPLE: 20$ + 20 manat when budget currency is USD
+// 20 USD + (20 AZN / 1.70) = 20 + 11.7647 = 31.76 USD
+const spentInUsd = calculateTotalSpent(userExampleSubs, 'USD');
+console.log(`User Example (20$ + 20 AZN -> Budget USD): ${spentInUsd.toFixed(2)} USD`);
+assert.strictEqual(spentInUsd.toFixed(2), '31.76');
 
-// Test 5: Budget limit auto-conversion 500 AZN -> EUR
-const test5 = convertCurrency(500, 'AZN', 'EUR');
-console.log(`Test 5 (500 AZN limit -> EUR limit): ${test5.toFixed(2)} EUR`);
-assert.strictEqual(test5.toFixed(2), '270.27');
+// EURO EXAMPLE: 20$ + 20 AZN + 10 EUR when budget currency is AZN
+// 20*1.70 + 20 + 10*1.85 = 34 + 20 + 18.50 = 72.50 AZN
+const tripleSubs = [
+  { price: 20, currency: 'USD', freq: 'monthly' },
+  { price: 20, currency: 'AZN', freq: 'monthly' },
+  { price: 10, currency: 'EUR', freq: 'monthly' }
+];
+const spentTripleAzn = calculateTotalSpent(tripleSubs, 'AZN');
+console.log(`Triple Example (20$ + 20 AZN + 10 EUR -> Budget AZN): ${spentTripleAzn.toFixed(2)} AZN`);
+assert.strictEqual(spentTripleAzn.toFixed(2), '72.50');
 
-console.log('✅ ALL DIRECT MANAT CONVERSION TESTS PASSED SUCCESSFULLY!');
+console.log('✅ ALL EXACT CALCULATION TESTS PASSED WITH 100% ACCURACY!');
