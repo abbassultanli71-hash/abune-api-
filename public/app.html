@@ -2630,11 +2630,10 @@
       }
     }
 
-    // Calculate total spent (converting to targetCurrency using monthly equivalence)
+    // Calculate total spent (converting price to targetCurrency directly, ignoring frequency)
     let totalSpend = 0;
     activeSubs.forEach(s => {
-      const monthlyEquiv = toMonthlyAmount(s.price, s.freqRaw);
-      totalSpend += convertCurrency(monthlyEquiv, s.currency, targetCurrency);
+      totalSpend += convertCurrency(s.price, s.currency, targetCurrency);
     });
 
     budgetState = {
@@ -3803,8 +3802,7 @@ async function handleAddCard() {
     const activeSubs = subscriptions.filter(s => s.status === 'active');
     let total = 0;
     activeSubs.forEach(s => {
-      const monthlyEquiv = toMonthlyAmount(s.price, s.freqRaw);
-      total += convertCurrency(monthlyEquiv, s.currency, curr);
+      total += convertCurrency(s.price, s.currency, curr);
     });
     return Math.round(total * 100) / 100;
   }
@@ -3864,8 +3862,7 @@ async function handleAddCard() {
     const categoryTotals = {};
     const activeSubs = subscriptions.filter(s => s.status === 'active');
     activeSubs.forEach(s => {
-      const monthlyEquiv = toMonthlyAmount(s.price, s.freqRaw);
-      const converted = convertCurrency(monthlyEquiv, s.currency, budgetState.currency);
+      const converted = convertCurrency(s.price, s.currency, budgetState.currency);
       categoryTotals[s.category] = (categoryTotals[s.category] || 0) + converted;
     });
 

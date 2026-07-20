@@ -38,12 +38,7 @@ function convertCurrency(amount, from, to) {
 }
 
 function toMonthlyAmount(price, freq) {
-  const p = Number(price) || 0;
-  const f = String(freq || 'monthly').toLowerCase();
-  if (f === 'yearly') return p / 12;
-  if (f === 'quarterly') return p / 3;
-  if (f === 'weekly') return p * 52 / 12;
-  return p;
+  return Number(price) || 0;
 }
 
 /* ==========================================================================

@@ -26,65 +26,44 @@ function convertCurrency(mebleq, fromValyuta, toValyuta) {
   return (val * fromRate) / toRate;
 }
 
+// Frequency is strictly ignored in calculations as explicitly requested by user
 function toMonthlyAmount(qiymet, odenisTezliyi) {
-  const amount = Number(qiymet) || 0;
-  const tezlik = String(odenisTezliyi || 'monthly').toLowerCase();
-  switch (tezlik) {
-    case 'weekly':
-      return (amount * 52) / 12; // Exact 52 weeks / 12 months = 4.3333x
-    case 'monthly':
-      return amount;
-    case 'quarterly':
-      return amount / 3;
-    case 'yearly':
-      return amount / 12;
-    default:
-      return amount;
-  }
+  return Number(qiymet) || 0;
 }
 
 function calculateTotalSpent(subs, targetCurrency) {
   let total = 0;
   subs.forEach(s => {
-    const monthlyEquiv = toMonthlyAmount(s.price, s.freq);
-    total += convertCurrency(monthlyEquiv, s.currency, targetCurrency);
+    // Just prices directly without frequency multiplier
+    const rawPrice = Number(s.price) || 0;
+    total += convertCurrency(rawPrice, s.currency, targetCurrency);
   });
   return Math.round(total * 100) / 100;
 }
 
-console.log('--- TEST 1: WEEKLY SUBSCRIPTION ACCURATE CALENDAR CALCULATION ---');
+console.log('--- TEST: RAW PRICE SUMMATION (FREQUENCY IGNORED IN MATH) ---');
 
-// 20 AZN weekly sub MUST calculate as 20 * 52 / 12 = 86.67 AZN (NOT 20 * 4 = 80)
-const weeklySubCost = toMonthlyAmount(20, 'weekly');
-console.log(`Weekly 20 AZN Monthly Equivalent: ${weeklySubCost.toFixed(2)} AZN`);
-assert.strictEqual(weeklySubCost.toFixed(2), '86.67');
-assert.notStrictEqual(weeklySubCost.toFixed(2), '80.00');
-
-console.log('--- TEST 2: INDIVIDUAL SUBSCRIPTION FREQUENCY ISOLATION ---');
-
-// Initial Subscriptions: Sub 1 (Netflix) = 20 AZN weekly, Sub 2 (Spotify) = 20 AZN weekly
-let userSubs = [
-  { id: 1, name: 'Netflix', price: 20, currency: 'AZN', freq: 'weekly' },
-  { id: 2, name: 'Spotify', price: 20, currency: 'AZN', freq: 'weekly' }
+// Sub 1: 20 USD (weekly) -> 20 * 1.70 = 34 AZN (weekly multiplier ignored!)
+// Sub 2: 20 AZN (monthly) -> 20 AZN
+// Sub 3: 50 EUR (yearly) -> 50 * 1.85 = 92.50 AZN (yearly divider ignored!)
+const testSubs = [
+  { price: 20, currency: 'USD', freq: 'weekly' },
+  { price: 20, currency: 'AZN', freq: 'monthly' },
+  { price: 50, currency: 'EUR', freq: 'yearly' }
 ];
 
-// Initial Spent: 86.67 + 86.67 = 173.33 AZN
-let spent = calculateTotalSpent(userSubs, 'AZN');
-console.log(`Initial Spent (Two 20 AZN Weekly Subs): ${spent.toFixed(2)} AZN`);
-assert.strictEqual(spent.toFixed(2), '173.33');
+const totalInAzn = calculateTotalSpent(testSubs, 'AZN');
+console.log(`Raw Price Sum in AZN Budget: ${totalInAzn.toFixed(2)} AZN`);
+// 34 + 20 + 92.50 = 146.50 AZN
+assert.strictEqual(totalInAzn.toFixed(2), '146.50');
 
-// Change ONLY Sub 1 (Netflix) frequency to 'monthly' (20 AZN monthly). Sub 2 MUST remain 'weekly' (20 AZN weekly)!
-userSubs[0].freq = 'monthly';
+const userExampleSubs = [
+  { price: 20, currency: 'USD', freq: 'weekly' },
+  { price: 20, currency: 'AZN', freq: 'weekly' }
+];
+const userTotalInAzn = calculateTotalSpent(userExampleSubs, 'AZN');
+console.log(`User Example (20$ weekly + 20 AZN weekly in AZN Budget): ${userTotalInAzn.toFixed(2)} AZN`);
+// 20*1.70 + 20 = 34 + 20 = 54.00 AZN
+assert.strictEqual(userTotalInAzn.toFixed(2), '54.00');
 
-console.log(`Sub 1 Frequency: ${userSubs[0].freq} (Should be monthly)`);
-console.log(`Sub 2 Frequency: ${userSubs[1].freq} (Should be weekly)`);
-
-assert.strictEqual(userSubs[0].freq, 'monthly');
-assert.strictEqual(userSubs[1].freq, 'weekly');
-
-// New Spent: 20.00 (Netflix monthly) + 86.67 (Spotify weekly) = 106.67 AZN
-spent = calculateTotalSpent(userSubs, 'AZN');
-console.log(`Updated Spent (Netflix monthly + Spotify weekly): ${spent.toFixed(2)} AZN`);
-assert.strictEqual(spent.toFixed(2), '106.67');
-
-console.log('✅ ALL FREQUENCY ACCURACY AND ISOLATION TESTS PASSED PERFECTLY!');
+console.log('✅ FREQUENCY-FREE RAW PRICE SUMMATION TEST PASSED PERFECTLY!');

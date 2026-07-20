@@ -430,20 +430,7 @@ function convertCurrency(mebleq, fromValyuta, toValyuta) {
 }
 
 function toMonthlyAmount(qiymet, odenisTezliyi) {
-  const amount = Number(qiymet) || 0;
-  const tezlik = String(odenisTezliyi || 'monthly').toLowerCase();
-  switch (tezlik) {
-    case 'weekly':
-      return amount * 52 / 12;
-    case 'monthly':
-      return amount;
-    case 'quarterly':
-      return amount / 3;
-    case 'yearly':
-      return amount / 12;
-    default:
-      return amount;
-  }
+  return Number(qiymet) || 0;
 }
 
 async function calculateTotalMonthlySpentInBudgetCurrency(userId, targetValyuta) {
@@ -454,14 +441,11 @@ async function calculateTotalMonthlySpentInBudgetCurrency(userId, targetValyuta)
 
   let totalSpent = 0;
   for (const row of activeSubs.rows) {
-    const qiymet = Number(row.QIYMET);
-    const valyuta = row.VALYUTA || 'AZN';
-    const odenisTezliyi = row.ODENIS_TEZLIYI || 'monthly';
+    const qiymet = Number(row.QIYMET !== undefined ? row.QIYMET : row.qiymet);
+    const valyuta = row.VALYUTA || row.valyuta || 'AZN';
 
-    const monthlyCostInOriginal = toMonthlyAmount(qiymet, odenisTezliyi);
-    const monthlyCostInBudgetCurrency = convertCurrency(monthlyCostInOriginal, valyuta, targetValyuta);
-
-    totalSpent += monthlyCostInBudgetCurrency;
+    const costInBudgetCurrency = convertCurrency(qiymet, valyuta, targetValyuta);
+    totalSpent += costInBudgetCurrency;
   }
   return Math.round(totalSpent * 100) / 100;
 }
