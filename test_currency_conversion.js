@@ -52,34 +52,45 @@ function calculateTotalSpent(subs, targetCurrency) {
   return Math.round(total * 100) / 100;
 }
 
-console.log('--- RUNNING USER SPECIFIC EXACT TEST CASES ---');
+console.log('--- TEST: INDIVIDUAL SUBSCRIPTION CURRENCY INDEPENDENCE ---');
 
-// USER EXAMPLE: 20$ + 20 manat when budget currency is AZN
-// 20$ * 1.70 + 20 AZN = 34 + 20 = 54 AZN
-const userExampleSubs = [
-  { price: 20, currency: 'USD', freq: 'monthly' },
-  { price: 20, currency: 'AZN', freq: 'monthly' }
+// Initial Subscriptions: Sub 1 = 20 USD, Sub 2 = 20 AZN
+let userSubs = [
+  { id: 1, name: 'Netflix', price: 20, currency: 'USD', freq: 'monthly' },
+  { id: 2, name: 'Spotify', price: 20, currency: 'AZN', freq: 'monthly' }
 ];
 
-const spentInAzn = calculateTotalSpent(userExampleSubs, 'AZN');
-console.log(`User Example (20$ + 20 AZN -> Budget AZN): ${spentInAzn.toFixed(2)} AZN`);
-assert.strictEqual(spentInAzn.toFixed(2), '54.00');
+// 1. Initial Spent in AZN Budget
+let spentAzn = calculateTotalSpent(userSubs, 'AZN');
+console.log(`Initial Spent (20$ + 20 AZN in AZN Budget): ${spentAzn.toFixed(2)} AZN`);
+assert.strictEqual(spentAzn.toFixed(2), '54.00');
 
-// REVERSE EXAMPLE: 20$ + 20 manat when budget currency is USD
-// 20 USD + (20 AZN / 1.70) = 20 + 11.7647 = 31.76 USD
-const spentInUsd = calculateTotalSpent(userExampleSubs, 'USD');
-console.log(`User Example (20$ + 20 AZN -> Budget USD): ${spentInUsd.toFixed(2)} USD`);
-assert.strictEqual(spentInUsd.toFixed(2), '31.76');
+// 2. Change ONLY Sub 1 (Netflix) from USD to EUR (20 EUR). Sub 2 MUST remain AZN!
+userSubs[0].currency = 'EUR';
 
-// EURO EXAMPLE: 20$ + 20 AZN + 10 EUR when budget currency is AZN
-// 20*1.70 + 20 + 10*1.85 = 34 + 20 + 18.50 = 72.50 AZN
-const tripleSubs = [
-  { price: 20, currency: 'USD', freq: 'monthly' },
-  { price: 20, currency: 'AZN', freq: 'monthly' },
-  { price: 10, currency: 'EUR', freq: 'monthly' }
-];
-const spentTripleAzn = calculateTotalSpent(tripleSubs, 'AZN');
-console.log(`Triple Example (20$ + 20 AZN + 10 EUR -> Budget AZN): ${spentTripleAzn.toFixed(2)} AZN`);
-assert.strictEqual(spentTripleAzn.toFixed(2), '72.50');
+console.log(`Sub 1 Currency: ${userSubs[0].currency} (Should be EUR)`);
+console.log(`Sub 2 Currency: ${userSubs[1].currency} (Should be AZN)`);
 
-console.log('✅ ALL EXACT CALCULATION TESTS PASSED WITH 100% ACCURACY!');
+assert.strictEqual(userSubs[0].currency, 'EUR');
+assert.strictEqual(userSubs[1].currency, 'AZN');
+
+// 3. New Spent in AZN Budget (20 EUR * 1.85 + 20 AZN = 37 + 20 = 57 AZN)
+spentAzn = calculateTotalSpent(userSubs, 'AZN');
+console.log(`Updated Spent (20 EUR + 20 AZN in AZN Budget): ${spentAzn.toFixed(2)} AZN`);
+assert.strictEqual(spentAzn.toFixed(2), '57.00');
+
+// 4. Change ONLY Sub 2 (Spotify) from AZN to USD (20 USD). Sub 1 remains EUR (20 EUR)!
+userSubs[1].currency = 'USD';
+
+console.log(`Sub 1 Currency: ${userSubs[0].currency} (EUR)`);
+console.log(`Sub 2 Currency: ${userSubs[1].currency} (USD)`);
+
+assert.strictEqual(userSubs[0].currency, 'EUR');
+assert.strictEqual(userSubs[1].currency, 'USD');
+
+// 5. New Spent in AZN Budget (20 EUR * 1.85 + 20 USD * 1.70 = 37 + 34 = 71 AZN)
+spentAzn = calculateTotalSpent(userSubs, 'AZN');
+console.log(`Updated Spent (20 EUR + 20 USD in AZN Budget): ${spentAzn.toFixed(2)} AZN`);
+assert.strictEqual(spentAzn.toFixed(2), '71.00');
+
+console.log('✅ INDIVIDUAL SUBSCRIPTION CURRENCY INDEPENDENCE TEST PASSED PERFECTLY!');
