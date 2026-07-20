@@ -8,6 +8,44 @@ let userSubs = [];
 let userPayments = [];
 let userNotifs = [];
 
+const EXCHANGE_RATES = {
+  USD: 1.0,
+  AZN: 1.70,
+  EUR: 0.92
+};
+
+function getValidCurrency(valyuta) {
+  if (!valyuta) return 'AZN';
+  let v = String(valyuta).trim().toUpperCase();
+  if (v === 'EURO') v = 'EUR';
+  return v;
+}
+
+function currencySymbol(curr) {
+  const c = getValidCurrency(curr);
+  if (c === 'USD') return '$';
+  if (c === 'EUR') return '€';
+  return '₼';
+}
+
+function convertCurrency(amount, from, to) {
+  const f = getValidCurrency(from);
+  const t = getValidCurrency(to);
+  if (f === t) return Number(amount) || 0;
+  const fromRate = EXCHANGE_RATES[f] || 1.0;
+  const toRate = EXCHANGE_RATES[t] || 1.0;
+  return (Number(amount) || 0) * (toRate / fromRate);
+}
+
+function toMonthlyAmount(price, freq) {
+  const p = Number(price) || 0;
+  const f = String(freq || 'monthly').toLowerCase();
+  if (f === 'yearly') return p / 12;
+  if (f === 'quarterly') return p / 3;
+  if (f === 'weekly') return p * 52 / 12;
+  return p;
+}
+
 /* ==========================================================================
    API HELPER
    ========================================================================== */
@@ -212,18 +250,26 @@ async function loadHome() {
   const subsRes = await api('GET', `/api/abunelikler?istifadeci_id=${currentUser.id}`);
   userSubs = subsRes.ok && Array.isArray(subsRes.data) ? subsRes.data : [];
 
-  const activeSubs = userSubs.filter(s => (s.STATUS || s.status) === 'active');
+  // Fetch user budget currency
+  const budgetRes = await api('GET', `/api/budceler/${currentUser.username}`);
+  let targetCurrency = 'AZN';
+  if (budgetRes.ok && budgetRes.data && budgetRes.data.data) {
+    const b = budgetRes.data.data.budget || (budgetRes.data.data.budgets && budgetRes.data.data.budgets[0]);
+    if (b) targetCurrency = getValidCurrency(b.VALYUTA || b.valyuta || 'AZN');
+  }
+
   const monthlyTotal = activeSubs.reduce((sum, s) => {
     const price = parseFloat(s.QIYMET || s.qiymet || 0);
+    const curr = getValidCurrency(s.VALYUTA || s.valyuta || 'AZN');
     const freq = s.ODENIS_TEZLIYI || s.odenis_tezliyi || 'monthly';
-    if (freq === 'yearly') return sum + price / 12;
-    if (freq === 'weekly') return sum + price * 4;
-    return sum + price;
+    const monthlyEquiv = toMonthlyAmount(price, freq);
+    return sum + convertCurrency(monthlyEquiv, curr, targetCurrency);
   }, 0);
 
+  const sym = currencySymbol(targetCurrency);
   document.getElementById('home-active-count').textContent = activeSubs.length;
-  document.getElementById('home-monthly-cost').textContent = monthlyTotal.toFixed(2) + ' AZN';
-  document.getElementById('home-yearly-cost').textContent = (monthlyTotal * 12).toFixed(2) + ' AZN';
+  document.getElementById('home-monthly-cost').textContent = `${sym}${monthlyTotal.toFixed(2)} ${targetCurrency}`;
+  document.getElementById('home-yearly-cost').textContent = `${sym}${(monthlyTotal * 12).toFixed(2)} ${targetCurrency}`;
 
   // Upcoming payments (next 3 active subs sorted by next payment)
   const sorted = [...activeSubs].sort((a, b) => {

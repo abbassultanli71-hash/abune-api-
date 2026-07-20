@@ -2505,16 +2505,43 @@
     document.getElementById('auth-password-input').value = '';
   }
 
-  // Dynamic currency conversion base rates (with AZN as anchor)
+  // Dynamic currency conversion base rates (with USD as base 1.0)
   const BASE_RATES = {
-    AZN: 1.0,
-    USD: 1.70,
-    EUR: 1.85
+    USD: 1.0,
+    AZN: 1.70,
+    EUR: 0.92
   };
+
+  function getValidCurrency(valyuta) {
+    if (!valyuta) return 'AZN';
+    let v = String(valyuta).trim().toUpperCase();
+    if (v === 'EURO') v = 'EUR';
+    return v;
+  }
+
+  function currencySymbol(curr) {
+    const c = getValidCurrency(curr);
+    if (c === 'USD') return '$';
+    if (c === 'EUR') return '€';
+    return '₼';
+  }
+
   function convertCurrency(amount, from, to) {
-    if (!from || !to || from === to) return amount;
-    const amountInAzn = amount * (BASE_RATES[from] || 1.0);
-    return amountInAzn / (BASE_RATES[to] || 1.0);
+    const f = getValidCurrency(from);
+    const t = getValidCurrency(to);
+    if (f === t) return Number(amount) || 0;
+    const fromRate = BASE_RATES[f] || 1.0;
+    const toRate = BASE_RATES[t] || 1.0;
+    return (Number(amount) || 0) * (toRate / fromRate);
+  }
+
+  function toMonthlyAmount(price, freq) {
+    const p = Number(price) || 0;
+    const f = String(freq || 'monthly').toLowerCase();
+    if (f === 'yearly') return p / 12;
+    if (f === 'quarterly') return p / 3;
+    if (f === 'weekly') return p * 52 / 12;
+    return p;
   }
 
   // Load all user data from API
@@ -2606,11 +2633,7 @@
     // Calculate total spent (converting to targetCurrency using monthly equivalence)
     let totalSpend = 0;
     activeSubs.forEach(s => {
-      let monthlyEquiv = s.price;
-      if (s.freqRaw === 'weekly') monthlyEquiv = s.price * 4;
-      else if (s.freqRaw === 'yearly') monthlyEquiv = s.price / 12;
-      else if (s.freqRaw === 'quarterly') monthlyEquiv = s.price / 3;
-
+      const monthlyEquiv = toMonthlyAmount(s.price, s.freqRaw);
       totalSpend += convertCurrency(monthlyEquiv, s.currency, targetCurrency);
     });
 

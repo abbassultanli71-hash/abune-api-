@@ -104,7 +104,18 @@ async function loadDashboardStats() {
   currentSubs.forEach(s => {
     if ((s.STATUS || s.status) === 'active') {
       activeSubs++;
-      totalRevenue += parseFloat(s.QIYMET || s.qiymet || 0);
+      const price = parseFloat(s.QIYMET || s.qiymet || 0);
+      const curr = String(s.VALYUTA || s.valyuta || 'AZN').toUpperCase();
+      const freq = String(s.ODENIS_TEZLIYI || s.odenis_tezliyi || 'monthly').toLowerCase();
+      let monthly = price;
+      if (freq === 'yearly') monthly = price / 12;
+      else if (freq === 'quarterly') monthly = price / 3;
+      else if (freq === 'weekly') monthly = price * 52 / 12;
+
+      let inAzn = monthly;
+      if (curr === 'USD') inAzn = monthly * 1.70;
+      else if (curr === 'EUR') inAzn = monthly * (1.70 / 0.92);
+      totalRevenue += inAzn;
     }
     const cat = s.KATEQORIYA || s.kateqoriya || 'Digər';
     catMap[cat] = (catMap[cat] || 0) + 1;
