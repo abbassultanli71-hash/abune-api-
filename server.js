@@ -419,6 +419,12 @@ const ICAZE_VERILEN_ODENIS_TEZLIKLERI = ['monthly', 'yearly', 'quarterly', 'week
 const ICAZE_VERILEN_KATEQORIYALAR = ['Entertainment', 'Music', 'Education', 'Health & Fitness', 'Productivity', 'Gaming', 'Cloud Storage', 'News', 'Food & Delivery', 'Shopping', 'Finance', 'Other'];
 const ICAZE_VERILEN_STATUSLAR = ['active', 'deactive'];
 
+const VALYUTA_MEZARBELERI_TO_USD = {
+  USD: 1.0,
+  AZN: 1.70,
+  EUR: 0.92
+};
+
 function getValidCurrency(valyuta) {
   if (!valyuta) return 'AZN';
   let v = String(valyuta).trim().toUpperCase();
@@ -428,6 +434,54 @@ function getValidCurrency(valyuta) {
 
 function isValidCurrency(valyuta) {
   return ICAZE_VERILEN_VALYUTALAR.includes(getValidCurrency(valyuta));
+}
+
+function convertCurrency(mebleq, fromValyuta, toValyuta) {
+  const from = getValidCurrency(fromValyuta);
+  const to = getValidCurrency(toValyuta);
+  if (from === to) return Number(mebleq);
+
+  const fromRate = VALYUTA_MEZARBELERI_TO_USD[from] || 1.0;
+  const toRate = VALYUTA_MEZARBELERI_TO_USD[to] || 1.0;
+
+  return Number(mebleq) * (toRate / fromRate);
+}
+
+function toMonthlyAmount(qiymet, odenisTezliyi) {
+  const amount = Number(qiymet) || 0;
+  const tezlik = String(odenisTezliyi || 'monthly').toLowerCase();
+  switch (tezlik) {
+    case 'weekly':
+      return amount * 52 / 12;
+    case 'monthly':
+      return amount;
+    case 'quarterly':
+      return amount / 3;
+    case 'yearly':
+      return amount / 12;
+    default:
+      return amount;
+  }
+}
+
+async function calculateTotalMonthlySpentInBudgetCurrency(userId, targetValyuta) {
+  const activeSubs = await executeQuery(
+    `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
+    { userId }
+  );
+
+  let totalSpent = 0;
+  for (const row of activeSubs.rows) {
+    const qiymet = Number(row.QIYMET);
+    const valyuta = row.VALYUTA || 'AZN';
+    const odenisTezliyi = row.ODENIS_TEZLIYI || 'monthly';
+
+    const monthlyCostInOriginal = toMonthlyAmount(qiymet, odenisTezliyi);
+    const monthlyCostInBudgetCurrency = convertCurrency(monthlyCostInOriginal, valyuta, targetValyuta);
+
+    totalSpent += monthlyCostInBudgetCurrency;
+  }
+  return totalSpent;
 }
 
 // İstifadəçinin username-inə görə daxili (PostgreSQL) ID-sini tapır.
@@ -1307,15 +1361,18 @@ app.get('/api/abunelikler', async (req, res) => {
  */
 async function syncBudgetSpent(userId) {
   try {
-    const activeSubs = await executeQuery(
-      `SELECT qiymet FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
+    const budgetRow = await executeQuery(
+      `SELECT valyuta FROM budceler WHERE istifadeci_id = :userId`,
       { userId }
     );
-    let total = 0;
-    for (const row of activeSubs.rows) { total += Number(row.QIYMET); }
+    const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || 'AZN') : 'AZN';
+
+    const total = await calculateTotalMonthlySpentInBudgetCurrency(userId, budgetValyuta);
+    const roundedTotal = Math.round(total * 100) / 100;
+
     await executeQuery(
       `UPDATE budceler SET hesab_mebleqi = :total WHERE istifadeci_id = :userId`,
-      { total, userId },
+      { total: roundedTotal, userId },
       { autoCommit: true }
     );
   } catch (err) {
@@ -1389,25 +1446,23 @@ app.post('/api/abunelikler', async (req, res) => {
       const budgetLimit   = budgetRow.rows.length > 0 ? Number(budgetRow.rows[0].LIMIT_MEBLEQ || budgetRow.rows[0].limit_mebleq) : 300;
       const budgetValyuta = budgetRow.rows.length > 0 ? (budgetRow.rows[0].VALYUTA || budgetRow.rows[0].valyuta || 'AZN') : 'AZN';
 
-      // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq (tezlik çevrilməsi və valyuta conversion daxil olmaqla)
-      const activeSubs = await executeQuery(
-        `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler
-          WHERE istifadeci_id = :userId AND status = 'active'`,
-        { userId }
-      );
+      const currentTotalInBudgetCurrency = await calculateTotalMonthlySpentInBudgetCurrency(userId, budgetValyuta);
 
-      const currentTotal = calculateMonthlyEquivalentSpend(activeSubs.rows, budgetValyuta);
-      const convertedNewSub = calculateMonthlyEquivalentSpend([{ qiymet: parsedQiymet, valyuta: getValidCurrency(valyuta), odenis_tezliyi: odenisTezliyi }], budgetValyuta);
-      const projectedTotal = currentTotal + convertedNewSub;
+      const subValyuta = getValidCurrency(valyuta);
+      const newSubMonthlyInOriginal = toMonthlyAmount(parsedQiymet, odenisTezliyi);
+      const newSubMonthlyInBudgetCurrency = convertCurrency(newSubMonthlyInOriginal, subValyuta, budgetValyuta);
+
+      const projectedTotal = currentTotalInBudgetCurrency + newSubMonthlyInBudgetCurrency;
 
       if (projectedTotal > budgetLimit) {
-        const remaining = Math.max(0, budgetLimit - currentTotal);
+        const remaining = Math.max(0, budgetLimit - currentTotalInBudgetCurrency);
         return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
           `Büdcə limiti keçilir! ` +
-          `Mövcud aylıq xərc: ${currentTotal.toFixed(2)} ${budgetValyuta}, ` +
-          `yeni abunəlik aylıq ekvivalenti: +${convertedNewSub.toFixed(2)} ${budgetValyuta}, ` +
-          `cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
-          `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})` 
+          `Mövcud xərc: ${currentTotalInBudgetCurrency.toFixed(2)} ${budgetValyuta}, ` +
+          `yeni abunəlik: +${newSubMonthlyInBudgetCurrency.toFixed(2)} ${budgetValyuta}` +
+          (subValyuta !== budgetValyuta ? ` (${parsedQiymet.toFixed(2)} ${subValyuta})` : '') +
+          `, cəmi: ${projectedTotal.toFixed(2)} ${budgetValyuta} — limit: ${budgetLimit.toFixed(2)} ${budgetValyuta}. ` +
+          `(Qalan boş büdcə: ${remaining.toFixed(2)} ${budgetValyuta})`
         );
       }
     }
@@ -2440,18 +2495,14 @@ app.post('/api/budceler', async (req, res) => {
     const userId = await getUserIdByUsername(username);
     if (userId === null) return errorResponse(res, 400, 'Bad Request', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
 
-    // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq (aylıq ekvivalent və valyuta conversion ilə)
-    const activeSubs = await executeQuery(
-      `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
-      { userId }
-    );
+    // Mövcud aktiv abunəliklərin qiymətlərini seçilmiş valyutaya çevirərək toplayırıq
+    const targetValyuta = getValidCurrency(valyuta || 'AZN');
+    const totalSpend = await calculateTotalMonthlySpentInBudgetCurrency(userId, targetValyuta);
+    const roundedTotal = Math.round(totalSpend * 100) / 100;
 
-    const targetValyuta = valyuta || 'AZN';
-    const totalSpend = calculateMonthlyEquivalentSpend(activeSubs.rows, targetValyuta);
-
-    if (totalSpend > parsedLimit) {
+    if (roundedTotal > parsedLimit) {
       return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
-        `Mövcud aylıq abunəlik xərcləri (${totalSpend.toFixed(2)} ${targetValyuta}) yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
+        `Mövcud abunəlik xərcləri (${roundedTotal.toFixed(2)} ${targetValyuta}) yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
     }
 
     await executeQuery(
@@ -2461,7 +2512,7 @@ app.post('/api/budceler', async (req, res) => {
         istifadeci_id: userId,
         limit_mebleq: parsedLimit,
         valyuta: targetValyuta,
-        hesab_mebleqi: totalSpend
+        hesab_mebleqi: roundedTotal
       },
       { autoCommit: true }
     );
@@ -2515,18 +2566,14 @@ app.put('/api/budceler/:username', async (req, res) => {
     if (isNaN(parsedLimit) || parsedLimit <= 0)
       return errorResponse(res, 400, 'Bad Request', 'INVALID_LIMIT', 'Limit 0-dan böyük olmalıdır.');
 
-    // Mövcud aktiv abunəliklərin qiymətlərini toplayırıq (aylıq ekvivalent və valyuta conversion ilə)
-    const activeSubs = await executeQuery(
-      `SELECT qiymet, valyuta, odenis_tezliyi FROM abunelikler WHERE istifadeci_id = :userId AND status = 'active'`,
-      { userId }
-    );
+    // Mövcud aktiv abunəliklərin qiymətlərini seçilmiş valyutaya çevirərək toplayırıq
+    const targetValyuta = getValidCurrency(valyuta || 'AZN');
+    const totalSpend = await calculateTotalMonthlySpentInBudgetCurrency(userId, targetValyuta);
+    const roundedTotal = Math.round(totalSpend * 100) / 100;
 
-    const targetValyuta = valyuta || 'AZN';
-    const totalSpend = calculateMonthlyEquivalentSpend(activeSubs.rows, targetValyuta);
-
-    if (totalSpend > parsedLimit) {
+    if (roundedTotal > parsedLimit) {
       return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
-        `Mövcud aylıq abunəlik xərcləri (${totalSpend.toFixed(2)} ${targetValyuta}) yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
+        `Mövcud abunəlik xərcləri (${roundedTotal.toFixed(2)} ${targetValyuta}) yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
     }
 
     await executeQuery(
@@ -2534,7 +2581,7 @@ app.put('/api/budceler/:username', async (req, res) => {
        SET limit_mebleq = :limit_mebleq, valyuta = :valyuta, hesab_mebleqi = :hesab_mebleqi
        WHERE istifadeci_id = :istifadeci_id`,
       {
-        limit_mebleq: parsedLimit, valyuta: targetValyuta, hesab_mebleqi: totalSpend, istifadeci_id: userId
+        limit_mebleq: parsedLimit, valyuta: targetValyuta, hesab_mebleqi: roundedTotal, istifadeci_id: userId
       },
       { autoCommit: true }
     );
