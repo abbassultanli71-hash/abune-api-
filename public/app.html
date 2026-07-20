@@ -3798,8 +3798,20 @@ async function handleAddCard() {
     }
   }
 
+  function calculateTotalSpent(targetCurrency) {
+    const curr = targetCurrency || budgetState.currency || 'AZN';
+    const activeSubs = subscriptions.filter(s => s.status === 'active');
+    let total = 0;
+    activeSubs.forEach(s => {
+      const monthlyEquiv = toMonthlyAmount(s.price, s.freqRaw);
+      total += convertCurrency(monthlyEquiv, s.currency, curr);
+    });
+    return Math.round(total * 100) / 100;
+  }
+
   // Budget
   function renderBudgetCard() {
+    budgetState.spent = calculateTotalSpent(budgetState.currency);
     const sym = currencySymbol(budgetState.currency);
     const pct = budgetState.limit > 0 ? Math.min(100, Math.round((budgetState.spent / budgetState.limit) * 100)) : 0;
     const free = Math.max(0, budgetState.limit - budgetState.spent);
@@ -3852,11 +3864,7 @@ async function handleAddCard() {
     const categoryTotals = {};
     const activeSubs = subscriptions.filter(s => s.status === 'active');
     activeSubs.forEach(s => {
-      let monthlyEquiv = s.price;
-      if (s.freqRaw === 'weekly') monthlyEquiv = s.price * 4;
-      else if (s.freqRaw === 'yearly') monthlyEquiv = s.price / 12;
-      else if (s.freqRaw === 'quarterly') monthlyEquiv = s.price / 3;
-
+      const monthlyEquiv = toMonthlyAmount(s.price, s.freqRaw);
       const converted = convertCurrency(monthlyEquiv, s.currency, budgetState.currency);
       categoryTotals[s.category] = (categoryTotals[s.category] || 0) + converted;
     });
@@ -3950,24 +3958,33 @@ async function handleAddCard() {
     document.getElementById('budget-edit').style.display = 'block';
     document.getElementById('budget-edit-actions').style.display = 'flex';
     document.getElementById('budget-limit-input').value = budgetState.limit;
-    document.getElementById('budget-spent-input').value = budgetState.spent;
+    
+    // Always compute fresh spent in modal currency
+    const freshSpent = calculateTotalSpent(budgetState.currency);
+    document.getElementById('budget-spent-input').value = freshSpent;
     document.getElementById('budget-currency-input').value = budgetState.currency;
     currentBudgetCurrencyInModal = budgetState.currency;
     clearBudgetError();
   }
 
-  // Auto-convert limit input value when user selects a different currency in Budget section
+  // Auto-convert limit & spent input values when user selects a different currency in Budget section
   document.addEventListener('DOMContentLoaded', () => {
     const curSelect = document.getElementById('budget-currency-input');
     if (curSelect) {
       curSelect.addEventListener('change', (e) => {
         const newCurrency = e.target.value;
         const limitInput = document.getElementById('budget-limit-input');
+        const spentInput = document.getElementById('budget-spent-input');
         const currentVal = parseFloat(limitInput.value);
         if (!isNaN(currentVal) && currentVal > 0 && currentBudgetCurrencyInModal) {
           const converted = convertCurrency(currentVal, currentBudgetCurrencyInModal, newCurrency);
           limitInput.value = converted.toFixed(2);
         }
+        
+        // Recalculate spent in the new currency!
+        const newSpent = calculateTotalSpent(newCurrency);
+        if (spentInput) spentInput.value = newSpent.toFixed(2);
+
         currentBudgetCurrencyInModal = newCurrency;
       });
     }
@@ -3995,7 +4012,6 @@ async function handleAddCard() {
 
   async function saveBudget() {
     const limitRaw = document.getElementById('budget-limit-input').value;
-    const spentRaw = document.getElementById('budget-spent-input').value;
     const currency = document.getElementById('budget-currency-input').value;
 
     if (limitRaw === '' || limitRaw === null || limitRaw === undefined) {
@@ -4007,11 +4023,9 @@ async function handleAddCard() {
       showBudgetError('limit_mebleq 0-dan böyük olmalıdır.');
       return;
     }
-    const spent = (spentRaw === '' || spentRaw === null) ? 0 : Number(spentRaw);
-    if (isNaN(spent) || spent < 0) {
-      showBudgetError('hesab_mebleqi mənfi ola bilməz.');
-      return;
-    }
+
+    // Always calculate fresh spent in the new currency
+    const spent = calculateTotalSpent(currency);
 
     clearBudgetError();
 
