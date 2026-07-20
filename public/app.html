@@ -1459,6 +1459,7 @@
           </div>
         </div>
 
+        <!-- Advanced Revolut-Style Hero Financial Widget -->
         <div class="dashboard-budget-card transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl active:scale-[0.98]" onclick="switchScreen('budget')" style="cursor:pointer;" title="Büdcəyə keç">
           <div class="db-left">
             <div class="db-eyebrow" data-i18n="stat_monthly">Aylıq Xərc</div>
@@ -1473,8 +1474,8 @@
             <svg class="db-ring" viewBox="0 0 100 100">
               <defs>
                 <linearGradient id="dbRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#1fe0c2"/>
-                  <stop offset="100%" stop-color="#00c9ff"/>
+                  <stop offset="0%" stop-color="#8b5cf6"/>
+                  <stop offset="100%" stop-color="#ec4899"/>
                 </linearGradient>
               </defs>
               <circle class="db-ring-track" cx="50" cy="50" r="40"></circle>
@@ -1484,19 +1485,39 @@
           </div>
         </div>
 
-        <!-- Tailwind v4 Glowing AI Insights Banner -->
-        <div class="my-4 p-4 rounded-3xl bg-gradient-to-r from-purple-900/40 via-indigo-900/40 to-slate-900/40 border border-purple-500/30 backdrop-blur-xl shadow-xl transition-all duration-300 hover:border-purple-400/50">
+        <!-- Revolut-Style Quick Actions Floating Toolbar -->
+        <div class="grid grid-cols-4 gap-2 my-4">
+          <button onclick="openSheet()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-500/25 transition-all hover:scale-105 active:scale-95 border border-purple-400/30 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            <span class="text-[10px] font-bold mt-1.5">+ Əlavə et</span>
+          </button>
+          <button onclick="switchScreen('budget')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-purple-500/40 active:scale-95 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-600 dark:text-purple-400"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span class="text-[10px] font-bold mt-1.5 text-slate-700 dark:text-slate-300">Büdcə</span>
+          </button>
+          <button onclick="switchScreen('cards')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-purple-500/40 active:scale-95 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-600 dark:text-indigo-400"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+            <span class="text-[10px] font-bold mt-1.5 text-slate-700 dark:text-slate-300">Kartlar</span>
+          </button>
+          <button onclick="switchScreen('notifications')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-purple-500/40 active:scale-95 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-pink-600 dark:text-pink-400"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="text-[10px] font-bold mt-1.5 text-slate-700 dark:text-slate-300">Xəbərlər</span>
+          </button>
+        </div>
+
+        <!-- Tailwind v4 Cheerful Vibrant AI Insights Banner -->
+        <div class="my-4 p-4 rounded-3xl bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-indigo-500/10 border border-purple-400/30 backdrop-blur-xl shadow-md transition-all duration-300 hover:border-purple-500/50">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="p-2.5 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-400/30 shadow-inner">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <div class="p-2.5 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 text-white shadow-md shadow-purple-500/30">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
-                <div class="text-xs font-bold tracking-wider uppercase text-purple-300">Ağıllı Təhlil & Büdcə</div>
-                <div class="text-xs text-slate-300 font-medium">Bütün xərcləriniz tam nəzarət altındadır ✨</div>
+                <div class="text-xs font-bold tracking-wider uppercase text-purple-700 dark:text-purple-300">Ağıllı Təhlil & Büdcə</div>
+                <div class="text-xs text-slate-700 dark:text-slate-200 font-medium">Bütün xərcləriniz tam nəzarət altındadır ✨</div>
               </div>
             </div>
-            <button onclick="switchScreen('budget')" class="px-3.5 py-1.5 rounded-xl bg-purple-600/80 hover:bg-purple-500 text-white font-semibold text-xs shadow-lg transition-all active:scale-95 cursor-pointer">
+            <button onclick="switchScreen('budget')" class="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md shadow-purple-500/20 transition-all active:scale-95 cursor-pointer">
               Büdcə →
             </button>
           </div>
