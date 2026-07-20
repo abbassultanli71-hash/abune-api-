@@ -2848,8 +2848,11 @@
   }
 
   function notifRowHTML(n) {
-    const color = n.urgency === 'urgent' ? 'var(--coral)' : n.urgency === 'soon' ? 'var(--gold)' : 'var(--teal)';
-    const dotHtml = n.is_read ? '' : `<span class="notif-dot" style="background:${color}"></span>`;
+    const isUnread = !n.is_read;
+    const redDotHtml = isUnread 
+      ? `<span class="notif-dot" style="background:#ef4444; width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; margin-top:5px; box-shadow:0 0 6px rgba(239,68,68,0.5);"></span>` 
+      : ``;
+
     // If this notification is linked to a subscription, show Cancel button
     const cancelBtn = n.abunelik_id
       ? `<button class="notif-cancel-btn" id="notif-cancel-${n.id}" onclick="event.stopPropagation(); handleCancelSubscriptionFromNotif(${n.abunelik_id}, ${n.id}, this)">
@@ -2857,17 +2860,16 @@
            Abunəliyi Ləğv Et
          </button>`
       : '';
+
     return `
-      <div class="notif-item" style="${n.is_read ? 'opacity:0.6;' : ''}">
-        ${dotHtml}
+      <div class="notif-item ${isUnread ? 'clickable' : ''}" ${isUnread ? `onclick="handleMarkNotificationRead(${n.id})"` : ''} style="${n.is_read ? 'opacity:0.6;' : ''}">
+        ${redDotHtml}
         <div style="flex: 1;">
           <div class="notif-title">${n.title}</div>
           <div class="notif-msg">${n.msg}</div>
           <div class="notif-time">${n.time}</div>
           ${cancelBtn}
         </div>
-        ${!n.is_read ? `<button onclick="handleMarkNotificationRead(${n.id})" title="Oxundu işarələ"
-          style="border:none;background:none;cursor:pointer;color:var(--ink-faint);padding:4px;font-size:16px;flex-shrink:0;">✓</button>` : ''}
       </div>`;
   }
   
@@ -2888,8 +2890,6 @@
         n.id === id ? { ...n, is_read: true } : n
       );
       renderNotifs();
-    } else {
-      alert(res.data?.error?.message || 'Bildiriş oxunmuş kimi işarələnə bilmədi.');
     }
   }
 

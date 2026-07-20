@@ -26,7 +26,7 @@ function convertCurrency(mebleq, fromValyuta, toValyuta) {
   return (val * fromRate) / toRate;
 }
 
-// Frequency is strictly ignored in calculations as explicitly requested by user
+// Frequency is completely ignored in math calculation
 function toMonthlyAmount(qiymet, odenisTezliyi) {
   return Number(qiymet) || 0;
 }
@@ -34,36 +34,42 @@ function toMonthlyAmount(qiymet, odenisTezliyi) {
 function calculateTotalSpent(subs, targetCurrency) {
   let total = 0;
   subs.forEach(s => {
-    // Just prices directly without frequency multiplier
+    // Take nominal price directly, ignore frequency multiplier
     const rawPrice = Number(s.price) || 0;
     total += convertCurrency(rawPrice, s.currency, targetCurrency);
   });
   return Math.round(total * 100) / 100;
 }
 
-console.log('--- TEST: RAW PRICE SUMMATION (FREQUENCY IGNORED IN MATH) ---');
+console.log('--- USER EXACT EXAMPLE: 4 SUBS (2 WEEKLY, 2 MONTHLY) OF 20 MANAT ---');
 
-// Sub 1: 20 USD (weekly) -> 20 * 1.70 = 34 AZN (weekly multiplier ignored!)
-// Sub 2: 20 AZN (monthly) -> 20 AZN
-// Sub 3: 50 EUR (yearly) -> 50 * 1.85 = 92.50 AZN (yearly divider ignored!)
-const testSubs = [
-  { price: 20, currency: 'USD', freq: 'weekly' },
+// 4 subscriptions: 2 weekly, 2 monthly, 20 AZN each
+// Formula MUST be: 20 + 20 + 20 + 20 = 80 AZN (NO 20*4 MULTIPLIER!)
+const fourSubs = [
+  { price: 20, currency: 'AZN', freq: 'weekly' },
+  { price: 20, currency: 'AZN', freq: 'weekly' },
   { price: 20, currency: 'AZN', freq: 'monthly' },
-  { price: 50, currency: 'EUR', freq: 'yearly' }
+  { price: 20, currency: 'AZN', freq: 'monthly' }
 ];
 
-const totalInAzn = calculateTotalSpent(testSubs, 'AZN');
-console.log(`Raw Price Sum in AZN Budget: ${totalInAzn.toFixed(2)} AZN`);
-// 34 + 20 + 92.50 = 146.50 AZN
-assert.strictEqual(totalInAzn.toFixed(2), '146.50');
+const totalFourSubs = calculateTotalSpent(fourSubs, 'AZN');
+console.log(`4 Subs Sum (2 weekly, 2 monthly @ 20 AZN): ${totalFourSubs.toFixed(2)} AZN`);
+// 20 + 20 + 20 + 20 = 80.00 AZN
+assert.strictEqual(totalFourSubs.toFixed(2), '80.00');
 
-const userExampleSubs = [
+console.log('--- USER MULTI-CURRENCY RAW SUMMATION EXAMPLE ---');
+
+// 2 weekly (20$ & 20 AZN), 2 monthly (20$ & 20 AZN) in AZN budget:
+// 20$*1.70 + 20 + 20$*1.70 + 20 = 34 + 20 + 34 + 20 = 108.00 AZN
+const multiCurrSubs = [
   { price: 20, currency: 'USD', freq: 'weekly' },
-  { price: 20, currency: 'AZN', freq: 'weekly' }
+  { price: 20, currency: 'AZN', freq: 'weekly' },
+  { price: 20, currency: 'USD', freq: 'monthly' },
+  { price: 20, currency: 'AZN', freq: 'monthly' }
 ];
-const userTotalInAzn = calculateTotalSpent(userExampleSubs, 'AZN');
-console.log(`User Example (20$ weekly + 20 AZN weekly in AZN Budget): ${userTotalInAzn.toFixed(2)} AZN`);
-// 20*1.70 + 20 = 34 + 20 = 54.00 AZN
-assert.strictEqual(userTotalInAzn.toFixed(2), '54.00');
 
-console.log('✅ FREQUENCY-FREE RAW PRICE SUMMATION TEST PASSED PERFECTLY!');
+const totalMultiCurr = calculateTotalSpent(multiCurrSubs, 'AZN');
+console.log(`Multi-currency 4 Subs Sum in AZN Budget: ${totalMultiCurr.toFixed(2)} AZN`);
+assert.strictEqual(totalMultiCurr.toFixed(2), '108.00');
+
+console.log('✅ ALL EXACT USER DEMANDS PASSED WITH 100% ACCURACY!');
