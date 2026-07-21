@@ -92,31 +92,49 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 30px 0;
+    padding: 20px 0;
     background:
-      radial-gradient(circle at 10% 10%, rgba(167, 139, 250, 0.40), transparent 45%),
-      radial-gradient(circle at 90% 85%, rgba(56, 189, 248, 0.35), transparent 45%),
-      radial-gradient(circle at 50% 40%, rgba(251, 113, 133, 0.25), transparent 50%),
-      linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+      radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.30), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.25), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.20), transparent 50%),
+      #090d16;
   }
-  [data-theme="dark"] .device-stage {
+  [data-theme="light"] .device-stage {
     background:
-      radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.35), transparent 45%),
-      radial-gradient(circle at 90% 85%, rgba(31, 224, 194, 0.28), transparent 45%),
-      radial-gradient(circle at 50% 40%, rgba(236, 72, 153, 0.22), transparent 50%),
-      #0b0d19;
+      radial-gradient(circle at 15% 15%, rgba(167, 139, 250, 0.35), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.30), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(251, 113, 133, 0.22), transparent 50%),
+      #e2e8f0;
   }
   .phone {
     width: 390px;
     height: 844px;
+    max-height: 94vh;
+    max-width: 95vw;
     background: var(--bg);
-    border-radius: 46px;
-    border: 10px solid #0f172a;
-    box-shadow: 0 35px 80px -20px rgba(99, 102, 241, 0.30), 0 0 40px rgba(167, 139, 250, 0.25);
+    border-radius: 48px;
+    border: 11px solid #0f172a;
+    box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.65), 0 0 50px rgba(99, 102, 241, 0.30);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    margin: auto;
+  }
+  @media (max-width: 480px) {
+    .device-stage {
+      padding: 0;
+      background: var(--bg);
+    }
+    .phone {
+      width: 100vw;
+      height: 100vh;
+      max-height: 100vh;
+      max-width: 100vw;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
   }
   @keyframes blobDrift {
     0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
@@ -1343,34 +1361,40 @@
         <div class="auth-container">
           <div class="auth-logo-area">
             <div class="logo-badge">
-              <svg viewBox="0 0 24 24" fill="none" class="logo-mark">
+              <svg viewBox="0 0 100 100" fill="none" class="logo-mark" style="width:56px; height:56px;">
                 <defs>
-                  <linearGradient id="logo-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#FF5B45" />
-                    <stop offset="100%" stop-color="#6952E0" />
+                  <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="5" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                  <linearGradient id="abuneGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4F46E5" />
+                    <stop offset="50%" stop-color="#7C3AED" />
+                    <stop offset="100%" stop-color="#EC4899" />
                   </linearGradient>
-                  <linearGradient id="logo-grad-2" x1="0%" y1="100%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#1FE0C2" />
-                    <stop offset="100%" stop-color="#00C9FF" />
+                  <linearGradient id="abuneGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#06B6D4" />
+                    <stop offset="100%" stop-color="#10B981" />
+                  </linearGradient>
+                  <linearGradient id="glassShine" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.6" />
+                    <stop offset="40%" stop-color="#FFFFFF" stop-opacity="0.1" />
+                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.0" />
                   </linearGradient>
                 </defs>
-                <!-- 3D Loop - Back portion -->
-                <path d="M4 12a8 8 0 0 1 12.8-6.4" stroke="url(#logo-grad-2)" stroke-width="2.2" stroke-linecap="round" />
-                
-                <!-- The Credit Card -->
-                <g style="filter: drop-shadow(0 4px 10px rgba(105, 82, 224, 0.25))">
-                  <rect x="5" y="8" width="14" height="9" rx="1.8" stroke="url(#logo-grad-1)" stroke-width="2" fill="rgba(20, 20, 35, 0.85)" />
-                  <!-- Card Stripe -->
-                  <line x1="5" y1="11" x2="19" y2="11" stroke="url(#logo-grad-1)" stroke-width="1.8" />
-                  <!-- Chip / Details -->
-                  <rect x="7" y="14" width="2" height="1.5" rx="0.5" fill="#1FE0C2" opacity="0.8" />
-                  <line x1="14" y1="14" x2="17" y2="14" stroke="#FFF" stroke-width="1" opacity="0.6" />
+                <circle cx="50" cy="50" r="38" fill="url(#abuneGrad1)" opacity="0.18" filter="url(#logoGlow)"/>
+                <path d="M 28 50 C 28 32, 45 32, 50 50 C 55 68, 72 68, 72 50" stroke="url(#abuneGrad2)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.45"/>
+                <g filter="url(#logoGlow)">
+                  <rect x="22" y="30" width="56" height="40" rx="10" fill="rgba(15, 23, 42, 0.9)" stroke="url(#abuneGrad1)" stroke-width="3"/>
+                  <rect x="23" y="31" width="54" height="38" rx="9" fill="url(#glassShine)"/>
+                  <line x1="22" y1="42" x2="78" y2="42" stroke="url(#abuneGrad1)" stroke-width="3.5" opacity="0.85"/>
+                  <rect x="29" y="52" width="10" height="8" rx="2.5" fill="url(#abuneGrad2)"/>
+                  <line x1="45" y1="55" x2="68" y2="55" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+                  <line x1="45" y1="60" x2="60" y2="60" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
                 </g>
-                
-                <!-- 3D Loop - Front portion wrapping around the card with an arrow head -->
-                <path d="M20 12a8 8 0 0 1-12.8 6.4" stroke="url(#logo-grad-2)" stroke-width="2.2" stroke-linecap="round" />
-                <!-- Arrow tip on the front loop -->
-                <path d="M8 15.5l-2.5 3 3 2.5" stroke="url(#logo-grad-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M 72 50 C 72 32, 55 32, 50 50 C 45 68, 28 68, 28 50" stroke="url(#abuneGrad2)" stroke-width="6" stroke-linecap="round" fill="none"/>
+                <circle cx="72" cy="32" r="4.5" fill="#10B981"/>
+                <circle cx="72" cy="32" r="8" fill="#10B981" opacity="0.3"/>
               </svg>
             </div>
             <h2>Abunəm</h2>
@@ -1441,17 +1465,32 @@
               <div class="hero-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
             </div>
             <div style="display: flex; align-items: center; gap: 14px;">
-              <div class="hero-illustration">
-                <svg viewBox="0 0 100 100" class="floating-illustration" style="width: 50px; height: 50px;">
-                  <g filter="drop-shadow(0 4px 10px rgba(105, 82, 224, 0.4))">
-                    <path d="M50 15 L62 45 L50 40 L38 45 Z" fill="#FF5B45" />
-                    <path d="M50 15 L50 40 L38 45 Z" fill="#CC4030" />
-                    <rect x="47" y="40" width="6" height="15" fill="#f5f7fa" />
-                    <path d="M46 55 L50 72 L54 55 Z" fill="#FFB020" />
-                    <path d="M38 45 L28 56 L38 52 Z" fill="#a58eff" />
-                    <path d="M62 45 L72 56 L62 52 Z" fill="#a58eff" />
-                    <circle cx="50" cy="30" r="3" fill="#FFF" />
-                  </g>
+              <div class="hero-illustration p-2 rounded-3xl bg-gradient-to-tr from-indigo-900/80 via-purple-900/80 to-slate-900/90 border border-indigo-400/40 shadow-xl shadow-indigo-500/25 backdrop-blur-xl transition-all duration-300 hover:rotate-6 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Interactive Holographic Emblem">
+                <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-cyan-500/20 to-pink-500/20 blur-md opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 46px; height: 46px; position:relative; z-index:1;">
+                  <defs>
+                    <linearGradient id="creativeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#8B5CF6" />
+                      <stop offset="50%" stop-color="#3B82F6" />
+                      <stop offset="100%" stop-color="#EC4899" />
+                    </linearGradient>
+                    <linearGradient id="creativeGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#10B981" />
+                      <stop offset="100%" stop-color="#06B6D4" />
+                    </linearGradient>
+                    <filter id="creativeGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="5" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+                  <polygon points="50,8 88,28 88,72 50,92 12,72 12,28" fill="rgba(15, 23, 42, 0.95)" stroke="url(#creativeGrad1)" stroke-width="3.5" filter="url(#creativeGlow)"/>
+                  <path d="M 30 50 Q 50 20 70 50 Q 50 80 30 50 Z" stroke="url(#creativeGrad2)" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.85"/>
+                  <path d="M 50 25 L 72 68 H 60 L 50 48 L 40 68 H 28 Z" fill="url(#creativeGrad1)"/>
+                  <circle cx="50" cy="50" r="5" fill="#10B981" filter="url(#creativeGlow)">
+                    <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+                  </circle>
+                  <polygon points="50,42 52,48 58,50 52,52 50,58 48,52 42,50 48,48" fill="#FFFFFF"/>
                 </svg>
               </div>
               <div class="hero-avatar" id="hero-avatar-initials" onclick="switchScreen('settings')" title="Ayarlar">U.U</div>
@@ -1506,18 +1545,18 @@
         </div>
 
         <!-- Tailwind v4 Cheerful Vibrant AI Insights Banner -->
-        <div class="my-4 p-4 rounded-3xl bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-indigo-500/10 border border-purple-400/30 backdrop-blur-xl shadow-md transition-all duration-300 hover:border-purple-500/50">
+        <div class="my-4 p-4 rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 border border-purple-400/40 backdrop-blur-xl shadow-lg transition-all duration-300 hover:border-purple-400/60">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="p-2.5 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 text-white shadow-md shadow-purple-500/30">
+              <div class="p-2.5 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/40">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
-                <div class="text-xs font-extrabold tracking-wider uppercase text-purple-600 dark:text-purple-300">Ağıllı Təhlil & Büdcə</div>
-                <div class="text-xs font-semibold text-purple-900 dark:text-purple-100">Bütün xərcləriniz tam nəzarət altındadır ✨</div>
+                <div class="text-xs font-extrabold tracking-wider uppercase text-white">Ağıllı Təhlil & Büdcə</div>
+                <div class="text-xs font-bold text-white mt-0.5">Bütün xərcləriniz tam nəzarət altındadır ✨</div>
               </div>
             </div>
-            <button onclick="switchScreen('budget')" class="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md shadow-purple-500/20 transition-all active:scale-95 cursor-pointer">
+            <button onclick="switchScreen('budget')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer">
               Büdcə →
             </button>
           </div>
