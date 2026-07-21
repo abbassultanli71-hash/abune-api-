@@ -2548,11 +2548,11 @@
     document.getElementById('auth-password-input').value = '';
   }
 
-  // Dynamic currency conversion base rates (with USD as base 1.0)
-  const BASE_RATES = {
-    USD: 1.0,
-    AZN: 1.70,
-    EUR: 0.92
+  // Dynamic currency conversion base rates (AZN base 1.0, USD 1.70, EUR 1.85)
+  const VALYUTA_RATES_AZN = {
+    AZN: 1.0,
+    USD: 1.70,
+    EUR: 1.85
   };
 
   function getValidCurrency(valyuta) {
@@ -2573,18 +2573,13 @@
     const f = getValidCurrency(from);
     const t = getValidCurrency(to);
     if (f === t) return Number(amount) || 0;
-    const fromRate = BASE_RATES[f] || 1.0;
-    const toRate = BASE_RATES[t] || 1.0;
-    return (Number(amount) || 0) * (toRate / fromRate);
+    const fromRate = VALYUTA_RATES_AZN[f] || 1.0;
+    const toRate = VALYUTA_RATES_AZN[t] || 1.0;
+    return ((Number(amount) || 0) * fromRate) / toRate;
   }
 
   function toMonthlyAmount(price, freq) {
-    const p = Number(price) || 0;
-    const f = String(freq || 'monthly').toLowerCase();
-    if (f === 'yearly') return p / 12;
-    if (f === 'quarterly') return p / 3;
-    if (f === 'weekly') return p * 52 / 12;
-    return p;
+    return Number(price) || 0;
   }
 
   // Load all user data from API
@@ -3158,16 +3153,20 @@
 
     // ── CLIENT-SIDE büdcə limiti yoxlaması ──────────────────────────────────
     // budgetState.limit - cari limit (hətta default 300 olsa belə)
-    // budgetState.spent - mövcud aktiv abunəliklərin cəmi
+    // budgetState.spent - mövcud aktiv abunəliklərin cəmi (in budgetState.currency)
     {
       const effectiveLimit = budgetState.limit > 0 ? budgetState.limit : 300;
       const currentSpent   = budgetState.spent  || 0;
-      const projectedTotal = currentSpent + price;
+      const budgetCurr     = budgetState.currency || 'AZN';
+      const priceInBudgetCurr = convertCurrency(price, currency, budgetCurr);
+      const projectedTotal = currentSpent + priceInBudgetCurr;
 
       if (projectedTotal > effectiveLimit) {
         const remaining = Math.max(0, effectiveLimit - currentSpent);
-        const sym = currencySymbol(budgetState.currency || 'AZN');
-        const errMsg = `Büdcə limiti keçilir! Mövcud xərc: ${sym}${currentSpent.toFixed(2)}, yeni abunəlik: +${sym}${price.toFixed(2)}, cəmi: ${sym}${projectedTotal.toFixed(2)} — limit: ${sym}${effectiveLimit.toFixed(2)}. (Qalan boş büdcə: ${sym}${remaining.toFixed(2)})`;
+        const sym = currencySymbol(budgetCurr);
+        const subSym = currencySymbol(currency);
+        const subPriceText = currency !== budgetCurr ? `+${subSym}${price.toFixed(2)} (+${sym}${priceInBudgetCurr.toFixed(2)})` : `+${sym}${price.toFixed(2)}`;
+        const errMsg = `Büdcə limiti keçilir! Mövcud xərc: ${sym}${currentSpent.toFixed(2)}, yeni abunəlik: ${subPriceText}, cəmi: ${sym}${projectedTotal.toFixed(2)} — limit: ${sym}${effectiveLimit.toFixed(2)}. (Qalan boş büdcə: ${sym}${remaining.toFixed(2)})`;
         document.getElementById('budget-exceeded-msg').textContent = errMsg;
         const banner = document.getElementById('budget-exceeded-banner');
         banner.style.display = 'block';
