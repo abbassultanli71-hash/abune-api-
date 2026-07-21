@@ -92,31 +92,49 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 30px 0;
+    padding: 20px 0;
     background:
-      radial-gradient(circle at 10% 10%, rgba(167, 139, 250, 0.40), transparent 45%),
-      radial-gradient(circle at 90% 85%, rgba(56, 189, 248, 0.35), transparent 45%),
-      radial-gradient(circle at 50% 40%, rgba(251, 113, 133, 0.25), transparent 50%),
-      linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+      radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.30), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.25), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.20), transparent 50%),
+      #090d16;
   }
-  [data-theme="dark"] .device-stage {
+  [data-theme="light"] .device-stage {
     background:
-      radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.35), transparent 45%),
-      radial-gradient(circle at 90% 85%, rgba(31, 224, 194, 0.28), transparent 45%),
-      radial-gradient(circle at 50% 40%, rgba(236, 72, 153, 0.22), transparent 50%),
-      #0b0d19;
+      radial-gradient(circle at 15% 15%, rgba(167, 139, 250, 0.35), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.30), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(251, 113, 133, 0.22), transparent 50%),
+      #e2e8f0;
   }
   .phone {
     width: 390px;
     height: 844px;
+    max-height: 94vh;
+    max-width: 95vw;
     background: var(--bg);
-    border-radius: 46px;
-    border: 10px solid #0f172a;
-    box-shadow: 0 35px 80px -20px rgba(99, 102, 241, 0.30), 0 0 40px rgba(167, 139, 250, 0.25);
+    border-radius: 48px;
+    border: 11px solid #0f172a;
+    box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.65), 0 0 50px rgba(99, 102, 241, 0.30);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    margin: auto;
+  }
+  @media (max-width: 480px) {
+    .device-stage {
+      padding: 0;
+      background: var(--bg);
+    }
+    .phone {
+      width: 100vw;
+      height: 100vh;
+      max-height: 100vh;
+      max-width: 100vw;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
   }
   @keyframes blobDrift {
     0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
