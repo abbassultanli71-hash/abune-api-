@@ -1103,7 +1103,6 @@ app.post('/api/istifadeciler/change-password/verify', authLimiter, async (req, r
 
 /**
  * @swagger
- * @swagger
  * /api/istifadeciler/login:
  *   post:
  *     summary: Username və şifrə ilə giriş edir
