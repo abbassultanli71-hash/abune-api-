@@ -214,7 +214,8 @@ const swaggerOptions = {
     ],
     components: {
       securitySchemes: {
-        basicAuth: { type: 'http', scheme: 'basic', description: 'API-ya giriş üçün istifadəçi adı və şifrə daxil edin.' }
+        bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', description: 'JWT token ilə autentifikasiya' },
+        basicAuth: { type: 'http', scheme: 'basic', description: 'İstifadəçi adı və şifrə ilə giriş' }
       },
       schemas: {
         ErrorResponse: {
@@ -282,9 +283,9 @@ const swaggerOptions = {
         }
       }
     },
-    security: [{ basicAuth: [] }]
+    security: [{ bearerAuth: [] }, { basicAuth: [] }]
   },
-  apis: ['./server.js'],
+  apis: [path.join(__dirname, 'server.js')],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
