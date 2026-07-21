@@ -106,7 +106,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-change-me-in-production';
@@ -290,9 +290,10 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 // Public routes - no auth needed
-app.get('/', (req, res) => { res.redirect('/app'); });
+app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
 app.get('/app', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
-app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
+app.get('/index.html', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
+app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
 
 // Telegram webhook - registered WITHOUT /api prefix so authMiddleware NEVER touches it
 const telegramBot = require('./telegramBot');
