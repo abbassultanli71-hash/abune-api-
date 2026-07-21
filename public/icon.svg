@@ -1,26 +1,16 @@
-<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="creativeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#8B5CF6" />
-      <stop offset="50%" stop-color="#3B82F6" />
-      <stop offset="100%" stop-color="#EC4899" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1f2a"/>
+      <stop offset="100%" stop-color="#2f3a4d"/>
     </linearGradient>
-    <linearGradient id="creativeGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#10B981" />
-      <stop offset="100%" stop-color="#06B6D4" />
+    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e6ffb0"/>
+      <stop offset="45%" stop-color="#c8f560"/>
+      <stop offset="100%" stop-color="#9fdb2e"/>
     </linearGradient>
-    <filter id="creativeGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="5" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
-  <rect width="100" height="100" rx="28" fill="#0f172a"/>
-  <polygon points="50,8 88,28 88,72 50,92 12,72 12,28" fill="rgba(15, 23, 42, 0.95)" stroke="url(#creativeGrad1)" stroke-width="3.5" filter="url(#creativeGlow)"/>
-  <path d="M 30 50 Q 50 20 70 50 Q 50 80 30 50 Z" stroke="url(#creativeGrad2)" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.85"/>
-  <path d="M 50 25 L 72 68 H 60 L 50 48 L 40 68 H 28 Z" fill="url(#creativeGrad1)"/>
-  <circle cx="50" cy="50" r="5" fill="#10B981" filter="url(#creativeGlow)">
-    <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
-  </circle>
-  <polygon points="50,42 52,48 58,50 52,52 50,58 48,52 42,50 48,48" fill="#FFFFFF"/>
+  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="url(#fg)" stroke-width="26"/>
+  <text x="256" y="300" font-family="Georgia, serif" font-size="180" font-weight="700" fill="url(#fg)" text-anchor="middle">A</text>
 </svg>
