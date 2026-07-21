@@ -19,8 +19,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'Abunəm';
   const options = {
     body: data.body || '',
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
+    icon: '/icon.svg',
+    badge: '/icon.svg',
     vibrate: [100, 50, 100],
     actions: data.abunelikId ? [
       { action: 'cancel_sub', title: 'Abunəliyi Ləğv Et ❌' },

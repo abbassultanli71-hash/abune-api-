@@ -2274,10 +2274,10 @@
     
     toast.innerHTML = `
       <div class="ios-toast-header">
-        <div class="ios-toast-app-icon">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color:var(--purple);"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        <div class="ios-toast-app-icon p-0.5 bg-slate-900 rounded-md border border-indigo-500/40">
+          <img src="/icon.svg" style="width:16px; height:16px; border-radius:4px;" alt="Abunəm Logo">
         </div>
-        <span class="ios-toast-app-name">ABUNƏM</span>
+        <span class="ios-toast-app-name font-bold tracking-wider text-slate-900 dark:text-white">ABUNƏM</span>
         <span class="ios-toast-time">indi</span>
       </div>
       <div class="ios-toast-body">
@@ -2317,8 +2317,8 @@
     if (window.Notification && Notification.permission === 'granted') {
       const options = {
         body: body,
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
+        icon: '/icon.svg',
+        badge: '/icon.svg',
         vibrate: [100, 50, 100]
       };
 
@@ -2344,8 +2344,8 @@
       const token = localStorage.getItem('abunelik_token');
       const options = {
         body,
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
+        icon: '/icon.svg',
+        badge: '/icon.svg',
         vibrate: [200, 100, 200, 100, 200],
         requireInteraction: true,   // stays on screen until user acts
         actions: [
