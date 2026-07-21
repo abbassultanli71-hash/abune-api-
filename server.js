@@ -298,6 +298,10 @@ const telegramBot = require('./telegramBot');
 app.post('/telegram-webhook', telegramBot.handleTelegramUpdate);
 
 // Protected routes
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerDocs);
+});
 app.use('/api-docs', authMiddleware, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/api', authMiddleware);
 
@@ -666,6 +670,26 @@ app.get('/api/istifadeciler/:username', async (req, res) => {
       return errorResponse(res, 404, 'Not Found', 'USER_NOT_FOUND', 'İstifadəçi tapılmadı.');
     }
     return successResponse(res, 200, 'Success', { user: result.rows[0] });
+  } catch (err) {
+    return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
+  }
+});
+
+/**
+ * @swagger
+ * /api/istifadeciler:
+ *   get:
+ *     summary: Bütün istifadəçilərin siyahısını gətirir
+ *     tags: [İstifadəçilər]
+ *     responses:
+ *       200:
+ *         description: Uğurlu əməliyyat
+ */
+app.get('/api/istifadeciler', async (req, res) => {
+  try {
+    const sql = `SELECT id, username, ad, email, TO_CHAR(yaradilma_tarixi, 'YYYY-MM-DD HH24:MI:SS') as yaradilma_tarixi FROM istifadeciler ORDER BY id DESC`;
+    const result = await executeQuery(sql, {});
+    return successResponse(res, 200, 'Success', { users: result.rows });
   } catch (err) {
     return errorResponse(res, 500, 'Internal Server Error', 'INTERNAL_ERROR', err.message);
   }
