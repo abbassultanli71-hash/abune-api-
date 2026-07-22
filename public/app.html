@@ -2793,7 +2793,7 @@
   }
 
   function getBrandIconHTML(name, category) {
-    const lowerName = (name || '').toLowerCase();
+    const lowerName = (name || '').toLowerCase().trim();
     
     // Netflix
     if (lowerName.includes('netflix') || lowerName.includes('neftlix')) {
@@ -2875,10 +2875,15 @@
     if (lowerName.includes('microsoft') || lowerName.includes('office') || lowerName.includes('onedrive')) {
       return `<div class="sub-icon" style="background: rgba(0, 164, 239, 0.15); border: 1px solid rgba(0, 164, 239, 0.3);"><svg viewBox="0 0 23 23" style="width:19px; height:19px;"><path fill="#f25022" d="M0 0h11v11H0z"/><path fill="#7fba00" d="M12 0h11v11H12z"/><path fill="#00a4ef" d="M0 12h11v11H0z"/><path fill="#ffb900" d="M12 12h11v11H12z"/></svg></div>`;
     }
+    // Universal Automatic Global Brand Logo Resolver (for ANY app in the world)
+    let domainCandidate = lowerName.replace(/[^a-z0-9]/g, '');
+    if (!domainCandidate.includes('.')) domainCandidate += '.com';
+    const fallbackHTML = categoryIconHTML(category);
     
-    // Fallback to Category Icon
-    // Fallback to Category Icon
-    return categoryIconHTML(category);
+    return `<div class="sub-icon" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 3px;">
+      <img src="https://www.google.com/s2/favicons?domain=${domainCandidate}&sz=128" style="width: 20px; height: 20px; border-radius: 4px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${name}">
+      <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center;">${fallbackHTML}</div>
+    </div>`;
   }
 
   function currencySymbol(code) {
