@@ -9,68 +9,68 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- Tailwind CSS v4 -->
 <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 <style>
   :root {
-    --bg: #f7f4ee;
+    --bg: #f8fafc;
     --surface: #ffffff;
-    --surface-2: #f2eee6;
-    --surface-3: #e8e4db;
-    --border: rgba(28, 27, 24, 0.08);
-    --border-strong: rgba(28, 27, 24, 0.15);
-    --ink: #1c1b18;
-    --ink-muted: #6e6b63;
-    --ink-faint: #99958c;
-    --gold: #e8b54d;
-    --teal: #4fbdba;
-    --coral: #e2685a;
-    --purple: #d96b43;
-    --pink: #e2685a;
-    --blue: #4fbdba;
-    --lime: #4fbdba;
-    --gold-soft: rgba(232, 181, 77, 0.14);
-    --teal-soft: rgba(79, 189, 186, 0.14);
-    --coral-soft: rgba(226, 104, 90, 0.16);
-    --purple-soft: rgba(217, 107, 67, 0.14);
-    --pink-soft: rgba(226, 104, 90, 0.14);
-    --blue-soft: rgba(79, 189, 186, 0.14);
-    --lime-soft: rgba(79, 189, 186, 0.18);
-    --accent: #d96b43;
-    --accent-soft: rgba(217, 107, 67, 0.14);
-    --accent-grad: linear-gradient(135deg, #d96b43 0%, #c45831 100%);
-    --hero-grad: linear-gradient(135deg, #181715 0%, #23221f 100%);
-    --glow-accent: 0 12px 32px -10px rgba(217, 107, 67, 0.35);
-    --glow-coral: 0 12px 32px -10px rgba(226, 104, 90, 0.38);
-    --shadow: 0 14px 35px -10px rgba(28, 27, 24, 0.12);
-    --font-serif: 'Instrument Serif', 'Fraunces', Georgia, serif;
-    --font-display: 'Fraunces', Georgia, serif;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --border: rgba(249, 115, 22, 0.12);
+    --border-strong: rgba(249, 115, 22, 0.25);
+    --ink: #0f172a;
+    --ink-muted: #475569;
+    --ink-faint: #94a3b8;
+    --gold: #f59e0b;
+    --teal: #10b981;
+    --coral: #ef4444;
+    --purple: #f97316;
+    --pink: #ea580c;
+    --blue: #3b82f6;
+    --lime: #10b981;
+    --gold-soft: rgba(245, 158, 11, 0.15);
+    --teal-soft: rgba(16, 185, 129, 0.15);
+    --coral-soft: rgba(239, 68, 68, 0.15);
+    --purple-soft: rgba(249, 115, 22, 0.14);
+    --pink-soft: rgba(234, 88, 12, 0.15);
+    --blue-soft: rgba(59, 130, 246, 0.15);
+    --lime-soft: rgba(16, 185, 129, 0.18);
+    --accent: #f97316;
+    --accent-soft: rgba(249, 115, 22, 0.14);
+    --accent-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    --hero-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    --glow-accent: 0 12px 32px -10px rgba(249, 115, 22, 0.35);
+    --glow-coral: 0 12px 32px -10px rgba(239, 68, 68, 0.38);
+    --shadow: 0 14px 35px -10px rgba(249, 115, 22, 0.12);
+    --font-serif: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
     --font-body: 'Outfit', 'Inter', -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   [data-theme="dark"] {
-    --bg: #14151a;
-    --surface: #1c1e25;
-    --surface-2: #23252e;
-    --surface-3: #2a2d38;
-    --border: rgba(242, 240, 234, 0.09);
-    --border-strong: rgba(242, 240, 234, 0.16);
-    --ink: #f2f0ea;
-    --ink-muted: #9a9dab;
-    --ink-faint: #64677a;
-    --gold-soft: rgba(232, 181, 77, 0.14);
-    --teal-soft: rgba(79, 189, 186, 0.14);
-    --coral-soft: rgba(226, 104, 90, 0.16);
-    --purple-soft: rgba(217, 107, 67, 0.14);
-    --pink-soft: rgba(226, 104, 90, 0.14);
-    --blue-soft: rgba(79, 189, 186, 0.14);
-    --lime-soft: rgba(79, 189, 186, 0.18);
-    --accent: #d96b43;
-    --accent-grad: linear-gradient(135deg, #d96b43 0%, #e8b54d 100%);
-    --hero-grad: linear-gradient(135deg, #1c1e25 0%, #23252e 100%);
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-2: #334155;
+    --surface-3: #475569;
+    --border: rgba(249, 115, 22, 0.15);
+    --border-strong: rgba(249, 115, 22, 0.30);
+    --ink: #f8fafc;
+    --ink-muted: #94a3b8;
+    --ink-faint: #64748b;
+    --gold-soft: rgba(245, 158, 11, 0.18);
+    --teal-soft: rgba(16, 185, 129, 0.18);
+    --coral-soft: rgba(239, 68, 68, 0.18);
+    --purple-soft: rgba(249, 115, 22, 0.20);
+    --pink-soft: rgba(234, 88, 12, 0.18);
+    --blue-soft: rgba(59, 130, 246, 0.18);
+    --lime-soft: rgba(16, 185, 129, 0.20);
+    --accent: #f97316;
+    --accent-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    --hero-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     --shadow: 0 20px 48px -18px rgba(0,0,0,0.65);
   }
 
@@ -249,13 +249,13 @@
     font-family: var(--font-mono); font-size: 11px; color: rgba(242,240,234,0.7);
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
   }
-  .hero-title { font-family: var(--font-serif); font-size: 28px; font-weight: 400; margin: 0; color: #f2f0ea; letter-spacing: -0.01em; line-height: 1.2; }
+  .hero-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin: 0; color: #f2f0ea; letter-spacing: -0.01em; line-height: 1.2; }
   .hero-sub { color: rgba(242,240,234,0.8); font-size: 13px; margin-top: 4px; }
   .hero-avatar {
     width: 48px; height: 48px; border-radius: 50%;
     background: #f2f0ea;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-serif); font-weight: 600; font-size: 16px; color: #d96b43;
+    font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #f97316;
     flex-shrink: 0; cursor: pointer; border: 2px solid rgba(255,255,255,0.3);
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -264,7 +264,7 @@
     font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-faint);
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
   }
-  h1.page-title { font-family: var(--font-serif); font-size: 28px; font-weight: 400; margin: 0; letter-spacing: -0.01em; line-height: 1.2; }
+  h1.page-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin: 0; letter-spacing: -0.01em; line-height: 1.2; }
   .page-sub { color: var(--ink-muted); font-size: 12.5px; margin-top: 4px; }
  
   .h-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -301,10 +301,10 @@
   .dashboard-budget-card:active { transform: scale(0.97); }
   .db-left { display: flex; flex-direction: column; gap: 4px; }
   .db-eyebrow { font-size: 10.5px; color: #9a9dab; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-mono); }
-  .db-spent { font-family: var(--font-serif); font-size: 30px; font-weight: 400; color: #f2f0ea; }
+  .db-spent { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: #f2f0ea; }
   .db-limit { font-family: var(--font-mono); font-size: 12.5px; color: #64677a; }
   .db-action {
-    margin-top: 8px; font-size: 11.5px; color: #d96b43; font-weight: 600;
+    margin-top: 8px; font-size: 11.5px; color: #f97316; font-weight: 600;
     display: flex; align-items: center; gap: 4px; cursor: pointer;
   }
   .db-action svg { width: 12px; height: 12px; transition: transform 0.2s; }
@@ -312,7 +312,7 @@
   .db-right { width: 90px; height: 90px; position: relative; }
   .db-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
   .db-ring-track { fill: none; stroke: var(--surface-3); stroke-width: 10; }
-  .db-ring-fill { fill: none; stroke: url(#dbRingGrad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset 0.6s ease; filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.45)); }
+  .db-ring-fill { fill: none; stroke: url(#dbRingGrad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset 0.6s ease; filter: drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)); }
   .db-ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
  
   /* ---- Horizontal scroll stat cards ---- */
@@ -1465,18 +1465,18 @@
               <div class="hero-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
             </div>
             <div style="display: flex; align-items: center; gap: 14px;">
-              <div class="hero-illustration p-2 rounded-3xl bg-gradient-to-tr from-indigo-900/80 via-purple-900/80 to-slate-900/90 border border-indigo-400/40 shadow-xl shadow-indigo-500/25 backdrop-blur-xl transition-all duration-300 hover:rotate-6 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Interactive Holographic Emblem">
-                <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-cyan-500/20 to-pink-500/20 blur-md opacity-75 group-hover:opacity-100 transition-opacity"></div>
+              <div class="hero-illustration p-2 rounded-3xl bg-gradient-to-tr from-orange-950/80 via-amber-950/80 to-slate-900/90 border border-orange-400/40 shadow-xl shadow-orange-500/25 backdrop-blur-xl transition-all duration-300 hover:rotate-6 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Interactive Holographic Emblem">
+                <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 blur-md opacity-75 group-hover:opacity-100 transition-opacity"></div>
                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 46px; height: 46px; position:relative; z-index:1;">
                   <defs>
                     <linearGradient id="creativeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#8B5CF6" />
-                      <stop offset="50%" stop-color="#3B82F6" />
-                      <stop offset="100%" stop-color="#EC4899" />
+                      <stop offset="0%" stop-color="#F97316" />
+                      <stop offset="50%" stop-color="#F59E0B" />
+                      <stop offset="100%" stop-color="#EA580C" />
                     </linearGradient>
                     <linearGradient id="creativeGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
                       <stop offset="0%" stop-color="#10B981" />
-                      <stop offset="100%" stop-color="#06B6D4" />
+                      <stop offset="100%" stop-color="#F59E0B" />
                     </linearGradient>
                     <filter id="creativeGlow" x="-20%" y="-20%" width="140%" height="140%">
                       <feGaussianBlur stdDeviation="5" result="blur" />
@@ -1513,8 +1513,8 @@
             <svg class="db-ring" viewBox="0 0 100 100">
               <defs>
                 <linearGradient id="dbRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#8b5cf6"/>
-                  <stop offset="100%" stop-color="#ec4899"/>
+                  <stop offset="0%" stop-color="#f97316"/>
+                  <stop offset="100%" stop-color="#f59e0b"/>
                 </linearGradient>
               </defs>
               <circle class="db-ring-track" cx="50" cy="50" r="40"></circle>
@@ -1526,29 +1526,29 @@
 
         <!-- Revolut-Style Quick Actions Floating Toolbar -->
         <div class="grid grid-cols-4 gap-2 my-4">
-          <button onclick="openSheet()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-500/25 transition-all hover:scale-105 active:scale-95 border border-purple-400/30 cursor-pointer">
+          <button onclick="openSheet()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/25 transition-all hover:scale-105 active:scale-95 border border-orange-400/30 cursor-pointer">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
             <span class="text-[10px] font-bold mt-1.5">+ Əlavə et</span>
           </button>
-          <button onclick="switchScreen('budget')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-purple-500/40 active:scale-95 cursor-pointer">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-600 dark:text-purple-400"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <button onclick="switchScreen('budget')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-orange-500/40 active:scale-95 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-500 dark:text-orange-400"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             <span class="text-[10px] font-bold mt-1.5 text-slate-700 dark:text-slate-300">Büdcə</span>
           </button>
-          <button onclick="switchScreen('cards')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-purple-500/40 active:scale-95 cursor-pointer">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-600 dark:text-indigo-400"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+          <button onclick="switchScreen('cards')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-orange-500/40 active:scale-95 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-500 dark:text-amber-400"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
             <span class="text-[10px] font-bold mt-1.5 text-slate-700 dark:text-slate-300">Kartlar</span>
           </button>
-          <button onclick="switchScreen('notifications')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-purple-500/40 active:scale-95 cursor-pointer">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-pink-600 dark:text-pink-400"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <button onclick="switchScreen('notifications')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-orange-500/40 active:scale-95 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-500 dark:text-orange-400"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <span class="text-[10px] font-bold mt-1.5 text-slate-700 dark:text-slate-300">Bildirişlər</span>
           </button>
         </div>
 
         <!-- Tailwind v4 Cheerful Vibrant AI Insights Banner -->
-        <div class="my-4 p-4 rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 border border-purple-400/40 backdrop-blur-xl shadow-lg transition-all duration-300 hover:border-purple-400/60">
+        <div class="my-4 p-4 rounded-3xl bg-gradient-to-r from-orange-950 via-amber-950 to-slate-900 border border-orange-400/40 backdrop-blur-xl shadow-lg transition-all duration-300 hover:border-orange-400/60">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="p-2.5 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/40">
+              <div class="p-2.5 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/40">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
@@ -1556,7 +1556,7 @@
                 <div class="text-xs font-bold text-white mt-0.5">Bütün xərcləriniz tam nəzarət altındadır ✨</div>
               </div>
             </div>
-            <button onclick="switchScreen('budget')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer">
+            <button onclick="switchScreen('budget')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer">
               Büdcə →
             </button>
           </div>
