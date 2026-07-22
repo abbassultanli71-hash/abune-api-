@@ -1,1342 +1,556 @@
 <!DOCTYPE html>
-<html lang="az" data-theme="dark">
+<html lang="az">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Abunəm — Abunəlikləriniz, bir baxışda aydın.</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg-page: #f7f4ee;
-    --bg-card: #ffffff;
-    --bg-card-subtle: #f2eee6;
-    --text-main: #1c1b18;
-    --text-muted: #6e6b63;
-    --text-faint: #99958c;
-    --border-color: #e5e0d5;
-    --accent-orange: #d96b43;
-    --dark-pill: #181715;
-    
-    /* Phone app themes */
-    --bg: #14151a;
-    --surface: #1c1e25;
-    --surface-2: #23252e;
-    --surface-3: #2a2d38;
-    --border: rgba(242,240,234,0.09);
-    --border-strong: rgba(242,240,234,0.16);
-    --ink: #f2f0ea;
-    --ink-muted: #9a9dab;
-    --ink-faint: #64677a;
-    --gold: #e8b54d;
-    --teal: #4fbdba;
-    --coral: #e2685a;
-    --gold-soft: rgba(232,181,77,0.14);
-    --teal-soft: rgba(79,189,186,0.14);
-    --coral-soft: rgba(226,104,90,0.16);
-    --shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
-    
-    --font-serif: 'Instrument Serif', 'Fraunces', Georgia, serif;
-    --font-display: 'Fraunces', Georgia, serif;
-    --font-body: 'Inter', -apple-system, system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  [data-theme="light"] {
-    --bg: #f4f2ec;
-    --surface: #ffffff;
-    --surface-2: #faf9f5;
-    --surface-3: #f0eee6;
-    --border: rgba(27,29,36,0.08);
-    --border-strong: rgba(27,29,36,0.14);
-    --ink: #1b1d24;
-    --ink-muted: #6b6e7a;
-    --ink-faint: #9799a3;
-    --gold-soft: rgba(184,131,20,0.14);
-    --teal-soft: rgba(28,140,137,0.12);
-    --coral-soft: rgba(197,63,49,0.12);
-    --shadow: 0 20px 50px -25px rgba(27,29,36,0.25);
-  }
-
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; min-height: 100%; }
-  body {
-    background-color: var(--bg-page);
-    color: var(--text-main);
-    font-family: var(--font-body);
-    font-size: 14px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
-
-  a { text-decoration: none; color: inherit; }
-  button, select, input { font-family: inherit; }
-
-  /* ============================================================ */
-  /* LANDING PAGE LAYOUT */
-  /* ============================================================ */
-  .page-container {
-    max-width: 1240px;
-    margin: 0 auto;
-    padding: 24px 32px 60px;
-  }
-
-  /* ---- Header Nav ---- */
-  .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 0 36px;
-  }
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-  .brand-logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--dark-pill);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-serif);
-    font-size: 18px;
-    font-weight: 400;
-  }
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    font-size: 13.5px;
-    color: var(--text-muted);
-    font-weight: 400;
-  }
-  .nav-links a:hover {
-    color: var(--text-main);
-  }
-  .btn-login {
-    background: var(--dark-pill);
-    color: #fff;
-    border: none;
-    padding: 9px 20px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-  }
-  .btn-login:hover { opacity: 0.9; }
-
-  /* ---- Hero Grid ---- */
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 40px;
-    align-items: center;
-    padding: 20px 0 60px;
-  }
-  @media (max-width: 960px) {
-    .hero-grid {
-      grid-template-columns: 1fr;
-      gap: 50px;
-    }
-  }
-
-  .hero-left {
-    max-width: 580px;
-  }
-
-  .version-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    background: rgba(0,0,0,0.035);
-    border: 1px solid rgba(0,0,0,0.06);
-    padding: 5px 12px;
-    border-radius: 20px;
-    margin-bottom: 24px;
-  }
-  .version-badge::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent-orange);
-  }
-
-  .hero-title {
-    font-family: var(--font-display);
-    font-size: 64px;
-    line-height: 1.06;
-    font-weight: 500;
-    letter-spacing: -0.03em;
-    margin: 0 0 24px;
-    color: var(--text-main);
-  }
-  .hero-title .highlight {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 400;
-    color: var(--accent-orange);
-  }
-
-  .hero-sub {
-    font-size: 16px;
-    line-height: 1.55;
-    color: var(--text-muted);
-    margin-bottom: 36px;
-    max-width: 490px;
-  }
-
-  .hero-actions {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 48px;
-  }
-  .btn-primary-pill {
-    background: var(--dark-pill);
-    color: #fff;
-    padding: 13px 28px;
-    border-radius: 30px;
-    font-size: 14px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-  }
-  .btn-secondary-pill {
-    background: transparent;
-    color: var(--text-main);
-    padding: 13px 24px;
-    border-radius: 30px;
-    font-size: 14px;
-    font-weight: 500;
-    border: 1px solid rgba(0,0,0,0.15);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .btn-secondary-pill:hover {
-    background: rgba(0,0,0,0.03);
-  }
-
-  /* ---- Stats Row ---- */
-  .stats-divider {
-    height: 1px;
-    background: var(--border-color);
-    margin-bottom: 24px;
-  }
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-  }
-  .stat-item {
-    display: flex;
-    flex-direction: column;
-  }
-  .stat-number {
-    font-family: var(--font-serif);
-    font-size: 34px;
-    font-weight: 400;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .stat-label-text {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-faint);
-  }
-
-  /* ============================================================ */
-  /* MOBILE PHONE MOCKUP FRAME */
-  /* ============================================================ */
-  .phone-stage {
-    display: flex;
-    justify-content: center;
-    position: relative;
-  }
-  .phone-glow {
-    position: absolute;
-    width: 380px;
-    height: 700px;
-    background: radial-gradient(circle, rgba(217,107,67,0.15) 0%, rgba(247,244,238,0) 70%);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .phone {
-    position: relative;
-    z-index: 1;
-    width: 390px;
-    height: 830px;
-    background: var(--bg);
-    border-radius: 46px;
-    border: 10px solid #141417;
-    box-shadow:
-      0 35px 80px -20px rgba(0,0,0,0.45),
-      0 0 0 1px rgba(255,255,255,0.06);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  .notch {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120px;
-    height: 26px;
-    background: #141417;
-    border-radius: 20px;
-    z-index: 30;
-  }
-  .statusbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 26px 4px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 600;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 20;
-    color: var(--ink);
-  }
-  .statusbar .icons { display: flex; gap: 5px; align-items: center; }
-
-  /* ---- Screens inside phone ---- */
-  .screens { position: relative; flex: 1; overflow: hidden; }
-  .screen {
-    position: absolute; inset: 0;
-    display: none;
-    flex-direction: column;
-    overflow-y: auto;
-    -ms-overflow-style: none; scrollbar-width: none;
-    padding-bottom: 90px;
-  }
-  .screen::-webkit-scrollbar { display: none; }
-  .screen.active { display: flex; animation: fadein 0.28s ease; }
-  @keyframes fadein { from { opacity: 0; transform: translateY(6px);} to {opacity: 1; transform: translateY(0);} }
-
-  .scr-header { padding: 8px 20px 14px; }
-  .eyebrow {
-    font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint);
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
-  }
-  h1.page-title {
-    font-family: var(--font-serif);
-    font-size: 28px;
-    font-weight: 400;
-    margin: 0;
-    letter-spacing: -0.01em;
-    line-height: 1.15;
-    color: var(--ink);
-  }
-  h1.page-title .italic { font-style: italic; }
-  .page-sub { color: var(--ink-muted); font-size: 12px; margin-top: 2px; }
-
-  .h-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .user-avatar-pill {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: var(--surface-2); border: 1px solid var(--border-strong);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
-    color: var(--ink);
-    flex-shrink: 0;
-  }
-
-  /* ---- Custom Dark Expense Gauge Card ---- */
-  .hero-expense-card {
-    margin: 4px 20px 16px;
-    background: var(--surface-2);
-    border: 1px solid var(--border-strong);
-    border-radius: 20px;
-    padding: 18px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-  }
-  .gauge-info { display: flex; flex-direction: column; }
-  .gauge-label {
-    font-family: var(--font-mono); font-size: 9.5px;
-    text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint);
-    margin-bottom: 6px;
-  }
-  .gauge-value {
-    font-family: var(--font-serif); font-size: 32px; font-weight: 400;
-    line-height: 1; color: var(--ink);
-  }
-  .gauge-value small { font-size: 14px; font-family: var(--font-mono); color: var(--ink-faint); }
-  .gauge-link {
-    font-size: 11px; color: var(--ink-muted); margin-top: 10px;
-    display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
-  }
-
-  .gauge-ring-wrap {
-    position: relative; width: 62px; height: 62px; flex-shrink: 0;
-  }
-  .gauge-ring-wrap svg { transform: rotate(-90deg); width: 62px; height: 62px; }
-  .gauge-ring-bg { stroke: var(--surface-3); stroke-width: 6; fill: none; }
-  .gauge-ring-fill {
-    stroke: #d96b43; stroke-width: 6; stroke-linecap: round; fill: none;
-    stroke-dasharray: 163; stroke-dashoffset: 62; transition: stroke-dashoffset 0.5s ease;
-  }
-  .gauge-pct {
-    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--ink);
-  }
-
-  /* ---- Payment Ruler ---- */
-  .ruler-card {
-    margin: 0 20px 16px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
-    padding: 16px;
-    box-shadow: var(--shadow);
-  }
-  .ruler-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
-  .ruler-title { font-family: var(--font-display); font-size: 15px; font-weight: 600; }
-  .ruler-month { font-family: var(--font-mono); font-size: 9.5px; color: var(--ink-faint); letter-spacing: 0.04em; }
-  .ruler-track-wrap { position: relative; padding-top: 22px; padding-bottom: 18px; }
-  .ruler-track { position: relative; height: 2px; background: var(--border-strong); border-radius: 2px; }
-  .ruler-today-line {
-    position: absolute; top: -10px; bottom: -10px; width: 1px;
-    background: repeating-linear-gradient(to bottom, var(--accent-orange) 0 4px, transparent 4px 8px);
-  }
-  .ruler-today-label {
-    position: absolute; top: -24px; transform: translateX(-50%);
-    font-family: var(--font-mono); font-size: 8.5px; font-weight: 600; color: var(--accent-orange);
-    background: rgba(217,107,67,0.15); padding: 2px 6px; border-radius: 20px; white-space: nowrap;
-  }
-  .ruler-chip {
-    position: absolute; top: -5px; transform: translateX(-50%);
-    width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--surface);
-  }
-  .ruler-chip.urgent { background: var(--coral); }
-  .ruler-chip.soon { background: var(--gold); }
-  .ruler-chip.normal { background: var(--teal); }
-  .ruler-ticks { display: flex; justify-content: space-between; margin-top: 2px; }
-  .ruler-ticks span { font-family: var(--font-mono); font-size: 9px; color: var(--ink-faint); }
-
-  /* ---- Section blocks ---- */
-  .section { padding: 8px 20px 4px; }
-  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .section-title { font-family: var(--font-display); font-size: 14.5px; font-weight: 600; }
-  .section-link { font-size: 11px; color: var(--ink-muted); font-weight: 500; cursor: pointer; }
-
-  /* ---- Sub Rows ---- */
-  .sub-list { display: flex; flex-direction: column; gap: 8px; }
-  .sub-row {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 11px 13px;
-  }
-  .app-logo-box {
-    width: 38px; height: 38px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; overflow: hidden;
-  }
-
-  .sub-info { flex: 1; min-width: 0; }
-  .sub-name { font-weight: 600; font-size: 13px; }
-  .sub-meta { font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
-  .sub-right { text-align: right; flex-shrink: 0; }
-  .sub-price { font-family: var(--font-mono); font-weight: 600; font-size: 13px; }
-  .sub-badge {
-    display: inline-block; margin-top: 3px; font-family: var(--font-mono);
-    font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 20px;
-  }
-  .sub-badge.urgent { background: var(--coral-soft); color: var(--coral); }
-  .sub-badge.soon { background: var(--gold-soft); color: var(--gold); }
-  .sub-badge.normal { background: var(--teal-soft); color: var(--teal); }
-  .sub-badge.paused { background: var(--surface-3); color: var(--ink-faint); }
-
-  /* ---- Notifications ---- */
-  .notif-item {
-    display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 12px 13px; margin-bottom: 8px;
-  }
-  .notif-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-  .notif-title { font-size: 12px; font-weight: 600; }
-  .notif-msg { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
-  .notif-time { font-size: 9.5px; color: var(--ink-faint); margin-top: 3px; font-family: var(--font-mono); }
-
-  /* ---- Budget ---- */
-  .budget-card {
-    margin: 0 20px 16px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 18px; padding: 18px;
-  }
-  .budget-nums { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
-  .budget-spent { font-family: var(--font-serif); font-size: 26px; font-weight: 400; }
-  .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); }
-  .budget-bar-track { height: 8px; background: var(--surface-3); border-radius: 20px; overflow: hidden; }
-  .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--gold)); }
-  .budget-note { font-size: 11px; color: var(--ink-faint); margin-top: 10px; }
-
-  /* ---- Settings ---- */
-  .settings-group { margin: 0 20px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-  .settings-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 13px 15px; border-bottom: 1px solid var(--border);
-  }
-  .settings-row:last-child { border-bottom: none; }
-  .settings-row-label { font-size: 13px; font-weight: 500; }
-  .settings-row-sub { font-size: 10.5px; color: var(--ink-faint); margin-top: 2px; }
-  .settings-value { font-size: 12px; color: var(--ink-muted); font-family: var(--font-mono); display: flex; align-items: center; gap: 5px; }
-  .select-wrap { position: relative; }
-  .select-wrap select {
-    appearance: none; -webkit-appearance: none;
-    background: none; border: none; color: var(--ink-muted);
-    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
-    padding-right: 14px; cursor: pointer; text-align: right;
-  }
-  .select-wrap select:focus { outline: none; color: var(--ink); }
-  .select-wrap::after {
-    content: '›'; position: absolute; right: -3px; top: 50%;
-    transform: translateY(-50%); color: var(--ink-faint); pointer-events: none; font-size: 13px;
-  }
-
-  .theme-row { display: flex; gap: 8px; padding: 12px 15px; }
-  .theme-opt { flex: 1; text-align: center; padding: 8px; border-radius: 10px; font-size: 11.5px; font-weight: 600; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink-muted); cursor: pointer; }
-  .theme-opt.selected { border-color: var(--gold); color: var(--gold); background: var(--gold-soft); }
-
-  /* ---- FAB ---- */
-  .fab {
-    position: absolute; right: 18px; bottom: 85px; z-index: 25;
-    width: 50px; height: 50px; border-radius: 50%;
-    background: var(--gold); color: #221a08;
-    display: flex; align-items: center; justify-content: center;
-    border: none; box-shadow: 0 12px 26px -8px rgba(232,181,77,0.55);
-    cursor: pointer;
-  }
-  .fab svg { width: 22px; height: 22px; }
-
-  /* ---- Tabbar ---- */
-  .tabbar {
-    position: absolute; left: 0; right: 0; bottom: 0; z-index: 20;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    display: flex;
-    padding: 6px 4px calc(8px + var(--safe-bottom));
-  }
-  .tab-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    color: var(--ink-faint); font-size: 9.5px; font-weight: 600; padding: 4px 0;
-    border-radius: 12px; position: relative; cursor: pointer;
-    text-transform: uppercase; letter-spacing: 0.04em;
-  }
-  .tab-item svg { width: 18px; height: 18px; }
-  .tab-item.active { color: var(--ink); }
-  .tab-dot {
-    position: absolute; top: 2px; right: 26%;
-    width: 6px; height: 6px; border-radius: 50%; background: var(--coral);
-    border: 1.5px solid var(--surface);
-  }
-
-  /* ---- Bottom sheet ---- */
-  .sheet-overlay {
-    position: absolute; inset: 0; background: rgba(6,6,8,0.55);
-    display: none; align-items: flex-end; z-index: 40;
-  }
-  .sheet-overlay.open { display: flex; }
-  .sheet {
-    width: 100%; background: var(--surface); border-radius: 24px 24px 0 0;
-    padding: 10px 20px calc(22px + var(--safe-bottom));
-    max-height: 82%; overflow-y: auto;
-    border-top: 1px solid var(--border-strong);
-  }
-  .sheet-handle { width: 36px; height: 4px; border-radius: 4px; background: var(--border-strong); margin: 6px auto 14px; }
-  .sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-  .sheet-title { font-family: var(--font-display); font-size: 17px; font-weight: 600; }
-  .sheet-close { background: none; border: none; color: var(--ink-faint); font-size: 16px; cursor: pointer; }
-  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
-  .field label { font-size: 11px; font-weight: 600; color: var(--ink-muted); }
-  .field select, .field input {
-    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
-    padding: 10px 12px; color: var(--ink); font-size: 13.5px;
-  }
-  .field input.invalid { border-color: var(--coral); }
-  .field-error {
-    display: none; font-size: 10px; color: var(--coral); font-weight: 500;
-  }
-  .field-error.show { display: block; }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .sheet-actions { display: flex; gap: 10px; margin-top: 8px; }
-  .btn {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 12px; border-radius: 12px; border: 1px solid var(--border-strong);
-    background: var(--surface-2); color: var(--ink); font-size: 13px; font-weight: 600;
-    cursor: pointer;
-  }
-  .btn-primary { background: var(--gold); color: #221a08; border-color: transparent; }
-
-  /* ============================================================ */
-  /* FEATURE CHAPTER CARDS (01, 02, 03) */
-  /* ============================================================ */
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-top: 40px;
-    padding-top: 40px;
-  }
-  @media (max-width: 840px) {
-    .features-grid { grid-template-columns: 1fr; }
-  }
-
-  .feature-card {
-    background: rgba(255,255,255,0.6);
-    border: 1px solid rgba(0,0,0,0.06);
-    border-radius: 20px;
-    padding: 28px 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 190px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-  .feature-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 16px 32px -12px rgba(0,0,0,0.06);
-    background: #ffffff;
-  }
-  .feature-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-  .feature-num {
-    font-family: var(--font-serif);
-    font-size: 38px;
-    font-weight: 400;
-    line-height: 1;
-    color: var(--text-main);
-  }
-  .feature-tag {
-    font-family: var(--font-mono);
-    font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-faint);
-  }
-  .feature-title {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 600;
-    margin: 16px 0 8px;
-  }
-  .feature-desc {
-    font-size: 13.5px;
-    line-height: 1.5;
-    color: var(--text-muted);
-    margin: 0;
-  }
-
-  /* ---- Footer ---- */
-  .footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 40px 0 20px;
-    margin-top: 40px;
-    border-top: 1px solid var(--border-color);
-    font-size: 12px;
-    color: var(--text-faint);
-  }
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abunəlik İdarəetmə Dashboard</title>
+  <!-- Outfit & Inter Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Tailwind CSS v4 -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="dark-theme">
 
-<div class="page-container">
-
-  <!-- Header Nav -->
-  <header class="navbar">
-    <div class="brand">
-      <div class="brand-logo">a</div>
-      <span>Abunəm</span>
+  <!-- ========================================== -->
+  <!-- LOGIN PAGE -->
+  <!-- ========================================== -->
+  <div id="login-container" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-icon">
+          <i data-lucide="shield-check"></i>
+        </div>
+        <h2>Sistemə Giriş</h2>
+        <p>API-ya qoşulmaq üçün istifadəçi adı və şifrə daxil edin</p>
+      </div>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="login-username">İstifadəçi adı</label>
+          <div class="input-wrapper">
+            <i data-lucide="user"></i>
+            <input type="text" id="login-username" placeholder="admin" required autocomplete="username">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="login-password">Şifrə</label>
+          <div class="input-wrapper">
+            <i data-lucide="lock"></i>
+            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+        </div>
+        <div id="login-error" class="form-error-msg hidden"></div>
+        <button type="submit" class="btn btn-primary btn-block" id="login-submit-btn">
+          <span>Daxil Ol</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
     </div>
-    <nav class="nav-links">
-      <a href="#icmal" onclick="switchScreen('dashboard')">İcmal</a>
-      <a href="#budce" onclick="switchScreen('budget')">Büdcə</a>
-      <a href="#qrafik" onclick="switchScreen('subs')">Qrafik</a>
-      <a href="#komek" onclick="switchScreen('settings')">Kömək</a>
-    </nav>
-    <button class="btn-login" onclick="document.querySelector('.phone-stage').scrollIntoView({behavior:'smooth'})">Daxil ol</button>
-  </header>
+  </div>
 
-  <!-- Hero Main Section -->
-  <main class="hero-grid">
-    
-    <!-- Left Hero Column -->
-    <div class="hero-left">
-      <div class="version-badge">V1.1 · ZƏRİF YENİDƏN DİZAYN</div>
+  <!-- ========================================== -->
+  <!-- MAIN APP CONTAINER -->
+  <!-- ========================================== -->
+  <div id="app-container" class="app-layout hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <i data-lucide="layers"></i>
+        </div>
+        <div class="brand-name">
+          <h1>Abunəlik</h1>
+          <span>Yoxlama Paneli</span>
+        </div>
+      </div>
       
-      <h1 class="hero-title">
-        Abunəlikləriniz, <span class="highlight">bir baxışda</span> aydın.
-      </h1>
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item active" data-tab="dashboard">
+            <i data-lucide="home"></i>
+            <span>Dashboard</span>
+          </li>
+          <li class="nav-item" data-tab="users">
+            <i data-lucide="users"></i>
+            <span>İstifadəçilər</span>
+          </li>
+          <li class="nav-item" data-tab="subscriptions">
+            <i data-lucide="credit-card"></i>
+            <span>Abunəliklər</span>
+          </li>
+          <li class="nav-item" data-tab="payments">
+            <i data-lucide="history"></i>
+            <span>Ödəniş Tarixçəsi</span>
+          </li>
+          <li class="nav-item" data-tab="notifications">
+            <i data-lucide="bell"></i>
+            <span>Bildirişlər</span>
+          </li>
+        </ul>
+      </nav>
 
-      <p class="hero-sub">
-        Aylıq xərclərinizi, ödəniş qrafikinizi və büdcə limitlərinizi sakit, redaktorial bir interfeysdə izləyin — daha az səs, daha çox məna.
-      </p>
-
-      <div class="hero-actions">
-        <button class="btn-primary-pill" onclick="openSheet()">Pulsuz başla</button>
-        <button class="btn-secondary-pill" onclick="document.querySelector('.phone-stage').scrollIntoView({behavior:'smooth'})">
-          Demo bax <span>→</span>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar">AD</div>
+          <div class="user-meta">
+            <span class="user-name">Admin</span>
+            <span class="user-role">Sistem İdarəçisi</span>
+          </div>
+        </div>
+        <button id="logout-btn" class="btn btn-logout" title="Çıxış">
+          <i data-lucide="log-out"></i>
+          <span>Çıxış Et</span>
         </button>
       </div>
+    </aside>
 
-      <div class="stats-divider"></div>
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="header-title">
+          <h2 id="page-title">Dashboard</h2>
+          <p id="page-subtitle">Sistem vəziyyəti və ümumi statistik göstəricilər</p>
+        </div>
+        <div class="header-actions">
+          <div class="status-indicator connected">
+            <span class="pulse"></span>
+            <span>API Qoşuldu</span>
+          </div>
+          <a href="/api-docs/" target="_blank" class="btn btn-secondary">
+            <i data-lucide="file-text"></i>
+            <span>Swagger Sənədləri</span>
+          </a>
+        </div>
+      </header>
 
-      <div class="stats-row">
-        <div class="stat-item">
-          <div class="stat-number">12</div>
-          <div class="stat-label-text">AKTİV ABUNƏ</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">₼187</div>
-          <div class="stat-label-text">AYLIQ XƏRC</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">2 gün</div>
-          <div class="stat-label-text">NÖVBƏTİ ÖDƏNİŞ</div>
-        </div>
+      <!-- Dynamic Tab Contents -->
+      <div class="content-body">
+        
+        <!-- 1. DASHBOARD TAB -->
+        <section id="tab-dashboard" class="tab-pane active">
+          <!-- Stats Cards Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon users-color">
+                <i data-lucide="users"></i>
+              </div>
+              <div class="stat-info">
+                <h3>İstifadəçilər</h3>
+                <p class="stat-value" id="stat-users-count">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon sub-color">
+                <i data-lucide="credit-card"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Aktiv Abunəliklər</h3>
+                <p class="stat-value" id="stat-subs-count">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon income-color">
+                <i data-lucide="dollar-sign"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Ümumi Qazanc</h3>
+                <p class="stat-value" id="stat-revenue-value">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon bell-color">
+                <i data-lucide="bell"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Bildirişlər</h3>
+                <p class="stat-value" id="stat-notifs-count">-</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Grid -->
+          <div class="dashboard-grid">
+            <!-- Recent Activity -->
+            <div class="dashboard-card col-span-2">
+              <div class="card-header">
+                <h3>Son Aktivliklər</h3>
+                <p>Tətbiq üzərindən icra olunan son əməliyyatlar</p>
+              </div>
+              <div class="card-body">
+                <div class="timeline" id="recent-activity-list">
+                  <div class="loading-spinner"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="dashboard-card">
+              <div class="card-header">
+                <h3>Kateqoriyalar</h3>
+                <p>Abunəliklərin kateqoriyalar üzrə faiz nisbəti</p>
+              </div>
+              <div class="card-body">
+                <div id="category-chart-container" class="chart-wrapper">
+                  <div class="loading-spinner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. USERS TAB -->
+        <section id="tab-users" class="tab-pane">
+          <div class="section-actions">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="users-search" placeholder="İstifadəçi adı və ya email ilə axtar...">
+            </div>
+            <button class="btn btn-primary" onclick="openModal('user-modal')">
+              <i data-lucide="plus"></i>
+              <span>Yeni İstifadəçi</span>
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Ad Soyad</th>
+                  <th>Email</th>
+                  <th>Yaradılma Tarixi</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 3. SUBSCRIPTIONS TAB -->
+        <section id="tab-subscriptions" class="tab-pane">
+          <div class="section-actions">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="subs-search" placeholder="Abunəlik adı ilə axtar...">
+            </div>
+            <button class="btn btn-primary" onclick="openModal('sub-modal')">
+              <i data-lucide="plus"></i>
+              <span>Yeni Abunəlik</span>
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>İstifadəçi</th>
+                  <th>Abunəlik Adı</th>
+                  <th>Qiymət</th>
+                  <th>Tezlik</th>
+                  <th>Başlama Tarixi</th>
+                  <th>Növbəti Ödəniş</th>
+                  <th>Kateqoriya</th>
+                  <th>Status</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody id="subs-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. PAYMENTS TAB -->
+        <section id="tab-payments" class="tab-pane">
+          <div class="section-actions">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="payments-search" placeholder="İstifadəçi və ya abunəlik ilə axtar...">
+            </div>
+            <button class="btn btn-primary" onclick="openModal('payment-modal')">
+              <i data-lucide="plus"></i>
+              <span>Yeni Ödəniş Qeydi</span>
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>İstifadəçi</th>
+                  <th>Abunəlik</th>
+                  <th>Ödəniş Tarixi</th>
+                  <th>Məbləğ</th>
+                  <th>Status</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 5. NOTIFICATIONS TAB -->
+        <section id="tab-notifications" class="tab-pane">
+          <div class="section-actions">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="notifs-search" placeholder="Başlıq və ya mesaj ilə axtar...">
+            </div>
+            <button class="btn btn-primary" onclick="openModal('notif-modal')">
+              <i data-lucide="send"></i>
+              <span>Yeni Bildiriş Göndər</span>
+            </button>
+          </div>
+
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>İstifadəçi</th>
+                  <th>Başlıq</th>
+                  <th>Mesaj</th>
+                  <th>Göndərilmə Tarixi</th>
+                  <th>Əməliyyatlar</th>
+                </tr>
+              </thead>
+              <tbody id="notifs-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
       </div>
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL FORMS -->
+  <!-- ========================================== -->
+
+  <!-- 1. USER MODAL (ADD/EDIT) -->
+  <div id="user-modal" class="modal">
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <h3 id="user-modal-title">Yeni İstifadəçi Əlavə Et</h3>
+        <button class="modal-close" onclick="closeModal('user-modal')">&times;</button>
+      </div>
+      <form id="user-form">
+        <input type="hidden" id="user-id-field">
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label for="user-ad">Ad Soyad *</label>
+            <input type="text" id="user-ad" placeholder="Məs: Əli Vəliyev" required minlength="3" maxlength="100">
+            <span class="field-error" id="error-user-ad"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="user-email">Email *</label>
+            <input type="email" id="user-email" placeholder="Məs: ali@example.com" required maxlength="100">
+            <span class="field-error" id="error-user-email"></span>
+          </div>
+          <div class="form-group col-span-2" id="user-date-group">
+            <label for="user-date">Yaradılma Tarixi (Köhnə tarix daxil etmək üçün, İsteğe bağlı)</label>
+            <input type="text" id="user-date" placeholder="YYYY-MM-DD HH:MI:SS formatında">
+            <span class="field-error" id="error-user-date"></span>
+          </div>
+        </div>
+        <div id="user-form-general-error" class="form-error-msg hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('user-modal')">Ləğv Et</button>
+          <button type="submit" class="btn btn-primary" id="user-submit-btn">Yadda Saxla</button>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <!-- Right Hero Column (Interactive Mobile Mockup) -->
-    <div class="phone-stage">
-      <div class="phone-glow"></div>
-      
-      <div class="phone">
-        <div class="notch"></div>
-        <div class="statusbar">
-          <span>9:41</span>
-          <div class="icons">
-            <svg width="15" height="10" viewBox="0 0 16 11" fill="none"><rect x="0" y="6" width="3" height="5" rx="0.5" fill="currentColor"/><rect x="4.5" y="4" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="9" y="2" width="3" height="9" rx="0.5" fill="currentColor"/><rect x="13" y="0" width="3" height="11" rx="0.5" fill="currentColor"/></svg>
-            <svg width="13" height="10" viewBox="0 0 14 11" fill="none"><path d="M7 11 0 4.5C3 1 11 1 14 4.5Z" fill="currentColor"/></svg>
-            <svg width="20" height="10" viewBox="0 0 22 11" fill="none"><rect x="0.5" y="0.5" width="18" height="10" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="14" height="7" rx="1.2" fill="currentColor"/><rect x="20" y="3.2" width="1.5" height="4.5" rx="0.7" fill="currentColor"/></svg>
-          </div>
-        </div>
-
-        <div class="screens">
-
-          <!-- ============ İCMAL / DASHBOARD ============ -->
-          <div class="screen active" id="scr-dashboard">
-            <div class="scr-header">
-              <div class="h-row">
-                <div>
-                  <div class="eyebrow">4 İYUL · CÜMƏ AŞQAMI</div>
-                  <h1 class="page-title">Xoş gördük, <span class="italic" id="user-display-name">Ulvi</span></h1>
-                </div>
-                <div class="user-avatar-pill">U.U</div>
-              </div>
-            </div>
-
-            <!-- Custom Dark Expense Gauge Card matching screenshot -->
-            <div class="hero-expense-card">
-              <div class="gauge-info">
-                <div class="gauge-label">AYLIQ XƏRC</div>
-                <div class="gauge-value">₼187 <small>/ ₼300</small></div>
-                <div class="gauge-link" onclick="switchScreen('budget')">Büdcə təfərrüatı →</div>
-              </div>
-              <div class="gauge-ring-wrap">
-                <svg>
-                  <circle class="gauge-ring-bg" cx="31" cy="31" r="26"></circle>
-                  <circle class="gauge-ring-fill" cx="31" cy="31" r="26"></circle>
-                </svg>
-                <div class="gauge-pct">62%</div>
-              </div>
-            </div>
-
-            <!-- Payment Ruler Card -->
-            <div class="ruler-card">
-              <div class="ruler-head">
-                <div class="ruler-title" data-i18n="ruler_title">Ödəniş cədvəli</div>
-                <div class="ruler-month">İYUL · 31 GÜN</div>
-              </div>
-              <div class="ruler-track-wrap">
-                <div class="ruler-track" id="ruler-track"></div>
-                <div class="ruler-ticks"><span>1</span><span>15</span><span>31</span></div>
-              </div>
-            </div>
-
-            <!-- Upcoming List -->
-            <div class="section">
-              <div class="section-head">
-                <div class="section-title" data-i18n="section_upcoming">Yaxınlaşan ödənişlər</div>
-                <span class="section-link" onclick="switchScreen('subs')" data-i18n="section_all_link">Hamısı →</span>
-              </div>
-              <div class="sub-list" id="subs-preview-list"></div>
-            </div>
-          </div>
-
-          <!-- ============ ABUNƏLİKLƏR ============ -->
-          <div class="screen" id="scr-subs">
-            <div class="scr-header">
-              <div class="h-row">
-                <div>
-                  <div class="eyebrow" data-i18n="subs_eyebrow">Abunəliklər</div>
-                  <h1 class="page-title" data-i18n="subs_title">Hamısı</h1>
-                  <div class="page-sub" data-i18n="subs_sub">10 abunəlik · 8 aktiv</div>
-                </div>
-                <div class="user-avatar-pill" onclick="openSheet()">+</div>
-              </div>
-            </div>
-            <div class="section" style="padding-top:0;">
-              <div class="sub-list" id="subs-full-list"></div>
-            </div>
-          </div>
-
-          <!-- ============ BİLDİRİŞLƏR ============ -->
-          <div class="screen" id="scr-notifications">
-            <div class="scr-header">
-              <div class="eyebrow" data-i18n="notif_eyebrow">Bildirişlər</div>
-              <h1 class="page-title" data-i18n="notif_title">Xəbərdarlıqlar</h1>
-            </div>
-            <div class="section" style="padding-top:6px;">
-              <div id="notif-full-list"></div>
-            </div>
-          </div>
-
-          <!-- ============ BÜDCƏ ============ -->
-          <div class="screen" id="scr-budget">
-            <div class="scr-header">
-              <div class="eyebrow" data-i18n="budget_eyebrow">Büdcə</div>
-              <h1 class="page-title" data-i18n="budget_title">Aylıq limit</h1>
-            </div>
-            <div class="budget-card">
-              <div class="budget-nums">
-                <span class="budget-spent">₼187.42</span>
-                <span class="budget-limit">/ ₼300.00</span>
-              </div>
-              <div class="budget-bar-track"><div class="budget-bar-fill" style="width:62%"></div></div>
-              <div class="budget-note">Limitin <strong>%62</strong>-si istifadə olunub · ₼112.58 sərbəst qalıb.</div>
-            </div>
-            <div class="settings-group" id="budget-view">
-              <div class="settings-row">
-                <div>
-                  <div class="settings-row-label" data-i18n="budget_limit_label">Limit məbləği</div>
-                  <div class="settings-row-sub">limit_mebleq</div>
-                </div>
-                <div class="settings-value" id="budget-limit-display">₼300.00</div>
-              </div>
-              <div class="settings-row">
-                <div>
-                  <div class="settings-row-label" data-i18n="budget_currency_label">Valyuta</div>
-                </div>
-                <div class="settings-value" id="budget-currency-display">AZN</div>
-              </div>
-            </div>
-            <div style="padding:0 20px;" id="budget-update-wrap">
-              <button class="btn btn-primary" style="width:100%;" onclick="openBudgetEdit()" data-i18n="budget_update_btn">Limiti yenilə</button>
-            </div>
-
-            <div class="settings-group" id="budget-edit" style="display:none;">
-              <div class="field" style="padding:14px 16px 0;">
-                <label data-i18n="budget_limit_label">Limit məbləği</label>
-                <input type="number" id="budget-limit-input" step="0.01" placeholder="300.00">
-              </div>
-              <div class="field" style="padding:0 16px;">
-                <label data-i18n="budget_spent_label">Xərclənib</label>
-                <input type="number" id="budget-spent-input" step="0.01" placeholder="0.00">
-              </div>
-              <div class="field" style="padding:0 16px 14px;">
-                <label data-i18n="budget_currency_label">Valyuta</label>
-                <select id="budget-currency-input">
-                  <option value="AZN">AZN</option>
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                </select>
-              </div>
-              <div class="field-error" id="budget-error" style="padding:0 16px 14px;"></div>
-            </div>
-            <div class="sheet-actions" id="budget-edit-actions" style="display:none; padding:0 20px 8px;">
-              <button class="btn" onclick="closeBudgetEdit()" data-i18n="budget_cancel_btn">İmtina et</button>
-              <button class="btn btn-primary" onclick="saveBudget()" data-i18n="budget_save_btn">Yadda saxla</button>
-            </div>
-          </div>
-
-          <!-- ============ AYARLAR ============ -->
-          <div class="screen" id="scr-settings">
-            <div class="scr-header">
-              <div class="eyebrow" data-i18n="settings_eyebrow">Ayarlar</div>
-              <h1 class="page-title" data-i18n="settings_title">Hesabım</h1>
-            </div>
-            <div class="settings-group">
-              <div class="settings-row">
-                <div class="settings-row-label" data-i18n="settings_currency">Əsas valyuta</div>
-                <div class="select-wrap">
-                  <select id="setting-currency" onchange="onSettingChange('esas_valyuta', this.value)">
-                    <option value="AZN">AZN</option>
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                  </select>
-                </div>
-              </div>
-              <div class="settings-row">
-                <div class="settings-row-label" data-i18n="settings_lang">Dil</div>
-                <div class="select-wrap">
-                  <select id="setting-lang" onchange="onSettingChange('dil', this.value)">
-                    <option value="az">Azərbaycan</option>
-                    <option value="en">English</option>
-                    <option value="ru">Русский</option>
-                    <option value="tr">Türkçe</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="settings-group">
-              <div class="settings-row" style="border-bottom:none; flex-direction:column; align-items:stretch; gap:8px;">
-                <div class="settings-row-label" data-i18n="settings_theme">Görünüş</div>
-                <div class="theme-row" style="padding:0;">
-                  <div class="theme-opt selected" id="theme-dark-opt" onclick="setTheme('dark')" data-i18n="theme_dark">Tünd</div>
-                  <div class="theme-opt" id="theme-light-opt" onclick="setTheme('light')" data-i18n="theme_light">Açıq</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- FAB -->
-        <button class="fab" onclick="openSheet()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
-
-        <!-- Tab Bar -->
-        <div class="tabbar">
-          <div class="tab-item active" data-screen="dashboard" onclick="switchScreen('dashboard')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-            <span>İCMAL</span>
-          </div>
-          <div class="tab-item" data-screen="subs" onclick="switchScreen('subs')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/><path d="M7 14h4"/></svg>
-            <span>ABUNƏ</span>
-          </div>
-          <div class="tab-item" data-screen="budget" onclick="switchScreen('budget')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-            <span>BÜDCƏ</span>
-          </div>
-          <div class="tab-item" data-screen="notifications" onclick="switchScreen('notifications')">
-            <span class="tab-dot"></span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span>BİLDİR.</span>
-          </div>
-          <div class="tab-item" data-screen="settings" onclick="switchScreen('settings')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span>AYARLAR</span>
-          </div>
-        </div>
-
-        <!-- Sheet Modal -->
-        <div class="sheet-overlay" id="sheet-overlay">
-          <div class="sheet">
-            <div class="sheet-handle"></div>
-            <div class="sheet-head">
-              <div class="sheet-title" data-i18n="sheet_title">Yeni abunəlik</div>
-              <button class="sheet-close" onclick="closeSheet()">✕</button>
-            </div>
-            <div class="field"><label data-i18n="field_name">Ad</label><input type="text" id="new-sub-name" placeholder="məs. Spotify"></div>
-            <div class="field-row">
-              <div class="field">
-                <label data-i18n="field_price">Qiymət</label>
-                <input type="number" id="new-sub-price" placeholder="9.99" step="0.01" oninput="clearPriceError()">
-                <div class="field-error" id="price-error" data-i18n="price_error">Qiymət 0-dan böyük olmalıdır.</div>
-              </div>
-              <div class="field"><label data-i18n="field_currency">Valyuta</label><select><option>AZN</option><option>USD</option><option>EUR</option></select></div>
-            </div>
-            <div class="sheet-actions">
-              <button class="btn" onclick="closeSheet()" data-i18n="btn_cancel">İmtina et</button>
-              <button class="btn btn-primary" onclick="handleAddSubscription()" data-i18n="btn_add">Əlavə et</button>
-            </div>
-          </div>
-        </div>
-
+  <!-- 2. SUBSCRIPTION MODAL (ADD/EDIT) -->
+  <div id="sub-modal" class="modal">
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <h3 id="sub-modal-title">Yeni Abunəlik Əlavə Et</h3>
+        <button class="modal-close" onclick="closeModal('sub-modal')">&times;</button>
       </div>
+      <form id="sub-form">
+        <input type="hidden" id="sub-id-field">
+        <div class="form-grid">
+          <div class="form-group col-span-2" id="sub-user-select-container">
+            <label for="sub-user">İstifadəçi *</label>
+            <select id="sub-user" required>
+              <option value="">İstifadəçi seçin...</option>
+            </select>
+            <span class="field-error" id="error-sub-user"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="sub-ad">Abunəlik Adı *</label>
+            <input type="text" id="sub-ad" placeholder="Məs: Netflix, Spotify..." required>
+            <span class="field-error" id="error-sub-ad"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-qiymet">Qiymət *</label>
+            <input type="number" id="sub-qiymet" step="0.01" min="0" placeholder="12.99" required>
+            <span class="field-error" id="error-sub-qiymet"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-valyuta">Valyuta</label>
+            <select id="sub-valyuta">
+              <option value="AZN">AZN</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+            <span class="field-error" id="error-sub-valyuta"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="sub-tezlik">Ödəniş Tezliyi</label>
+            <select id="sub-tezlik">
+              <option value="monthly">Aylıq</option>
+              <option value="yearly">İllik</option>
+              <option value="weekly">Həftəlik</option>
+            </select>
+            <span class="field-error" id="error-sub-tezlik"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-baslama-tarixi">Başlama Tarixi *</label>
+            <input type="date" id="sub-baslama-tarixi" required>
+            <span class="field-error" id="error-sub-baslama-tarixi"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-novbeti-odenis">Növbəti Ödəniş Tarixi *</label>
+            <input type="date" id="sub-novbeti-odenis" required>
+            <span class="field-error" id="error-sub-novbeti-odenis"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-kateqoriya">Kateqoriya</label>
+            <input type="text" id="sub-kateqoriya" placeholder="Məs: Entertainment, Utilities">
+            <span class="field-error" id="error-sub-kateqoriya"></span>
+          </div>
+          <div class="form-group">
+            <label for="sub-status">Status</label>
+            <select id="sub-status">
+              <option value="active">Aktiv</option>
+              <option value="inactive">Deaktiv</option>
+            </select>
+            <span class="field-error" id="error-sub-status"></span>
+          </div>
+        </div>
+        <div id="sub-form-general-error" class="form-error-msg hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('sub-modal')">Ləğv Et</button>
+          <button type="submit" class="btn btn-primary" id="sub-submit-btn">Yadda Saxla</button>
+        </div>
+      </form>
     </div>
+  </div>
 
-  </main>
-
-  <!-- Feature Chapter Cards -->
-  <section class="features-grid">
-    <div class="feature-card">
-      <div class="feature-top">
-        <div class="feature-num">01</div>
-        <div class="feature-tag">FƏSİL</div>
+  <!-- 3. PAYMENT MODAL (ADD/EDIT) -->
+  <div id="payment-modal" class="modal">
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <h3 id="payment-modal-title">Yeni Ödəniş Qeydi Əlavə Et</h3>
+        <button class="modal-close" onclick="closeModal('payment-modal')">&times;</button>
       </div>
-      <div>
-        <h3 class="feature-title">Ödəniş qrafiki</h3>
-        <p class="feature-desc">Hər abunə üçün növbəti tarixi bir cədvəldə görün — heç bir sürpriz yoxdur.</p>
-      </div>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-top">
-        <div class="feature-num">02</div>
-        <div class="feature-tag">FƏSİL</div>
-      </div>
-      <div>
-        <h3 class="feature-title">Ağıllı büdcə</h3>
-        <p class="feature-desc">Aylıq limitinizi təyin edin, kateqoriyalar üzrə bölünüşü izləyin.</p>
-      </div>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-top">
-        <div class="feature-num">03</div>
-        <div class="feature-tag">FƏSİL</div>
-      </div>
-      <div>
-        <h3 class="feature-title">Sakit bildirişlər</h3>
-        <p class="feature-desc">Ödənişdən əvvəl yalnız lazım olanda xatırladın — sessiz və dəqiq.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div>© 2026 Abunam · Bakı</div>
-    <div>Bütün məlumatlar username üzərindən sinxronlaşdırılır.</div>
-  </footer>
-
-</div>
-
-<!-- ============================================================ -->
-<!-- PRESERVED BUSINESS LOGIC & OFFICIAL SVG BRAND LOGOS SCRIPTS -->
-<!-- ============================================================ -->
-<script>
-  const TODAY = new Date(Date.UTC(2026, 6, 4));
-
-  // Official Brand Logos Vector Collection
-  const OFFICIAL_BRAND_LOGOS = {
-    'spotify': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#1ED760"/><path d="M17.25 15.75c-.2.3-.5.4-.8.2-2.3-1.4-5.2-1.7-8.6-.9-.35.1-.65-.1-.75-.4-.1-.35.1-.65.4-.75 3.7-.85 6.9-.5 9.5 1.1.3.15.45.5.25.75zm1.1-2.5c-.25.35-.7.5-1.05.25-2.65-1.6-6.7-2.1-9.85-1.15-.4.1-.8-.15-.9-.55-.1-.4.15-.8.55-.9 3.6-1.1 8.05-.55 11 1.3.35.25.5.7.25 1.05zm.1-2.6C15.3 8.85 10 8.7 6.9 9.65c-.45.15-.95-.1-1.1-.55-.15-.45.1-.95.55-1.1 3.55-1.1 9.4-.9 12.95 1.2.4.25.55.8.3 1.2-.2.45-.8.6-1.2.35z" fill="#000"/></svg>`,
-    'netflix': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#141414"/><path d="M7.5 4.5h2.6l3.5 8.7V4.5h2.9v15h-2.5L10.4 10v9.5H7.5V4.5z" fill="#E50914"/><path d="M13.6 4.5h2.9v15h-2.9z" fill="#B81D24" opacity="0.4"/></svg>`,
-    'notion': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#FFFFFF"/><path d="M5 4.5l10.8-2 3.2 10.5-11 8L5 4.5z" fill="#000"/><path d="M7 6.2l8.5-1.5 2 6.8-8.5 6.2L7 6.2z" fill="#FFF"/><path d="M9 8.2h1.5l4 5.8V8.2H16v7.5h-1.5l-4-5.8v5.8H9V8.2z" fill="#000"/></svg>`,
-    'icloud': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#3B82F6"/><path d="M17.3 10.5C16.7 7.5 14 5.3 10.8 5.3c-2.6 0-4.8 1.4-5.9 3.6-2.7.3-4.9 2.6-4.9 5.4 0 3 2.4 5.4 5.4 5.4h11.7c2.5 0 4.5-2 4.5-4.5 0-2.3-1.8-4.2-4.3-4.7z" fill="#FFF"/></svg>`,
-    'wolt': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#00C2E8"/><path d="M4.5 8L8 16L11.5 8L15 16L18.5 8" stroke="#FFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
-    'chatgpt': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#10A37F"/><path d="M19.1 10.8a3.5 3.5 0 00-.3-1.5 3.6 3.6 0 00-3-2.1 3.5 3.5 0 00-2.2-.6 3.6 3.6 0 00-3.3 1.7 3.5 3.5 0 00-1.9.2 3.6 3.6 0 00-2.2 2.9 3.5 3.5 0 00-1.1 1.5 3.6 3.6 0 00.3 3.6 3.5 3.5 0 00.3 1.5 3.6 3.6 0 003 2.1 3.5 3.5 0 002.2.6 3.6 3.6 0 003.3-1.7 3.5 3.5 0 001.9-.2 3.6 3.6 0 002.2-2.9 3.5 3.5 0 001.1-1.5 3.6 3.6 0 00-.3-3.6zm-6.9 7.6a2.2 2.2 0 01-1.5-.6l.8-1.4a1.3 1.3 0 00.8.2c.4 0 .6-.1.8-.3l1.4.8a2.2 2.2 0 01-2.3 1.3zm-4.1-2.3a2.2 2.2 0 01-.5-1.6v-1.6l1.6.4v1.1a1.3 1.3 0 00.4.8l-.8 1.4a2.2 2.2 0 01-.7-.7zm-1-4.8a2.2 2.2 0 011-1.4l1.4.8v.8a1.3 1.3 0 00-.4.8l-1.6-.4a2.2 2.2 0 01-.4-1.6zm6.2-2.4c.6 0 1.2.2 1.5.6l-.8 1.4a1.3 1.3 0 00-.8-.2c-.4 0-.6.1-.8.3l-1.4-.8a2.2 2.2 0 012.3-1.3zm4.1 2.3a2.2 2.2 0 01.5 1.6v1.6l-1.6-.4v-1.1a1.3 1.3 0 00-.4-.8l.8-1.4c.2.2.5.4.7.7zm1 4.8a2.2 2.2 0 01-1 1.4l-1.4-.8v-.8a1.3 1.3 0 00.4-.8l1.6.4c.2.5.4 1 .4 1.6z" fill="#FFF"/></svg>`,
-    'adobe': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#FA0F00"/><path d="M14.2 4.5L19.5 19.5H15.8L14 14.8H10L8.2 19.5H4.5L9.8 4.5H14.2ZM12 9.2L10.8 12.4H13.2L12 9.2Z" fill="#FFF"/></svg>`,
-    'yandex': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#FC3F1D"/><path d="M13.8 19.5H10.6V12.2L6.8 4.5H10.2L12.2 9.2L14.2 4.5H17.6L13.8 12.2V19.5Z" fill="#FFF"/></svg>`,
-    'pubg': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#F5A623"/><path d="M5 6h14v3H5V6zm0 4.5h9v3H5v-3zm0 4.5h14v3H5v-3z" fill="#000"/></svg>`,
-    'economist': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#E3120B"/><text x="12" y="15" font-family="Georgia, serif" font-size="9" font-weight="bold" fill="#FFF" text-anchor="middle">Econ</text></svg>`,
-    'gym': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#10B981"/><path d="M6 9v6M9 7.5v9M15 7.5v9M18 9v6M4 12h16" stroke="#FFF" stroke-width="2" stroke-linecap="round"/></svg>`,
-    'youtube': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#FF0000"/><path d="M9.8 8.5v7l5.7-3.5-5.7-3.5z" fill="#FFF"/></svg>`,
-    'duolingo': `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#58CC02"/><circle cx="9" cy="10.5" r="2.2" fill="#FFF"/><circle cx="15" cy="10.5" r="2.2" fill="#FFF"/><circle cx="9" cy="10.5" r="1.1" fill="#000"/><circle cx="15" cy="10.5" r="1.1" fill="#000"/><path d="M10 14.5c.6.6 3.4.6 4 0" stroke="#FF4B4B" stroke-width="1.8" stroke-linecap="round"/></svg>`
-  };
-
-  function getAppLogoSVG(name) {
-    const key = name.toLowerCase();
-    for (let k in OFFICIAL_BRAND_LOGOS) {
-      if (key.includes(k)) return OFFICIAL_BRAND_LOGOS[k];
-    }
-    // Dynamic Fallback Logo Badge
-    const initial = name[0].toUpperCase();
-    return `<svg viewBox="0 0 24 24" style="width:100%;height:100%"><rect width="24" height="24" rx="7" fill="#2A2D38"/><text x="12" y="16" font-family="sans-serif" font-size="12" font-weight="bold" fill="#E8B54D" text-anchor="middle">${initial}</text></svg>`;
-  }
-
-  const subscriptions = [
-    { name: 'Spotify', category: 'Musiqi', price: 9.99, currency: '₼', freq: 'Aylıq', next: '2026-07-06', status: 'active' },
-    { name: 'Netflix', category: 'Əyləncə', price: 9.90, currency: '₼', freq: 'Aylıq', next: '2026-07-09', status: 'active' },
-    { name: 'Notion', category: 'Məhsuldarlıq', price: 3.60, currency: '₼', freq: 'Aylıq', next: '2026-07-15', status: 'active' },
-    { name: 'iCloud+ 200GB', category: 'Cloud Storage', price: 2.99, currency: '₼', freq: 'Aylıq', next: '2026-07-18', status: 'active' },
-    { name: 'Wolt+', category: 'Food & Delivery', price: 7.99, currency: '₼', freq: 'Aylıq', next: '2026-07-20', status: 'active' },
-    { name: 'ChatGPT Plus', category: 'Productivity', price: 20.00, currency: '$', freq: 'Aylıq', next: '2026-07-22', status: 'active' },
-    { name: 'Adobe Creative Cloud', category: 'Productivity', price: 52.99, currency: '$', freq: 'Aylıq', next: '2026-07-25', status: 'active' },
-    { name: 'Yandex Plus', category: 'Entertainment', price: 6.99, currency: '₼', freq: 'Aylıq', next: '2026-07-28', status: 'active' },
-    { name: 'PUBG Mobile UC', category: 'Gaming', price: 9.99, currency: '₼', freq: 'Aylıq', next: '2026-06-30', status: 'deactive' },
-    { name: 'The Economist', category: 'News', price: 15.00, currency: '$', freq: 'İllik', next: '2027-02-01', status: 'deactive' }
-  ];
-
-  const notifications = [
-    { title: 'Spotify — ödənişə 2 gün qalıb', msg: '6 İyul 2026 tarixində ₼9.99 ödəniləcək.', urgency: 'urgent', time: '2 saat əvvəl' },
-    { title: 'Netflix — xəbərdarlıq', msg: '9 İyul 2026 tarixində ₼9.90 icra olunacaq.', urgency: 'soon', time: 'bu gün, 09:14' },
-    { title: 'Adobe CC — uğurlu ödəniş', msg: '25 İyul tarixinə yeniləndi.', urgency: 'normal', time: '3 gün əvvəl' }
-  ];
-
-  function daysUntil(dateStr) {
-    const [y, m, d] = dateStr.split('-').map(Number);
-    return Math.round((new Date(Date.UTC(y, m - 1, d)) - TODAY) / 86400000);
-  }
-  function urgencyFor(days) { return days <= 2 ? 'urgent' : days <= 7 ? 'soon' : 'normal'; }
-  function badgeLabel(days) {
-    if (days < 0) return 'gecikib';
-    if (days === 0) return 'bu gün';
-    if (days === 1) return 'sabah';
-    return days + ' gün sonra';
-  }
-
-  function subRowHTML(s) {
-    const days = daysUntil(s.next);
-    const urg = s.status === 'deactive' ? 'paused' : urgencyFor(days);
-    const badgeText = s.status === 'deactive' ? 'dayandırılıb' : badgeLabel(days);
-    const logoSVG = getAppLogoSVG(s.name);
-
-    return `
-      <div class="sub-row">
-        <div class="app-logo-box">${logoSVG}</div>
-        <div class="sub-info">
-          <div class="sub-name">${s.name}</div>
-          <div class="sub-meta">${s.category}</div>
+      <form id="payment-form">
+        <input type="hidden" id="payment-id-field">
+        <div class="form-grid">
+          <div class="form-group col-span-2" id="payment-user-select-container">
+            <label for="payment-user">İstifadəçi *</label>
+            <select id="payment-user" required onchange="loadUserSubs(this.value)">
+              <option value="">İstifadəçi seçin...</option>
+            </select>
+            <span class="field-error" id="error-payment-user"></span>
+          </div>
+          <div class="form-group col-span-2" id="payment-sub-select-container">
+            <label for="payment-sub">Abunəlik *</label>
+            <select id="payment-sub" required disabled>
+              <option value="">Əvvəlcə istifadəçi seçin...</option>
+            </select>
+            <span class="field-error" id="error-payment-sub"></span>
+          </div>
+          <div class="form-group">
+            <label for="payment-tarix">Ödəniş Tarixi *</label>
+            <input type="date" id="payment-tarix" required>
+            <span class="field-error" id="error-payment-tarix"></span>
+          </div>
+          <div class="form-group">
+            <label for="payment-mebleq">Məbləğ *</label>
+            <input type="number" id="payment-mebleq" step="0.01" min="0" placeholder="12.99" required>
+            <span class="field-error" id="error-payment-mebleq"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="payment-status">Status</label>
+            <select id="payment-status">
+              <option value="success">Uğurlu (Success)</option>
+              <option value="fail">Uğursuz (Fail)</option>
+            </select>
+            <span class="field-error" id="error-payment-status"></span>
+          </div>
         </div>
-        <div class="sub-right">
-          <div class="sub-price">${s.currency}${s.price.toFixed(2)}</div>
-          <span class="sub-badge ${urg}">${badgeText}</span>
+        <div id="payment-form-general-error" class="form-error-msg hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('payment-modal')">Ləğv Et</button>
+          <button type="submit" class="btn btn-primary" id="payment-submit-btn">Yadda Saxla</button>
         </div>
-      </div>`;
-  }
+      </form>
+    </div>
+  </div>
 
-  function renderSubs() {
-    const preview = subscriptions.filter(s => s.status === 'active')
-      .sort((a,b) => daysUntil(a.next) - daysUntil(b.next)).slice(0,3);
-    document.getElementById('subs-preview-list').innerHTML = preview.map(subRowHTML).join('');
-    document.getElementById('subs-full-list').innerHTML = subscriptions
-      .sort((a,b) => daysUntil(a.next) - daysUntil(b.next))
-      .map(subRowHTML).join('');
-  }
-
-  function notifRowHTML(n) {
-    const color = n.urgency === 'urgent' ? 'var(--coral)' : n.urgency === 'soon' ? 'var(--gold)' : 'var(--teal)';
-    return `
-      <div class="notif-item">
-        <span class="notif-dot" style="background:${color}"></span>
-        <div>
-          <div class="notif-title">${n.title}</div>
-          <div class="notif-msg">${n.msg}</div>
-          <div class="notif-time">${n.time}</div>
+  <!-- 4. NOTIFICATION MODAL (SEND) -->
+  <div id="notif-modal" class="modal">
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <h3>Yeni Bildiriş Göndər</h3>
+        <button class="modal-close" onclick="closeModal('notif-modal')">&times;</button>
+      </div>
+      <form id="notif-form">
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label for="notif-user">İstifadəçi *</label>
+            <select id="notif-user" required>
+              <option value="">İstifadəçi seçin...</option>
+            </select>
+            <span class="field-error" id="error-notif-user"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="notif-basliq">Başlıq *</label>
+            <input type="text" id="notif-basliq" placeholder="Məs: Ödəniş xatırlatması" required>
+            <span class="field-error" id="error-notif-basliq"></span>
+          </div>
+          <div class="form-group col-span-2">
+            <label for="notif-mesaj">Mesaj *</label>
+            <textarea id="notif-mesaj" placeholder="Mesajı bura daxil edin..." required rows="4"></textarea>
+            <span class="field-error" id="error-notif-mesaj"></span>
+          </div>
         </div>
-      </div>`;
-  }
-  function renderNotifs() {
-    document.getElementById('notif-full-list').innerHTML = notifications.map(notifRowHTML).join('');
-  }
+        <div id="notif-form-general-error" class="form-error-msg hidden"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('notif-modal')">Ləğv Et</button>
+          <button type="submit" class="btn btn-primary">Göndər</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  function renderRuler() {
-    const track = document.getElementById('ruler-track');
-    const daysInMonth = 31;
-    const todayDay = TODAY.getUTCDate();
-    let html = '';
-    const todayPct = ((todayDay - 1) / (daysInMonth - 1)) * 100;
-    html += `<div class="ruler-today-line" style="left:${todayPct}%"></div>`;
-    html += `<div class="ruler-today-label" style="left:${todayPct}%">BUGÜN</div>`;
-    subscriptions.filter(s => s.status === 'active' && s.next.startsWith('2026-07')).forEach(s => {
-      const day = Number(s.next.split('-')[2]);
-      const pct = ((day - 1) / (daysInMonth - 1)) * 100;
-      const urg = urgencyFor(daysUntil(s.next));
-      html += `<div class="ruler-chip ${urg}" style="left:${pct}%" title="${s.name}"></div>`;
-    });
-    track.innerHTML = html;
-  }
+  <!-- ========================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <!-- ========================================== -->
+  <div id="toast-container" class="toast-container"></div>
 
-  function switchScreen(name) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const target = document.getElementById('scr-' + name);
-    if (target) target.classList.add('active');
-    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-    const tab = document.querySelector(`.tab-item[data-screen="${name}"]`);
-    if (tab) tab.classList.add('active');
-  }
-
-  function openSheet() { document.getElementById('sheet-overlay').classList.add('open'); }
-  function closeSheet() { document.getElementById('sheet-overlay').classList.remove('open'); }
-  document.getElementById('sheet-overlay').addEventListener('click', e => {
-    if (e.target.id === 'sheet-overlay') closeSheet();
-  });
-
-  function clearPriceError() {
-    document.getElementById('price-error').classList.remove('show');
-    document.getElementById('new-sub-price').classList.remove('invalid');
-  }
-
-  function handleAddSubscription() {
-    const nameInput = document.getElementById('new-sub-name');
-    const priceInput = document.getElementById('new-sub-price');
-    const errorEl = document.getElementById('price-error');
-    const price = Number(priceInput.value);
-
-    if (!priceInput.value || isNaN(price) || price <= 0) {
-      errorEl.classList.add('show');
-      priceInput.classList.add('invalid');
-      priceInput.focus();
-      return;
-    }
-
-    clearPriceError();
-    const name = nameInput.value || 'Yeni Abunəlik';
-    subscriptions.push({
-      name, category: 'Ümumi', price, currency: '₼', freq: 'Aylıq', next: '2026-07-28', status: 'active'
-    });
-    renderSubs();
-    renderRuler();
-    closeSheet();
-    switchScreen('subs');
-  }
-
-  function onSettingChange(key, value) {
-    console.log('Ayar dəyişdi:', key, '=', value);
-    if (key === 'dil') applyLanguage(value);
-  }
-
-  function setTheme(mode) {
-    document.documentElement.setAttribute('data-theme', mode);
-    document.getElementById('theme-dark-opt').classList.toggle('selected', mode === 'dark');
-    document.getElementById('theme-light-opt').classList.toggle('selected', mode === 'light');
-  }
-
-  const BUDGET_ICAZE_VERILEN_VALYUTALAR = ['AZN', 'USD', 'EUR'];
-  let budgetState = { limit: 300.00, spent: 187.00, currency: 'AZN' };
-
-  function currencySymbol(code) {
-    return code === 'USD' ? '$' : code === 'EUR' ? '€' : '₼';
-  }
-
-  function renderBudgetCard() {
-    const sym = currencySymbol(budgetState.currency);
-    const pct = budgetState.limit > 0 ? Math.min(100, Math.round((budgetState.spent / budgetState.limit) * 100)) : 0;
-    const free = Math.max(0, budgetState.limit - budgetState.spent);
-    document.querySelector('.budget-spent').textContent = sym + budgetState.spent.toFixed(2);
-    document.querySelector('.budget-limit').textContent = '/ ' + sym + budgetState.limit.toFixed(2);
-    document.querySelector('.budget-bar-fill').style.width = pct + '%';
-    document.querySelector('.budget-note').innerHTML =
-      `Limitin <strong>%${pct}</strong>-i istifadə olunub · ${sym}${free.toFixed(2)} sərbəst qalıb.`;
-    document.getElementById('budget-limit-display').textContent = sym + budgetState.limit.toFixed(2);
-    document.getElementById('budget-currency-display').textContent = budgetState.currency;
-  }
-
-  function openBudgetEdit() {
-    document.getElementById('budget-view').style.display = 'none';
-    document.getElementById('budget-update-wrap').style.display = 'none';
-    document.getElementById('budget-edit').style.display = 'block';
-    document.getElementById('budget-edit-actions').style.display = 'flex';
-    document.getElementById('budget-limit-input').value = budgetState.limit;
-    document.getElementById('budget-spent-input').value = budgetState.spent;
-    document.getElementById('budget-currency-input').value = budgetState.currency;
-    clearBudgetError();
-  }
-
-  function closeBudgetEdit() {
-    document.getElementById('budget-edit').style.display = 'none';
-    document.getElementById('budget-edit-actions').style.display = 'none';
-    document.getElementById('budget-view').style.display = 'block';
-    document.getElementById('budget-update-wrap').style.display = 'block';
-    clearBudgetError();
-  }
-
-  function clearBudgetError() {
-    const err = document.getElementById('budget-error');
-    err.classList.remove('show');
-    err.textContent = '';
-  }
-
-  function showBudgetError(msg) {
-    const err = document.getElementById('budget-error');
-    err.textContent = msg;
-    err.classList.add('show');
-  }
-
-  function saveBudget() {
-    const limitRaw = document.getElementById('budget-limit-input').value;
-    const spentRaw = document.getElementById('budget-spent-input').value;
-    const currency = document.getElementById('budget-currency-input').value;
-
-    if (limitRaw === '' || limitRaw === null || limitRaw === undefined) {
-      showBudgetError('limit_mebleq sahəsi məcburidir.');
-      return;
-    }
-    const limit = Number(limitRaw);
-    if (isNaN(limit) || limit <= 0) {
-      showBudgetError('limit_mebleq 0-dan böyük olmalıdır.');
-      return;
-    }
-    const spent = (spentRaw === '' || spentRaw === null) ? 0 : Number(spentRaw);
-    if (isNaN(spent) || spent < 0) {
-      showBudgetError('hesab_mebleqi mənfi ola bilməz.');
-      return;
-    }
-    if (spent > limit) {
-      showBudgetError('Hesabdakı məbləğ limit məbləğdən çox ola bilməz.');
-      return;
-    }
-    if (!BUDGET_ICAZE_VERILEN_VALYUTALAR.includes(currency)) {
-      showBudgetError(`Yanlış valyuta: "${currency}". Yalnız ${BUDGET_ICAZE_VERILEN_VALYUTALAR.join(', ')} daxil edilə bilər.`);
-      return;
-    }
-
-    budgetState = { limit, spent, currency };
-    renderBudgetCard();
-    closeBudgetEdit();
-  }
-
-  const translations = {
-    az: {
-      ruler_title: 'Ödəniş cədvəli', section_upcoming: 'Yaxınlaşan ödənişlər', section_all_link: 'Hamısı →',
-      subs_eyebrow: 'Abunəliklər', subs_title: 'Hamısı', subs_sub: '10 abunəlik · 8 aktiv',
-      notif_eyebrow: 'Bildirişlər', notif_title: 'Xəbərdarlıqlar',
-      budget_eyebrow: 'Büdcə', budget_title: 'Aylıq limit', budget_limit_label: 'Limit məbləği',
-      budget_currency_label: 'Valyuta', budget_spent_label: 'Xərclənib', budget_update_btn: 'Limiti yenilə',
-      budget_save_btn: 'Yadda saxla', budget_cancel_btn: 'İmtina et', settings_eyebrow: 'Ayarlar',
-      settings_title: 'Hesabım', settings_currency: 'Əsas valyuta', settings_lang: 'Dil',
-      settings_theme: 'Görünüş', theme_dark: 'Tünd', theme_light: 'Açıq', sheet_title: 'Yeni abunəlik',
-      field_name: 'Ad', field_price: 'Qiymət', field_currency: 'Valyuta', btn_cancel: 'İmtina et', btn_add: 'Əlavə et',
-      price_error: 'Qiymət 0-dan böyük olmalıdır.'
-    },
-    en: {
-      ruler_title: 'Payment schedule', section_upcoming: 'Upcoming payments', section_all_link: 'See all →',
-      subs_eyebrow: 'Subscriptions', subs_title: 'All', subs_sub: '10 subscriptions · 8 active',
-      notif_eyebrow: 'Notifications', notif_title: 'Alerts',
-      budget_eyebrow: 'Budget', budget_title: 'Monthly limit', budget_limit_label: 'Limit amount',
-      budget_currency_label: 'Currency', budget_spent_label: 'Spent', budget_update_btn: 'Update limit',
-      budget_save_btn: 'Save', budget_cancel_btn: 'Cancel', settings_eyebrow: 'Settings',
-      settings_title: 'My account', settings_currency: 'Base currency', settings_lang: 'Language',
-      settings_theme: 'Appearance', theme_dark: 'Dark', theme_light: 'Light', sheet_title: 'New subscription',
-      field_name: 'Name', field_price: 'Price', field_currency: 'Currency', btn_cancel: 'Cancel', btn_add: 'Add',
-      price_error: 'Price must be greater than 0.'
-    }
-  };
-
-  function applyLanguage(lang) {
-    const dict = translations[lang] || translations.az;
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (dict[key] !== undefined) el.textContent = dict[key];
-    });
-    document.documentElement.lang = lang;
-    const langSelect = document.getElementById('setting-lang');
-    if (langSelect) langSelect.value = lang;
-  }
-
-  // Init
-  renderSubs();
-  renderNotifs();
-  renderRuler();
-  renderBudgetCard();
-  setTheme('dark');
-  applyLanguage('az');
-</script>
-
+  <!-- Custom Scripts -->
+  <script src="app.js"></script>
 </body>
 </html>

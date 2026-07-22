@@ -2,28 +2,28 @@
    DESIGN SYSTEM & VARIABLES
    ========================================================================== */
 :root {
-  --bg-primary: #0b0f19;
-  --bg-secondary: #131a2e;
-  --bg-sidebar: #070a12;
-  --bg-card: #161e38;
-  --accent-color: #6366f1;
-  --accent-hover: #4f46e5;
-  --accent-light: rgba(99, 102, 241, 0.15);
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --border-color: rgba(255, 255, 255, 0.08);
+  --bg-primary: #14151a;
+  --bg-secondary: #1c1e25;
+  --bg-sidebar: #0f1014;
+  --bg-card: #23252e;
+  --accent-color: #d96b43;
+  --accent-hover: #c45831;
+  --accent-light: rgba(217, 107, 67, 0.15);
+  --text-primary: #f2f0ea;
+  --text-secondary: #9a9dab;
+  --text-muted: #64677a;
+  --border-color: rgba(242, 240, 234, 0.09);
   
-  --success: #10b981;
-  --success-light: rgba(16, 185, 129, 0.1);
-  --danger: #ef4444;
-  --danger-light: rgba(239, 68, 68, 0.1);
-  --warning: #f59e0b;
-  --warning-light: rgba(245, 158, 11, 0.1);
-  --info: #0ea5e9;
-  --info-light: rgba(14, 165, 233, 0.1);
+  --success: #4fbdba;
+  --success-light: rgba(79, 189, 186, 0.1);
+  --danger: #e2685a;
+  --danger-light: rgba(226, 104, 90, 0.1);
+  --warning: #e8b54d;
+  --warning-light: rgba(232, 181, 77, 0.1);
+  --info: #4fbdba;
+  --info-light: rgba(79, 189, 186, 0.1);
 
-  --font-family-title: 'Outfit', sans-serif;
+  --font-family-title: 'Fraunces', 'Instrument Serif', Georgia, serif;
   --font-family-body: 'Inter', sans-serif;
   
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
