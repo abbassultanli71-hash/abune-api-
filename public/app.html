@@ -395,58 +395,54 @@
 
   /* ---- Subscription rows ---- */
   /* ---- Subscription cards grid ---- */
+  /* ---- Subscription rows & cards ---- */
   .sub-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     padding: 4px 0 16px;
   }
   .sub-row {
     background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 28px;
-    padding: 22px 16px 20px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 20px;
+    padding: 14px 18px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    text-align: center;
+    justify-content: space-between;
+    gap: 14px;
     box-shadow: var(--shadow);
     cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     position: relative;
     overflow: hidden;
   }
   .sub-row:active {
-    transform: scale(0.95);
-  }
-  [data-theme="light"] .sub-row {
-    box-shadow: 0 14px 30px -8px rgba(105, 82, 224, 0.16), inset 0 1px 0 0 rgba(255,255,255,0.9);
-  }
-  [data-theme="dark"] .sub-row {
-    box-shadow: 0 14px 30px -8px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255,255,255,0.06);
+    transform: scale(0.98);
   }
   @media (hover: hover) {
     .sub-row:hover {
-      border-color: var(--purple);
-      transform: translateY(-4px);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(249, 115, 22, 0.15);
     }
   }
   .sub-icon-wrap {
-    margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
   .sub-icon-wrap .sub-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
-    border: 1px solid var(--border);
-    transition: transform 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid var(--border-strong);
+    overflow: hidden;
   }
   .sub-row:hover .sub-icon-wrap .sub-icon {
     transform: scale(1.08) rotate(3deg);
@@ -658,17 +654,17 @@
   .chip-row { display: flex; gap: 8px; padding: 0 20px 14px; overflow-x: auto; -ms-overflow-style:none; scrollbar-width:none; }
   .chip-row::-webkit-scrollbar { display: none; }
   .filter-chip {
-    flex-shrink: 0; padding: 8px 16px; border-radius: 24px; font-size: 12px; font-weight: 700;
-    background: var(--surface-2); border: 2px solid var(--border); color: var(--ink-muted);
+    flex-shrink: 0; padding: 8px 18px; border-radius: 20px; font-size: 12.5px; font-weight: 700;
+    background: var(--surface-2); border: 1.5px solid var(--border-strong); color: var(--ink-muted);
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
   }
   .filter-chip:active { transform: scale(0.94); }
   .filter-chip.selected {
-    background: var(--accent-soft);
-    color: var(--accent);
-    border-color: var(--accent);
-    box-shadow: 0 6px 16px -4px var(--accent-soft);
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 6px 16px -3px rgba(249, 115, 22, 0.4);
   }
   .search-bar {
     margin: 0 20px 14px; display: flex; align-items: center; gap: 8px;
@@ -2902,16 +2898,16 @@
       : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20';
 
     return `
-      <div class="sub-row flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/80 shadow-sm transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:border-purple-500/40 active:scale-[0.98] cursor-pointer" onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
-        <div class="flex items-center gap-3 min-w-0">
+      <div class="sub-row flex items-center justify-between gap-3.5 p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/80 shadow-sm transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:border-orange-500/40 active:scale-[0.98] cursor-pointer" onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+        <div class="flex items-center gap-3.5 min-w-0">
           <div class="sub-icon-wrap flex-shrink-0">
             ${getBrandIconHTML(s.name, s.category)}
           </div>
-          <div class="sub-name font-semibold text-slate-900 dark:text-slate-100 truncate text-sm">${s.name}</div>
+          <div class="sub-name font-bold text-slate-900 dark:text-slate-100 text-sm md:text-base truncate">${s.name}</div>
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <div class="inline-flex items-center rounded-xl bg-purple-50 dark:bg-purple-500/10 px-2.5 py-1 text-xs font-bold text-purple-700 dark:text-purple-300 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-500/20">${sym}${s.price.toFixed(2)}</div>
-          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${badgeTailwind}">${badgeText}</span>
+        <div class="flex items-center gap-2.5 flex-shrink-0">
+          <div class="inline-flex items-center rounded-xl bg-orange-50 dark:bg-orange-500/10 px-2.5 py-1 text-xs md:text-sm font-extrabold text-orange-600 dark:text-orange-400 ring-1 ring-inset ring-orange-500/20">${sym}${s.price.toFixed(2)}</div>
+          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ring-1 ring-inset ${badgeTailwind}">${badgeText}</span>
         </div>
       </div>`;
   }
