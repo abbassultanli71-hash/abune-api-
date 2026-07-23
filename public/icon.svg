@@ -1,16 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1a1f2a"/>
-      <stop offset="100%" stop-color="#2f3a4d"/>
+      <stop offset="0%" stop-color="#232532"/>
+      <stop offset="100%" stop-color="#14151e"/>
     </linearGradient>
-    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e6ffb0"/>
-      <stop offset="45%" stop-color="#c8f560"/>
-      <stop offset="100%" stop-color="#9fdb2e"/>
+    <linearGradient id="cardGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea" />
+      <stop offset="50%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#f43f5e" />
+    </linearGradient>
+    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#4facfe" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.0" />
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="url(#fg)" stroke-width="26"/>
-  <text x="256" y="300" font-family="Georgia, serif" font-size="180" font-weight="700" fill="url(#fg)" text-anchor="middle">A</text>
+
+  <!-- Squircle Base Icon Box -->
+  <rect width="512" height="512" rx="115" fill="url(#bg)" stroke="rgba(255,255,255,0.12)" stroke-width="6"/>
+
+  <!-- Glowing Credit Card Shape -->
+  <rect x="96" y="130" width="320" height="236" rx="36" fill="#181924" stroke="url(#cardGlow)" stroke-width="16"/>
+  <rect x="102" y="136" width="308" height="224" rx="30" fill="url(#shine)"/>
+
+  <!-- Card Detail lines -->
+  <line x1="96" y1="192" x2="416" y2="192" stroke="url(#cardGlow)" stroke-width="14" opacity="0.65"/>
+  <line x1="246" y1="290" x2="350" y2="290" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity="0.4"/>
+  <line x1="246" y1="320" x2="310" y2="320" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.25"/>
+
+  <!-- Cyan/Teal 'a' Wave Path -->
+  <path d="M 126 300 C 126 210, 216 320, 256 280 C 296 240, 368 200, 368 230" stroke="url(#waveGrad)" stroke-width="28" stroke-linecap="round" fill="none"/>
+
+  <!-- Glowing Green/Cyan Dot on 'a' -->
+  <circle cx="368" cy="180" r="26" fill="#10B981"/>
+  <circle cx="368" cy="180" r="40" fill="#10B981" opacity="0.3"/>
 </svg>
