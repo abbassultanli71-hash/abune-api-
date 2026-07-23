@@ -47,7 +47,7 @@
     --font-serif: 'Plus Jakarta Sans', -apple-system, sans-serif;
     --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
     --font-body: 'Outfit', 'Inter', -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+    --font-mono: 'Plus Jakarta Sans', 'Outfit', -apple-system, sans-serif;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -319,30 +319,35 @@
  
   /* ---- Horizontal scroll stat cards ---- */
   .stat-scroll {
-    display: flex; gap: 12px; padding: 0 20px 4px;
-    overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
+    display: flex; gap: 12px; padding: 0 20px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    touch-action: pan-x;
+    scrollbar-width: none;
   }
   .stat-scroll::-webkit-scrollbar { display: none; }
   .stat-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
-    padding: 18px 20px; min-width: 152px; flex-shrink: 0;
+    background: var(--surface); border: 1.5px solid var(--border-strong); border-radius: 20px;
+    padding: 16px 18px; min-width: 175px; flex-shrink: 0;
+    scroll-snap-align: start;
     display: flex; flex-direction: column; gap: 8px;
     box-shadow: var(--shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   .stat-card:active { transform: scale(0.96); }
-  .stat-icon { width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-  .stat-icon svg { width: 16px; height: 16px; }
+  .stat-icon { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .stat-icon svg { width: 18px; height: 18px; }
   .stat-icon.teal { background: var(--teal-soft); color: var(--teal); }
   .stat-icon.gold { background: var(--gold-soft); color: var(--gold); }
   .stat-icon.coral { background: var(--coral-soft); color: var(--coral); }
   .stat-icon.purple { background: var(--purple-soft); color: var(--purple); }
   .stat-icon.pink { background: var(--pink-soft); color: var(--pink); }
   .stat-icon.blue { background: var(--blue-soft); color: var(--blue); }
-  .stat-label { font-size: 11px; color: var(--ink-muted); font-weight: 600; }
-  .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat-label { font-size: 11.5px; color: var(--ink-muted); font-weight: 600; white-space: normal; line-height: 1.3; }
+  .stat-value { font-family: var(--font-display); font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
   .stat-value small { font-size: 12px; color: var(--ink-faint); font-weight: 500; }
-  .stat-card-accent { border-color: var(--purple-soft); box-shadow: var(--shadow), inset 0 0 0 1px rgba(139,92,246,0.12); }
+  .stat-card-accent { border-color: var(--accent); box-shadow: var(--shadow), inset 0 0 0 1px var(--accent-soft); }
  
   /* ---- Signature: payment ruler ---- */
   .ruler-card {
@@ -620,27 +625,28 @@
   .tabbar {
     position: absolute; left: 16px; right: 16px; bottom: calc(12px + var(--safe-bottom)); z-index: 20;
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    display: flex;
-    padding: 8px 8px;
-    box-shadow: 0 20px 45px -10px rgba(105,82,224,0.4), var(--shadow);
+    border: 1.5px solid var(--border-strong);
+    border-radius: 24px;
+    display: flex; align-items: center;
+    padding: 6px 6px;
+    box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.4), var(--shadow);
   }
   .tab-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 8px 0;
-    border-radius: 20px; position: relative;
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 7px 0;
+    border-radius: 18px; position: relative;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
   }
-  .tab-item:active { transform: scale(0.92); }
-  .tab-item svg { width: 20px; height: 20px; }
-  .tab-item.active { color: #fff; }
-  .tab-item.active::before {
-    content: ''; position: absolute; inset: -2px 6px auto 6px; top: -4px; height: 36px;
-    background: var(--accent-grad); border-radius: 18px; z-index: -1;
-    box-shadow: 0 8px 20px -4px rgba(105,82,224,0.5);
+  .tab-item:active { transform: scale(0.94); }
+  .tab-item svg { width: 20px; height: 20px; transition: transform 0.2s ease; }
+  .tab-item.active {
+    color: var(--accent);
+    font-weight: 700;
+    background: var(--accent-soft);
   }
+  .tab-item.active svg { transform: scale(1.1); }
+  .tab-item.active::before { display: none; }
   .tab-dot {
     position: absolute; top: 0px; right: 26%;
     width: 7px; height: 7px; border-radius: 50%; background: var(--coral);
@@ -3448,11 +3454,13 @@
       color = '#1fe0c2';
       shadow = '0 12px 32px rgba(31,224,194,0.12)';
     } else if (type === 'visa') {
-      bg = 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #6952e0 0%, #1a153b 100%)';
-      shadow = '0 12px 32px rgba(105, 82, 224, 0.2)';
+      bg = 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, #1A1F71 0%, #0056B2 60%, #1434CB 100%)';
+      shadow = '0 14px 35px rgba(0, 102, 178, 0.35)';
+      color = '#ffffff';
     } else if (type === 'mastercard') {
-      bg = 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #ff8a00 0%, #da1b60 100%)';
-      shadow = '0 12px 32px rgba(255, 138, 0, 0.2)';
+      bg = 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, #1f1416 0%, #850b1b 50%, #eb001b 100%)';
+      shadow = '0 14px 35px rgba(235, 0, 27, 0.35)';
+      color = '#ffffff';
     }
     
     return { bg, color, shadow };
@@ -3465,8 +3473,8 @@
     
     const style = getCardStyleByName(c.ad, c.kart_tipi);
     const brandLogoHTML = (c.kart_tipi || '').toLowerCase() === 'visa'
-      ? `<img src="/visa.svg?v=1.2" style="height: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Visa">`
-      : `<img src="/mastercard.svg?v=1.2" style="height: 18px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Mastercard">`;
+      ? `<img src="/visa.svg?v=1.3" style="height: 24px; width: 44px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Visa">`
+      : `<img src="/mastercard.svg?v=1.3" style="height: 24px; width: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Mastercard">`;
 
     return `
       <div class="wallet-card" style="background: ${style.bg}; color: ${style.color}; box-shadow: ${style.shadow};">
@@ -3582,13 +3590,13 @@
     if (brand) {
       badge.textContent = brand;
       badge.style.display = 'block';
-      badge.style.background = brand === 'Visa' ? 'var(--teal-soft)' : 'var(--gold-soft)';
-      badge.style.color = brand === 'Visa' ? 'var(--teal)' : 'var(--gold)';
+      badge.style.background = brand === 'Visa' ? 'rgba(0, 102, 178, 0.25)' : 'rgba(235, 0, 27, 0.25)';
+      badge.style.color = brand === 'Visa' ? '#60a5fa' : '#f87171';
       errorEl.style.display = 'none';
       if (logoEl) {
         logoEl.innerHTML = brand === 'Visa' ? 
-          `<img src="/visa.svg?v=1.2" style="height: 15px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Visa">` : 
-          `<img src="/mastercard.svg?v=1.2" style="height: 20px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Mastercard">`;
+          `<img src="/visa.svg?v=1.3" style="height: 24px; width: 44px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Visa">` : 
+          `<img src="/mastercard.svg?v=1.3" style="height: 24px; width: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Mastercard">`;
       }
     } else {
       badge.style.display = 'none';
