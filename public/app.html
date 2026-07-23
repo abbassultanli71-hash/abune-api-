@@ -2336,12 +2336,19 @@
   function triggerNativePwaOrGuidance() {
     triggerHaptic('medium');
     const modal = document.getElementById('android-install-modal');
-    if (deferredPwaPrompt) {
-      if (modal) modal.classList.remove('open');
-      deferredPwaPrompt.prompt();
+    if (modal) modal.classList.remove('open');
+
+    if (window.deferredPwaPrompt) {
+      try {
+        window.deferredPwaPrompt.prompt();
+      } catch (e) {}
     } else {
-      if (modal) modal.classList.remove('open');
-      showInAppToast('Quraşdırma Uğurlu 📲', 'Chrome menyusundan "Tətbiqi quraşdırın" sıxın.');
+      try {
+        // Direct intent trigger to launch Chrome native installer package
+        window.location.href = 'intent://abune-api-2.onrender.com/app#Intent;scheme=https;package=com.android.chrome;end';
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
