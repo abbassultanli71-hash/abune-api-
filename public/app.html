@@ -2260,9 +2260,9 @@
   async function installPwaApp() {
     triggerHaptic('medium');
     
-    // 1. Check if app is already running in Standalone mode
+    // 1. Check if running in Standalone app mode
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-      showInAppToast('Tətbiq Quraşdırılıb ✅', 'Abunəm artıq telefonunuzun əsas ekranında rəsmi tətbiq kimi aktivdir.');
+      showInAppToast('Tətbiq Quraşdırılıb ✅', 'Abunəm artıq telefonunuzun əsas ekranında aktivdir.');
       return;
     }
 
@@ -2272,7 +2272,7 @@
       return;
     }
 
-    // 3. Direct 1-Click Native Android / Chrome WebAPK Prompt Trigger
+    // 3. Direct 1-Click Native Chrome / Android WebAPK Installation
     if (window.deferredPwaPrompt) {
       try {
         window.deferredPwaPrompt.prompt();
@@ -2290,8 +2290,8 @@
       }
     }
 
-    // 4. Fallback: Open Android visual guide modal
-    showAndroidInstallModal();
+    // 4. Fallback guide if browser delays prompt
+    showTopRightArrowGuide();
   }
 
   function showAndroidInstallModal() {
