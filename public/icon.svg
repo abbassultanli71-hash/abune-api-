@@ -1,49 +1,65 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
-    <!-- Background Dark Premium Gradient -->
-    <linearGradient id="brandDarkBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#181c28"/>
-      <stop offset="50%" stop-color="#0f1420"/>
-      <stop offset="100%" stop-color="#090d16"/>
+    <!-- Deep Slate Glassmorphic Canvas -->
+    <linearGradient id="abuneMasterBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19"/>
+      <stop offset="50%" stop-color="#182234"/>
+      <stop offset="100%" stop-color="#070a12"/>
     </linearGradient>
 
-    <!-- Vibrant Brand Gold-Orange Metallic Gradient -->
-    <linearGradient id="brandOrangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff9d42"/>
-      <stop offset="40%" stop-color="#f97316"/>
-      <stop offset="100%" stop-color="#ea580c"/>
+    <!-- Luxury Gold-Orange Gradient -->
+    <linearGradient id="goldOrangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffb74d"/>
+      <stop offset="50%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#e65100"/>
     </linearGradient>
 
-    <!-- Glowing Golden Pearl Gradient -->
-    <linearGradient id="pearlGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fef08a"/>
-      <stop offset="50%" stop-color="#fbbf24"/>
-      <stop offset="100%" stop-color="#f59e0b"/>
+    <!-- Cyan-Emerald Subscription Wave Gradient -->
+    <linearGradient id="cyanWaveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="50%" stop-color="#00d294"/>
+      <stop offset="100%" stop-color="#10b981"/>
     </linearGradient>
 
-    <!-- Ambient Glow Filter -->
-    <filter id="orangeAura" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="20" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <!-- Glowing Green Pearl -->
+    <linearGradient id="smartPearlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- Metallic Edge Ring -->
+    <linearGradient id="edgeRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.8"/>
+    </linearGradient>
+
+    <!-- Neon Glow Filter -->
+    <filter id="masterGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
   </defs>
 
   <!-- Squircle Base Canvas -->
-  <rect width="512" height="512" rx="136" fill="url(#brandDarkBg)"/>
+  <rect width="512" height="512" rx="136" fill="url(#abuneMasterBg)"/>
 
-  <!-- Thin Glowing Orange Outer Ring -->
-  <rect width="488" height="488" x="12" y="12" rx="124" fill="none" stroke="url(#brandOrangeGrad)" stroke-width="4" stroke-opacity="0.6"/>
+  <!-- Metallic Gradient Border Ring -->
+  <rect width="492" height="492" x="10" y="10" rx="126" fill="none" stroke="url(#edgeRingGrad)" stroke-width="4"/>
 
-  <!-- Main 'Å' Emblem Group with Ambient Glow -->
-  <g filter="url(#orangeAura)">
-    <!-- Main Peak of 'A' -->
-    <path d="M 160 370 L 256 160 L 352 370" stroke="url(#brandOrangeGrad)" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
-    
-    <!-- Curved Subscription Wave Crossbar -->
-    <path d="M 198 305 C 226 270, 286 340, 314 305" stroke="url(#brandOrangeGrad)" stroke-width="32" stroke-linecap="round" fill="none"/>
-    
-    <!-- Glowing Golden Notification Pearl at Apex -->
-    <circle cx="256" cy="115" r="26" fill="url(#pearlGoldGrad)"/>
-    <circle cx="256" cy="115" r="40" fill="#fbbf24" opacity="0.3"/>
+  <!-- Ambient Light Center Aura -->
+  <circle cx="256" cy="260" r="160" fill="#f97316" opacity="0.1" filter="url(#masterGlow)"/>
+
+  <!-- Iconic 'A' Shield Mark -->
+  <g filter="url(#masterGlow)">
+    <!-- Left Leg of A -->
+    <path d="M 152 380 L 256 150 C 256 150, 260 142, 264 150 L 360 380" stroke="url(#goldOrangeGrad)" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Dynamic Recurring Wave Crossbar -->
+    <path d="M 190 310 C 220 260, 292 350, 322 310" stroke="url(#cyanWaveGrad)" stroke-width="32" stroke-linecap="round" fill="none"/>
+
+    <!-- Glowing Smart Notification Pearl at Apex -->
+    <circle cx="256" cy="100" r="26" fill="url(#smartPearlGrad)"/>
+    <circle cx="256" cy="100" r="40" fill="#34d399" opacity="0.25"/>
   </g>
 </svg>
