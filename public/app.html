@@ -2260,21 +2260,42 @@
   async function installPwaApp() {
     triggerHaptic('medium');
     
-    // Direct 1-Click Native Chrome / Android WebAPK Installation Trigger
+    // 1. Check if already installed & running standalone
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      showInAppToast('Tətbiq Quraşdırılıb ✅', 'Abunəm artıq telefonunuzun əsas ekranında aktivdir.');
+      return;
+    }
+
+    // 2. Direct 1-Click Native Chrome / Android WebAPK Installation Trigger
     if (window.deferredPwaPrompt) {
       try {
         window.deferredPwaPrompt.prompt();
         const { outcome } = await window.deferredPwaPrompt.userChoice;
         if (outcome === 'accepted') {
           triggerHaptic('success');
+          showInAppToast('Tətbiq Quraşdırıldı 📲', 'Abunəm tətbiqi uğurla telefonunuza yükləndi.');
           const banner = document.getElementById('pwa-quick-banner');
           if (banner) banner.style.display = 'none';
         }
         window.deferredPwaPrompt = null;
+        return;
       } catch (e) {
         console.error('PWA prompt error:', e);
       }
     }
+
+    // 3. Fallback: Trigger native share/install menu so user can complete 1-click install
+    try {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Abunəm Tətbiqi',
+          text: 'Abunəm tətbiqini telefonunuza quraşdırın',
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        showInAppToast('Quraşdırma 📲', 'Chrome menyusundan "Tətbiqi quraşdırın" sıxın.');
+      }
+    } catch (e) {}
   }
 
   function showIosInstallModal() {
