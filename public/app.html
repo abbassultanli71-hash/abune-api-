@@ -1597,21 +1597,21 @@
             <div class="icon-round" onclick="openSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
           </div>
         </div>
-        <div class="h-row" style="padding: 0 20px 14px; gap: 10px;">
-          <div class="search-bar" style="margin: 0; flex: 1;">
+        <div style="padding: 0 20px 12px; width: 100%; box-sizing: border-box;">
+          <div class="search-bar" style="margin: 0; width: 100%; box-sizing: border-box;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
             <input type="text" id="sub-search-input" placeholder="Abunəlik axtar…" data-i18n-placeholder="search_placeholder" oninput="filterSubscriptionsList()">
           </div>
-          <div class="select-wrap" style="background: var(--surface); border: 2px solid var(--border); border-radius: 18px; padding: 10px 16px; box-shadow: var(--shadow); height: 42px; display: flex; align-items: center; justify-content: center;">
-            <select id="sub-sort-select" onchange="filterSubscriptionsList()" style="background:none; border:none; color:var(--ink-muted); font-size:12px; font-weight:700; outline:none; cursor:pointer; padding-right:12px;">
-              <option value="next_asc">Ödəniş (Tez)</option>
-              <option value="price_desc">Qiymət (Azalan)</option>
-              <option value="price_asc">Qiymət (Artan)</option>
-              <option value="name_asc">Ad (A-Z)</option>
-            </select>
-          </div>
         </div>
         <div class="chip-row" id="category-filter-row">
+          <div class="sort-chip-wrap" style="flex-shrink: 0;">
+            <select id="sub-sort-select" onchange="filterSubscriptionsList()" style="background: var(--surface-2); border: 1.5px solid var(--border-strong); border-radius: 20px; color: var(--ink); font-size: 12px; font-weight: 700; padding: 7px 12px; outline: none; cursor: pointer; height: 36px;">
+              <option value="next_asc">⇅ Ödəniş (Tez)</option>
+              <option value="price_desc">↓ Qiymət (Azalan)</option>
+              <option value="price_asc">↑ Qiymət (Artan)</option>
+              <option value="name_asc">A-Z Ad</option>
+            </select>
+          </div>
           <div class="filter-chip selected" data-category="All" onclick="filterCategory('All')" data-i18n="filter_all">Hamısı</div>
           <div class="filter-chip" data-category="Entertainment" onclick="filterCategory('Entertainment')">Entertainment</div>
           <div class="filter-chip" data-category="Music" onclick="filterCategory('Music')">Music</div>
