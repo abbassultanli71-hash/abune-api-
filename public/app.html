@@ -2287,8 +2287,14 @@
       }
     }
 
-    // Direct toast indicator if prompt was already triggered or in-app browser
-    showInAppToast('Quraşdırma 📲', 'Chrome menyusundan "Tətbiqi quraşdırın" (və ya "Əsas ekrana əlavə et") sıxın.');
+    // Direct Android APK File Download Fallback (PRAMOY YÜKLƏNİR)
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = '/Abunem.apk';
+    downloadAnchor.download = 'Abunem.apk';
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
+    showInAppToast('Yüklənir... 📥', 'Abunəm tətbiq faylı telefonunuza endirilir.');
   }
 
   function showAndroidInstallModal() {
