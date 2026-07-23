@@ -16,7 +16,22 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=6.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=6.0.0').catch(function(){});
+    navigator.serviceWorker.register('/sw.js?v=6.0.0').then(function(reg) {
+      // Force background update check on app open to update home screen launcher logo automatically
+      reg.update();
+      reg.addEventListener('updatefound', function() {
+        const newWorker = reg.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', function() {
+            if (newWorker.state === 'activated') {
+              if (window.caches) {
+                caches.keys().then(keys => keys.forEach(key => caches.delete(key)));
+              }
+            }
+          });
+        }
+      });
+    }).catch(function(){});
   }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
