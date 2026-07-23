@@ -88,7 +88,7 @@
   button, select, input { font-family: inherit; }
 
   /* 60FPS Hardware Acceleration for Chrome Desktop */
-  .phone, .screen, .stat-scroll, .sub-row, .card-row, .dashboard-budget-card {
+  .phone, .stat-scroll, .sub-row, .card-row, .dashboard-budget-card {
     will-change: transform;
     transform: translate3d(0,0,0);
     -webkit-backface-visibility: hidden;
@@ -195,10 +195,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    overscroll-behavior-y: contain;
-    -webkit-transform: translate3d(0,0,0);
-    transform: translate3d(0,0,0);
+    touch-action: auto;
     padding-bottom: 112px;
   }
   .screen > * { flex-shrink: 0; }
@@ -962,7 +959,7 @@
     .hero-panel { margin: 8px 16px 12px; padding: 18px 16px 18px; }
     .hero-title { font-size: 21px; }
     .stat-scroll { padding: 0 16px 4px; gap: 8px; }
-    .stat-card { padding: 10px 12px; min-width: 132px; gap: 6px; border-radius: 12px; }
+    .stat-card { padding: 12px 14px; min-width: 160px; gap: 6px; border-radius: 14px; }
     .stat-icon { width: 24px; height: 24px; border-radius: 6px; }
     .stat-value { font-size: 17px; }
     .ruler-card { margin: 12px 16px 6px; padding: 14px 14px 16px; border-radius: 16px; }
@@ -2199,6 +2196,12 @@
     }
     return obj;
   }
+
+  // ─── Native Passive Touch Momentum Engine (Fixes Mobile Scroll Freeze) ───
+  try {
+    window.addEventListener('touchstart', function() {}, { passive: true });
+    window.addEventListener('touchmove', function() {}, { passive: true });
+  } catch (e) {}
 
   // ─── Native iOS & Android Haptic Feedback Engine ─────────────────
   function triggerHaptic(type = 'light') {
