@@ -752,20 +752,32 @@
 
   /* ---- Modal (bottom sheet) ---- */
   .sheet-overlay {
-    position: absolute; inset: 0; background: rgba(6,6,8,0.55);
+    position: absolute; inset: 0; background: rgba(6,6,8,0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: none; align-items: flex-end; z-index: 40;
     overflow: hidden; max-width: 100%; box-sizing: border-box;
+    animation: sheetOverlayFadeIn 0.25s ease-out;
+  }
+  @keyframes sheetOverlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
   .sheet-overlay.open { display: flex; }
   .sheet {
     width: 100%; max-width: 100%; box-sizing: border-box; background: var(--bg); border-radius: 32px 32px 0 0;
-    padding: 10px 20px calc(22px + var(--safe-bottom));
-    max-height: 82%; overflow-y: auto; overflow-x: hidden;
+    padding: 12px 20px calc(24px + var(--safe-bottom));
+    max-height: 85%; overflow-y: auto; overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
     border-top: 2px solid var(--border-strong);
-    box-shadow: 0 -15px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 -20px 40px rgba(0,0,0,0.35);
+    animation: nativeSheetUp 0.35s cubic-bezier(0.32, 1.25, 0.375, 1.15);
+  }
+  @keyframes nativeSheetUp {
+    from { transform: translate3d(0, 100%, 0); }
+    to { transform: translate3d(0, 0, 0); }
   }
   .sheet *, .sheet *::before, .sheet *::after {
     box-sizing: border-box;
@@ -1332,7 +1344,7 @@
   <div class="phone">
     <div class="notch"></div>
     <div class="statusbar">
-      <span>9:41</span>
+      <span class="time">9:41</span>
       <div class="icons">
         <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><rect x="0" y="6" width="3" height="5" rx="0.5" fill="currentColor"/><rect x="4.5" y="4" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="9" y="2" width="3" height="9" rx="0.5" fill="currentColor"/><rect x="13" y="0" width="3" height="11" rx="0.5" fill="currentColor"/></svg>
         <svg width="14" height="11" viewBox="0 0 14 11" fill="none"><path d="M7 11 0 4.5C3 1 11 1 14 4.5Z" fill="currentColor"/></svg>
@@ -2184,6 +2196,75 @@
     }
     return obj;
   }
+
+  // ─── Native iOS & Android Haptic Feedback Engine ─────────────────
+  function triggerHaptic(type = 'light') {
+    try {
+      if ('vibrate' in navigator) {
+        if (type === 'light') navigator.vibrate(8);
+        else if (type === 'medium') navigator.vibrate(16);
+        else if (type === 'heavy') navigator.vibrate([20, 30, 20]);
+        else if (type === 'success') navigator.vibrate([10, 40, 15]);
+        else if (type === 'error') navigator.vibrate([35, 35, 35]);
+      }
+    } catch (e) {}
+  }
+
+  // ─── Live Statusbar Clock Tick ────────────────────────────────────
+  function updateNativeClock() {
+    const timeEl = document.querySelector('.statusbar .time');
+    if (!timeEl) return;
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    timeEl.textContent = `${hours}:${minutes}`;
+  }
+  setInterval(updateNativeClock, 1000);
+  setTimeout(updateNativeClock, 100);
+
+  // ─── Native Drag-to-Dismiss Sheet Gestures ────────────────────────
+  function initNativeSheetGestures() {
+    document.querySelectorAll('.sheet-overlay').forEach(overlay => {
+      const sheet = overlay.querySelector('.sheet');
+      const handle = overlay.querySelector('.sheet-handle') || overlay.querySelector('.sheet-head');
+      if (!sheet || !handle) return;
+
+      let startY = 0;
+      let currentY = 0;
+      let isDragging = false;
+
+      handle.style.cursor = 'grab';
+
+      handle.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+        isDragging = true;
+        sheet.style.transition = 'none';
+      }, { passive: true });
+
+      handle.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentY = e.touches[0].clientY - startY;
+        if (currentY > 0) {
+          sheet.style.transform = `translate3d(0, ${currentY}px, 0)`;
+        }
+      }, { passive: true });
+
+      handle.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        sheet.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+        if (currentY > 75) {
+          triggerHaptic('medium');
+          overlay.classList.remove('open');
+          if (typeof updateBodyScrollLock === 'function') updateBodyScrollLock();
+        } else {
+          sheet.style.transform = 'translate3d(0, 0, 0)';
+        }
+        currentY = 0;
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', initNativeSheetGestures);
 
   // API Request Wrapper using JWT Bearer authentication
   async function apiFetch(method, endpoint, body = null) {
@@ -3080,6 +3161,7 @@
   }
 
   function switchScreen(name) {
+    triggerHaptic('light');
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const targetScreen = document.getElementById('scr-' + name);
     if (targetScreen) targetScreen.classList.add('active');
@@ -3128,6 +3210,7 @@
   }
 
   function scrollToTop() {
+    triggerHaptic('light');
     const active = document.querySelector('.screen.active');
     if (active) active.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById('scroll-top-btn').classList.remove('visible');
@@ -3143,6 +3226,7 @@
   }
 
   function openSheet() { 
+    triggerHaptic('medium');
     // Set start date to today's date formatted as YYYY-MM-DD
     const yyyy = TODAY.getFullYear();
     const mm = String(TODAY.getMonth() + 1).padStart(2, '0');
@@ -3159,6 +3243,7 @@
     if (sheet) sheet.scrollTop = 0;
   }
   function closeSheet() {
+    triggerHaptic('light');
     document.getElementById('sheet-overlay').classList.remove('open');
     updateBodyScrollLock();
     if (document.activeElement) document.activeElement.blur();
