@@ -328,9 +328,7 @@
     padding: 18px 20px; min-width: 152px; flex-shrink: 0;
     display: flex; flex-direction: column; gap: 8px;
     box-shadow: var(--shadow);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   .stat-card:active { transform: scale(0.96); }
   .stat-icon { width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
@@ -352,8 +350,6 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 26px;
     padding: 20px 20px 22px;
     box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255,255,255,0.06);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
   }
   .ruler-card::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -411,11 +407,9 @@
     text-align: center;
     box-shadow: var(--shadow);
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.2s ease, border-color 0.2s ease;
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
   }
   .sub-row:active {
     transform: scale(0.95);
@@ -507,9 +501,7 @@
     background: var(--surface); border: 2px solid var(--border);
     border-radius: 22px; padding: 16px 18px; margin-bottom: 10px;
     box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255,255,255,0.06);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.2s ease, border-color 0.2s ease;
   }
   @media (hover: hover) {
     .card-row:hover, .history-row:hover { border-color: var(--purple); transform: translateY(-2px); }
@@ -539,9 +531,7 @@
     display: flex; gap: 10px; background: var(--surface); border: 2px solid var(--border);
     border-radius: 22px; padding: 16px 18px; margin-bottom: 10px;
     box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255,255,255,0.06);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.2s ease, border-color 0.2s ease;
   }
   .notif-item.clickable { cursor: pointer; }
   .notif-item.clickable:hover { border-color: var(--purple); transform: translateY(-2px); }
@@ -635,8 +625,6 @@
     display: flex;
     padding: 8px 8px;
     box-shadow: 0 20px 45px -10px rgba(105,82,224,0.4), var(--shadow);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
   }
   .tab-item {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
@@ -869,14 +857,12 @@
   }
   .logo-badge {
     width: 64px; height: 64px; border-radius: 20px;
-    background: rgba(20, 20, 35, 0.65);
+    background: rgba(20, 20, 35, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 12px;
     box-shadow: 0 12px 32px rgba(105, 82, 224, 0.28), inset 0 0 12px rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    animation: logoPop 0.45s cubic-bezier(.16,.84,.44,1) both, glowBreathe 3.2s ease-in-out 0.45s infinite;
+    animation: logoPop 0.45s cubic-bezier(.16,.84,.44,1) both;
   }
   .auth-logo-area h2 { animation: riseIn 0.4s ease 0.12s both; }
   .auth-logo-area p { animation: riseIn 0.4s ease 0.18s both; }
@@ -931,8 +917,6 @@
     border-radius: 20px;
     padding: 20px;
     box-shadow: var(--shadow);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
   }
 
   /* ---- Real mobil ekranlarda: telefon çərçivəsini ləğv et, tam ekran ol ---- */
@@ -1270,9 +1254,7 @@
     top: -140px;
     left: 5%;
     width: 90%;
-    background: rgba(255, 255, 255, 0.82);
-    backdrop-filter: blur(20px) saturate(190%);
-    -webkit-backdrop-filter: blur(20px) saturate(190%);
+    background: rgba(255, 255, 255, 0.96);
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 20px;
     padding: 12px 16px;
@@ -1480,18 +1462,10 @@
                       <stop offset="0%" stop-color="#10B981" />
                       <stop offset="100%" stop-color="#F59E0B" />
                     </linearGradient>
-                    <filter id="creativeGlow" x="-20%" y="-20%" width="140%" height="140%">
-                      <feGaussianBlur stdDeviation="5" result="blur" />
-                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                    </filter>
-                  </defs>
-                  <polygon points="50,8 88,28 88,72 50,92 12,72 12,28" fill="rgba(15, 23, 42, 0.95)" stroke="url(#creativeGrad1)" stroke-width="3.5" filter="url(#creativeGlow)"/>
+                  <polygon points="50,8 88,28 88,72 50,92 12,72 12,28" fill="rgba(15, 23, 42, 0.95)" stroke="url(#creativeGrad1)" stroke-width="3.5"/>
                   <path d="M 30 50 Q 50 20 70 50 Q 50 80 30 50 Z" stroke="url(#creativeGrad2)" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.85"/>
                   <path d="M 50 25 L 72 68 H 60 L 50 48 L 40 68 H 28 Z" fill="url(#creativeGrad1)"/>
-                  <circle cx="50" cy="50" r="5" fill="#10B981" filter="url(#creativeGlow)">
-                    <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite"/>
-                    <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
-                  </circle>
+                  <circle cx="50" cy="50" r="5" fill="#10B981"/>
                   <polygon points="50,42 52,48 58,50 52,52 50,58 48,52 42,50 48,48" fill="#FFFFFF"/>
                 </svg>
               </div>
