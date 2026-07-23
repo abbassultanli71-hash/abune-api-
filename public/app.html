@@ -2338,8 +2338,39 @@
     if (window.deferredPwaPrompt) {
       try {
         window.deferredPwaPrompt.prompt();
-      } catch (e) {}
+      } catch (e) {
+        showTopRightArrowGuide();
+      }
+    } else {
+      showTopRightArrowGuide();
     }
+  }
+
+  function showTopRightArrowGuide() {
+    const existing = document.getElementById('top-right-arrow-overlay');
+    if (existing) { existing.style.display = 'flex'; return; }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'top-right-arrow-overlay';
+    overlay.style.cssText = `
+      position: fixed; inset: 0; z-index: 99999;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex; flex-direction: column; align-items: flex-end;
+      padding: 20px 24px; color: #fff; text-align: right;
+    `;
+    overlay.innerHTML = `
+      <div style="font-size: 48px; animation: bounce 1.2s infinite; margin-right: 8px;">↗️</div>
+      <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 16px 20px; border-radius: 20px; box-shadow: 0 12px 32px rgba(249,115,22,0.4); max-width: 280px; text-align: left; margin-top: 8px;">
+        <div style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">👆 Yuxarı küncdən Yükləyin</div>
+        <div style="font-size: 13px; line-height: 1.4; opacity: 0.95;">
+          Brauzerin <strong>3 Nöqtə (⋮)</strong> menyusuna vurub <strong>"Tətbiqi quraşdırın"</strong> (və ya "Əsas ekrana əlavə et") seçin.
+        </div>
+      </div>
+      <button onclick="document.getElementById('top-right-arrow-overlay').style.display='none'" style="margin-top: 24px; align-self: center; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 16px; cursor: pointer;">Anladım, Bağla</button>
+    `;
+    document.body.appendChild(overlay);
   }
 
   function showIosInstallModal() {
