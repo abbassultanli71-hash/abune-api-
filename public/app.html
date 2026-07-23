@@ -2266,7 +2266,12 @@
       return;
     }
 
-    // 2. Direct 1-Click Native Chrome / Android WebAPK Installation Trigger
+    // 2. If prompt is not ready immediately, wait 800ms for Chrome beforeinstallprompt event
+    if (!window.deferredPwaPrompt) {
+      await new Promise(resolve => setTimeout(resolve, 800));
+    }
+
+    // 3. Direct 1-Click Native Chrome / Android WebAPK Installation Trigger
     if (window.deferredPwaPrompt) {
       try {
         window.deferredPwaPrompt.prompt();
@@ -2282,11 +2287,6 @@
       } catch (e) {
         console.error('PWA prompt error:', e);
       }
-    }
-
-    // 3. Fallback: Trigger native prompt execution
-    if (!window.deferredPwaPrompt) {
-      showInAppToast('Quraşdırma 📲', 'Chrome menyusundan "Tətbiqi quraşdırın" sıxın.');
     }
   }
 
