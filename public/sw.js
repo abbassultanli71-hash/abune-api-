@@ -8,6 +8,16 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
+// Fetch event handler required by Chrome for WebAPK PWA installation
+self.addEventListener('fetch', (event) => {
+  // Pass through fetch requests cleanly
+  event.respondWith(
+    fetch(event.request).catch(function() {
+      return caches.match(event.request);
+    })
+  );
+});
+
 // Handle incoming push messages (from server-sent push in future)
 self.addEventListener('push', (event) => {
   let data = {};

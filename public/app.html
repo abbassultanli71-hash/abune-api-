@@ -2269,7 +2269,7 @@
       return;
     }
 
-    // Direct 1-Click Native Android / Chrome Installation Prompt
+    // Direct 1-Click Native Android / Chrome WebAPK Prompt
     if (deferredPwaPrompt) {
       try {
         deferredPwaPrompt.prompt();
@@ -2287,14 +2287,7 @@
       }
     }
 
-    // Direct Android APK File Download Fallback (PRAMOY YÜKLƏNİR)
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.href = '/Abunem.apk';
-    downloadAnchor.download = 'Abunem.apk';
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    document.body.removeChild(downloadAnchor);
-    showInAppToast('Yüklənir... 📥', 'Abunəm tətbiq faylı telefonunuza endirilir.');
+    showInAppToast('Quraşdırma 📲', 'Chrome menyusundan "Tətbiqi quraşdırın" sıxın.');
   }
 
   function showAndroidInstallModal() {
