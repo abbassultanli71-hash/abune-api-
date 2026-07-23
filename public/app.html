@@ -2260,117 +2260,21 @@
   async function installPwaApp() {
     triggerHaptic('medium');
     
-    // 1. Check if running in Standalone app mode
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-      showInAppToast('Tətbiq Quraşdırılıb ✅', 'Abunəm artıq telefonunuzun əsas ekranında aktivdir.');
-      return;
-    }
-
-    // 2. If running on iOS Safari (iPhone / iPad), open Apple HIG guide sheet
-    if (isIosDevice()) {
-      showIosInstallModal();
-      return;
-    }
-
-    // 3. Direct 1-Click Native Chrome / Android WebAPK Installation
+    // Direct 1-Click Native Chrome / Android WebAPK Installation Trigger
     if (window.deferredPwaPrompt) {
       try {
         window.deferredPwaPrompt.prompt();
         const { outcome } = await window.deferredPwaPrompt.userChoice;
         if (outcome === 'accepted') {
           triggerHaptic('success');
-          showInAppToast('Tətbiq Quraşdırıldı 📲', 'Abunəm tətbiqi uğurla telefonunuza yükləndi.');
           const banner = document.getElementById('pwa-quick-banner');
           if (banner) banner.style.display = 'none';
         }
         window.deferredPwaPrompt = null;
-        return;
       } catch (e) {
         console.error('PWA prompt error:', e);
       }
     }
-
-    // 4. Fallback guide if browser delays prompt
-    showTopRightArrowGuide();
-  }
-
-  function showAndroidInstallModal() {
-    const existing = document.getElementById('android-install-modal');
-    if (existing) { existing.classList.add('open'); return; }
-
-    const modal = document.createElement('div');
-    modal.id = 'android-install-modal';
-    modal.className = 'sheet-overlay open';
-    modal.innerHTML = `
-      <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
-        <div class="sheet-handle"></div>
-        <div style="font-size: 42px; margin-bottom: 8px;">📲</div>
-        <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
-        <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
-        
-        <div style="background: var(--surface-2); border: 1.5px solid var(--border-strong); border-radius: 18px; padding: 16px; text-align: left; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--ink);">
-            <span style="background: var(--accent); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">1</span>
-            <span>Yuxarı sağ küncdəki <strong style="color: var(--accent);">3 Nöqtə (⋮)</strong> menyusuna sıxın.</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--ink);">
-            <span style="background: var(--accent); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">2</span>
-            <span>Açılan menyudan <strong style="color: var(--accent);">'Tətbiqi quraşdırın' (və ya 'Əsas ekrana əlavə et')</strong> seçin.</span>
-          </div>
-        </div>
-
-        <button onclick="triggerNativePwaOrGuidance()" style="width: 100%; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; font-size: 14px; font-weight: 800; padding: 16px; border-radius: 18px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(249,115,22,0.35);">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>1-KLİKLƏ QURAŞDIR</span>
-        </button>
-        
-        <button onclick="document.getElementById('android-install-modal').classList.remove('open')" style="width: 100%; background: none; border: none; color: var(--ink-faint); font-size: 13px; font-weight: 600; margin-top: 14px; cursor: pointer;">Bağla</button>
-      </div>
-    `;
-    document.body.appendChild(modal);
-  }
-
-  function triggerNativePwaOrGuidance() {
-    triggerHaptic('medium');
-    const modal = document.getElementById('android-install-modal');
-    if (modal) modal.classList.remove('open');
-
-    if (window.deferredPwaPrompt) {
-      try {
-        window.deferredPwaPrompt.prompt();
-      } catch (e) {
-        showTopRightArrowGuide();
-      }
-    } else {
-      showTopRightArrowGuide();
-    }
-  }
-
-  function showTopRightArrowGuide() {
-    const existing = document.getElementById('top-right-arrow-overlay');
-    if (existing) { existing.style.display = 'flex'; return; }
-
-    const overlay = document.createElement('div');
-    overlay.id = 'top-right-arrow-overlay';
-    overlay.style.cssText = `
-      position: fixed; inset: 0; z-index: 99999;
-      background: rgba(15, 23, 42, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      display: flex; flex-direction: column; align-items: flex-end;
-      padding: 20px 24px; color: #fff; text-align: right;
-    `;
-    overlay.innerHTML = `
-      <div style="font-size: 48px; animation: bounce 1.2s infinite; margin-right: 8px;">↗️</div>
-      <div style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 16px 20px; border-radius: 20px; box-shadow: 0 12px 32px rgba(249,115,22,0.4); max-width: 280px; text-align: left; margin-top: 8px;">
-        <div style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">👆 Yuxarı küncdən Yükləyin</div>
-        <div style="font-size: 13px; line-height: 1.4; opacity: 0.95;">
-          Brauzerin <strong>3 Nöqtə (⋮)</strong> menyusuna vurub <strong>"Tətbiqi quraşdırın"</strong> (və ya "Əsas ekrana əlavə et") seçin.
-        </div>
-      </div>
-      <button onclick="document.getElementById('top-right-arrow-overlay').style.display='none'" style="margin-top: 24px; align-self: center; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 16px; cursor: pointer;">Anladım, Bağla</button>
-    `;
-    document.body.appendChild(overlay);
   }
 
   function showIosInstallModal() {
