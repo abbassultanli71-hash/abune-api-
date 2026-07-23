@@ -1446,6 +1446,16 @@
 
       <!-- ============ DASHBOARD ============ -->
       <div class="screen" id="scr-dashboard">
+        <div id="pwa-quick-banner" style="display:none; margin: 8px 16px 4px; background: linear-gradient(135deg, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.08) 100%); border: 1.5px solid var(--border-strong); border-radius: 20px; padding: 12px 16px; align-items: center; justify-content: space-between; gap: 10px; box-shadow: var(--shadow);">
+          <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+            <div style="font-size: 22px;">📲</div>
+            <div>
+              <div style="font-size: 13px; font-weight: 800; color: var(--ink);">Abunəm Tətbiqini Yükləyin</div>
+              <div style="font-size: 11px; color: var(--ink-muted);">Brauzer zolağı olmadan real app kimi istifadə edin</div>
+            </div>
+          </div>
+          <button onclick="installPwaApp()" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; border: none; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0;">Quraşdır</button>
+        </div>
         <div class="hero-panel">
           <div class="hero-blob hero-blob-1"></div>
           <div class="hero-blob hero-blob-2"></div>
@@ -2238,6 +2248,8 @@
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPwaPrompt = e;
+    const banner = document.getElementById('pwa-quick-banner');
+    if (banner) banner.style.display = 'flex';
   });
 
   function isIosDevice() {
@@ -2253,17 +2265,19 @@
       return;
     }
 
-    if (!deferredPwaPrompt) {
-      alert('Tətbiqi real app kimi yükləmək üçün:\n\n1. Brauzer menyusuna (⋮ və ya Share) basın.\n2. "Əsas ekrana əlavə et" (Add to Home Screen) seçin.');
-      return;
+    if (deferredPwaPrompt) {
+      deferredPwaPrompt.prompt();
+      const { outcome } = await deferredPwaPrompt.userChoice;
+      if (outcome === 'accepted') {
+        triggerHaptic('success');
+        showInAppToast('Tətbiq Quraşdırıldı 📲', 'Abunəm uğurla telefonunuza yükləndi.');
+        const banner = document.getElementById('pwa-quick-banner');
+        if (banner) banner.style.display = 'none';
+      }
+      deferredPwaPrompt = null;
+    } else {
+      alert('Tətbiqi real app kimi yükləmək üçün:\n\n1. Brauzer menyusuna (⋮ və ya Paylaş) basın.\n2. "Əsas ekrana əlavə et" (Add to Home Screen) seçin.');
     }
-    deferredPwaPrompt.prompt();
-    const { outcome } = await deferredPwaPrompt.userChoice;
-    if (outcome === 'accepted') {
-      triggerHaptic('success');
-      alert('Abunəm tətbiqi uğurla sisteminizə yükləndi!');
-    }
-    deferredPwaPrompt = null;
   }
 
   function showIosInstallModal() {
