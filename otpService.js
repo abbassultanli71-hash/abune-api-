@@ -94,7 +94,7 @@ async function generateOtp(email, purpose, payloadObj) {
   const codeHash = hashOtp(code);
 
   const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 10); // 10 minutes expiration
+  expiresAt.setSeconds(expiresAt.getSeconds() + 120); // 2 minutes (120 seconds) expiration
 
   const normalizedEmail = email.toLowerCase().trim();
   const payloadStr = JSON.stringify(payloadObj);

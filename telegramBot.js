@@ -52,6 +52,52 @@ function initTelegramWebhook() {
   });
 }
 
+// In-memory Rate Limiting Store for Email OTP Requests (Max 3 codes per 10 mins, then 10-minute block)
+const emailOtpRateLimits = {};
+
+function checkRateLimit(email) {
+  const now = Date.now();
+  const key = email.toLowerCase().trim();
+
+  let limitRecord = emailOtpRateLimits[key];
+  if (!limitRecord) {
+    limitRecord = { attempts: [], blockedUntil: 0 };
+    emailOtpRateLimits[key] = limitRecord;
+  }
+
+  // 1. Check if currently blocked
+  if (limitRecord.blockedUntil && now < limitRecord.blockedUntil) {
+    const remainingMs = limitRecord.blockedUntil - now;
+    const remainingMins = Math.ceil(remainingMs / 60000);
+    return {
+      allowed: false,
+      message: `⛔ <b>DİQQƏT: LIMIT AŞILDI!</b>\n\nBu email ünvanı üçün 3 dəfədən artıq kod sorğulandığı üçün hesabınız <b>10 dəqiqəlik bloklanıb</b>.\n\n⏱ Zəhmət olmasa <b>${remainingMins} dəqiqə</b> gözləyin. Vaxt bitdikdən sonra yenidən kod ala bilərsiniz.`
+    };
+  }
+
+  // Reset block if time expired
+  if (limitRecord.blockedUntil && now >= limitRecord.blockedUntil) {
+    limitRecord.blockedUntil = 0;
+    limitRecord.attempts = [];
+  }
+
+  // Filter attempts within the last 10 minutes (600,000 ms)
+  limitRecord.attempts = limitRecord.attempts.filter(timestamp => (now - timestamp) < 10 * 60 * 1000);
+
+  // 2. Check if user reached 3 attempts
+  if (limitRecord.attempts.length >= 3) {
+    limitRecord.blockedUntil = now + 10 * 60 * 1000; // Block for 10 minutes
+    return {
+      allowed: false,
+      message: `⛔ <b>DİQQƏT: LIMIT AŞILDI!</b>\n\nSiz 3 dəfə OTP kodu tələb etdiniz. Təhlükəsizlik qaydalarına əsasən bu email <b>10 dəqiqəlik bloklandı</b>.\n\n⏱ 10 dəqiqə keçdikdən sonra yenidən kod ala bilərsiniz.`
+    };
+  }
+
+  // Record new attempt timestamp
+  limitRecord.attempts.push(now);
+  return { allowed: true };
+}
+
 async function handleTelegramUpdate(req, res) {
   res.sendStatus(200);
 
@@ -70,6 +116,13 @@ async function handleTelegramUpdate(req, res) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (emailRegex.test(text)) {
     const email = text.toLowerCase().trim();
+
+    // Rate Limit Check (3 attempts limit, 10 min block)
+    const rateCheck = checkRateLimit(email);
+    if (!rateCheck.allowed) {
+      sendTelegramMessage(chatId, rateCheck.message);
+      return;
+    }
 
     try {
       // Look up pending registration data stored by /register/initiate
@@ -97,8 +150,9 @@ async function handleTelegramUpdate(req, res) {
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const codeHash = hashOtp(code);
 
+      // Set OTP expiration to 2 minutes (120 seconds)
       const expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+      expiresAt.setSeconds(expiresAt.getSeconds() + 120);
 
       // Delete old REGISTER OTPs for this email
       await executeQuery(
@@ -114,8 +168,8 @@ async function handleTelegramUpdate(req, res) {
         { autoCommit: true }
       );
 
-      // Send the code to the user
-      sendTelegramMessage(chatId, `✅ Sizin <b>Abunəm</b> qeydiyyat kodunuz:\n\n<code>${code}</code>\n\nBu kodu saytdakı OTP xanasına daxil edin.\n⏱ Kod <b>10 dəqiqə</b> ərzində etibarlıdır.`);
+      // Send the code to the user with 2-minute expiration notice
+      sendTelegramMessage(chatId, `✅ Sizin <b>Abunəm</b> qeydiyyat kodunuz:\n\n<code>${code}</code>\n\nBu kodu saytdakı OTP xanasına daxil edin.\n⏱ Kod <b>2 dəqiqə</b> ərzində etibarlıdır.`);
 
       // Save chat_id to user's profile for future push notifications
       await executeQuery(

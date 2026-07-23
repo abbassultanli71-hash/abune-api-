@@ -1425,9 +1425,9 @@
             <!-- OTP input container (hidden by default) -->
             <div class="field" id="reg-otp-container" style="display: none;">
               <label>Təsdiq Kodu (OTP)</label>
-              <input type="text" id="reg-otp" placeholder="6 rəqəmli kod">
-              <div style="text-align: right; margin-top: 4px;">
-                <a href="#" style="font-size: 12px; color: #4f46e5; text-decoration: underline;" onclick="resendRegisterOtp(event)">Kodu yenidən göndər</a>
+              <input type="text" id="reg-otp" placeholder="6 rəqəmli kod" maxlength="6">
+              <div id="otp-timer-status" style="margin-top: 8px; font-size: 12px; text-align: center; color: var(--ink-muted);">
+                ⏳ Koda verilən vaxt: <span id="otp-countdown-timer" style="font-family: var(--font-mono); font-weight: 700; color: #f97316; font-size: 13px;">02:00</span>
               </div>
             </div>
             <div class="field-error" id="auth-register-error" style="margin-bottom: 8px;"></div>
@@ -2364,6 +2364,7 @@
     // Reset registration form state if tab changes
     if (mode === 'login' || mode === 'register') {
       isOtpVerificationStep = false;
+      if (otpCountdownInterval) clearInterval(otpCountdownInterval);
       document.getElementById('reg-otp-container').style.display = 'none';
       document.getElementById('reg-username').parentElement.style.display = 'block';
       document.getElementById('reg-ad').parentElement.style.display = 'block';
@@ -2372,6 +2373,40 @@
       document.getElementById('reg-submit-btn').textContent = 'Qeydiyyatdan Keç';
       document.getElementById('auth-register-error').style.color = '#ef4444'; // Reset color to red
     }
+  }
+
+  let otpCountdownInterval = null;
+
+  function startOtpCountdownTimer(seconds = 120) {
+    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+
+    const timerStatusEl = document.getElementById('otp-timer-status');
+    if (timerStatusEl) {
+      timerStatusEl.style.color = 'var(--ink-muted)';
+      timerStatusEl.innerHTML = '⏳ Koda verilən vaxt: <span id="otp-countdown-timer" style="font-family: var(--font-mono); font-weight: 700; color: #f97316; font-size: 13px;">02:00</span>';
+    }
+
+    let timeLeft = seconds;
+
+    function tick() {
+      const currentValEl = document.getElementById('otp-countdown-timer');
+      const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      const secs = (timeLeft % 60).toString().padStart(2, '0');
+      if (currentValEl) currentValEl.textContent = `${mins}:${secs}`;
+
+      if (timeLeft <= 0) {
+        clearInterval(otpCountdownInterval);
+        otpCountdownInterval = null;
+        if (timerStatusEl) {
+          timerStatusEl.style.color = '#ef4444';
+          timerStatusEl.innerHTML = '⚠️ <b>Koda verilən 2 dəqiqəlik vaxt bitdi!</b><br>Telegram-da emailinizi yenidən yazaraq yeni kod alın.';
+        }
+      }
+      timeLeft--;
+    }
+
+    tick();
+    otpCountdownInterval = setInterval(tick, 1000);
   }
 
   // Login handler
@@ -2426,13 +2461,16 @@
     if (!isOtpVerificationStep) {
       // Step 1: Initiate registration (send OTP)
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Kod göndərilir...';
+      submitBtn.textContent = 'Məlumatlar yoxlanılır...';
       
       const res = await apiFetch('POST', '/api/istifadeciler/register/initiate', { username, ad, email, password });
       submitBtn.disabled = false;
 
       if (res.ok) {
         isOtpVerificationStep = true;
+        // Start 2-minute countdown
+        startOtpCountdownTimer(120);
+
         // Hide regular inputs to keep layout clean
         document.getElementById('reg-username').parentElement.style.display = 'none';
         document.getElementById('reg-ad').parentElement.style.display = 'none';
@@ -2454,7 +2492,7 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.284c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.92 14.41l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.896.176z"/></svg>
               @Abunem_bot-u Açın
             </a>
-            <div style="font-size:11px; margin-top:8px; opacity:0.6;">Bota emailinizi yazın → kod anında gələcək</div>
+            <div style="font-size:11px; margin-top:8px; opacity:0.6;">Bota emailinizi yazın → kod anında gələcək (⏱ 2 dəqiqə etibarlıdır)</div>
           </div>`;
         errorEl.style.color = '#10b981';
         errorEl.classList.add('show');
@@ -2487,6 +2525,7 @@
         activeBtn.disabled = false;
         
         // Reset registration fields state
+        if (otpCountdownInterval) clearInterval(otpCountdownInterval);
         isOtpVerificationStep = false;
         otpContainer.style.display = 'none';
         document.getElementById('reg-username').parentElement.style.display = 'block';
@@ -2513,12 +2552,6 @@
         errorEl.classList.add('show');
       }
     }
-  }
-
-  async function resendRegisterOtp(event) {
-    if (event) event.preventDefault();
-    isOtpVerificationStep = false;
-    await handleRegister();
   }
 
   function handleLogout() {
