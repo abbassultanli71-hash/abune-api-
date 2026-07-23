@@ -2284,18 +2284,10 @@
       }
     }
 
-    // 3. Fallback: Trigger native share/install menu so user can complete 1-click install
-    try {
-      if (navigator.share) {
-        navigator.share({
-          title: 'Abunəm Tətbiqi',
-          text: 'Abunəm tətbiqini telefonunuza quraşdırın',
-          url: window.location.href
-        }).catch(() => {});
-      } else {
-        showInAppToast('Quraşdırma 📲', 'Chrome menyusundan "Tətbiqi quraşdırın" sıxın.');
-      }
-    } catch (e) {}
+    // 3. Fallback: Trigger native prompt execution
+    if (!window.deferredPwaPrompt) {
+      showInAppToast('Quraşdırma 📲', 'Chrome menyusundan "Tətbiqi quraşdırın" sıxın.');
+    }
   }
 
   function showIosInstallModal() {
