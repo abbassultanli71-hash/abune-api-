@@ -2269,19 +2269,26 @@
       return;
     }
 
+    // Direct 1-Click Native Android / Chrome Installation Prompt
     if (deferredPwaPrompt) {
-      deferredPwaPrompt.prompt();
-      const { outcome } = await deferredPwaPrompt.userChoice;
-      if (outcome === 'accepted') {
-        triggerHaptic('success');
-        showInAppToast('Tətbiq Quraşdırıldı 📲', 'Abunəm uğurla telefonunuza yükləndi.');
-        const banner = document.getElementById('pwa-quick-banner');
-        if (banner) banner.style.display = 'none';
+      try {
+        deferredPwaPrompt.prompt();
+        const { outcome } = await deferredPwaPrompt.userChoice;
+        if (outcome === 'accepted') {
+          triggerHaptic('success');
+          showInAppToast('Tətbiq Quraşdırıldı 📲', 'Abunəm tətbiqi uğurla telefonunuza yükləndi.');
+          const banner = document.getElementById('pwa-quick-banner');
+          if (banner) banner.style.display = 'none';
+        }
+        deferredPwaPrompt = null;
+        return;
+      } catch (e) {
+        console.error('PWA prompt error:', e);
       }
-      deferredPwaPrompt = null;
-    } else {
-      showAndroidInstallModal();
     }
+
+    // Direct toast indicator if prompt was already triggered or in-app browser
+    showInAppToast('Quraşdırma 📲', 'Chrome menyusundan "Tətbiqi quraşdırın" (və ya "Əsas ekrana əlavə et") sıxın.');
   }
 
   function showAndroidInstallModal() {
