@@ -1,49 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
-    <!-- Background Dark Premium Gradient -->
-    <linearGradient id="abuneBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="50%" stop-color="#1e293b"/>
-      <stop offset="100%" stop-color="#090d16"/>
+    <!-- Dark Metallic Squircle Canvas -->
+    <linearGradient id="userSquircleBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a4b56"/>
+      <stop offset="50%" stop-color="#34353f"/>
+      <stop offset="100%" stop-color="#212229"/>
     </linearGradient>
 
-    <!-- Vibrant Brand Gold-Orange Metallic Gradient -->
-    <linearGradient id="abuneGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff9d42"/>
-      <stop offset="40%" stop-color="#f97316"/>
-      <stop offset="100%" stop-color="#dc2626"/>
+    <!-- Neon Purple-Pink Card Glow -->
+    <linearGradient id="neonCardBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#ec4899"/>
     </linearGradient>
 
-    <!-- Inner Glow Gradient -->
-    <linearGradient id="abuneInnerGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fbbf24"/>
-      <stop offset="100%" stop-color="#f59e0b"/>
+    <!-- Cyan-Teal Wave Ribbon -->
+    <linearGradient id="cyanTealRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="100%" stop-color="#009688"/>
     </linearGradient>
 
-    <!-- Drop Shadow Filter -->
-    <filter id="glowShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="16" result="blur" />
+    <!-- Glowing Green Apex Dot -->
+    <linearGradient id="greenDotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- Neon Glow Filter -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <!-- Squircle Outer Canvas -->
-  <rect width="512" height="512" rx="128" fill="url(#abuneBgGrad)"/>
-  <rect width="500" height="500" x="6" y="6" rx="122" fill="none" stroke="url(#abuneGoldGrad)" stroke-width="4" stroke-opacity="0.3"/>
+  <!-- Outer Dark Squircle Container -->
+  <rect width="512" height="512" rx="140" fill="url(#userSquircleBg)"/>
 
-  <!-- Subtle Radial Glow in Center -->
-  <circle cx="256" cy="256" r="180" fill="#f97316" opacity="0.12" filter="url(#glowShadow)"/>
+  <!-- Glowing Inner Card Container -->
+  <rect x="96" y="146" width="320" height="220" rx="36" fill="#1e1f26" stroke="url(#neonCardBorder)" stroke-width="10" filter="url(#neonGlow)"/>
 
-  <!-- Iconic Bold 'A' + Recurring Subscription Card Shield Symbol -->
-  <g filter="url(#glowShadow)">
-    <!-- Left Leg of A -->
-    <path d="M 148 376 L 244 144 C 248 134, 264 134, 268 144 L 364 376" stroke="url(#abuneGoldGrad)" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
-    
-    <!-- Dynamic Recurring Loop Crossbar (Subscription Wave) -->
-    <path d="M 188 300 C 220 250, 292 350, 324 300" stroke="url(#abuneGoldGrad)" stroke-width="36" stroke-linecap="round" fill="none"/>
-    
-    <!-- Smart Notification Glowing Crown Pearl -->
-    <circle cx="256" cy="100" r="28" fill="url(#abuneInnerGlow)"/>
-    <circle cx="256" cy="100" r="42" fill="#fbbf24" opacity="0.25"/>
-  </g>
+  <!-- Cyan-Teal Wave Ribbon Mark -->
+  <path d="M 140 280 C 160 330, 210 320, 240 270 C 270 220, 320 200, 360 270" stroke="url(#cyanTealRibbon)" stroke-width="24" stroke-linecap="round" fill="none"/>
+
+  <!-- Smart Notification Green Dot -->
+  <circle cx="360" cy="196" r="20" fill="url(#greenDotGrad)" filter="url(#neonGlow)"/>
+  <circle cx="360" cy="196" r="30" fill="#10b981" opacity="0.3"/>
 </svg>
