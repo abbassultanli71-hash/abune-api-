@@ -2260,25 +2260,13 @@
   async function installPwaApp() {
     triggerHaptic('medium');
     
-    // 1. Check if already installed & running standalone
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-      showInAppToast('Tətbiq Quraşdırılıb ✅', 'Abunəm artıq telefonunuzun əsas ekranında aktivdir.');
-      return;
-    }
-
-    // 2. If prompt is not ready immediately, wait 800ms for Chrome beforeinstallprompt event
-    if (!window.deferredPwaPrompt) {
-      await new Promise(resolve => setTimeout(resolve, 800));
-    }
-
-    // 3. Direct 1-Click Native Chrome / Android WebAPK Installation Trigger
+    // 1. Direct 1-Click Native Chrome / Samsung Internet / Android WebAPK Installation Trigger
     if (window.deferredPwaPrompt) {
       try {
         window.deferredPwaPrompt.prompt();
         const { outcome } = await window.deferredPwaPrompt.userChoice;
         if (outcome === 'accepted') {
           triggerHaptic('success');
-          showInAppToast('Tətbiq Quraşdırıldı 📲', 'Abunəm tətbiqi uğurla telefonunuza yükləndi.');
           const banner = document.getElementById('pwa-quick-banner');
           if (banner) banner.style.display = 'none';
         }
@@ -2287,6 +2275,12 @@
       } catch (e) {
         console.error('PWA prompt error:', e);
       }
+    }
+
+    // 2. If running on iOS Safari (iPhone / iPad), open Apple HIG sheet
+    if (isIosDevice()) {
+      showIosInstallModal();
+      return;
     }
   }
 
