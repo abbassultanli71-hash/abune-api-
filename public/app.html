@@ -2342,13 +2342,6 @@
       try {
         window.deferredPwaPrompt.prompt();
       } catch (e) {}
-    } else {
-      try {
-        // Direct intent trigger to launch Chrome native installer package
-        window.location.href = 'intent://abune-api-2.onrender.com/app#Intent;scheme=https;package=com.android.chrome;end';
-      } catch (e) {
-        console.log(e);
-      }
     }
   }
 
