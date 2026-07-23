@@ -1,36 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
     <!-- Background Dark Premium Gradient -->
-    <linearGradient id="abuneBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1c1d24"/>
-      <stop offset="100%" stop-color="#0f1015"/>
-    </linearGradient>
-    
-    <!-- Signature Vibrant Brand Gradient -->
-    <linearGradient id="abuneBrandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f97316"/>
-      <stop offset="50%" stop-color="#fb923c"/>
-      <stop offset="100%" stop-color="#ea580c"/>
+    <linearGradient id="abuneBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#090d16"/>
     </linearGradient>
 
-    <!-- Accent Dot Glow -->
-    <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Vibrant Brand Gold-Orange Metallic Gradient -->
+    <linearGradient id="abuneGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9d42"/>
+      <stop offset="40%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+
+    <!-- Inner Glow Gradient -->
+    <linearGradient id="abuneInnerGlow" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#fbbf24"/>
       <stop offset="100%" stop-color="#f59e0b"/>
     </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="glowShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
   </defs>
 
-  <!-- Squircle Base Canvas -->
-  <rect width="512" height="512" rx="118" fill="url(#abuneBg)" stroke="rgba(249, 115, 22, 0.18)" stroke-width="6"/>
+  <!-- Squircle Outer Canvas -->
+  <rect width="512" height="512" rx="128" fill="url(#abuneBgGrad)"/>
+  <rect width="500" height="500" x="6" y="6" rx="122" fill="none" stroke="url(#abuneGoldGrad)" stroke-width="4" stroke-opacity="0.3"/>
 
-  <!-- Minimalist 'A' + Infinity Loop Signature Mark -->
-  <!-- Left Leg to Peak to Right Leg -->
-  <path d="M 155 350 L 256 160 L 357 350" stroke="url(#abuneBrandGrad)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
-  
-  <!-- Seamless Infinity Wave Crossbar (Loop of Recurring Subscriptions) -->
-  <path d="M 195 285 C 220 240, 292 330, 317 285" stroke="url(#abuneBrandGrad)" stroke-width="32" stroke-linecap="round" fill="none"/>
+  <!-- Subtle Radial Glow in Center -->
+  <circle cx="256" cy="256" r="180" fill="#f97316" opacity="0.12" filter="url(#glowShadow)"/>
 
-  <!-- Smart Notification Apex Dot -->
-  <circle cx="256" cy="115" r="26" fill="url(#dotGrad)"/>
-  <circle cx="256" cy="115" r="38" fill="#f59e0b" opacity="0.25"/>
+  <!-- Iconic Bold 'A' + Recurring Subscription Card Shield Symbol -->
+  <g filter="url(#glowShadow)">
+    <!-- Left Leg of A -->
+    <path d="M 148 376 L 244 144 C 248 134, 264 134, 268 144 L 364 376" stroke="url(#abuneGoldGrad)" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Dynamic Recurring Loop Crossbar (Subscription Wave) -->
+    <path d="M 188 300 C 220 250, 292 350, 324 300" stroke="url(#abuneGoldGrad)" stroke-width="36" stroke-linecap="round" fill="none"/>
+    
+    <!-- Smart Notification Glowing Crown Pearl -->
+    <circle cx="256" cy="100" r="28" fill="url(#abuneInnerGlow)"/>
+    <circle cx="256" cy="100" r="42" fill="#fbbf24" opacity="0.25"/>
+  </g>
 </svg>
