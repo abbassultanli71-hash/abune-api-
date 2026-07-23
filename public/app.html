@@ -2276,7 +2276,49 @@
       }
       deferredPwaPrompt = null;
     } else {
-      alert('Tətbiqi real app kimi yükləmək üçün:\n\n1. Brauzer menyusuna (⋮ və ya Paylaş) basın.\n2. "Əsas ekrana əlavə et" (Add to Home Screen) seçin.');
+      showAndroidInstallModal();
+    }
+  }
+
+  function showAndroidInstallModal() {
+    const existing = document.getElementById('android-install-modal');
+    if (existing) { existing.classList.add('open'); return; }
+
+    const modal = document.createElement('div');
+    modal.id = 'android-install-modal';
+    modal.className = 'sheet-overlay open';
+    modal.innerHTML = `
+      <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
+        <div class="sheet-handle"></div>
+        <div style="font-size: 42px; margin-bottom: 8px;">📲</div>
+        <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
+        <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Play Store rahatlığında 1-kliklə tətbiqi telefonunuza yükləyin:</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+          <button onclick="triggerNativePwaOrGuidance()" style="width: 100%; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; font-size: 14px; font-weight: 800; padding: 16px; border-radius: 18px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(249,115,22,0.35);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>1-KLİKLƏ TELEFONA QURAŞDIR (PLAY STORE)</span>
+          </button>
+        </div>
+        
+        <div style="font-size: 11.5px; color: var(--ink-muted); line-height: 1.4;">
+          💡 Quraşdırdıqdan sonra tətbiq Play Store tətbiqləri kimi proqramlar menyunuzda <strong>Abunəm</strong> ikonu ilə açılacaq.
+        </div>
+        
+        <button onclick="document.getElementById('android-install-modal').classList.remove('open')" style="width: 100%; background: none; border: none; color: var(--ink-faint); font-size: 13px; font-weight: 600; margin-top: 16px; cursor: pointer;">Bağla</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  function triggerNativePwaOrGuidance() {
+    triggerHaptic('medium');
+    const modal = document.getElementById('android-install-modal');
+    if (modal) modal.classList.remove('open');
+    if (deferredPwaPrompt) {
+      deferredPwaPrompt.prompt();
+    } else {
+      alert('Brauzerinizdə 1-kliklə yükləmək üçün:\n\n1. Yuxarı sağda 3 nöqtə (⋮) menyusuna sıxın.\n2. "Tətbiqi quraşdırın" və ya "Əsas ekrana əlavə et" seçin.');
     }
   }
 
