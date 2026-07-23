@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#f8fafc">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Abunəm">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Abunəm">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -176,15 +181,17 @@
   }
   .statusbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 26px 4px;
+    padding: 14px 26px 8px;
     font-family: var(--font-mono);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     flex-shrink: 0;
     position: relative;
-    z-index: 20;
+    z-index: 25;
+    background: var(--bg);
+    border-bottom: 1px solid rgba(249, 115, 22, 0.08);
   }
-  .statusbar .icons { display: flex; gap: 5px; align-items: center; }
+  .statusbar .icons { display: flex; gap: 6px; align-items: center; }
 
   /* ---- Screens ---- */
   .screens { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; }
@@ -196,6 +203,7 @@
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     touch-action: auto;
+    padding-top: 6px;
     padding-bottom: 112px;
   }
   .screen > * { flex-shrink: 0; }
@@ -1815,6 +1823,22 @@
           </div>
         </div>
 
+        <!-- Settings Group: PWA Standalone Real App Installation -->
+        <div class="settings-group" id="pwa-install-group" style="cursor:pointer;" onclick="installPwaApp()">
+          <div class="settings-row">
+            <div class="settings-row-left">
+              <div class="settings-icon purple" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </div>
+              <div>
+                <div class="settings-row-label" style="font-size:14px; font-weight:700; color:var(--ink);">Tətbiqi Quraşdırın (Real App)</div>
+                <div style="font-size:11px; color:var(--ink-muted);">Chrome/Safari brauzer çərçivəsi olmadan kompüterə və telefona yükləyin</div>
+              </div>
+            </div>
+            <span class="badge" style="background:linear-gradient(135deg, #f97316 0%, #ea580c 100%); color:#fff; font-size:11px; padding:4px 10px; border-radius:12px; font-weight:700;">📲 YÜKLƏ</span>
+          </div>
+        </div>
+
         <!-- Settings Group 3: Logout -->
         <div class="settings-group" style="cursor:pointer;" onclick="handleLogout()">
           <div class="settings-row">
@@ -2202,6 +2226,27 @@
     window.addEventListener('touchstart', function() {}, { passive: true });
     window.addEventListener('touchmove', function() {}, { passive: true });
   } catch (e) {}
+
+  // ─── PWA Standalone App Installer ─────────────────────────────────
+  let deferredPwaPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPwaPrompt = e;
+  });
+
+  async function installPwaApp() {
+    triggerHaptic('medium');
+    if (!deferredPwaPrompt) {
+      alert('Tətbiqi brauzer çərçivəsi olmadan real app kimi yükləmək üçün:\n\n1. Chrome/Safari menyusuna (⋮ və ya Share) basın.\n2. "Əsas ekrana əlavə et" və ya "Tətbiqi quraşdırın" (Add to Home Screen / Install App) seçin.');
+      return;
+    }
+    deferredPwaPrompt.prompt();
+    const { outcome } = await deferredPwaPrompt.userChoice;
+    if (outcome === 'accepted') {
+      alert('Abunəm tətbiqi uğurla sisteminizə yükləndi!');
+    }
+    deferredPwaPrompt = null;
+  }
 
   // ─── Native iOS & Android Haptic Feedback Engine ─────────────────
   function triggerHaptic(type = 'light') {
