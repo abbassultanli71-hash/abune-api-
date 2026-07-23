@@ -2248,10 +2248,10 @@
   } catch (e) {}
 
   // ─── PWA Standalone App Installer (iOS Apple HIG & Android Native) ───
-  let deferredPwaPrompt = null;
+  window.deferredPwaPrompt = null;
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    deferredPwaPrompt = e;
+    window.deferredPwaPrompt = e;
     const banner = document.getElementById('pwa-quick-banner');
     if (banner) banner.style.display = 'flex';
   });
@@ -2269,25 +2269,32 @@
       return;
     }
 
+    // If prompt isn't ready immediately, wait 1.2s for Chrome ServiceWorker & beforeinstallprompt warm-up
+    if (!window.deferredPwaPrompt) {
+      showInAppToast('Quraşdırma işə salınır... ⚡', 'Zəhmət olmasa 1 saniyə gözləyin...');
+      await new Promise(resolve => setTimeout(resolve, 1200));
+    }
+
     // Direct 1-Click Native Android / Chrome WebAPK Prompt
-    if (deferredPwaPrompt) {
+    if (window.deferredPwaPrompt) {
       try {
-        deferredPwaPrompt.prompt();
-        const { outcome } = await deferredPwaPrompt.userChoice;
+        window.deferredPwaPrompt.prompt();
+        const { outcome } = await window.deferredPwaPrompt.userChoice;
         if (outcome === 'accepted') {
           triggerHaptic('success');
           showInAppToast('Tətbiq Quraşdırıldı 📲', 'Abunəm tətbiqi uğurla telefonunuza yükləndi.');
           const banner = document.getElementById('pwa-quick-banner');
           if (banner) banner.style.display = 'none';
         }
-        deferredPwaPrompt = null;
+        window.deferredPwaPrompt = null;
         return;
       } catch (e) {
         console.error('PWA prompt error:', e);
       }
     }
 
-    showInAppToast('Quraşdırma 📲', 'Chrome menyusundan "Tətbiqi quraşdırın" sıxın.');
+    // Fallback if Chrome already consumed prompt or user is in In-App browser (Telegram/WhatsApp)
+    showAndroidInstallModal();
   }
 
   function showAndroidInstallModal() {
