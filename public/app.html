@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=900.0.0">
+<link rel="manifest" href="/manifest.json?v=1000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=900.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=900.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=900.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=900.0.0">
+<link rel="icon" href="/icon-192.png?v=1000.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=1000.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=1000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=900.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=1000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -41,6 +41,10 @@
 <style>
   :root {
     --bg: #f8fafc;
+    --bg-gradient: radial-gradient(circle at 15% 15%, rgba(249, 115, 22, 0.08), transparent 45%),
+                   radial-gradient(circle at 85% 75%, rgba(16, 185, 129, 0.06), transparent 45%),
+                   radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05), transparent 50%),
+                   #f8fafc;
     --surface: #ffffff;
     --surface-2: #f1f5f9;
     --surface-3: #e2e8f0;
@@ -78,7 +82,11 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   [data-theme="dark"] {
-    --bg: #0f172a;
+    --bg: #0b0f19;
+    --bg-gradient: radial-gradient(circle at 15% 15%, rgba(249, 115, 22, 0.18), transparent 45%),
+                   radial-gradient(circle at 85% 75%, rgba(16, 185, 129, 0.15), transparent 45%),
+                   radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.12), transparent 50%),
+                   #0b0f19;
     --surface: #1e293b;
     --surface-2: #334155;
     --surface-3: #475569;
@@ -103,7 +111,8 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; text-rendering: optimizeSpeed; }
   body {
-    background: var(--bg);
+    background: var(--bg-gradient);
+    background-attachment: fixed;
     color: var(--ink);
     font-family: var(--font-body);
     font-size: 14px;
