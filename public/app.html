@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=700.0.0">
+<link rel="manifest" href="/manifest.json?v=800.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=700.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=700.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=700.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=700.0.0">
+<link rel="icon" href="/icon-192.png?v=800.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=800.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=800.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=800.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=700.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=800.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -112,6 +112,34 @@
   }
   a { text-decoration: none; color: inherit; }
   button, select, input { font-family: inherit; }
+
+  /* 🌌 Ambient Mesh Gradient 3.0 Backdrop */
+  .ambient-mesh-glow {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.55;
+    animation: ambientMeshFloat 10s ease-in-out infinite alternate;
+  }
+  .ambient-glow-1 {
+    top: -60px;
+    right: -50px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.40), transparent 70%);
+  }
+  .ambient-glow-2 {
+    bottom: 80px;
+    left: -60px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.30), transparent 70%);
+  }
+  @keyframes ambientMeshFloat {
+    0% { transform: scale(1) translate(0, 0); opacity: 0.45; }
+    50% { transform: scale(1.15) translate(20px, -20px); opacity: 0.75; }
+    100% { transform: scale(1) translate(0, 0); opacity: 0.45; }
+  }
 
   /* 60FPS Hardware Acceleration for Chrome Desktop */
   .phone, .stat-scroll, .sub-row, .card-row, .dashboard-budget-card {
@@ -1473,7 +1501,9 @@
           </div>
           <button onclick="installPwaApp()" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; border: none; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0;">Quraşdır</button>
         </div>
-        <div class="hero-panel">
+        <div class="hero-panel" style="position:relative; overflow:hidden;">
+          <div class="ambient-mesh-glow ambient-glow-1"></div>
+          <div class="ambient-mesh-glow ambient-glow-2"></div>
           <div class="hero-blob hero-blob-1"></div>
           <div class="hero-blob hero-blob-2"></div>
           <div class="h-row" style="position:relative; z-index:1;">
@@ -1554,7 +1584,7 @@
           </button>
         </div>
 
-        <!-- Tailwind v4 Cheerful Vibrant AI Insights Banner -->
+        <!-- 🤖 AI Copilot Smart Nudge Banner -->
         <div class="my-4 p-4 rounded-3xl bg-gradient-to-r from-orange-950 via-amber-950 to-slate-900 border border-orange-400/40 backdrop-blur-xl shadow-lg transition-all duration-300 hover:border-orange-400/60">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -1562,13 +1592,24 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
-                <div class="text-xs font-extrabold tracking-wider uppercase text-white">Ağıllı Təhlil & Büdcə</div>
-                <div class="text-xs font-bold text-white mt-0.5">Bütün xərcləriniz tam nəzarət altındadır ✨</div>
+                <div class="text-xs font-extrabold tracking-wider uppercase text-orange-400">🤖 ABUNƏM AI COPILOT</div>
+                <div class="text-xs font-bold text-white mt-0.5" id="ai-copilot-banner-text">Bütün xərcləriniz tam nəzarət altındadır ✨</div>
               </div>
             </div>
             <button onclick="switchScreen('budget')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer">
-              Büdcə →
+              Analiz →
             </button>
+          </div>
+        </div>
+
+        <!-- ⏱️ Interactive 30-Day Payment Barcode Timeline Strip -->
+        <div class="my-4 p-4 rounded-3xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl shadow-lg">
+          <div class="flex items-center justify-between mb-2.5">
+            <div class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">⏱️ 30 GÜNLÜK ÖDƏNİŞ TAYMLAYNI</div>
+            <div class="text-[11px] font-bold text-orange-400" id="timeline-summary-count">0 Ödəniş</div>
+          </div>
+          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1" id="barcode-timeline-strip">
+            <div class="text-xs text-slate-400">Yüklənir...</div>
           </div>
         </div>
 
@@ -3158,6 +3199,102 @@
       </div>`;
   }
 
+  function renderBarcodeTimeline() {
+    const container = document.getElementById('barcode-timeline-strip');
+    const summaryCount = document.getElementById('timeline-summary-count');
+    if (!container) return;
+
+    const activeSubs = subscriptions.filter(s => s.status === 'active');
+    if (activeSubs.length === 0) {
+      container.innerHTML = `<div class="text-xs text-slate-400">Bu ay üçün aktiv ödəniş yoxdur.</div>`;
+      if (summaryCount) summaryCount.textContent = '0 Ödəniş';
+      return;
+    }
+
+    let html = '';
+    let upcomingCount = 0;
+    const today = new Date();
+
+    for (let day = 0; day < 30; day++) {
+      const targetDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + day);
+      const dateStr = targetDate.toISOString().split('T')[0];
+      const dueSubs = activeSubs.filter(s => s.next === dateStr);
+
+      if (dueSubs.length > 0) {
+        upcomingCount += dueSubs.length;
+        const sub = dueSubs[0];
+        html += `
+          <div class="flex flex-col items-center flex-shrink-0 cursor-pointer group" onclick="openManageSheet(${JSON.stringify(sub).replace(/"/g, '&quot;')})" title="${sub.name} - ${sub.price} ${sub.currency} (${day === 0 ? 'Bu gün' : day + ' gün sonra'})">
+            <div class="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/50 flex items-center justify-center p-1 shadow-md shadow-orange-500/20 group-hover:scale-110 transition-transform">
+              ${getBrandIconHTML(sub.name, sub.category)}
+            </div>
+            <span class="text-[9px] font-extrabold text-orange-400 mt-1">${day === 0 ? 'Bu gün' : day + 'g'}</span>
+          </div>`;
+      } else if (day % 3 === 0) {
+        html += `<div class="w-1.5 h-5 rounded-full bg-slate-800 flex-shrink-0"></div>`;
+      }
+    }
+
+    container.innerHTML = html;
+    if (summaryCount) summaryCount.textContent = `${upcomingCount} Ödəniş`;
+  }
+
+  function renderAiCopilotBanner() {
+    const aiBannerEl = document.getElementById('ai-copilot-banner-text');
+    if (!aiBannerEl) return;
+
+    const activeSubs = subscriptions.filter(s => s.status === 'active');
+    const catCounts = {};
+    activeSubs.forEach(s => catCounts[s.category] = (catCounts[s.category] || 0) + 1);
+
+    let duplicateCat = Object.keys(catCounts).find(c => catCounts[c] >= 2);
+    if (duplicateCat) {
+      aiBannerEl.innerHTML = `💡 <b>AI Copilot:</b> <code>${duplicateCat}</code> kateqoriyasında ${catCounts[duplicateCat]} aktiv abunəlik var. İllik <b>~120 AZN</b> qənaət imkanı!`;
+    } else if (activeSubs.length > 0) {
+      aiBannerEl.innerHTML = `✨ <b>AI Copilot:</b> ${activeSubs.length} aktiv abunəliyiniz dürüst izlənilir. Büdcəniz təhlükəsizdir!`;
+    } else {
+      aiBannerEl.innerHTML = `🚀 <b>AI Copilot:</b> Yeni abunəliklər əlavə edin, büdcənizi 100% avtomatlaşdırın!`;
+    }
+  }
+
+  function applyCard3DTiltEngine() {
+    document.querySelectorAll('.wallet-card').forEach(card => {
+      if (card.dataset.tiltApplied) return;
+      card.dataset.tiltApplied = "true";
+      card.style.transition = 'transform 0.15s ease-out, box-shadow 0.15s ease-out';
+
+      function handleTilt(e) {
+        const rect = card.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        if (!clientX || !clientY) return;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -12;
+        const rotateY = ((x - centerX) / centerX) * 12;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        const glow = card.querySelector('.wallet-card-glow');
+        if (glow) {
+          glow.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3), transparent 60%)`;
+        }
+      }
+
+      function resetTilt() {
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        const glow = card.querySelector('.wallet-card-glow');
+        if (glow) glow.style.background = 'none';
+      }
+
+      card.addEventListener('mousemove', handleTilt);
+      card.addEventListener('mouseleave', resetTilt);
+      card.addEventListener('touchmove', handleTilt, { passive: true });
+      card.addEventListener('touchend', resetTilt);
+    });
+  }
+
   function renderSubs() {
     const activeSubs = subscriptions.filter(s => s.status === 'active');
     
@@ -3177,6 +3314,10 @@
     if (activeCountEl) {
       activeCountEl.textContent = activeSubs.length;
     }
+
+    // Render 30-Day Barcode Timeline & AI Copilot Banner
+    renderBarcodeTimeline();
+    renderAiCopilotBanner();
 
     // Render full list with filter
     filterSubscriptionsList();
@@ -3786,6 +3927,7 @@
     } else {
       list.innerHTML = cards.map(cardRowHTML).join('');
       if (sub) sub.textContent = `${cards.length} ödəniş metodu`;
+      applyCard3DTiltEngine();
     }
   }
 
