@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=800.0.0">
+<link rel="manifest" href="/manifest.json?v=900.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=800.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=800.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=800.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=800.0.0">
+<link rel="icon" href="/icon-192.png?v=900.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=900.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=900.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=900.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=800.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=900.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1502,6 +1502,7 @@
           <button onclick="installPwaApp()" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; border: none; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0;">Quraşdır</button>
         </div>
         <div class="hero-panel" style="position:relative; overflow:hidden;">
+          <canvas id="hero-particle-canvas" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.7;"></canvas>
           <div class="ambient-mesh-glow ambient-glow-1"></div>
           <div class="ambient-mesh-glow ambient-glow-2"></div>
           <div class="hero-blob hero-blob-1"></div>
@@ -1533,7 +1534,10 @@
                   <circle cx="50" cy="16" r="8.5" fill="#34d399" opacity="0.25"/>
                 </svg>
               </div>
-              <div class="hero-avatar" id="hero-avatar-initials" onclick="switchScreen('settings')" title="Ayarlar">U.U</div>
+              <div class="relative group cursor-pointer" onclick="switchScreen('settings')" title="Ayarlar">
+                <div class="hero-avatar" id="hero-avatar-initials">U.U</div>
+                <div class="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-[8px] font-black text-white shadow-md uppercase tracking-wider border border-amber-300/40">🔥 PRO</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1610,6 +1614,17 @@
           </div>
           <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1" id="barcode-timeline-strip">
             <div class="text-xs text-slate-400">Yüklənir...</div>
+          </div>
+        </div>
+
+        <!-- 🗓️ Néon Financial Heatmap Calendar Grid -->
+        <div class="my-4 p-4 rounded-3xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xl shadow-lg">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">🗓️ MALIYYƏ HEATMAP TƏQVİMİ</div>
+            <div class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">BU AY</div>
+          </div>
+          <div class="grid grid-cols-7 gap-1.5" id="financial-heatmap-grid">
+            <div class="text-xs text-slate-400 col-span-7">Yüklənir...</div>
           </div>
         </div>
 
@@ -3295,6 +3310,103 @@
     });
   }
 
+  function initHeroParticleConstellation() {
+    const canvas = document.getElementById('hero-particle-canvas');
+    if (!canvas || canvas.dataset.initialized) return;
+    canvas.dataset.initialized = "true";
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = canvas.parentElement.offsetWidth || 350;
+    let height = canvas.height = canvas.parentElement.offsetHeight || 140;
+
+    const particles = [];
+    const particleCount = 20;
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        radius: Math.random() * 2 + 1.2,
+        color: i % 3 === 0 ? '#f97316' : i % 3 === 1 ? '#34d399' : '#00f2fe'
+      });
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = 0; i < particleCount; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+
+        for (let j = i + 1; j < particleCount; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 65) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(249, 115, 22, ${0.35 * (1 - dist / 65)})`;
+            ctx.lineWidth = 0.7;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(render);
+    }
+    render();
+  }
+
+  function renderFinancialHeatmapGrid() {
+    const grid = document.getElementById('financial-heatmap-grid');
+    if (!grid) return;
+
+    const activeSubs = subscriptions.filter(s => s.status === 'active');
+    const today = new Date();
+    const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+
+    let html = '';
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const dueSubs = activeSubs.filter(s => s.next === dateStr);
+
+      let statusClass = 'bg-slate-800/80 text-slate-400 border-slate-700/50';
+      let subDot = '';
+
+      if (dueSubs.length > 0) {
+        const totalDue = dueSubs.reduce((acc, curr) => acc + curr.price, 0);
+        if (totalDue > 30) {
+          statusClass = 'bg-rose-500/30 text-rose-300 border-rose-500/60 shadow-md shadow-rose-500/20 font-black';
+          subDot = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>';
+        } else {
+          statusClass = 'bg-amber-500/30 text-amber-300 border-amber-500/60 shadow-md shadow-amber-500/20 font-black';
+          subDot = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>';
+        }
+      } else if (d === today.getDate()) {
+        statusClass = 'bg-orange-500 text-white border-orange-400 font-extrabold shadow-md shadow-orange-500/30';
+      }
+
+      html += `
+        <div class="flex flex-col items-center justify-center h-9 rounded-xl border text-[11px] font-bold transition-all hover:scale-110 cursor-pointer ${statusClass}" title="${d}-ci gün: ${dueSubs.length} ödəniş">
+          <span>${d}</span>
+          ${subDot}
+        </div>`;
+    }
+    grid.innerHTML = html;
+  }
+
   function renderSubs() {
     const activeSubs = subscriptions.filter(s => s.status === 'active');
     
@@ -3315,9 +3427,11 @@
       activeCountEl.textContent = activeSubs.length;
     }
 
-    // Render 30-Day Barcode Timeline & AI Copilot Banner
+    // Render 30-Day Barcode Timeline, AI Copilot Banner & Heatmap Grid
     renderBarcodeTimeline();
     renderAiCopilotBanner();
+    renderFinancialHeatmapGrid();
+    setTimeout(initHeroParticleConstellation, 100);
 
     // Render full list with filter
     filterSubscriptionsList();
