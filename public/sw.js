@@ -1,6 +1,6 @@
-// ─── Service Worker: Abunəm Instant Auto-Update Engine (v300.0.0) ───
+// ─── Service Worker: Abunəm Instant Auto-Update Engine (v400.0.0) ───
 
-const CACHE_VERSION = 'abune-v300.0.0';
+const CACHE_VERSION = 'abune-v400.0.0';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
