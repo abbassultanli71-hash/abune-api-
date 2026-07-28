@@ -4,39 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=6.0.0">
-<meta name="theme-color" content="#0f172a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Abunəm">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=6.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=6.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=6.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=6.0.0">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=6.0.0').then(function(reg) {
-      // Force background update check on app open to update home screen launcher logo automatically
-      reg.update();
-      reg.addEventListener('updatefound', function() {
-        const newWorker = reg.installing;
-        if (newWorker) {
-          newWorker.addEventListener('statechange', function() {
-            if (newWorker.state === 'activated') {
-              if (window.caches) {
-                caches.keys().then(keys => keys.forEach(key => caches.delete(key)));
-              }
-            }
-          });
-        }
-      });
-    }).catch(function(){});
-  }
-</script>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#f8fafc">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- Tailwind CSS v4 -->
 <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 <style>
@@ -45,64 +18,63 @@
     --surface: #ffffff;
     --surface-2: #f1f5f9;
     --surface-3: #e2e8f0;
-    --border: rgba(249, 115, 22, 0.12);
-    --border-strong: rgba(249, 115, 22, 0.25);
+    --border: rgba(139, 92, 246, 0.12);
+    --border-strong: rgba(139, 92, 246, 0.25);
     --ink: #0f172a;
     --ink-muted: #475569;
     --ink-faint: #94a3b8;
     --gold: #f59e0b;
     --teal: #10b981;
     --coral: #ef4444;
-    --purple: #f97316;
-    --pink: #ea580c;
+    --purple: #8b5cf6;
+    --pink: #ec4899;
     --blue: #3b82f6;
     --lime: #10b981;
     --gold-soft: rgba(245, 158, 11, 0.15);
     --teal-soft: rgba(16, 185, 129, 0.15);
     --coral-soft: rgba(239, 68, 68, 0.15);
-    --purple-soft: rgba(249, 115, 22, 0.14);
-    --pink-soft: rgba(234, 88, 12, 0.15);
+    --purple-soft: rgba(139, 92, 246, 0.12);
+    --pink-soft: rgba(236, 72, 153, 0.15);
     --blue-soft: rgba(59, 130, 246, 0.15);
     --lime-soft: rgba(16, 185, 129, 0.18);
-    --accent: #f97316;
-    --accent-soft: rgba(249, 115, 22, 0.14);
-    --accent-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-    --hero-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-    --glow-accent: 0 12px 32px -10px rgba(249, 115, 22, 0.35);
+    --accent: var(--purple);
+    --accent-soft: var(--purple-soft);
+    --accent-grad: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    --hero-grad: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    --glow-accent: 0 12px 32px -10px rgba(139, 92, 246, 0.35);
     --glow-coral: 0 12px 32px -10px rgba(239, 68, 68, 0.38);
-    --shadow: 0 14px 35px -10px rgba(249, 115, 22, 0.12);
-    --font-serif: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', sans-serif;
-    --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', sans-serif;
-    --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Outfit', 'Inter', sans-serif;
-    --font-mono: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', sans-serif;
+    --shadow: 0 14px 35px -10px rgba(99, 102, 241, 0.12);
+    --font-display: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    --font-body: 'Outfit', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   [data-theme="dark"] {
-    --bg: #0f172a;
-    --surface: #1e293b;
-    --surface-2: #334155;
-    --surface-3: #475569;
-    --border: rgba(249, 115, 22, 0.15);
-    --border-strong: rgba(249, 115, 22, 0.30);
-    --ink: #f8fafc;
-    --ink-muted: #94a3b8;
-    --ink-faint: #64748b;
-    --gold-soft: rgba(245, 158, 11, 0.18);
-    --teal-soft: rgba(16, 185, 129, 0.18);
-    --coral-soft: rgba(239, 68, 68, 0.18);
-    --purple-soft: rgba(249, 115, 22, 0.20);
-    --pink-soft: rgba(234, 88, 12, 0.18);
-    --blue-soft: rgba(59, 130, 246, 0.18);
-    --lime-soft: rgba(16, 185, 129, 0.20);
-    --accent: #f97316;
-    --accent-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-    --hero-grad: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    --bg: #120e29;
+    --surface: rgba(29, 23, 62, 0.65);
+    --surface-2: rgba(42, 33, 86, 0.75);
+    --surface-3: rgba(60, 48, 120, 0.8);
+    --border: rgba(165, 142, 255, 0.08);
+    --border-strong: rgba(165, 142, 255, 0.18);
+    --ink: #f5f7fa;
+    --ink-muted: #b5b7da;
+    --ink-faint: #8a8cae;
+    --gold-soft: rgba(245, 196, 107, 0.12);
+    --teal-soft: rgba(31, 224, 194, 0.12);
+    --coral-soft: rgba(255, 91, 69, 0.12);
+    --purple-soft: rgba(139, 92, 246, 0.18);
+    --pink-soft: rgba(255, 143, 184, 0.12);
+    --blue-soft: rgba(0, 201, 255, 0.12);
+    --lime-soft: rgba(31, 224, 194, 0.15);
+    --accent-grad: linear-gradient(135deg, #a58eff 0%, #6952e0 100%);
+    --hero-grad: linear-gradient(135deg, #a58eff 0%, #6952e0 100%);
     --shadow: 0 20px 48px -18px rgba(0,0,0,0.65);
   }
 
+
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; text-rendering: optimizeSpeed; }
+  html, body { margin: 0; padding: 0; height: 100%; overscroll-behavior: none; }
   body {
     background: var(--bg);
     color: var(--ink);
@@ -114,14 +86,6 @@
   a { text-decoration: none; color: inherit; }
   button, select, input { font-family: inherit; }
 
-  /* 60FPS Hardware Acceleration for Chrome Desktop */
-  .phone, .stat-scroll, .sub-row, .card-row, .dashboard-budget-card {
-    will-change: transform;
-    transform: translate3d(0,0,0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-
   /* ---- Phone frame (for desktop preview only) ---- */
   .device-stage {
     min-height: 100vh;
@@ -130,15 +94,17 @@
     justify-content: center;
     padding: 20px 0;
     background:
-      radial-gradient(circle at 20% 20%, rgba(217, 107, 67, 0.12), transparent 45%),
-      radial-gradient(circle at 80% 80%, rgba(232, 181, 77, 0.10), transparent 45%),
-      #0d0e12;
+      radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.30), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.25), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.20), transparent 50%),
+      #090d16;
   }
   [data-theme="light"] .device-stage {
     background:
-      radial-gradient(circle at 20% 20%, rgba(217, 107, 67, 0.15), transparent 45%),
-      radial-gradient(circle at 80% 80%, rgba(232, 181, 77, 0.12), transparent 45%),
-      #f4f1ea;
+      radial-gradient(circle at 15% 15%, rgba(167, 139, 250, 0.35), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(56, 189, 248, 0.30), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(251, 113, 133, 0.22), transparent 50%),
+      #e2e8f0;
   }
   .phone {
     width: 390px;
@@ -147,8 +113,8 @@
     max-width: 95vw;
     background: var(--bg);
     border-radius: 48px;
-    border: 11px solid #141417;
-    box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.65), 0 0 40px rgba(217, 107, 67, 0.20);
+    border: 11px solid #0f172a;
+    box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.65), 0 0 50px rgba(99, 102, 241, 0.30);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -180,19 +146,30 @@
     content: '';
     position: absolute; inset: -10% -10%; z-index: 0; pointer-events: none;
     background:
-      radial-gradient(ellipse 550px 380px at 5% -5%, rgba(217, 107, 67, 0.10), transparent 60%),
-      radial-gradient(ellipse 550px 420px at 95% 15%, rgba(232, 181, 77, 0.08), transparent 55%);
+      radial-gradient(ellipse 550px 380px at 5% -5%, rgba(167, 139, 250, 0.45), transparent 60%),
+      radial-gradient(ellipse 550px 420px at 95% 15%, rgba(56, 189, 248, 0.38), transparent 55%),
+      radial-gradient(ellipse 500px 450px at -5% 75%, rgba(251, 113, 133, 0.30), transparent 55%),
+      radial-gradient(ellipse 650px 550px at 105% 95%, rgba(129, 140, 248, 0.32), transparent 60%);
+    animation: blobDrift 16s ease-in-out infinite;
   }
-  .phone::after { display: none; }
+  .phone::after {
+    content: '';
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0.15; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
   .phone > * { position: relative; z-index: 1; }
   @media (prefers-reduced-motion: reduce) {
     .phone::before { animation: none; }
   }
   [data-theme="dark"] .phone::before {
     background:
-      radial-gradient(ellipse 550px 380px at 5% -5%, rgba(217, 107, 67, 0.10), transparent 60%),
-      radial-gradient(ellipse 550px 420px at 95% 15%, rgba(232, 181, 77, 0.08), transparent 55%);
+      radial-gradient(ellipse 500px 350px at 5% -5%, rgba(139, 92, 246, 0.50), transparent 60%),
+      radial-gradient(ellipse 550px 400px at 95% 15%, rgba(31, 224, 194, 0.40), transparent 55%),
+      radial-gradient(ellipse 500px 450px at -5% 75%, rgba(236, 72, 153, 0.35), transparent 55%),
+      radial-gradient(ellipse 650px 550px at 105% 95%, rgba(6, 182, 212, 0.32), transparent 60%);
   }
+  [data-theme="dark"] .phone::after { opacity: 0.5; }
   .notch {
     position: absolute;
     top: 10px; left: 50%; transform: translateX(-50%);
@@ -203,17 +180,15 @@
   }
   .statusbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 26px 8px;
+    padding: 16px 26px 4px;
     font-family: var(--font-mono);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     flex-shrink: 0;
     position: relative;
-    z-index: 25;
-    background: var(--bg);
-    border-bottom: 1px solid rgba(249, 115, 22, 0.08);
+    z-index: 20;
   }
-  .statusbar .icons { display: flex; gap: 6px; align-items: center; }
+  .statusbar .icons { display: flex; gap: 5px; align-items: center; }
 
   /* ---- Screens ---- */
   .screens { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; }
@@ -224,8 +199,10 @@
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    touch-action: auto;
-    padding-top: 6px;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
     padding-bottom: 112px;
   }
   .screen > * { flex-shrink: 0; }
@@ -244,16 +221,15 @@
     pointer-events: none; z-index: -1; opacity: 0.8;
   }
 
-  /* ---- Hero panel (editorial dark greeting card) ---- */
+  /* ---- Hero panel (vivid gradient greeting card) ---- */
   .hero-panel {
     margin: 8px 20px 18px;
     padding: 24px 20px;
     border-radius: 28px;
     position: relative;
     overflow: hidden;
-    background: #181715;
-    color: #f2f0ea;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255,255,255,0.15);
+    background: var(--hero-grad);
+    box-shadow: 0 20px 40px -10px rgba(105, 82, 224, 0.4), inset 0 1px 0 0 rgba(255,255,255,0.25);
   }
   .hero-illustration {
     width: 54px;
@@ -271,21 +247,21 @@
     0%, 100% { transform: translateY(0) scale(1) rotate(2deg); }
     50% { transform: translateY(-6px) scale(1.05) rotate(-2deg); }
   }
-  .hero-blob { position: absolute; border-radius: 50%; filter: blur(2px); pointer-events: none; opacity: 0.25; }
-  .hero-blob-1 { width: 140px; height: 140px; background: rgba(217,107,67,0.3); top: -60px; right: -30px; }
-  .hero-blob-2 { width: 90px; height: 90px; background: rgba(232,181,77,0.2); bottom: -40px; left: 20%; }
+  .hero-blob { position: absolute; border-radius: 50%; filter: blur(2px); pointer-events: none; opacity: 0.45; }
+  .hero-blob-1 { width: 140px; height: 140px; background: rgba(255,255,255,0.12); top: -60px; right: -30px; }
+  .hero-blob-2 { width: 90px; height: 90px; background: rgba(255,255,255,0.08); bottom: -40px; left: 20%; }
   .hero-eyebrow {
-    font-family: var(--font-mono); font-size: 11px; color: rgba(242,240,234,0.7);
+    font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.8);
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
   }
-  .hero-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin: 0; color: #f2f0ea; letter-spacing: -0.01em; line-height: 1.2; }
-  .hero-sub { color: rgba(242,240,234,0.8); font-size: 13px; margin-top: 4px; }
+  .hero-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin: 0; color: #fff; letter-spacing: -0.01em; line-height: 1.2; }
+  .hero-sub { color: rgba(255,255,255,0.85); font-size: 13px; margin-top: 4px; }
   .hero-avatar {
     width: 48px; height: 48px; border-radius: 50%;
-    background: #f2f0ea;
+    background: rgba(255,255,255,0.92);
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #f97316;
-    flex-shrink: 0; cursor: pointer; border: 2px solid rgba(255,255,255,0.3);
+    font-family: var(--font-display); font-weight: 700; font-size: 16px; color: #6952e0;
+    flex-shrink: 0; cursor: pointer; border: 2px solid rgba(255,255,255,0.5);
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .hero-avatar:active { transform: scale(0.92); }
@@ -293,7 +269,7 @@
     font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-faint);
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
   }
-  h1.page-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin: 0; letter-spacing: -0.01em; line-height: 1.2; }
+  h1.page-title { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin: 0; letter-spacing: -0.01em; line-height: 1.2; }
   .page-sub { color: var(--ink-muted); font-size: 12.5px; margin-top: 4px; }
  
   .h-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -313,27 +289,28 @@
   }
   .icon-round svg { width: 18px; height: 18px; }
  
-  /* ---- Dashboard Budget Card (Figma / Editorial Style) ---- */
+  /* ---- Dashboard Budget Card (Figma Style) ---- */
   .dashboard-budget-card {
     margin: 0 20px 14px;
-    background: #1c1e25;
-    color: #f2f0ea;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 26px;
     padding: 18px 22px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.45);
+    box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .dashboard-budget-card:active { transform: scale(0.97); }
   .db-left { display: flex; flex-direction: column; gap: 4px; }
-  .db-eyebrow { font-size: 10.5px; color: #9a9dab; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-mono); }
-  .db-spent { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: #f2f0ea; }
-  .db-limit { font-family: var(--font-mono); font-size: 12.5px; color: #64677a; }
+  .db-eyebrow { font-size: 11px; color: var(--ink-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .db-spent { font-family: var(--font-mono); font-size: 25px; font-weight: 700; color: var(--ink); }
+  .db-limit { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-faint); }
   .db-action {
-    margin-top: 8px; font-size: 11.5px; color: #f97316; font-weight: 600;
+    margin-top: 8px; font-size: 11.5px; color: var(--purple); font-weight: 600;
     display: flex; align-items: center; gap: 4px; cursor: pointer;
   }
   .db-action svg { width: 12px; height: 12px; transition: transform 0.2s; }
@@ -341,40 +318,37 @@
   .db-right { width: 90px; height: 90px; position: relative; }
   .db-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
   .db-ring-track { fill: none; stroke: var(--surface-3); stroke-width: 10; }
-  .db-ring-fill { fill: none; stroke: url(#dbRingGrad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset 0.6s ease; filter: drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)); }
+  .db-ring-fill { fill: none; stroke: url(#dbRingGrad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset 0.6s ease; filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.45)); }
   .db-ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
  
   /* ---- Horizontal scroll stat cards ---- */
   .stat-scroll {
-    display: flex; gap: 12px; padding: 0 20px 8px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    touch-action: pan-x;
-    scrollbar-width: none;
+    display: flex; gap: 12px; padding: 0 20px 4px;
+    overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;
   }
   .stat-scroll::-webkit-scrollbar { display: none; }
   .stat-card {
-    background: var(--surface); border: 1.5px solid var(--border-strong); border-radius: 20px;
-    padding: 16px 18px; min-width: 175px; flex-shrink: 0;
-    scroll-snap-align: start;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+    padding: 18px 20px; min-width: 152px; flex-shrink: 0;
     display: flex; flex-direction: column; gap: 8px;
     box-shadow: var(--shadow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .stat-card:active { transform: scale(0.96); }
-  .stat-icon { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-  .stat-icon svg { width: 18px; height: 18px; }
+  .stat-icon { width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .stat-icon svg { width: 16px; height: 16px; }
   .stat-icon.teal { background: var(--teal-soft); color: var(--teal); }
   .stat-icon.gold { background: var(--gold-soft); color: var(--gold); }
   .stat-icon.coral { background: var(--coral-soft); color: var(--coral); }
   .stat-icon.purple { background: var(--purple-soft); color: var(--purple); }
   .stat-icon.pink { background: var(--pink-soft); color: var(--pink); }
   .stat-icon.blue { background: var(--blue-soft); color: var(--blue); }
-  .stat-label { font-size: 11.5px; color: var(--ink-muted); font-weight: 600; white-space: normal; line-height: 1.3; }
-  .stat-value { font-family: var(--font-display); font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+  .stat-label { font-size: 11px; color: var(--ink-muted); font-weight: 600; }
+  .stat-value { font-family: var(--font-mono); font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .stat-value small { font-size: 12px; color: var(--ink-faint); font-weight: 500; }
-  .stat-card-accent { border-color: var(--accent); box-shadow: var(--shadow), inset 0 0 0 1px var(--accent-soft); }
+  .stat-card-accent { border-color: var(--purple-soft); box-shadow: var(--shadow), inset 0 0 0 1px rgba(139,92,246,0.12); }
  
   /* ---- Signature: payment ruler ---- */
   .ruler-card {
@@ -382,6 +356,8 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 26px;
     padding: 20px 20px 22px;
     box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
   .ruler-card::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -422,54 +398,60 @@
 
   /* ---- Subscription rows ---- */
   /* ---- Subscription cards grid ---- */
-  /* ---- Subscription rows & cards ---- */
   .sub-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
     padding: 4px 0 16px;
   }
   .sub-row {
     background: var(--surface);
-    border: 1.5px solid var(--border-strong);
-    border-radius: 20px;
-    padding: 14px 18px;
+    border: 2px solid var(--border);
+    border-radius: 28px;
+    padding: 22px 16px 20px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 14px;
+    text-align: center;
     box-shadow: var(--shadow);
     cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
   .sub-row:active {
-    transform: scale(0.98);
+    transform: scale(0.95);
+  }
+  [data-theme="light"] .sub-row {
+    box-shadow: 0 14px 30px -8px rgba(105, 82, 224, 0.16), inset 0 1px 0 0 rgba(255,255,255,0.9);
+  }
+  [data-theme="dark"] .sub-row {
+    box-shadow: 0 14px 30px -8px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255,255,255,0.06);
   }
   @media (hover: hover) {
     .sub-row:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(249, 115, 22, 0.15);
+      border-color: var(--purple);
+      transform: translateY(-4px);
     }
   }
   .sub-icon-wrap {
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
   }
   .sub-icon-wrap .sub-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    border: 1px solid var(--border-strong);
-    overflow: hidden;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+    border: 1px solid var(--border);
+    transition: transform 0.2s ease;
   }
   .sub-row:hover .sub-icon-wrap .sub-icon {
     transform: scale(1.08) rotate(3deg);
@@ -529,7 +511,9 @@
     background: var(--surface); border: 2px solid var(--border);
     border-radius: 22px; padding: 16px 18px; margin-bottom: 10px;
     box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255,255,255,0.06);
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
   @media (hover: hover) {
     .card-row:hover, .history-row:hover { border-color: var(--purple); transform: translateY(-2px); }
@@ -559,7 +543,9 @@
     display: flex; gap: 10px; background: var(--surface); border: 2px solid var(--border);
     border-radius: 22px; padding: 16px 18px; margin-bottom: 10px;
     box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255,255,255,0.06);
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
   .notif-item.clickable { cursor: pointer; }
   .notif-item.clickable:hover { border-color: var(--purple); transform: translateY(-2px); }
@@ -648,28 +634,29 @@
   .tabbar {
     position: absolute; left: 16px; right: 16px; bottom: calc(12px + var(--safe-bottom)); z-index: 20;
     background: var(--surface);
-    border: 1.5px solid var(--border-strong);
-    border-radius: 24px;
-    display: flex; align-items: center;
-    padding: 6px 6px;
-    box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.4), var(--shadow);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    display: flex;
+    padding: 8px 8px;
+    box-shadow: 0 20px 45px -10px rgba(105,82,224,0.4), var(--shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
   .tab-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-    color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 7px 0;
-    border-radius: 18px; position: relative;
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 8px 0;
+    border-radius: 20px; position: relative;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .tab-item:active { transform: scale(0.94); }
-  .tab-item svg { width: 20px; height: 20px; transition: transform 0.2s ease; }
-  .tab-item.active {
-    color: var(--accent);
-    font-weight: 700;
-    background: var(--accent-soft);
+  .tab-item:active { transform: scale(0.92); }
+  .tab-item svg { width: 20px; height: 20px; }
+  .tab-item.active { color: #fff; }
+  .tab-item.active::before {
+    content: ''; position: absolute; inset: -2px 6px auto 6px; top: -4px; height: 36px;
+    background: var(--accent-grad); border-radius: 18px; z-index: -1;
+    box-shadow: 0 8px 20px -4px rgba(105,82,224,0.5);
   }
-  .tab-item.active svg { transform: scale(1.1); }
-  .tab-item.active::before { display: none; }
   .tab-dot {
     position: absolute; top: 0px; right: 26%;
     width: 7px; height: 7px; border-radius: 50%; background: var(--coral);
@@ -681,17 +668,17 @@
   .chip-row { display: flex; gap: 8px; padding: 0 20px 14px; overflow-x: auto; -ms-overflow-style:none; scrollbar-width:none; }
   .chip-row::-webkit-scrollbar { display: none; }
   .filter-chip {
-    flex-shrink: 0; padding: 8px 18px; border-radius: 20px; font-size: 12.5px; font-weight: 700;
-    background: var(--surface-2); border: 1.5px solid var(--border-strong); color: var(--ink-muted);
+    flex-shrink: 0; padding: 8px 16px; border-radius: 24px; font-size: 12px; font-weight: 700;
+    background: var(--surface-2); border: 2px solid var(--border); color: var(--ink-muted);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .filter-chip:active { transform: scale(0.94); }
   .filter-chip.selected {
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-    color: #ffffff;
-    border-color: transparent;
-    box-shadow: 0 6px 16px -3px rgba(249, 115, 22, 0.4);
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 6px 16px -4px var(--accent-soft);
   }
   .search-bar {
     margin: 0 20px 14px; display: flex; align-items: center; gap: 8px;
@@ -779,32 +766,20 @@
 
   /* ---- Modal (bottom sheet) ---- */
   .sheet-overlay {
-    position: absolute; inset: 0; background: rgba(6,6,8,0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    position: absolute; inset: 0; background: rgba(6,6,8,0.55);
     display: none; align-items: flex-end; z-index: 40;
     overflow: hidden; max-width: 100%; box-sizing: border-box;
-    animation: sheetOverlayFadeIn 0.25s ease-out;
-  }
-  @keyframes sheetOverlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
   }
   .sheet-overlay.open { display: flex; }
   .sheet {
     width: 100%; max-width: 100%; box-sizing: border-box; background: var(--bg); border-radius: 32px 32px 0 0;
-    padding: 12px 20px calc(24px + var(--safe-bottom));
-    max-height: 85%; overflow-y: auto; overflow-x: hidden;
+    padding: 10px 20px calc(22px + var(--safe-bottom));
+    max-height: 82%; overflow-y: auto; overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
     border-top: 2px solid var(--border-strong);
-    box-shadow: 0 -20px 40px rgba(0,0,0,0.35);
-    animation: nativeSheetUp 0.35s cubic-bezier(0.32, 1.25, 0.375, 1.15);
-  }
-  @keyframes nativeSheetUp {
-    from { transform: translate3d(0, 100%, 0); }
-    to { transform: translate3d(0, 0, 0); }
+    box-shadow: 0 -15px 30px rgba(0,0,0,0.15);
   }
   .sheet *, .sheet *::before, .sheet *::after {
     box-sizing: border-box;
@@ -898,12 +873,14 @@
   }
   .logo-badge {
     width: 64px; height: 64px; border-radius: 20px;
-    background: rgba(20, 20, 35, 0.95);
+    background: rgba(20, 20, 35, 0.65);
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 12px;
     box-shadow: 0 12px 32px rgba(105, 82, 224, 0.28), inset 0 0 12px rgba(255, 255, 255, 0.05);
-    animation: logoPop 0.45s cubic-bezier(.16,.84,.44,1) both;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: logoPop 0.45s cubic-bezier(.16,.84,.44,1) both, glowBreathe 3.2s ease-in-out 0.45s infinite;
   }
   .auth-logo-area h2 { animation: riseIn 0.4s ease 0.12s both; }
   .auth-logo-area p { animation: riseIn 0.4s ease 0.18s both; }
@@ -958,23 +935,25 @@
     border-radius: 20px;
     padding: 20px;
     box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   /* ---- Real mobil ekranlarda: telefon çərçivəsini ləğv et, tam ekran ol ---- */
-  @media (max-width: 640px) {
+  @media (max-width: 480px), (max-height: 860px) {
     .device-stage {
       padding: 0;
       align-items: stretch;
       background:
-        radial-gradient(circle at 20% 20%, rgba(217,107,67,0.10), transparent 55%),
-        radial-gradient(circle at 80% 80%, rgba(232,181,77,0.08), transparent 55%),
-        var(--bg);
+        radial-gradient(circle at 10% 20%, rgba(139,92,246,0.18), transparent 55%),
+        radial-gradient(circle at 90% 80%, rgba(31,224,194,0.14), transparent 55%),
+        #ebeeFA;
     }
     [data-theme="dark"] .device-stage {
       background:
-        radial-gradient(circle at 20% 20%, rgba(217,107,67,0.10), transparent 55%),
-        radial-gradient(circle at 80% 80%, rgba(232,181,77,0.08), transparent 55%),
-        #14151a;
+        radial-gradient(circle at 10% 20%, rgba(105,82,224,0.25), transparent 55%),
+        radial-gradient(circle at 90% 80%, rgba(31,224,194,0.20), transparent 55%),
+        #090710;
     }
     .phone {
       width: 100%; height: 100vh; height: 100dvh;
@@ -989,7 +968,7 @@
     .hero-panel { margin: 8px 16px 12px; padding: 18px 16px 18px; }
     .hero-title { font-size: 21px; }
     .stat-scroll { padding: 0 16px 4px; gap: 8px; }
-    .stat-card { padding: 12px 14px; min-width: 160px; gap: 6px; border-radius: 14px; }
+    .stat-card { padding: 10px 12px; min-width: 132px; gap: 6px; border-radius: 12px; }
     .stat-icon { width: 24px; height: 24px; border-radius: 6px; }
     .stat-value { font-size: 17px; }
     .ruler-card { margin: 12px 16px 6px; padding: 14px 14px 16px; border-radius: 16px; }
@@ -1080,12 +1059,11 @@
   .preview-bank-name {
     font-family: var(--font-display);
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 1px;
-    color: #ffffff !important;
-    opacity: 0.95;
+    color: var(--ink);
+    opacity: 0.85;
     text-transform: uppercase;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
   }
   .preview-brand-logo {
     display: flex;
@@ -1105,14 +1083,14 @@
     z-index: 2;
   }
   .preview-card-number {
-    font-family: var(--font-display);
-    font-size: 16.5px;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-    color: #ffffff !important;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--ink);
     margin: 12px 0 6px;
     z-index: 2;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
   }
   .preview-card-footer {
     display: flex;
@@ -1121,19 +1099,18 @@
     z-index: 2;
   }
   .preview-label {
-    font-size: 7.5px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.75) !important;
-    letter-spacing: 0.6px;
+    font-size: 7px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    letter-spacing: 0.5px;
     margin-bottom: 2px;
   }
   .preview-value {
-    font-size: 10.5px;
-    font-weight: 700;
-    color: #ffffff !important;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink);
     text-transform: uppercase;
-    letter-spacing: 0.6px;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    letter-spacing: 0.5px;
   }
   .preview-card-back {
     background: rgba(16, 14, 30, 0.95);
@@ -1297,7 +1274,9 @@
     top: -140px;
     left: 5%;
     width: 90%;
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px) saturate(190%);
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 20px;
     padding: 12px 16px;
@@ -1373,7 +1352,7 @@
   <div class="phone">
     <div class="notch"></div>
     <div class="statusbar">
-      <span class="time">9:41</span>
+      <span>9:41</span>
       <div class="icons">
         <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><rect x="0" y="6" width="3" height="5" rx="0.5" fill="currentColor"/><rect x="4.5" y="4" width="3" height="7" rx="0.5" fill="currentColor"/><rect x="9" y="2" width="3" height="9" rx="0.5" fill="currentColor"/><rect x="13" y="0" width="3" height="11" rx="0.5" fill="currentColor"/></svg>
         <svg width="14" height="11" viewBox="0 0 14 11" fill="none"><path d="M7 11 0 4.5C3 1 11 1 14 4.5Z" fill="currentColor"/></svg>
@@ -1387,23 +1366,41 @@
       <div class="screen active" id="scr-auth">
         <div class="auth-container">
           <div class="auth-logo-area">
-            <div class="logo-badge" style="background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.25); box-shadow: 0 12px 32px rgba(249, 115, 22, 0.2);">
-              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:52px; height:52px;">
+            <div class="logo-badge">
+              <svg viewBox="0 0 100 100" fill="none" class="logo-mark" style="width:56px; height:56px;">
                 <defs>
-                  <linearGradient id="goldOrangeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#ffb74d"/>
-                    <stop offset="50%" stop-color="#f97316"/>
-                    <stop offset="100%" stop-color="#ea580c"/>
+                  <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="5" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                  <linearGradient id="abuneGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4F46E5" />
+                    <stop offset="50%" stop-color="#7C3AED" />
+                    <stop offset="100%" stop-color="#EC4899" />
                   </linearGradient>
-                  <linearGradient id="cyanWaveGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#00f2fe"/>
-                    <stop offset="100%" stop-color="#10b981"/>
+                  <linearGradient id="abuneGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#06B6D4" />
+                    <stop offset="100%" stop-color="#10B981" />
+                  </linearGradient>
+                  <linearGradient id="glassShine" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.6" />
+                    <stop offset="40%" stop-color="#FFFFFF" stop-opacity="0.1" />
+                    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.0" />
                   </linearGradient>
                 </defs>
-                <path d="M 28 74 L 50 25 L 72 74" stroke="url(#goldOrangeGrad1)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M 36 60 C 42 50, 58 70, 64 60" stroke="url(#cyanWaveGrad1)" stroke-width="6.5" stroke-linecap="round" fill="none"/>
-                <circle cx="50" cy="16" r="5.5" fill="#34d399"/>
-                <circle cx="50" cy="16" r="8.5" fill="#34d399" opacity="0.25"/>
+                <circle cx="50" cy="50" r="38" fill="url(#abuneGrad1)" opacity="0.18" filter="url(#logoGlow)"/>
+                <path d="M 28 50 C 28 32, 45 32, 50 50 C 55 68, 72 68, 72 50" stroke="url(#abuneGrad2)" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.45"/>
+                <g filter="url(#logoGlow)">
+                  <rect x="22" y="30" width="56" height="40" rx="10" fill="rgba(15, 23, 42, 0.9)" stroke="url(#abuneGrad1)" stroke-width="3"/>
+                  <rect x="23" y="31" width="54" height="38" rx="9" fill="url(#glassShine)"/>
+                  <line x1="22" y1="42" x2="78" y2="42" stroke="url(#abuneGrad1)" stroke-width="3.5" opacity="0.85"/>
+                  <rect x="29" y="52" width="10" height="8" rx="2.5" fill="url(#abuneGrad2)"/>
+                  <line x1="45" y1="55" x2="68" y2="55" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+                  <line x1="45" y1="60" x2="60" y2="60" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+                </g>
+                <path d="M 72 50 C 72 32, 55 32, 50 50 C 45 68, 28 68, 28 50" stroke="url(#abuneGrad2)" stroke-width="6" stroke-linecap="round" fill="none"/>
+                <circle cx="72" cy="32" r="4.5" fill="#10B981"/>
+                <circle cx="72" cy="32" r="8" fill="#10B981" opacity="0.3"/>
               </svg>
             </div>
             <h2>Abunəm</h2>
@@ -1450,9 +1447,9 @@
             <!-- OTP input container (hidden by default) -->
             <div class="field" id="reg-otp-container" style="display: none;">
               <label>Təsdiq Kodu (OTP)</label>
-              <input type="text" id="reg-otp" placeholder="6 rəqəmli kod" maxlength="6">
-              <div id="otp-timer-status" style="margin-top: 8px; font-size: 12px; text-align: center; color: var(--ink-muted);">
-                ⏳ Koda verilən vaxt: <span id="otp-countdown-timer" style="font-family: var(--font-mono); font-weight: 700; color: #f97316; font-size: 13px;">02:00</span>
+              <input type="text" id="reg-otp" placeholder="6 rəqəmli kod">
+              <div style="text-align: right; margin-top: 4px;">
+                <a href="#" style="font-size: 12px; color: #4f46e5; text-decoration: underline;" onclick="resendRegisterOtp(event)">Kodu yenidən göndər</a>
               </div>
             </div>
             <div class="field-error" id="auth-register-error" style="margin-bottom: 8px;"></div>
@@ -1464,16 +1461,6 @@
 
       <!-- ============ DASHBOARD ============ -->
       <div class="screen" id="scr-dashboard">
-        <div id="pwa-quick-banner" style="display:none; margin: 8px 16px 4px; background: linear-gradient(135deg, rgba(249,115,22,0.15) 0%, rgba(234,88,12,0.08) 100%); border: 1.5px solid var(--border-strong); border-radius: 20px; padding: 12px 16px; align-items: center; justify-content: space-between; gap: 10px; box-shadow: var(--shadow);">
-          <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-            <div style="font-size: 22px;">📲</div>
-            <div>
-              <div style="font-size: 13px; font-weight: 800; color: var(--ink);">Abunəm Tətbiqini Yükləyin</div>
-              <div style="font-size: 11px; color: var(--ink-muted);">Brauzer zolağı olmadan real app kimi istifadə edin</div>
-            </div>
-          </div>
-          <button onclick="installPwaApp()" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; border: none; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0;">Quraşdır</button>
-        </div>
         <div class="hero-panel">
           <div class="hero-blob hero-blob-1"></div>
           <div class="hero-blob hero-blob-2"></div>
@@ -1484,24 +1471,32 @@
               <div class="hero-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
             </div>
             <div style="display: flex; align-items: center; gap: 14px;">
-              <div class="hero-illustration p-2 rounded-3xl bg-gradient-to-tr from-orange-950/40 via-slate-900 to-amber-950/30 border border-orange-500/30 shadow-xl shadow-orange-500/20 transition-all duration-300 hover:rotate-6 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Rəsmi Loqosu">
-                <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 blur-md opacity-75 group-hover:opacity-100 transition-opacity"></div>
+              <div class="hero-illustration p-2 rounded-3xl bg-gradient-to-tr from-indigo-900/80 via-purple-900/80 to-slate-900/90 border border-indigo-400/40 shadow-xl shadow-indigo-500/25 backdrop-blur-xl transition-all duration-300 hover:rotate-6 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Interactive Holographic Emblem">
+                <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-cyan-500/20 to-pink-500/20 blur-md opacity-75 group-hover:opacity-100 transition-opacity"></div>
                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 46px; height: 46px; position:relative; z-index:1;">
                   <defs>
-                    <linearGradient id="goldOrangeGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#ffb74d"/>
-                      <stop offset="50%" stop-color="#f97316"/>
-                      <stop offset="100%" stop-color="#ea580c"/>
+                    <linearGradient id="creativeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#8B5CF6" />
+                      <stop offset="50%" stop-color="#3B82F6" />
+                      <stop offset="100%" stop-color="#EC4899" />
                     </linearGradient>
-                    <linearGradient id="cyanWaveGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#00f2fe"/>
-                      <stop offset="100%" stop-color="#10b981"/>
+                    <linearGradient id="creativeGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#10B981" />
+                      <stop offset="100%" stop-color="#06B6D4" />
                     </linearGradient>
+                    <filter id="creativeGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="5" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
                   </defs>
-                  <path d="M 28 74 L 50 25 L 72 74" stroke="url(#goldOrangeGrad2)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M 36 60 C 42 50, 58 70, 64 60" stroke="url(#cyanWaveGrad2)" stroke-width="6.5" stroke-linecap="round" fill="none"/>
-                  <circle cx="50" cy="16" r="5.5" fill="#34d399"/>
-                  <circle cx="50" cy="16" r="8.5" fill="#34d399" opacity="0.25"/>
+                  <polygon points="50,8 88,28 88,72 50,92 12,72 12,28" fill="rgba(15, 23, 42, 0.95)" stroke="url(#creativeGrad1)" stroke-width="3.5" filter="url(#creativeGlow)"/>
+                  <path d="M 30 50 Q 50 20 70 50 Q 50 80 30 50 Z" stroke="url(#creativeGrad2)" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="0.85"/>
+                  <path d="M 50 25 L 72 68 H 60 L 50 48 L 40 68 H 28 Z" fill="url(#creativeGrad1)"/>
+                  <circle cx="50" cy="50" r="5" fill="#10B981" filter="url(#creativeGlow)">
+                    <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+                  </circle>
+                  <polygon points="50,42 52,48 58,50 52,52 50,58 48,52 42,50 48,48" fill="#FFFFFF"/>
                 </svg>
               </div>
               <div class="hero-avatar" id="hero-avatar-initials" onclick="switchScreen('settings')" title="Ayarlar">U.U</div>
@@ -1524,8 +1519,8 @@
             <svg class="db-ring" viewBox="0 0 100 100">
               <defs>
                 <linearGradient id="dbRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#f97316"/>
-                  <stop offset="100%" stop-color="#f59e0b"/>
+                  <stop offset="0%" stop-color="#8b5cf6"/>
+                  <stop offset="100%" stop-color="#ec4899"/>
                 </linearGradient>
               </defs>
               <circle class="db-ring-track" cx="50" cy="50" r="40"></circle>
@@ -1537,29 +1532,29 @@
 
         <!-- Revolut-Style Quick Actions Floating Toolbar -->
         <div class="grid grid-cols-4 gap-2 my-4">
-          <button onclick="openSheet()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/25 transition-all hover:scale-105 active:scale-95 border border-orange-400/30 cursor-pointer">
+          <button onclick="openSheet()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-500/25 transition-all hover:scale-105 active:scale-95 border border-purple-400/30 cursor-pointer">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
             <span class="text-[10px] font-bold mt-1.5">+ Əlavə et</span>
           </button>
-          <button onclick="switchScreen('budget')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-orange-500/40 active:scale-95 cursor-pointer">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-500 dark:text-orange-400"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <button onclick="switchScreen('budget')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-purple-500/40 active:scale-95 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple-600 dark:text-purple-400"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             <span class="text-[10px] font-bold mt-1.5 text-slate-700 dark:text-slate-300">Büdcə</span>
           </button>
-          <button onclick="switchScreen('cards')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-orange-500/40 active:scale-95 cursor-pointer">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-500 dark:text-amber-400"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+          <button onclick="switchScreen('cards')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-purple-500/40 active:scale-95 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-600 dark:text-indigo-400"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
             <span class="text-[10px] font-bold mt-1.5 text-slate-700 dark:text-slate-300">Kartlar</span>
           </button>
-          <button onclick="switchScreen('notifications')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-orange-500/40 active:scale-95 cursor-pointer">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-orange-500 dark:text-orange-400"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <button onclick="switchScreen('notifications')" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all hover:scale-105 hover:border-purple-500/40 active:scale-95 cursor-pointer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-pink-600 dark:text-pink-400"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <span class="text-[10px] font-bold mt-1.5 text-slate-700 dark:text-slate-300">Bildirişlər</span>
           </button>
         </div>
 
         <!-- Tailwind v4 Cheerful Vibrant AI Insights Banner -->
-        <div class="my-4 p-4 rounded-3xl bg-gradient-to-r from-orange-950 via-amber-950 to-slate-900 border border-orange-400/40 backdrop-blur-xl shadow-lg transition-all duration-300 hover:border-orange-400/60">
+        <div class="my-4 p-4 rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 border border-purple-400/40 backdrop-blur-xl shadow-lg transition-all duration-300 hover:border-purple-400/60">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="p-2.5 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/40">
+              <div class="p-2.5 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-500 text-white shadow-md shadow-purple-500/40">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
               <div>
@@ -1567,7 +1562,7 @@
                 <div class="text-xs font-bold text-white mt-0.5">Bütün xərcləriniz tam nəzarət altındadır ✨</div>
               </div>
             </div>
-            <button onclick="switchScreen('budget')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer">
+            <button onclick="switchScreen('budget')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer">
               Büdcə →
             </button>
           </div>
@@ -1636,24 +1631,21 @@
             <div class="icon-round" onclick="openSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
           </div>
         </div>
-        <div style="padding: 0 20px 12px; width: 100%; box-sizing: border-box;">
-          <div class="search-bar" style="margin: 0; width: 100%; box-sizing: border-box;">
+        <div class="h-row" style="padding: 0 20px 14px; gap: 10px;">
+          <div class="search-bar" style="margin: 0; flex: 1;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
             <input type="text" id="sub-search-input" placeholder="Abunəlik axtar…" data-i18n-placeholder="search_placeholder" oninput="filterSubscriptionsList()">
           </div>
-        </div>
-        <div class="chip-row" id="category-filter-row">
-          <div class="sort-chip-wrap" style="flex-shrink: 0; position: relative; display: inline-flex; align-items: center; background: var(--surface-2); border: 1.5px solid var(--border-strong); border-radius: 20px; padding: 0 12px; height: 38px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; flex-shrink: 0;">
-              <path d="M7 20V4M7 4l-4 4M7 4l4 4M17 4v16M17 20l-4-4M17 20l4-4"/>
-            </svg>
-            <select id="sub-sort-select" onchange="filterSubscriptionsList()" style="background: transparent; border: none; color: var(--ink); font-size: 12.5px; font-weight: 700; outline: none; cursor: pointer; height: 100%; font-family: var(--font-display);">
+          <div class="select-wrap" style="background: var(--surface); border: 2px solid var(--border); border-radius: 18px; padding: 10px 16px; box-shadow: var(--shadow); height: 42px; display: flex; align-items: center; justify-content: center;">
+            <select id="sub-sort-select" onchange="filterSubscriptionsList()" style="background:none; border:none; color:var(--ink-muted); font-size:12px; font-weight:700; outline:none; cursor:pointer; padding-right:12px;">
               <option value="next_asc">Ödəniş (Tez)</option>
               <option value="price_desc">Qiymət (Azalan)</option>
               <option value="price_asc">Qiymət (Artan)</option>
               <option value="name_asc">Ad (A-Z)</option>
             </select>
           </div>
+        </div>
+        <div class="chip-row" id="category-filter-row">
           <div class="filter-chip selected" data-category="All" onclick="filterCategory('All')" data-i18n="filter_all">Hamısı</div>
           <div class="filter-chip" data-category="Entertainment" onclick="filterCategory('Entertainment')">Entertainment</div>
           <div class="filter-chip" data-category="Music" onclick="filterCategory('Music')">Music</div>
@@ -1854,22 +1846,6 @@
               <div class="theme-opt" id="theme-dark-opt" onclick="setTheme('dark')" data-i18n="theme_dark">Tünd</div>
               <div class="theme-opt" id="theme-light-opt" onclick="setTheme('light')" data-i18n="theme_light">Açıq</div>
             </div>
-          </div>
-        </div>
-
-        <!-- Settings Group: PWA Standalone Real App Installation -->
-        <div class="settings-group" id="pwa-install-group" style="cursor:pointer;" onclick="installPwaApp()">
-          <div class="settings-row">
-            <div class="settings-row-left">
-              <div class="settings-icon purple" style="background: rgba(249, 115, 22, 0.15); color: #f97316;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              </div>
-              <div>
-                <div class="settings-row-label" style="font-size:14px; font-weight:700; color:var(--ink);">Tətbiqi Quraşdırın (Real App)</div>
-                <div style="font-size:11px; color:var(--ink-muted);">Chrome/Safari brauzer çərçivəsi olmadan kompüterə və telefona yükləyin</div>
-              </div>
-            </div>
-            <span class="badge" style="background:linear-gradient(135deg, #f97316 0%, #ea580c 100%); color:#fff; font-size:11px; padding:4px 10px; border-radius:12px; font-weight:700;">📲 YÜKLƏ</span>
           </div>
         </div>
 
@@ -2255,201 +2231,6 @@
     return obj;
   }
 
-  // ─── Native Passive Touch Momentum Engine (Fixes Mobile Scroll Freeze) ───
-  try {
-    window.addEventListener('touchstart', function() {}, { passive: true });
-    window.addEventListener('touchmove', function() {}, { passive: true });
-  } catch (e) {}
-
-  // ─── PWA Standalone App Installer (iOS Apple HIG & Android Native) ───
-  window.deferredPwaPrompt = null;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    window.deferredPwaPrompt = e;
-    const banner = document.getElementById('pwa-quick-banner');
-    if (banner) banner.style.display = 'flex';
-  });
-
-  function isIosDevice() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  }
-
-  async function installPwaApp() {
-    triggerHaptic('medium');
-    
-    // 1. Check if running in Standalone mode
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-      showInAppToast('Tətbiq Quraşdırılıb ✅', 'Abunəm artıq telefonunuzun əsas ekranında rəsmi tətbiq kimi aktivdir.');
-      return;
-    }
-
-    // 2. Direct 1-Click Native Chrome / Samsung Internet / Android WebAPK Installation Trigger
-    if (window.deferredPwaPrompt) {
-      try {
-        window.deferredPwaPrompt.prompt();
-        const { outcome } = await window.deferredPwaPrompt.userChoice;
-        if (outcome === 'accepted') {
-          triggerHaptic('success');
-          showInAppToast('Tətbiq Quraşdırıldı 📲', 'Abunəm tətbiqi uğurla telefonunuza yükləndi.');
-          const banner = document.getElementById('pwa-quick-banner');
-          if (banner) banner.style.display = 'none';
-        }
-        window.deferredPwaPrompt = null;
-        return;
-      } catch (e) {
-        console.error('PWA prompt error:', e);
-      }
-    }
-
-    // 3. If running on iOS Safari (iPhone / iPad), open Apple HIG sheet
-    if (isIosDevice()) {
-      showIosInstallModal();
-      return;
-    }
-
-    // 4. Guaranteed Feedback: If Chrome prompt is warming up or suppressed
-    showAndroidInstallModal();
-  }
-
-  function showAndroidInstallModal() {
-    const existing = document.getElementById('android-install-modal');
-    if (existing) { existing.classList.add('open'); return; }
-
-    const modal = document.createElement('div');
-    modal.id = 'android-install-modal';
-    modal.className = 'sheet-overlay open';
-    modal.innerHTML = `
-      <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
-        <div class="sheet-handle"></div>
-        <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=6.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
-        </div>
-        <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
-        <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
-        
-        <div style="background: var(--surface-2); border: 1.5px solid var(--border-strong); border-radius: 18px; padding: 16px; text-align: left; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--ink);">
-            <span style="background: var(--accent); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">1</span>
-            <span>Yuxarı küncdəki <strong style="color: var(--accent);">3 Nöqtə (⋮)</strong> menyusuna sıxın.</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--ink);">
-            <span style="background: var(--accent); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">2</span>
-            <span>Açılan menyudan <strong style="color: var(--accent);">'Tətbiqi quraşdırın' (və ya 'Əsas ekrana əlavə et')</strong> seçin.</span>
-          </div>
-        </div>
-
-        <button onclick="document.getElementById('android-install-modal').classList.remove('open')" style="width: 100%; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; font-size: 14px; font-weight: 800; padding: 16px; border-radius: 18px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 20px rgba(249,115,22,0.35);">
-          <span>ANLADIM, BAĞLA</span>
-        </button>
-      </div>
-    `;
-    document.body.appendChild(modal);
-  }
-
-  function showIosInstallModal() {
-    const existing = document.getElementById('ios-install-modal');
-    if (existing) { existing.classList.add('open'); return; }
-
-    const modal = document.createElement('div');
-    modal.id = 'ios-install-modal';
-    modal.className = 'sheet-overlay open';
-    modal.innerHTML = `
-      <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
-        <div class="sheet-handle"></div>
-        <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=6.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
-        </div>
-        <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
-        <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
-        <div style="background: var(--surface-2); border: 1.5px solid var(--border-strong); border-radius: 18px; padding: 16px; text-align: left; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--ink);">
-            <span style="background: var(--accent); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">1</span>
-            <span>Safari menyusundan <strong style="color: var(--accent);">Paylaş (⎋ Share)</strong> ikonuna basın.</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--ink);">
-            <span style="background: var(--accent); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">2</span>
-            <span>Aşağı sürüşdürüb <strong style="color: var(--accent);">'Əsas ekrana əlavə et' (Add to Home Screen ➕)</strong> seçin.</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--ink);">
-            <span style="background: var(--accent); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">3</span>
-            <span>Yuxarı sağ küncdə <strong style="color: var(--accent);">'Əlavə et' (Add)</strong> düyməsini sıxın.</span>
-          </div>
-        </div>
-        <button onclick="document.getElementById('ios-install-modal').classList.remove('open')" style="width: 100%; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; font-size: 14px; font-weight: 800; padding: 16px; border-radius: 18px; border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(249,115,22,0.35);">ANLADIM, BAĞLA</button>
-      </div>
-    `;
-    document.body.appendChild(modal);
-  }
-
-  // ─── Native iOS & Android Haptic Feedback Engine ─────────────────
-  function triggerHaptic(type = 'light') {
-    try {
-      if ('vibrate' in navigator) {
-        if (type === 'light') navigator.vibrate(8);
-        else if (type === 'medium') navigator.vibrate(16);
-        else if (type === 'heavy') navigator.vibrate([20, 30, 20]);
-        else if (type === 'success') navigator.vibrate([10, 40, 15]);
-        else if (type === 'error') navigator.vibrate([35, 35, 35]);
-      }
-    } catch (e) {}
-  }
-
-  // ─── Live Statusbar Clock Tick ────────────────────────────────────
-  function updateNativeClock() {
-    const timeEl = document.querySelector('.statusbar .time');
-    if (!timeEl) return;
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    timeEl.textContent = `${hours}:${minutes}`;
-  }
-  setInterval(updateNativeClock, 1000);
-  setTimeout(updateNativeClock, 100);
-
-  // ─── Native Drag-to-Dismiss Sheet Gestures ────────────────────────
-  function initNativeSheetGestures() {
-    document.querySelectorAll('.sheet-overlay').forEach(overlay => {
-      const sheet = overlay.querySelector('.sheet');
-      const handle = overlay.querySelector('.sheet-handle') || overlay.querySelector('.sheet-head');
-      if (!sheet || !handle) return;
-
-      let startY = 0;
-      let currentY = 0;
-      let isDragging = false;
-
-      handle.style.cursor = 'grab';
-
-      handle.addEventListener('touchstart', (e) => {
-        startY = e.touches[0].clientY;
-        isDragging = true;
-        sheet.style.transition = 'none';
-      }, { passive: true });
-
-      handle.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        currentY = e.touches[0].clientY - startY;
-        if (currentY > 0) {
-          sheet.style.transform = `translate3d(0, ${currentY}px, 0)`;
-        }
-      }, { passive: true });
-
-      handle.addEventListener('touchend', () => {
-        if (!isDragging) return;
-        isDragging = false;
-        sheet.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-        if (currentY > 75) {
-          triggerHaptic('medium');
-          overlay.classList.remove('open');
-          if (typeof updateBodyScrollLock === 'function') updateBodyScrollLock();
-        } else {
-          sheet.style.transform = 'translate3d(0, 0, 0)';
-        }
-        currentY = 0;
-      });
-    });
-  }
-  document.addEventListener('DOMContentLoaded', initNativeSheetGestures);
-
   // API Request Wrapper using JWT Bearer authentication
   async function apiFetch(method, endpoint, body = null) {
     const token = localStorage.getItem('abunelik_token');
@@ -2598,7 +2379,6 @@
     // Reset registration form state if tab changes
     if (mode === 'login' || mode === 'register') {
       isOtpVerificationStep = false;
-      if (otpCountdownInterval) clearInterval(otpCountdownInterval);
       document.getElementById('reg-otp-container').style.display = 'none';
       document.getElementById('reg-username').parentElement.style.display = 'block';
       document.getElementById('reg-ad').parentElement.style.display = 'block';
@@ -2607,40 +2387,6 @@
       document.getElementById('reg-submit-btn').textContent = 'Qeydiyyatdan Keç';
       document.getElementById('auth-register-error').style.color = '#ef4444'; // Reset color to red
     }
-  }
-
-  let otpCountdownInterval = null;
-
-  function startOtpCountdownTimer(seconds = 120) {
-    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
-
-    const timerStatusEl = document.getElementById('otp-timer-status');
-    if (timerStatusEl) {
-      timerStatusEl.style.color = 'var(--ink-muted)';
-      timerStatusEl.innerHTML = '⏳ Koda verilən vaxt: <span id="otp-countdown-timer" style="font-family: var(--font-mono); font-weight: 700; color: #f97316; font-size: 13px;">02:00</span>';
-    }
-
-    let timeLeft = seconds;
-
-    function tick() {
-      const currentValEl = document.getElementById('otp-countdown-timer');
-      const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-      const secs = (timeLeft % 60).toString().padStart(2, '0');
-      if (currentValEl) currentValEl.textContent = `${mins}:${secs}`;
-
-      if (timeLeft <= 0) {
-        clearInterval(otpCountdownInterval);
-        otpCountdownInterval = null;
-        if (timerStatusEl) {
-          timerStatusEl.style.color = '#ef4444';
-          timerStatusEl.innerHTML = '⚠️ <b>Koda verilən 2 dəqiqəlik vaxt bitdi!</b><br>Telegram-da emailinizi yenidən yazaraq yeni kod alın.';
-        }
-      }
-      timeLeft--;
-    }
-
-    tick();
-    otpCountdownInterval = setInterval(tick, 1000);
   }
 
   // Login handler
@@ -2695,16 +2441,13 @@
     if (!isOtpVerificationStep) {
       // Step 1: Initiate registration (send OTP)
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Məlumatlar yoxlanılır...';
+      submitBtn.textContent = 'Kod göndərilir...';
       
       const res = await apiFetch('POST', '/api/istifadeciler/register/initiate', { username, ad, email, password });
       submitBtn.disabled = false;
 
       if (res.ok) {
         isOtpVerificationStep = true;
-        // Start 2-minute countdown
-        startOtpCountdownTimer(120);
-
         // Hide regular inputs to keep layout clean
         document.getElementById('reg-username').parentElement.style.display = 'none';
         document.getElementById('reg-ad').parentElement.style.display = 'none';
@@ -2726,7 +2469,7 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.284c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.92 14.41l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.896.176z"/></svg>
               @Abunem_bot-u Açın
             </a>
-            <div style="font-size:11px; margin-top:8px; opacity:0.6;">Bota emailinizi yazın → kod anında gələcək (⏱ 2 dəqiqə etibarlıdır)</div>
+            <div style="font-size:11px; margin-top:8px; opacity:0.6;">Bota emailinizi yazın → kod anında gələcək</div>
           </div>`;
         errorEl.style.color = '#10b981';
         errorEl.classList.add('show');
@@ -2759,7 +2502,6 @@
         activeBtn.disabled = false;
         
         // Reset registration fields state
-        if (otpCountdownInterval) clearInterval(otpCountdownInterval);
         isOtpVerificationStep = false;
         otpContainer.style.display = 'none';
         document.getElementById('reg-username').parentElement.style.display = 'block';
@@ -2786,6 +2528,12 @@
         errorEl.classList.add('show');
       }
     }
+  }
+
+  async function resendRegisterOtp(event) {
+    if (event) event.preventDefault();
+    isOtpVerificationStep = false;
+    await handleRegister();
   }
 
   function handleLogout() {
@@ -2991,24 +2739,11 @@
     renderSubs();
     renderNotifs();
     renderRuler();
-    try {
-      renderBudgetCard();
-    } catch (err) {
-      console.error('❌ Büdcə paneli (ilkin yüklənmə) uğursuz oldu:', err);
-    }
+    renderBudgetCard();
 
     // 5. Cards & Payment History
-    // Each is guarded independently so a failure in one never blocks the other.
-    try {
-      await loadCards();
-    } catch (err) {
-      console.error('❌ Kartlar (ilkin yüklənmə) uğursuz oldu:', err);
-    }
-    try {
-      await loadPaymentHistory();
-    } catch (err) {
-      console.error('❌ Ödəniş tarixçəsi (ilkin yüklənmə) uğursuz oldu:', err);
-    }
+    await loadCards();
+    await loadPaymentHistory();
   }
 
   function getUrgency(basliq, mesaj) {
@@ -3064,97 +2799,55 @@
   }
 
   function getBrandIconHTML(name, category) {
-    const lowerName = (name || '').toLowerCase().trim();
+    const lowerName = (name || '').toLowerCase();
     
     // Netflix
     if (lowerName.includes('netflix') || lowerName.includes('neftlix')) {
-      return `<div class="sub-icon" style="background: rgba(229, 9, 20, 0.15); border: 1px solid rgba(229, 9, 20, 0.3); box-shadow: 0 4px 10px rgba(229, 9, 20, 0.15);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><path d="M4 2v20h4V13.6L16 22h4V2h-4v8.4L8 2H4z" fill="#E50914"/></svg></div>`;
+      return `<div class="sub-icon" style="background: rgba(229, 9, 20, 0.12); border: 1px solid rgba(229, 9, 20, 0.25); box-shadow: 0 4px 10px rgba(229, 9, 20, 0.15);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><path d="M4 2v20h4V13.6L16 22h4V2h-4v8.4L8 2H4z" fill="#E50914"/></svg></div>`;
     }
     // Spotify
     if (lowerName.includes('spotify')) {
-      return `<div class="sub-icon" style="background: rgba(29, 185, 84, 0.15); border: 1px solid rgba(29, 185, 84, 0.3); box-shadow: 0 4px 10px rgba(29, 185, 84, 0.15);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><circle cx="12" cy="12" r="10" fill="#1DB954"/><path d="M7 9a11 11 0 0 1 10 0M8 12a8 8 0 0 1 8 0M9 15a5 5 0 0 1 6 0" stroke="#FFF" stroke-width="1.8" stroke-linecap="round"/></svg></div>`;
-    }
-    // LinkedIn
-    if (lowerName.includes('linkedin')) {
-      return `<div class="sub-icon" style="background: rgba(10, 102, 194, 0.15); border: 1px solid rgba(10, 102, 194, 0.3); box-shadow: 0 4px 10px rgba(10, 102, 194, 0.15);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#0A66C2"/><path d="M6.5 8.5h3v10h-3v-10zM8 5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM12.5 8.5h2.9v1.4h.1c.4-.7 1.4-1.5 2.8-1.5 3 0 3.5 2 3.5 4.6v5.5h-3v-4.9c0-1.2 0-2.7-1.6-2.7-1.7 0-1.9 1.3-1.9 2.6v5h-3v-10z" fill="#FFF"/></svg></div>`;
-    }
-    // Facebook
-    if (lowerName.includes('facebook') || lowerName.includes('fb') || lowerName.includes('meta')) {
-      return `<div class="sub-icon" style="background: rgba(24, 119, 242, 0.15); border: 1px solid rgba(24, 119, 242, 0.3); box-shadow: 0 4px 10px rgba(24, 119, 242, 0.15);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><circle cx="12" cy="12" r="10" fill="#1877F2"/><path d="M15 12h-2v7h-3v-7H8.5V9.5H10V8c0-2 1-3 3-3h2v2.5h-1.5c-.8 0-1 .4-1 1v1h2.5L15 12z" fill="#FFF"/></svg></div>`;
-    }
-    // Instagram
-    if (lowerName.includes('instagram') || lowerName.includes('ig')) {
-      return `<div class="sub-icon" style="background: rgba(228, 64, 95, 0.15); border: 1px solid rgba(228, 64, 95, 0.3); box-shadow: 0 4px 10px rgba(228, 64, 95, 0.15);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="url(#igGrad)"/><defs><linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FFDC80"/><stop offset="50%" stop-color="#E4405F"/><stop offset="100%" stop-color="#833AB4"/></linearGradient></defs><rect x="6" y="6" width="12" height="12" rx="3" stroke="#FFF" stroke-width="1.8" fill="none"/><circle cx="12" cy="12" r="3" stroke="#FFF" stroke-width="1.8" fill="none"/><circle cx="15.5" cy="8.5" r="1" fill="#FFF"/></svg></div>`;
+      return `<div class="sub-icon" style="background: rgba(29, 185, 84, 0.12); border: 1px solid rgba(29, 185, 84, 0.25); box-shadow: 0 4px 10px rgba(29, 185, 84, 0.15);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><circle cx="12" cy="12" r="10" fill="#1DB954"/><path d="M7 9a11 11 0 0 1 10 0M8 12a8 8 0 0 1 8 0M9 15a5 5 0 0 1 6 0" stroke="#FFF" stroke-width="1.8" stroke-linecap="round"/></svg></div>`;
     }
     // YouTube / YouTube Premium
-    if (lowerName.includes('youtube') || lowerName.includes('yt')) {
-      return `<div class="sub-icon" style="background: rgba(255, 0, 0, 0.15); border: 1px solid rgba(255, 0, 0, 0.3); box-shadow: 0 4px 10px rgba(255, 0, 0, 0.15);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/><polygon points="10 9 15 12 10 15" fill="#FFF"/></svg></div>`;
+    if (lowerName.includes('youtube')) {
+      return `<div class="sub-icon" style="background: rgba(255, 0, 0, 0.12); border: 1px solid rgba(255, 0, 0, 0.25); box-shadow: 0 4px 10px rgba(255, 0, 0, 0.15);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/><polygon points="10 9 15 12 10 15" fill="#FFF"/></svg></div>`;
     }
     // Apple / iCloud / iTunes / Apple Music / Apple TV
     if (lowerName.includes('apple') || lowerName.includes('icloud') || lowerName.includes('itunes')) {
-      return `<div class="sub-icon" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 4px 10px rgba(255,255,255,0.05);"><svg viewBox="0 0 24 24" fill="currentColor" style="width:20px; height:20px; color:#fff;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-.96.04-2.13.64-2.82 1.45-.6.69-1.12 1.84-.98 2.94 1.07.08 2.15-.52 2.81-1.33z"/></svg></div>`;
+      return `<div class="sub-icon" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 4px 10px rgba(255,255,255,0.05);"><svg viewBox="0 0 24 24" fill="currentColor" style="width:20px; height:20px; color:#fff;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-.96.04-2.13.64-2.82 1.45-.6.69-1.12 1.84-.98 2.94 1.07.08 2.15-.52 2.81-1.33z"/></svg></div>`;
     }
     // ChatGPT / OpenAI
     if (lowerName.includes('chatgpt') || lowerName.includes('openai')) {
-      return `<div class="sub-icon" style="background: rgba(16, 163, 127, 0.15); border: 1px solid rgba(16, 163, 127, 0.3); box-shadow: 0 4px 10px rgba(16, 163, 127, 0.15);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#10A37F"/><path d="M12 4.5a3.5 3.5 0 00-3.3 2.2 3.5 3.5 0 00-2.3 2.9 3.5 3.5 0 00.3 3.6 3.5 3.5 0 003.3 1.7 3.5 3.5 0 002.2-.6 3.6 3.6 0 003.3-1.7 3.5 3.5 0 00.3-3.6 3.6 3.6 0 00-2.2-2.9 3.5 3.5 0 00-1.6-1.6z" stroke="#FFF" stroke-width="1.6"/></svg></div>`;
+      return `<div class="sub-icon" style="background: rgba(16, 163, 127, 0.12); border: 1px solid rgba(16, 163, 127, 0.25); box-shadow: 0 4px 10px rgba(16, 163, 127, 0.15);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:20px; height:20px; color:#10a37f;"><path d="M4.5 16.5c-1.5-2.5-1.5-5.5 0-8M19.5 7.5c1.5 2.5 1.5 5.5 0 8M16.5 4.5c2.5-1.5 5.5-1.5 8 0M7.5 19.5c-2.5 1.5-5.5 1.5-8 0M7.5 4.5c2.5 1.5 2.5 4.5 0 7M16.5 19.5c-2.5-1.5-2.5-4.5 0-7"/></svg></div>`;
     }
     // Telegram
     if (lowerName.includes('telegram')) {
-      return `<div class="sub-icon" style="background: rgba(0, 136, 204, 0.15); border: 1px solid rgba(0, 136, 204, 0.3); box-shadow: 0 4px 10px rgba(0, 136, 204, 0.15);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><path d="m22 2-21 8 8 3 3 8 2-5 6 4z" fill="#0088cc"/><path d="m9 13 4-8-7 6z" fill="#fff"/></svg></div>`;
+      return `<div class="sub-icon" style="background: rgba(0, 136, 204, 0.12); border: 1px solid rgba(0, 136, 204, 0.25); box-shadow: 0 4px 10px rgba(0, 136, 204, 0.15);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><path d="m22 2-21 8 8 3 3 8 2-5 6 4z" fill="#0088cc"/><path d="m9 13 4-8-7 6z" fill="#fff"/></svg></div>`;
     }
-    // Google / Drive / Gmail / GSuite
-    if (lowerName.includes('google') || lowerName.includes('drive') || lowerName.includes('gmail') || lowerName.includes('gsuite')) {
-      return `<div class="sub-icon" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22-.03-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg></div>`;
+    // Google / Google One / Drive
+    if (lowerName.includes('google') || lowerName.includes('drive') || lowerName.includes('youtube premium') === false && lowerName.includes('yt premium') === false && lowerName.includes('gsuite') || lowerName.includes('gmail')) {
+      return `<div class="sub-icon" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22-.03-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg></div>`;
     }
-    // Wolt
-    if (lowerName.includes('wolt')) {
-      return `<div class="sub-icon" style="background: rgba(0, 194, 232, 0.15); border: 1px solid rgba(0, 194, 232, 0.3);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#00C2E8"/><path d="M4.5 8L8 16L11.5 8L15 16L18.5 8" stroke="#FFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>`;
+    // Canva
+    if (lowerName.includes('canva')) {
+      return `<div class="sub-icon" style="background: rgba(0, 194, 203, 0.12); border: 1px solid rgba(139, 61, 255, 0.25); box-shadow: 0 4px 10px rgba(139, 61, 255, 0.15);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><circle cx="12" cy="12" r="10" fill="url(#canva-grad)"/><defs><linearGradient id="canva-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00C2CB"/><stop offset="100%" stop-color="#8B3DFF"/></linearGradient></defs></svg></div>`;
     }
-    // Yandex
-    if (lowerName.includes('yandex')) {
-      return `<div class="sub-icon" style="background: rgba(252, 63, 29, 0.15); border: 1px solid rgba(252, 63, 29, 0.3);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#FC3F1D"/><path d="M13.8 19.5H10.6V12.2L6.8 4.5H10.2L12.2 9.2L14.2 4.5H17.6L13.8 12.2V19.5Z" fill="#FFF"/></svg></div>`;
-    }
-    // Notion
-    if (lowerName.includes('notion')) {
-      return `<div class="sub-icon" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#FFF"/><path d="M5 4.5l10.8-2 3.2 10.5-11 8L5 4.5z" fill="#000"/><path d="M7 6.2l8.5-1.5 2 6.8-8.5 6.2L7 6.2z" fill="#FFF"/><path d="M9 8.2h1.5l4 5.8V8.2H16v7.5h-1.5l-4-5.8v5.8H9V8.2z" fill="#000"/></svg></div>`;
-    }
-    // Adobe / Photoshop / Illustrator
-    if (lowerName.includes('adobe') || lowerName.includes('photoshop') || lowerName.includes('illustrator') || lowerName.includes('lightroom')) {
-      return `<div class="sub-icon" style="background: rgba(250, 15, 0, 0.15); border: 1px solid rgba(250, 15, 0, 0.3);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#FA0F00"/><path d="M14.2 4.5L19.5 19.5H15.8L14 14.8H10L8.2 19.5H4.5L9.8 4.5H14.2ZM12 9.2L10.8 12.4H13.2L12 9.2Z" fill="#FFF"/></svg></div>`;
-    }
-    // Duolingo
-    if (lowerName.includes('duolingo')) {
-      return `<div class="sub-icon" style="background: rgba(88, 204, 2, 0.15); border: 1px solid rgba(88, 204, 2, 0.3);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#58CC02"/><circle cx="9" cy="10.5" r="2.2" fill="#FFF"/><circle cx="15" cy="10.5" r="2.2" fill="#FFF"/><circle cx="9" cy="10.5" r="1.1" fill="#000"/><circle cx="15" cy="10.5" r="1.1" fill="#000"/><path d="M10 14.5c.6.6 3.4.6 4 0" stroke="#FF4B4B" stroke-width="1.8" stroke-linecap="round"/></svg></div>`;
-    }
-    // TikTok
-    if (lowerName.includes('tiktok')) {
-      return `<div class="sub-icon" style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#000"/><path d="M12.5 3v10.5a3.5 3.5 0 1 1-3.5-3.5c.3 0 .6.05.9.15V7.1a6.5 6.5 0 1 0 5.6 6.4V8.2a7.5 7.5 0 0 0 4.5 1.5V6.7a4.5 4.5 0 0 1-3.5-1.5 4.5 4.5 0 0 1-1-2.2h-3z" fill="#25F4EE"/></svg></div>`;
-    }
-    // Twitter / X
-    if (lowerName.includes('twitter') || lowerName.includes('x.com') || lowerName === 'x') {
-      return `<div class="sub-icon" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#000"/><path d="M18.2 3H21.5L14.3 11.2L22.8 21H16.1L10.9 14.2L4.9 21H1.6L9.3 12.2L1.2 3H8.1L12.8 9.2L18.2 3ZM17.1 19.1H18.9L7 4.8H5.1L17.1 19.1Z" fill="#FFF"/></svg></div>`;
-    }
-    // Discord
-    if (lowerName.includes('discord')) {
-      return `<div class="sub-icon" style="background: rgba(88, 101, 242, 0.15); border: 1px solid rgba(88, 101, 242, 0.3);"><svg viewBox="0 0 24 24" style="width:20px; height:20px;"><rect width="24" height="24" rx="6" fill="#5865F2"/><path d="M16.4 7a13.3 13.3 0 0 0-3.3-1c-.1.2-.3.5-.4.8-1.3-.2-2.6-.2-3.8 0-.1-.3-.3-.6-.5-.8a13.3 13.3 0 0 0-3.3 1C3.3 9.7 2.8 14.5 3.5 19.2a13.5 13.5 0 0 0 4.1 2.1c.3-.4.6-.9.8-1.4-.5-.2-1-.4-1.4-.7l.3-.3a9.6 9.6 0 0 0 9.4 0l.3.3c-.5.3-1 .5-1.4.7.3.5.6.9.8 1.4a13.5 13.5 0 0 0 4.1-2.1c.9-5.4-.5-10.2-1.9-12.2zM9 15.3c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7c.9 0 1.5.8 1.5 1.7 0 1-.6 1.7-1.5 1.7zm6 0c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7c.9 0 1.5.8 1.5 1.7 0 1-.6 1.7-1.5 1.7z" fill="#FFF"/></svg></div>`;
+    // Adobe
+    if (lowerName.includes('adobe') || lowerName.includes('photoshop') || lowerName.includes('illustrator')) {
+      return `<div class="sub-icon" style="background: rgba(255, 0, 0, 0.1); border: 1px solid rgba(255, 0, 0, 0.25);"><svg viewBox="0 0 24 24" fill="#FF0000" style="width:19px; height:19px;"><path d="M14.7 2h7.3v18.7l-7.3-18.7zm-5.4 0H2v18.7L9.3 2zm2.7 5.7L18.4 22h-3.6l-2.8-6.9H8.7L12 7.7z"/></svg></div>`;
     }
     // Amazon / Prime
     if (lowerName.includes('amazon') || lowerName.includes('prime')) {
-      return `<div class="sub-icon" style="background: rgba(255, 153, 0, 0.15); border: 1px solid rgba(255, 153, 0, 0.3);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><path d="M3 17c5 4 13 4 18 0" stroke="#FF9900" stroke-width="2" stroke-linecap="round"/><path d="M18 15l3 2-2 3" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="9" r="6" stroke="#fff" stroke-width="2"/></svg></div>`;
+      return `<div class="sub-icon" style="background: rgba(255, 153, 0, 0.12); border: 1px solid rgba(255, 153, 0, 0.25);"><svg viewBox="0 0 24 24" fill="none" style="width:20px; height:20px;"><path d="M3 17c5 4 13 4 18 0" stroke="#FF9900" stroke-width="2" stroke-linecap="round"/><path d="M18 15l3 2-2 3" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="9" r="6" stroke="#fff" stroke-width="2"/></svg></div>`;
     }
     // Microsoft / Office
     if (lowerName.includes('microsoft') || lowerName.includes('office') || lowerName.includes('onedrive')) {
-      return `<div class="sub-icon" style="background: rgba(0, 164, 239, 0.15); border: 1px solid rgba(0, 164, 239, 0.3);"><svg viewBox="0 0 23 23" style="width:19px; height:19px;"><path fill="#f25022" d="M0 0h11v11H0z"/><path fill="#7fba00" d="M12 0h11v11H12z"/><path fill="#00a4ef" d="M0 12h11v11H0z"/><path fill="#ffb900" d="M12 12h11v11H12z"/></svg></div>`;
+      return `<div class="sub-icon" style="background: rgba(0, 164, 239, 0.12); border: 1px solid rgba(0, 164, 239, 0.25);"><svg viewBox="0 0 23 23" style="width:19px; height:19px;"><path fill="#f25022" d="M0 0h11v11H0z"/><path fill="#7fba00" d="M12 0h11v11H12z"/><path fill="#00a4ef" d="M0 12h11v11H0z"/><path fill="#ffb900" d="M12 12h11v11H12z"/></svg></div>`;
     }
-    // Universal Automatic Global Brand Logo Resolver (for ANY app in the world)
-    let domainCandidate = lowerName.replace(/[^a-z0-9]/g, '');
-    if (!domainCandidate.includes('.')) domainCandidate += '.com';
-    const fallbackHTML = categoryIconHTML(category);
     
-    return `<div class="sub-icon" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 3px;">
-      <img src="https://www.google.com/s2/favicons?domain=${domainCandidate}&sz=128" style="width: 20px; height: 20px; border-radius: 4px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${name}">
-      <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center;">${fallbackHTML}</div>
-    </div>`;
+    // Fallback to Category Icon
+    return categoryIconHTML(category);
   }
 
   function currencySymbol(code) {
@@ -3176,16 +2869,16 @@
       : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20';
 
     return `
-      <div class="sub-row flex items-center justify-between gap-3.5 p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/80 shadow-sm transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:border-orange-500/40 active:scale-[0.98] cursor-pointer" onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
-        <div class="flex items-center gap-3.5 min-w-0">
+      <div class="sub-row flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/80 shadow-sm transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:border-purple-500/40 active:scale-[0.98] cursor-pointer" onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+        <div class="flex items-center gap-3 min-w-0">
           <div class="sub-icon-wrap flex-shrink-0">
             ${getBrandIconHTML(s.name, s.category)}
           </div>
-          <div class="sub-name font-bold text-slate-900 dark:text-slate-100 text-sm md:text-base truncate">${s.name}</div>
+          <div class="sub-name font-semibold text-slate-900 dark:text-slate-100 truncate text-sm">${s.name}</div>
         </div>
-        <div class="flex items-center gap-2.5 flex-shrink-0">
-          <div class="inline-flex items-center rounded-xl bg-orange-50 dark:bg-orange-500/10 px-2.5 py-1 text-xs md:text-sm font-extrabold text-orange-600 dark:text-orange-400 ring-1 ring-inset ring-orange-500/20">${sym}${s.price.toFixed(2)}</div>
-          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ring-1 ring-inset ${badgeTailwind}">${badgeText}</span>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <div class="inline-flex items-center rounded-xl bg-purple-50 dark:bg-purple-500/10 px-2.5 py-1 text-xs font-bold text-purple-700 dark:text-purple-300 ring-1 ring-inset ring-purple-700/10 dark:ring-purple-500/20">${sym}${s.price.toFixed(2)}</div>
+          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${badgeTailwind}">${badgeText}</span>
         </div>
       </div>`;
   }
@@ -3358,7 +3051,6 @@
   }
 
   function switchScreen(name) {
-    triggerHaptic('light');
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const targetScreen = document.getElementById('scr-' + name);
     if (targetScreen) targetScreen.classList.add('active');
@@ -3386,20 +3078,6 @@
         }
       }
 
-      // Refresh screen-specific data on navigation, so a failed initial
-      // load (race condition on app start) doesn't leave the screen stuck
-      // on its placeholder ("Yüklənir...") forever.
-      if (name === 'cards') {
-        loadCards().catch(err => console.error('❌ Kartlar yenilənmədi:', err));
-      }
-      if (name === 'budget') {
-        try {
-          renderBudgetCard();
-        } catch (err) {
-          console.error('❌ Büdcə paneli yenilənmədi:', err);
-        }
-      }
-
       // Attach scroll-to-top listener on this screen
       const scrollBtn = document.getElementById('scroll-top-btn');
       if (scrollBtn && targetScreen) {
@@ -3421,7 +3099,6 @@
   }
 
   function scrollToTop() {
-    triggerHaptic('light');
     const active = document.querySelector('.screen.active');
     if (active) active.scrollTo({ top: 0, behavior: 'smooth' });
     document.getElementById('scroll-top-btn').classList.remove('visible');
@@ -3437,7 +3114,6 @@
   }
 
   function openSheet() { 
-    triggerHaptic('medium');
     // Set start date to today's date formatted as YYYY-MM-DD
     const yyyy = TODAY.getFullYear();
     const mm = String(TODAY.getMonth() + 1).padStart(2, '0');
@@ -3454,7 +3130,6 @@
     if (sheet) sheet.scrollTop = 0;
   }
   function closeSheet() {
-    triggerHaptic('light');
     document.getElementById('sheet-overlay').classList.remove('open');
     updateBodyScrollLock();
     if (document.activeElement) document.activeElement.blur();
@@ -3746,13 +3421,11 @@
       color = '#1fe0c2';
       shadow = '0 12px 32px rgba(31,224,194,0.12)';
     } else if (type === 'visa') {
-      bg = 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, #1A1F71 0%, #0056B2 60%, #1434CB 100%)';
-      shadow = '0 14px 35px rgba(0, 102, 178, 0.35)';
-      color = '#ffffff';
+      bg = 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #6952e0 0%, #1a153b 100%)';
+      shadow = '0 12px 32px rgba(105, 82, 224, 0.2)';
     } else if (type === 'mastercard') {
-      bg = 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, #1f1416 0%, #850b1b 50%, #eb001b 100%)';
-      shadow = '0 14px 35px rgba(235, 0, 27, 0.35)';
-      color = '#ffffff';
+      bg = 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #ff8a00 0%, #da1b60 100%)';
+      shadow = '0 12px 32px rgba(255, 138, 0, 0.2)';
     }
     
     return { bg, color, shadow };
@@ -3765,8 +3438,8 @@
     
     const style = getCardStyleByName(c.ad, c.kart_tipi);
     const brandLogoHTML = (c.kart_tipi || '').toLowerCase() === 'visa'
-      ? `<img src="/visa.svg?v=1.3" style="height: 24px; width: 44px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Visa">`
-      : `<img src="/mastercard.svg?v=1.3" style="height: 24px; width: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Mastercard">`;
+      ? `<img src="/visa.svg?v=1.2" style="height: 14px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Visa">`
+      : `<img src="/mastercard.svg?v=1.2" style="height: 18px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Mastercard">`;
 
     return `
       <div class="wallet-card" style="background: ${style.bg}; color: ${style.color}; box-shadow: ${style.shadow};">
@@ -3882,13 +3555,13 @@
     if (brand) {
       badge.textContent = brand;
       badge.style.display = 'block';
-      badge.style.background = brand === 'Visa' ? 'rgba(0, 102, 178, 0.25)' : 'rgba(235, 0, 27, 0.25)';
-      badge.style.color = brand === 'Visa' ? '#60a5fa' : '#f87171';
+      badge.style.background = brand === 'Visa' ? 'var(--teal-soft)' : 'var(--gold-soft)';
+      badge.style.color = brand === 'Visa' ? 'var(--teal)' : 'var(--gold)';
       errorEl.style.display = 'none';
       if (logoEl) {
         logoEl.innerHTML = brand === 'Visa' ? 
-          `<img src="/visa.svg?v=1.3" style="height: 24px; width: 44px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Visa">` : 
-          `<img src="/mastercard.svg?v=1.3" style="height: 24px; width: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Mastercard">`;
+          `<img src="/visa.svg?v=1.2" style="height: 15px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Visa">` : 
+          `<img src="/mastercard.svg?v=1.2" style="height: 20px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" alt="Mastercard">`;
       }
     } else {
       badge.style.display = 'none';
@@ -4434,7 +4107,6 @@ async function handleAddCard() {
   }
 
   async function saveBudget() {
-    const saveBtn = document.querySelector('#budget-edit-actions .btn-primary');
     const limitRaw = document.getElementById('budget-limit-input').value;
     const currency = document.getElementById('budget-currency-input').value;
 
@@ -4453,51 +4125,29 @@ async function handleAddCard() {
 
     clearBudgetError();
 
-    // Visible feedback the instant the button is pressed, so it never
-    // looks like "nothing happened" while the request is in flight.
-    const originalBtnText = saveBtn ? saveBtn.textContent : '';
-    if (saveBtn) {
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Yadda saxlanılır...';
+    // Check if budget needs to be POSTed (new) or PUTted (update)
+    let res;
+    if (budgetState.exists) {
+      res = await apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
+        limit_mebleq: limit,
+        valyuta: currency,
+        hesab_mebleqi: spent
+      });
+    } else {
+      res = await apiFetch('POST', '/api/budceler', {
+        username: currentUser.username,
+        limit_mebleq: limit,
+        valyuta: currency,
+        hesab_mebleqi: spent
+      });
     }
 
-    console.log('🟠 saveBudget çağırıldı. exists=', budgetState.exists, 'limit=', limit, 'currency=', currency, 'spent=', spent);
-
-    try {
-      // Check if budget needs to be POSTed (new) or PUTted (update)
-      let res;
-      if (budgetState.exists) {
-        res = await apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
-          limit_mebleq: limit,
-          valyuta: currency,
-          hesab_mebleqi: spent
-        });
-      } else {
-        res = await apiFetch('POST', '/api/budceler', {
-          username: currentUser.username,
-          limit_mebleq: limit,
-          valyuta: currency,
-          hesab_mebleqi: spent
-        });
-      }
-
-      console.log('🟠 saveBudget server cavabı:', res);
-
-      if (res.ok) {
-        budgetState = { limit, spent, currency, exists: true };
-        renderBudgetCard();
-        closeBudgetEdit();
-      } else {
-        showBudgetError(res.data?.error?.message || res.data?.message || 'Büdcə yadda saxlanılmadı.');
-      }
-    } catch (err) {
-      console.error('❌ saveBudget xətası:', err);
-      showBudgetError('Gözlənilməz xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
-    } finally {
-      if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.textContent = originalBtnText || 'Yadda saxla';
-      }
+    if (res.ok) {
+      budgetState = { limit, spent, currency, exists: true };
+      renderBudgetCard();
+      closeBudgetEdit();
+    } else {
+      showBudgetError(res.data?.error?.message || 'Büdcə yadda saxlanılmadı.');
     }
   }
 
