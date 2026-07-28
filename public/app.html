@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=2100.0.0">
+<link rel="manifest" href="/manifest.json?v=2200.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=2100.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=2100.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=2100.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=2100.0.0">
+<link rel="icon" href="/icon-192.png?v=2200.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=2200.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=2200.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=2200.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=2100.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=2200.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3345,20 +3345,45 @@
 
   function handle3dCardTilt(e, card) {
     const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e;
+    if (!touch || touch.clientX === undefined) return;
+
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -6;
-    const rotateY = ((x - centerX) / centerX) * 6;
+    const rotateX = ((y - centerY) / centerY) * -10;
+    const rotateY = ((x - centerX) / centerX) * 10;
 
-    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
     card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
     card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+
+    const glare = card.querySelector('.card-glare');
+    if (glare) glare.style.opacity = '1';
   }
 
   function reset3dCardTilt(card) {
     card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+    const glare = card.querySelector('.card-glare');
+    if (glare) glare.style.opacity = '0';
+  }
+
+  // Mobile Phone Physical Gyroscope Sensor (Tilt phone in hand)
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', (e) => {
+      if (e.beta === null || e.gamma === null) return;
+      const tiltX = Math.max(-12, Math.min(12, (e.beta - 45) * 0.3));
+      const tiltY = Math.max(-12, Math.min(12, e.gamma * 0.3));
+
+      document.querySelectorAll('.interactive-3d-card').forEach(card => {
+        card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.01)`;
+        card.style.setProperty('--mouse-x', `${50 + tiltY * 3}%`);
+        card.style.setProperty('--mouse-y', `${50 + tiltX * 3}%`);
+        const glare = card.querySelector('.card-glare');
+        if (glare) glare.style.opacity = '0.7';
+      });
+    }, true);
   }
 
   function subRowHTML(s) {
@@ -3381,6 +3406,9 @@
            style="background: ${theme.bg}; border: ${theme.border}; box-shadow: ${theme.shadow};"
            onmousemove="handle3dCardTilt(event, this)"
            onmouseleave="reset3dCardTilt(this)"
+           ontouchstart="handle3dCardTilt(event, this)"
+           ontouchmove="handle3dCardTilt(event, this)"
+           ontouchend="reset3dCardTilt(this)"
            onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
         
         <!-- Glowing Left Brand Indicator Bar -->
