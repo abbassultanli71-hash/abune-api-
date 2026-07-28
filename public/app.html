@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=18000.0.0">
+<link rel="manifest" href="/manifest.json?v=19000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=18000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=18000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=18000.0.0">
+<link rel="icon" href="/icon-192.png?v=19000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=19000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=19000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=18000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=19000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -395,10 +395,10 @@
   }
   .db-action svg { width: 12px; height: 12px; transition: transform 0.2s; }
   .db-action:hover svg { transform: translateX(2.5px); }
-  .db-right { width: 90px; height: 90px; position: relative; }
-  .db-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .db-right { width: 90px; height: 90px; position: relative; border-radius: 50%; }
+  .db-ring { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible !important; }
   .db-ring-track { fill: none; stroke: var(--surface-3); stroke-width: 10; }
-  .db-ring-fill { fill: none; stroke: url(#dbRingGrad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset 0.6s ease; filter: drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)); }
+  .db-ring-fill { fill: none; stroke: url(#dbRingGrad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset 0.6s ease; }
   .db-ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 18px; font-weight: 600; }
  
   /* ---- Horizontal scroll stat cards ---- */
@@ -645,19 +645,23 @@
   .budget-limit { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
   .budget-bar-track { height: 8px; background: var(--surface-3); border-radius: 20px; overflow: hidden; }
   .budget-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--teal), var(--gold) 65%, var(--coral)); box-shadow: 0 0 12px -2px var(--accent-soft); transition: width 0.6s cubic-bezier(.16,.84,.44,1); }
-  .budget-ring-wrap { position: relative; width: 148px; height: 148px; margin: 4px auto 18px; }
-  .budget-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .budget-ring-wrap { position: relative; width: 148px; height: 148px; margin: 4px auto 18px; border-radius: 50%; }
+  .budget-ring { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible !important; }
   .budget-ring-track { fill: none; stroke: var(--surface-3); stroke-width: 11; }
-  .budget-ring-fill { fill: none; stroke: url(#ringGrad); stroke-width: 11; stroke-linecap: round; stroke-dasharray: 326.7; stroke-dashoffset: 326.7; transition: stroke-dashoffset 0.6s cubic-bezier(.16,.84,.44,1); filter: drop-shadow(0 0 4px rgba(31, 224, 194, 0.45)); }
+  .budget-ring-fill { fill: none; stroke: url(#ringGrad); stroke-width: 11; stroke-linecap: round; stroke-dasharray: 326.7; stroke-dashoffset: 326.7; transition: stroke-dashoffset 0.6s cubic-bezier(.16,.84,.44,1); }
   .budget-ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
   .budget-ring-pct { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--ink); line-height: 1; }
 
-  @keyframes ringPulse {
-    0%, 100% { opacity: 0.95; filter: drop-shadow(0 0 3px var(--accent)); }
-    50% { opacity: 1; filter: drop-shadow(0 0 10px var(--accent)); }
+  @keyframes circleGlowPulse {
+    0%, 100% {
+      box-shadow: 0 0 12px 0px rgba(249, 115, 22, 0.4), inset 0 0 12px -2px rgba(249, 115, 22, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 24px 4px rgba(249, 115, 22, 0.75), inset 0 0 18px 0px rgba(249, 115, 22, 0.35);
+    }
   }
   .pulse-glow {
-    animation: ringPulse 2s infinite ease-in-out !important;
+    animation: circleGlowPulse 2s infinite ease-in-out !important;
   }
   .budget-ring-label { font-size: 10.5px; color: var(--ink-faint); margin-top: 4px; max-width: 90px; line-height: 1.3; }
   .budget-note { font-size: 11px; color: var(--ink-faint); margin-top: 10px; }
@@ -5034,10 +5038,13 @@ async function handleAddCard() {
     // Circular progress ring
     const ringCircumference = 326.7;
     const ringFill = document.getElementById('budget-ring-fill');
+    const ringWrap = document.querySelector('.budget-ring-wrap');
     if (ringFill) {
       ringFill.style.strokeDashoffset = ringCircumference * (1 - pct / 100);
-      if (pct >= 80) ringFill.classList.add('pulse-glow');
-      else ringFill.classList.remove('pulse-glow');
+    }
+    if (ringWrap) {
+      if (pct >= 80) ringWrap.classList.add('pulse-glow');
+      else ringWrap.classList.remove('pulse-glow');
     }
     const ringPct = document.getElementById('budget-ring-pct');
     if (ringPct) ringPct.textContent = pct + '%';
@@ -5053,10 +5060,13 @@ async function handleAddCard() {
     if (dbLimit) dbLimit.textContent = '/ ' + sym + budgetState.limit.toFixed(2);
     
     const dbRingFill = document.getElementById('db-ring-fill');
+    const dbRight = document.querySelector('.db-right');
     if (dbRingFill) {
       dbRingFill.style.strokeDashoffset = 251.2 * (1 - pct / 100);
-      if (pct >= 80) dbRingFill.classList.add('pulse-glow');
-      else dbRingFill.classList.remove('pulse-glow');
+    }
+    if (dbRight) {
+      if (pct >= 80) dbRight.classList.add('pulse-glow');
+      else dbRight.classList.remove('pulse-glow');
     }
     const dbRingPct = document.getElementById('db-ring-pct');
     if (dbRingPct) dbRingPct.textContent = pct + '%';
