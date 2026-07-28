@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=2200.0.0">
+<link rel="manifest" href="/manifest.json?v=2300.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=2200.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=2200.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=2200.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=2200.0.0">
+<link rel="icon" href="/icon-192.png?v=2300.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=2300.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=2300.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=2300.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=2200.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=2300.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1547,22 +1547,22 @@
           </div>
           <button onclick="installPwaApp()" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: #fff; border: none; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0;">Quraşdır</button>
         </div>
-        <div class="hero-panel" style="position:relative; overflow:hidden;">
-          <canvas id="hero-particle-canvas" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.7;"></canvas>
+        <div class="hero-panel" style="position:relative; overflow:hidden; padding: 20px 22px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.98) 100%); border-radius: 28px; border: 1.5px solid rgba(249, 115, 22, 0.35); box-shadow: 0 16px 40px -10px rgba(0,0,0,0.5);">
+          <canvas id="hero-particle-canvas" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.75;"></canvas>
           <div class="ambient-mesh-glow ambient-glow-1"></div>
           <div class="ambient-mesh-glow ambient-glow-2"></div>
           <div class="hero-blob hero-blob-1"></div>
           <div class="hero-blob hero-blob-2"></div>
-          <div class="h-row" style="position:relative; z-index:1;">
-            <div>
-              <div class="hero-eyebrow" id="dashboard-date">4 İyul, Cümə axşamı</div>
-              <h1 class="hero-title" data-i18n="dashboard_title">Xoş gördük</h1>
-              <div class="hero-sub" data-i18n="dashboard_sub">Aktiv abunəlik izlənilir</div>
+          <div class="h-row" style="position:relative; z-index:1; align-items: flex-start; justify-content: space-between;">
+            <div style="flex: 1; min-width: 0;">
+              <div class="hero-eyebrow" id="dashboard-date" style="color: rgba(255,255,255,0.80) !important; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">4 İyul, Cümə axşamı</div>
+              <h1 class="hero-title" data-i18n="dashboard_title" style="color: #ffffff !important; font-size: 23px; font-weight: 900; text-shadow: 0 2px 10px rgba(0,0,0,0.8); margin-top: 4px; line-height: 1.25;">Xoş gördük</h1>
+              <div class="hero-sub" data-i18n="dashboard_sub" style="color: rgba(255,255,255,0.85) !important; font-size: 12.5px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.6); margin-top: 4px;">Aktiv abunəlik izlənilir</div>
             </div>
-            <div style="display: flex; align-items: center; gap: 14px;">
-              <div class="hero-illustration p-2 rounded-3xl bg-gradient-to-tr from-orange-950/40 via-slate-900 to-amber-950/30 border border-orange-500/30 shadow-xl shadow-orange-500/20 transition-all duration-300 hover:rotate-6 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Rəsmi Loqosu">
-                <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 blur-md opacity-75 group-hover:opacity-100 transition-opacity"></div>
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 46px; height: 46px; position:relative; z-index:1;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 10px;">
+              <div class="hero-illustration p-1.5 rounded-2xl bg-gradient-to-tr from-orange-950/50 via-slate-900 to-amber-950/40 border border-orange-500/40 shadow-lg shadow-orange-500/20 transition-all duration-300 hover:rotate-6 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Rəsmi Loqosu">
+                <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 blur-md opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 36px; height: 36px; position:relative; z-index:1;">
                   <defs>
                     <linearGradient id="goldOrangeGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stop-color="#ffb74d"/>
@@ -1581,7 +1581,7 @@
                 </svg>
               </div>
               <div class="relative cursor-pointer group" onclick="triggerAvatarUpload()" title="Profil şəklini dəyiş">
-                <div class="hero-avatar overflow-hidden flex items-center justify-center border-2 border-orange-500/40 shadow-lg shadow-orange-500/20 transition-all hover:scale-105" id="hero-avatar-initials">U.U</div>
+                <div class="hero-avatar overflow-hidden flex items-center justify-center border-2 border-orange-400 shadow-lg shadow-orange-500/30 transition-all hover:scale-105" style="width:38px; height:38px;" id="hero-avatar-initials">U.U</div>
               </div>
             </div>
           </div>
