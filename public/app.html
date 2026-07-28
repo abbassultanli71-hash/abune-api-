@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=10000.0.0">
+<link rel="manifest" href="/manifest.json?v=11000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=10000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=10000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=10000.0.0">
+<link rel="icon" href="/icon-192.png?v=11000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=11000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=11000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=10000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=11000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3924,27 +3924,44 @@
       const isToday = isCurrentMonth && (d === todayDay);
 
       if (dueSubs.length > 0) {
+        // Use first sub for border/bg color theming
         const primarySub = dueSubs[0];
         const bc = getBrandColors(primarySub.name);
-        const logoHtml = getCalendarLogoHTML(primarySub.name);
         const borderStyle = isToday
           ? 'border:2px solid #ef4444;box-shadow:0 0 16px rgba(239,68,68,0.7);'
           : 'border:1.5px solid ' + bc.border + ';box-shadow:0 0 10px ' + bc.glow + ';';
-        const countBadge = dueSubs.length > 1
-          ? '<span style="position:absolute;bottom:2px;right:2px;font-size:7px;font-weight:800;background:' + bc.border + ';color:#fff;padding:1px 3px;border-radius:5px;">+' + (dueSubs.length - 1) + '</span>'
-          : '';
         const todayBadge = isToday
           ? '<span style="position:absolute;top:1px;right:2px;font-size:6px;font-weight:800;background:#ef4444;color:#fff;padding:1px 2px;border-radius:3px;">BUG.</span>'
           : '';
-        const titleText = dueSubs.map(s => s.name + ' (' + s.price + ' ' + (s.currency||'AZN') + ')').join(', ');
+        const titleText = dueSubs.map(s => s.name + ' (' + s.price + ' ' + (s.currency||'AZN') + ')').join(' + ');
+
+        // Build logo strip: show up to 2 logos side by side, or 1 centered
+        let logosHtml = '';
+        if (dueSubs.length === 1) {
+          // Single subscription: show logo centered
+          logosHtml = '<div style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px;margin-top:3px;">'
+            + getCalendarLogoHTML(dueSubs[0].name)
+            + '</div>';
+        } else if (dueSubs.length === 2) {
+          // Two subscriptions: show both logos side by side (smaller)
+          logosHtml = '<div style="display:flex;gap:2px;margin-top:3px;align-items:center;justify-content:center;">'
+            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:4px;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
+            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:4px;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
+            + '</div>';
+        } else {
+          // 3+ subscriptions: show first 2 + count
+          const extra = dueSubs.length - 2;
+          logosHtml = '<div style="display:flex;gap:1px;margin-top:3px;align-items:center;justify-content:center;flex-wrap:wrap;">'
+            + '<div style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:3px;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
+            + '<div style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:3px;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
+            + '<span style="font-size:8px;font-weight:800;color:#fff;background:rgba(0,0,0,0.5);border-radius:3px;padding:0 2px;">+' + extra + '</span>'
+            + '</div>';
+        }
 
         html += '<div onclick="showSubDetails(' + primarySub.id + ')" title="' + titleText + '" style="position:relative;aspect-ratio:1/1;border-radius:14px;background:' + bc.bg + ';' + borderStyle + 'display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;transition:all 0.2s;">'
           + '<span style="position:absolute;top:2px;left:3px;font-size:9px;font-weight:800;color:rgba(255,255,255,0.9);font-family:monospace;">' + d + '</span>'
           + todayBadge
-          + '<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;margin-top:4px;overflow:hidden;border-radius:5px;">'
-          + logoHtml
-          + '</div>'
-          + countBadge
+          + logosHtml
           + '</div>';
       } else {
         const borderStyle = isToday ? 'border:2px solid #ef4444;box-shadow:0 0 10px rgba(239,68,68,0.5);' : 'border:1px solid rgba(255,255,255,0.07);';
