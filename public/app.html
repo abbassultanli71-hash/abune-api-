@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=1200.0.0">
+<link rel="manifest" href="/manifest.json?v=1300.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=1200.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=1200.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=1200.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1200.0.0">
+<link rel="icon" href="/icon-192.png?v=1300.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=1300.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=1300.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1300.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=1200.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=1300.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3184,31 +3184,124 @@
     return code === 'USD' ? '$' : code === 'EUR' ? '€' : '₼';
   }
 
+  function getBrandThemeStyle(name, category) {
+    const lower = (name || '').toLowerCase().trim();
+    
+    if (lower.includes('netflix') || lower.includes('neftlix')) {
+      return {
+        bg: 'radial-gradient(circle at 0% 50%, rgba(229, 9, 20, 0.22), transparent 70%), linear-gradient(135deg, rgba(24, 10, 15, 0.90) 0%, rgba(14, 14, 20, 0.95) 100%)',
+        border: '1.5px solid rgba(229, 9, 20, 0.50)',
+        shadow: '0 8px 24px rgba(229, 9, 20, 0.22)',
+        accentColor: '#e50914',
+        badgeClass: 'bg-red-500/20 text-red-400 ring-1 ring-red-500/40 font-black'
+      };
+    }
+    if (lower.includes('spotify')) {
+      return {
+        bg: 'radial-gradient(circle at 0% 50%, rgba(30, 215, 96, 0.22), transparent 70%), linear-gradient(135deg, rgba(10, 22, 14, 0.90) 0%, rgba(12, 18, 14, 0.95) 100%)',
+        border: '1.5px solid rgba(30, 215, 96, 0.50)',
+        shadow: '0 8px 24px rgba(30, 215, 96, 0.22)',
+        accentColor: '#1ed760',
+        badgeClass: 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/40 font-black'
+      };
+    }
+    if (lower.includes('youtube') || lower.includes('yt')) {
+      return {
+        bg: 'radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.20), transparent 70%), linear-gradient(135deg, rgba(24, 10, 10, 0.90) 0%, rgba(15, 10, 10, 0.95) 100%)',
+        border: '1.5px solid rgba(255, 0, 0, 0.45)',
+        shadow: '0 8px 24px rgba(255, 0, 0, 0.20)',
+        accentColor: '#ff0000',
+        badgeClass: 'bg-rose-500/20 text-rose-400 ring-1 ring-rose-500/40 font-black'
+      };
+    }
+    if (lower.includes('apple') || lower.includes('icloud') || lower.includes('itunes')) {
+      return {
+        bg: 'radial-gradient(circle at 0% 50%, rgba(168, 85, 247, 0.22), transparent 70%), linear-gradient(135deg, rgba(20, 14, 28, 0.90) 0%, rgba(14, 12, 20, 0.95) 100%)',
+        border: '1.5px solid rgba(168, 85, 247, 0.45)',
+        shadow: '0 8px 24px rgba(168, 85, 247, 0.20)',
+        accentColor: '#a855f7',
+        badgeClass: 'bg-purple-500/20 text-purple-400 ring-1 ring-purple-500/40 font-black'
+      };
+    }
+    if (lower.includes('linkedin')) {
+      return {
+        bg: 'radial-gradient(circle at 0% 50%, rgba(10, 102, 194, 0.25), transparent 70%), linear-gradient(135deg, rgba(10, 20, 32, 0.90) 0%, rgba(10, 14, 22, 0.95) 100%)',
+        border: '1.5px solid rgba(10, 102, 194, 0.50)',
+        shadow: '0 8px 24px rgba(10, 102, 194, 0.22)',
+        accentColor: '#0a66c2',
+        badgeClass: 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/40 font-black'
+      };
+    }
+    if (lower.includes('chatgpt') || lower.includes('openai')) {
+      return {
+        bg: 'radial-gradient(circle at 0% 50%, rgba(16, 185, 129, 0.22), transparent 70%), linear-gradient(135deg, rgba(10, 24, 18, 0.90) 0%, rgba(10, 16, 14, 0.95) 100%)',
+        border: '1.5px solid rgba(16, 185, 129, 0.45)',
+        shadow: '0 8px 24px rgba(16, 185, 129, 0.20)',
+        accentColor: '#10b981',
+        badgeClass: 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/40 font-black'
+      };
+    }
+    if (lower.includes('duolingo')) {
+      return {
+        bg: 'radial-gradient(circle at 0% 50%, rgba(88, 204, 2, 0.25), transparent 70%), linear-gradient(135deg, rgba(14, 26, 10, 0.90) 0%, rgba(10, 16, 10, 0.95) 100%)',
+        border: '1.5px solid rgba(88, 204, 2, 0.50)',
+        shadow: '0 8px 24px rgba(88, 204, 2, 0.22)',
+        accentColor: '#58cc02',
+        badgeClass: 'bg-lime-500/20 text-lime-400 ring-1 ring-lime-500/40 font-black'
+      };
+    }
+    if (lower.includes('telegram')) {
+      return {
+        bg: 'radial-gradient(circle at 0% 50%, rgba(34, 158, 217, 0.25), transparent 70%), linear-gradient(135deg, rgba(10, 22, 30, 0.90) 0%, rgba(10, 14, 20, 0.95) 100%)',
+        border: '1.5px solid rgba(34, 158, 217, 0.50)',
+        shadow: '0 8px 24px rgba(34, 158, 217, 0.22)',
+        accentColor: '#229ed9',
+        badgeClass: 'bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/40 font-black'
+      };
+    }
+
+    return {
+      bg: 'radial-gradient(circle at 0% 50%, rgba(249, 115, 22, 0.18), transparent 70%), linear-gradient(135deg, rgba(24, 20, 18, 0.90) 0%, rgba(14, 14, 18, 0.95) 100%)',
+      border: '1.5px solid rgba(249, 115, 22, 0.40)',
+      shadow: '0 8px 24px rgba(249, 115, 22, 0.18)',
+      accentColor: '#f97316',
+      badgeClass: 'bg-orange-500/20 text-orange-400 ring-1 ring-orange-500/40 font-black'
+    };
+  }
+
   function subRowHTML(s) {
     const days = daysUntil(s.next);
     const urg = s.status === 'deactive' ? 'paused' : urgencyFor(days);
     const badgeText = s.status === 'deactive' ? 'dayandırılıb' : badgeLabel(days);
     const sym = currencySymbol(s.currency);
+    const theme = getBrandThemeStyle(s.name, s.category);
 
     const badgeTailwind = urg === 'urgent'
-      ? 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/20'
+      ? 'bg-rose-500/20 text-rose-400 ring-1 ring-rose-500/40 font-black'
       : urg === 'soon'
-      ? 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20'
+      ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40 font-black'
       : urg === 'paused'
-      ? 'bg-slate-100 text-slate-600 ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400'
-      : 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20';
+      ? 'bg-slate-800 text-slate-400 ring-1 ring-slate-700/50'
+      : 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/40 font-black';
 
     return `
-      <div class="sub-row flex items-center justify-between gap-3.5 p-3.5 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/80 shadow-sm transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:border-orange-500/40 active:scale-[0.98] cursor-pointer" onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
-        <div class="flex items-center gap-3.5 min-w-0">
-          <div class="sub-icon-wrap flex-shrink-0">
+      <div class="sub-row relative overflow-hidden flex items-center justify-between gap-3.5 p-3.5 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] cursor-pointer group" 
+           style="background: ${theme.bg}; border: ${theme.border}; box-shadow: ${theme.shadow};"
+           onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+        <!-- Geometric mesh wave pattern overlay -->
+        <svg class="absolute inset-0 w-full h-full opacity-15 pointer-events-none group-hover:opacity-30 transition-opacity" viewBox="0 0 400 80" fill="none">
+          <path d="M-50 40 Q 100 -20 250 40 T 550 40" stroke="${theme.accentColor}" stroke-width="1.8"/>
+          <path d="M-50 60 Q 100 0 250 60 T 550 60" stroke="${theme.accentColor}" stroke-width="1.2" stroke-dasharray="4 4"/>
+        </svg>
+        <div class="flex items-center gap-3.5 min-w-0 relative z-10">
+          <div class="sub-icon-wrap flex-shrink-0 transition-transform group-hover:scale-110 group-hover:rotate-3">
             ${getBrandIconHTML(s.name, s.category)}
           </div>
-          <div class="sub-name font-bold text-slate-900 dark:text-slate-100 text-sm md:text-base truncate">${s.name}</div>
+          <div class="sub-name font-black text-slate-900 dark:text-slate-100 text-sm md:text-base truncate tracking-tight">${s.name}</div>
         </div>
-        <div class="flex items-center gap-2.5 flex-shrink-0">
-          <div class="inline-flex items-center rounded-xl bg-orange-50 dark:bg-orange-500/10 px-2.5 py-1 text-xs md:text-sm font-extrabold text-orange-600 dark:text-orange-400 ring-1 ring-inset ring-orange-500/20">${sym}${s.price.toFixed(2)}</div>
-          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ring-1 ring-inset ${badgeTailwind}">${badgeText}</span>
+        <div class="flex items-center gap-2.5 flex-shrink-0 relative z-10">
+          <div class="inline-flex items-center rounded-xl px-2.5 py-1 text-xs md:text-sm font-black ${theme.badgeClass}">${sym}${s.price.toFixed(2)}</div>
+          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-extrabold ${badgeTailwind}">${badgeText}</span>
         </div>
       </div>`;
   }
