@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=12000.0.0">
+<link rel="manifest" href="/manifest.json?v=13000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=12000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=12000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=12000.0.0">
+<link rel="icon" href="/icon-192.png?v=13000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=13000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=13000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=12000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=13000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -5186,47 +5186,87 @@ async function handleAddCard() {
   }
 
   async function saveBudget() {
-    const limitRaw = document.getElementById('budget-limit-input').value;
-    const currency = document.getElementById('budget-currency-input').value;
+    const btn = document.querySelector('#budget-edit-actions .btn-primary');
+    const origText = btn ? btn.textContent : 'Yadda saxla';
 
-    if (limitRaw === '' || limitRaw === null || limitRaw === undefined) {
-      showBudgetError('limit_mebleq sahəsi məcburidir.');
-      return;
-    }
-    const limit = Number(limitRaw);
-    if (isNaN(limit) || limit <= 0) {
-      showBudgetError('limit_mebleq 0-dan böyük olmalıdır.');
-      return;
-    }
+    try {
+      const limitInput = document.getElementById('budget-limit-input');
+      const currencyInput = document.getElementById('budget-currency-input');
+      if (!limitInput || !currencyInput || !currentUser) return;
 
-    // Always calculate fresh spent in the new currency
-    const spent = calculateTotalSpent(currency);
+      const limitRaw = limitInput.value;
+      const currency = currencyInput.value;
 
-    clearBudgetError();
+      if (limitRaw === '' || limitRaw === null || limitRaw === undefined) {
+        showBudgetError('Limit məbləği sahəsi məcburidir.');
+        return;
+      }
+      const limit = Number(limitRaw);
+      if (isNaN(limit) || limit <= 0) {
+        showBudgetError('Limit 0-dan böyük olmalıdır.');
+        return;
+      }
 
-    // Check if budget needs to be POSTed (new) or PUTted (update)
-    let res;
-    if (budgetState.exists) {
-      res = await apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
-        limit_mebleq: limit,
-        valyuta: currency,
-        hesab_mebleqi: spent
-      });
-    } else {
-      res = await apiFetch('POST', '/api/budceler', {
-        username: currentUser.username,
-        limit_mebleq: limit,
-        valyuta: currency,
-        hesab_mebleqi: spent
-      });
-    }
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Saxlanılır...';
+      }
 
-    if (res.ok) {
-      budgetState = { limit, spent, currency, exists: true };
-      renderBudgetCard();
-      closeBudgetEdit();
-    } else {
-      showBudgetError(res.data?.error?.message || 'Büdcə yadda saxlanılmadı.');
+      const spent = calculateTotalSpent(currency);
+      clearBudgetError();
+
+      // Check if budget needs to be POSTed (new) or PUTted (update)
+      let res;
+      if (budgetState.exists) {
+        res = await apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
+          limit_mebleq: limit,
+          valyuta: currency,
+          hesab_mebleqi: spent
+        });
+      } else {
+        res = await apiFetch('POST', '/api/budceler', {
+          username: currentUser.username,
+          limit_mebleq: limit,
+          valyuta: currency,
+          hesab_mebleqi: spent
+        });
+      }
+
+      // If method failed with 404 or 400, try alternative method
+      if (!res.ok && res.status === 404 && budgetState.exists) {
+        res = await apiFetch('POST', '/api/budceler', {
+          username: currentUser.username,
+          limit_mebleq: limit,
+          valyuta: currency,
+          hesab_mebleqi: spent
+        });
+      } else if (!res.ok && res.status === 404 && !budgetState.exists) {
+        res = await apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
+          limit_mebleq: limit,
+          valyuta: currency,
+          hesab_mebleqi: spent
+        });
+      }
+
+      if (res.ok) {
+        budgetState = { limit, spent, currency, exists: true };
+        renderBudgetCard();
+        closeBudgetEdit();
+        showInAppToast('Büdcə Yeniləndi ✅', `Yeni limit: ${limit.toFixed(2)} ${currency}`);
+      } else {
+        const errMsg = res.data?.error?.message || 'Büdcə yadda saxlanılmadı.';
+        showBudgetError(errMsg);
+        showInAppToast('Büdcə Xətası ⚠️', errMsg);
+      }
+    } catch (err) {
+      console.error('saveBudget error:', err);
+      showBudgetError('Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.');
+      showInAppToast('Xəta ⚠️', 'Şəbəkə xətası baş verdi.');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = origText;
+      }
     }
   }
 

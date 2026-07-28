@@ -2498,17 +2498,26 @@ app.post('/api/budceler', async (req, res) => {
         `Mövcud abunəlik xərcləri (${roundedTotal.toFixed(2)} ${targetValyuta}) yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
     }
 
-    await executeQuery(
-      `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, hesab_mebleqi)
-       VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :hesab_mebleqi)`,
-      {
-        istifadeci_id: userId,
-        limit_mebleq: parsedLimit,
-        valyuta: targetValyuta,
-        hesab_mebleqi: roundedTotal
-      },
-      { autoCommit: true }
+    const existingPostBudget = await executeQuery(
+      `SELECT id FROM budceler WHERE istifadeci_id = :userId`,
+      { userId }
     );
+    if (existingPostBudget.rows && existingPostBudget.rows.length > 0) {
+      await executeQuery(
+        `UPDATE budceler
+         SET limit_mebleq = :limit_mebleq, valyuta = :valyuta, hesab_mebleqi = :hesab_mebleqi
+         WHERE istifadeci_id = :istifadeci_id`,
+        { limit_mebleq: parsedLimit, valyuta: targetValyuta, hesab_mebleqi: roundedTotal, istifadeci_id: userId },
+        { autoCommit: true }
+      );
+    } else {
+      await executeQuery(
+        `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, hesab_mebleqi)
+         VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :hesab_mebleqi)`,
+        { istifadeci_id: userId, limit_mebleq: parsedLimit, valyuta: targetValyuta, hesab_mebleqi: roundedTotal },
+        { autoCommit: true }
+      );
+    }
 
     return successResponse(res, 201, 'Created', { message: 'Büdcə uğurla yaradıldı.' });
   } catch (err) {
@@ -2569,15 +2578,26 @@ app.put('/api/budceler/:username', async (req, res) => {
         `Mövcud abunəlik xərcləri (${roundedTotal.toFixed(2)} ${targetValyuta}) yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur. Zəhmət olmasa limit məbləğini artırın.`);
     }
 
-    await executeQuery(
-      `UPDATE budceler
-       SET limit_mebleq = :limit_mebleq, valyuta = :valyuta, hesab_mebleqi = :hesab_mebleqi
-       WHERE istifadeci_id = :istifadeci_id`,
-      {
-        limit_mebleq: parsedLimit, valyuta: targetValyuta, hesab_mebleqi: roundedTotal, istifadeci_id: userId
-      },
-      { autoCommit: true }
+    const existingPutBudget = await executeQuery(
+      `SELECT id FROM budceler WHERE istifadeci_id = :userId`,
+      { userId }
     );
+    if (existingPutBudget.rows && existingPutBudget.rows.length > 0) {
+      await executeQuery(
+        `UPDATE budceler
+         SET limit_mebleq = :limit_mebleq, valyuta = :valyuta, hesab_mebleqi = :hesab_mebleqi
+         WHERE istifadeci_id = :istifadeci_id`,
+        { limit_mebleq: parsedLimit, valyuta: targetValyuta, hesab_mebleqi: roundedTotal, istifadeci_id: userId },
+        { autoCommit: true }
+      );
+    } else {
+      await executeQuery(
+        `INSERT INTO budceler (istifadeci_id, limit_mebleq, valyuta, hesab_mebleqi)
+         VALUES (:istifadeci_id, :limit_mebleq, :valyuta, :hesab_mebleqi)`,
+        { istifadeci_id: userId, limit_mebleq: parsedLimit, valyuta: targetValyuta, hesab_mebleqi: roundedTotal },
+        { autoCommit: true }
+      );
+    }
 
     return successResponse(res, 200, 'Updated', { message: 'Büdcə uğurla yeniləndi.' });
   } catch (err) {
