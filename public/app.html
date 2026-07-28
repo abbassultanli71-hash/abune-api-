@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=1700.0.0">
+<link rel="manifest" href="/manifest.json?v=1800.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=1700.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=1700.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=1700.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1700.0.0">
+<link rel="icon" href="/icon-192.png?v=1800.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=1800.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=1800.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1800.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=1700.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=1800.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3505,52 +3505,71 @@
     let width = canvas.width = canvas.parentElement.offsetWidth || 350;
     let height = canvas.height = canvas.parentElement.offsetHeight || 140;
 
-    const particles = [];
-    const particleCount = 20;
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1.2,
-        color: i % 3 === 0 ? '#f97316' : i % 3 === 1 ? '#34d399' : '#00f2fe'
-      });
-    }
+    let step = 0;
+    const currencySymbols = ['₼', '$', '€', '₼', '₼'];
+    const currencyOrbs = Array.from({ length: 8 }, (_, i) => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      symbol: currencySymbols[i % currencySymbols.length],
+      size: Math.random() * 6 + 12,
+      opacity: Math.random() * 0.35 + 0.25,
+      pulse: Math.random() * Math.PI
+    }));
 
     function render() {
       ctx.clearRect(0, 0, width, height);
+      step += 0.025;
 
-      for (let i = 0; i < particleCount; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
+      // 1. Render 3D OLED Liquid Silk Waves
+      const waves = [
+        { color: 'rgba(249, 115, 22, 0.35)', freq: 0.015, amp: 16, speed: 0.04, yOffset: height * 0.5 },
+        { color: 'rgba(0, 242, 254, 0.25)',  freq: 0.022, amp: 12, speed: 0.03, yOffset: height * 0.6 },
+        { color: 'rgba(16, 185, 129, 0.20)', freq: 0.018, amp: 18, speed: 0.05, yOffset: height * 0.4 }
+      ];
 
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-
+      waves.forEach(w => {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
+        ctx.moveTo(0, height);
+        for (let x = 0; x <= width; x += 5) {
+          const y = w.yOffset + Math.sin(x * w.freq + step * w.speed * 10) * w.amp + Math.cos(x * 0.008 + step) * 8;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(width, height);
+        ctx.closePath();
+        
+        const grad = ctx.createLinearGradient(0, 0, width, height);
+        grad.addColorStop(0, w.color);
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
         ctx.fill();
 
-        for (let j = i + 1; j < particleCount; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        ctx.strokeStyle = w.color.replace('0.', '0.7');
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      });
 
-          if (dist < 65) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(249, 115, 22, ${0.35 * (1 - dist / 65)})`;
-            ctx.lineWidth = 0.7;
-            ctx.stroke();
-          }
-        }
-      }
+      // 2. Render Floating 3D Currency Orbs
+      currencyOrbs.forEach(orb => {
+        orb.x += orb.vx;
+        orb.y += orb.vy;
+        orb.pulse += 0.03;
+
+        if (orb.x < -20) orb.x = width + 20;
+        if (orb.x > width + 20) orb.x = -20;
+        if (orb.y < -20) orb.y = height + 20;
+        if (orb.y > height + 20) orb.y = -20;
+
+        const currentOpacity = orb.opacity + Math.sin(orb.pulse) * 0.15;
+        ctx.font = `800 ${orb.size}px var(--font-mono)`;
+        ctx.fillStyle = `rgba(249, 115, 22, ${Math.max(0.1, currentOpacity)})`;
+        ctx.shadowColor = '#f97316';
+        ctx.shadowBlur = 10;
+        ctx.fillText(orb.symbol, orb.x, orb.y);
+        ctx.shadowBlur = 0;
+      });
+
       requestAnimationFrame(render);
     }
     render();
