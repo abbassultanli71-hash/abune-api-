@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=1500.0.0">
+<link rel="manifest" href="/manifest.json?v=1600.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=1500.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=1500.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=1500.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1500.0.0">
+<link rel="icon" href="/icon-192.png?v=1600.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=1600.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=1600.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1600.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=1500.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=1600.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -118,6 +118,22 @@
     font-size: 14px;
     line-height: 1.45;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Universal High-Contrast Theme Overrides */
+  .sub-name {
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  input, select, textarea {
+    color: var(--ink) !important;
+    background-color: var(--surface-2) !important;
+  }
+  .page-title, .section-title, .hero-title, .stat-val, .profile-name, .sheet-title, .settings-row-label {
+    color: var(--ink) !important;
+  }
+  .hero-sub, .profile-sub, .settings-row-sub, .notif-msg, .hint {
+    color: var(--ink-muted) !important;
   }
   a { text-decoration: none; color: inherit; }
   button, select, input { font-family: inherit; }
@@ -3330,7 +3346,7 @@
           <div class="sub-icon-wrap flex-shrink-0 transition-transform group-hover:scale-110 group-hover:rotate-3">
             ${getBrandIconHTML(s.name, s.category)}
           </div>
-          <div class="sub-name font-black text-slate-900 dark:text-slate-100 text-sm md:text-base truncate tracking-tight">${s.name}</div>
+          <div class="sub-name font-black text-white text-sm md:text-base truncate tracking-tight" style="color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">${s.name}</div>
         </div>
         <div class="flex items-center gap-2.5 flex-shrink-0 relative z-10">
           <div class="inline-flex items-center rounded-xl px-3 py-1 text-xs md:text-sm font-extrabold" style="${theme.priceStyle}">${sym}${s.price.toFixed(2)}</div>
