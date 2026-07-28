@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=20000.0.0">
+<link rel="manifest" href="/manifest.json?v=21000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=20000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20000.0.0">
+<link rel="icon" href="/icon-192.png?v=21000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=21000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=21000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=20000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=21000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3888,7 +3888,7 @@
     });
 
     // Helper: get favicon logo HTML from subscription name
-    function getCalendarLogoHTML(name) {
+    function getCalendarLogoHTML(name, size = 22) {
       const lowerName = (name || '').toLowerCase().trim();
       const BD = {
         'netflix':'netflix.com','neftlix':'netflix.com',
@@ -3931,12 +3931,15 @@
       }
 
       const initial = (name || '?')[0].toUpperCase();
+      const px = size + 'px';
+      const fontPx = Math.max(7, Math.floor(size * 0.45)) + 'px';
+
       if (domain) {
-        return '<img src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=64" width="22" height="22" style="border-radius:5px;object-fit:contain;display:block;" /><span style="width:22px;height:22px;border-radius:5px;background:#f97316;color:#fff;font-size:10px;font-weight:900;display:none;align-items:center;justify-content:center;">' + initial + '</span>';
+        return '<img src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=64" style="width:' + px + ';height:' + px + ';border-radius:3px;object-fit:contain;display:block;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" /><span style="width:' + px + ';height:' + px + ';border-radius:3px;background:#f97316;color:#fff;font-size:' + fontPx + ';font-weight:900;display:none;align-items:center;justify-content:center;">' + initial + '</span>';
       }
       const colors = ['#f97316','#8b5cf6','#06b6d4','#10b981','#f43f5e','#3b82f6','#ec4899','#a855f7'];
       const ci = ((name||'A').charCodeAt(0)) % colors.length;
-      return '<span style="width:22px;height:22px;border-radius:5px;background:' + colors[ci] + ';color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;">' + initial + '</span>';
+      return '<span style="width:' + px + ';height:' + px + ';border-radius:3px;background:' + colors[ci] + ';color:#fff;font-size:' + fontPx + ';font-weight:900;display:flex;align-items:center;justify-content:center;">' + initial + '</span>';
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
@@ -3959,29 +3962,32 @@
         const cellKey = `cell_${rulerSelectedYear}_${rulerSelectedMonth}_${d}`;
         window._calendarSubsCache[cellKey] = dueSubs;
 
-        // Build Avatar Stack logos for 1, 2, 3, 4+ subs
+        // Build logos layout: 1 sub (large centered), 2 subs (side-by-side), 3+ subs (symmetrical 2x2 folder grid)
         let logosHtml = '';
         if (dueSubs.length === 1) {
-          logosHtml = '<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px;margin-top:3px;">'
-            + getCalendarLogoHTML(dueSubs[0].name)
+          logosHtml = '<div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:5px;margin-top:3px;">'
+            + getCalendarLogoHTML(dueSubs[0].name, 22)
             + '</div>';
         } else if (dueSubs.length === 2) {
-          logosHtml = '<div style="display:flex;align-items:center;justify-content:center;margin-top:3px;">'
-            + '<div style="width:19px;height:19px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);z-index:2;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
-            + '<div style="width:19px;height:19px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);margin-left:-6px;z-index:1;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
+          logosHtml = '<div style="display:flex;gap:3px;margin-top:4px;align-items:center;justify-content:center;">'
+            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:4px;">' + getCalendarLogoHTML(dueSubs[0].name, 16) + '</div>'
+            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:4px;">' + getCalendarLogoHTML(dueSubs[1].name, 16) + '</div>'
             + '</div>';
         } else if (dueSubs.length === 3) {
-          logosHtml = '<div style="display:flex;align-items:center;justify-content:center;margin-top:3px;">'
-            + '<div style="width:17px;height:17px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);z-index:3;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
-            + '<div style="width:17px;height:17px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);margin-left:-7px;z-index:2;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
-            + '<div style="width:17px;height:17px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);margin-left:-7px;z-index:1;">' + getCalendarLogoHTML(dueSubs[2].name) + '</div>'
+          // 3 subs: Ultra-clean 2x2 mini-folder grid (12x12px each)
+          logosHtml = '<div style="display:grid;grid-template-columns:12px 12px;gap:2px;margin-top:4px;align-items:center;justify-content:center;">'
+            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[0].name, 12) + '</div>'
+            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[1].name, 12) + '</div>'
+            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;grid-column:span 2;justify-self:center;">' + getCalendarLogoHTML(dueSubs[2].name, 12) + '</div>'
             + '</div>';
         } else {
-          const extra = dueSubs.length - 2;
-          logosHtml = '<div style="display:flex;align-items:center;justify-content:center;margin-top:3px;">'
-            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);z-index:3;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
-            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);margin-left:-6px;z-index:2;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
-            + '<span style="font-size:8px;font-weight:900;color:#fff;background:#f97316;border-radius:50%;width:15px;height:15px;display:flex;align-items:center;justify-content:center;margin-left:-5px;z-index:1;border:1.5px solid rgba(15,23,42,0.9);">+' + extra + '</span>'
+          // 4+ subs: 2x2 grid (3 logos + +N badge)
+          const extra = dueSubs.length - 3;
+          logosHtml = '<div style="display:grid;grid-template-columns:12px 12px;gap:2px;margin-top:4px;align-items:center;justify-content:center;">'
+            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[0].name, 12) + '</div>'
+            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[1].name, 12) + '</div>'
+            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[2].name, 12) + '</div>'
+            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;background:#f97316;color:#fff;border-radius:3px;font-size:7px;font-weight:900;line-height:1;">+' + extra + '</div>'
             + '</div>';
         }
 
