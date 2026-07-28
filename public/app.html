@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=3400.0.0">
+<link rel="manifest" href="/manifest.json?v=3500.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=3400.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3400.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3400.0.0">
+<link rel="icon" href="/icon-192.png?v=3500.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3500.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3500.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=3400.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=3500.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -440,10 +440,7 @@
     padding: 20px 20px 22px;
     box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255,255,255,0.06);
   }
-  .ruler-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: var(--hero-grad);
-  }
+  .ruler-card::before { display: none; }
   .ruler-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
   .ruler-title { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
   .ruler-month { font-family: var(--font-mono); font-size: 10px; color: var(--ink-faint); letter-spacing: 0.04em; }
@@ -3856,30 +3853,56 @@
       html += `<div class="ruler-today-label" style="left:${todayPct}%; position:absolute; top:-22px; transform:translateX(-50%); font-size:9.5px; font-weight:800; color:#fff; background:#ef4444; padding:1.5px 6px; border-radius:6px; white-space:nowrap; z-index:4; box-shadow:0 2px 8px rgba(239,68,68,0.5);">BUGÜN (${todayDay})</div>`;
     }
 
-    const currentMonthPrefix = `${rulerSelectedYear}-${String(rulerSelectedMonth + 1).padStart(2, '0')}`;
+    const targetMonthPrefix = `${rulerSelectedYear}-${String(rulerSelectedMonth + 1).padStart(2, '0')}`;
     
-    // Filter subscriptions for target month or recurring active subscriptions
-    const activeSubs = subscriptions.filter(s => s.status === 'active');
-    
-    activeSubs.forEach(s => {
-      let day = null;
-      if (s.next && s.next.startsWith(currentMonthPrefix)) {
-        day = Number(s.next.split('-')[2]);
-      } else if (s.next) {
-        // Fallback for monthly recurring calculation
-        const parts = s.next.split('-');
-        const subDay = Number(parts[2]);
-        day = Math.min(subDay, daysInMonth);
-      }
+    // Filter active subscriptions that fall into target month
+    const monthSubs = [];
+    subscriptions.filter(s => s.status === 'active').forEach(s => {
+      if (!s.next) return;
+      const parts = s.next.split('-');
+      const sYear = Number(parts[0]);
+      const sMonth = Number(parts[1]) - 1; // 0-indexed
+      const sDay = Number(parts[2]);
 
-      if (day) {
-        const pct = Math.max(3, Math.min(97, ((day - 1) / (daysInMonth - 1)) * 100));
+      // Exact match for year and month
+      if (s.next.startsWith(targetMonthPrefix)) {
+        monthSubs.push({ sub: s, day: sDay });
+      } else {
+        // For monthly recurring subscriptions: check if date recurs in this month
+        const cycle = (s.billing_cycle || 'monthly').toLowerCase();
+        if (cycle === 'monthly') {
+          const startDate = new Date(sYear, sMonth, sDay);
+          const targetDate = new Date(rulerSelectedYear, rulerSelectedMonth, Math.min(sDay, daysInMonth));
+          if (startDate <= targetDate) {
+            monthSubs.push({ sub: s, day: Math.min(sDay, daysInMonth) });
+          }
+        }
+      }
+    });
+
+    // Group subscriptions by day to offset overlapping chips cleanly
+    const dayGroups = {};
+    monthSubs.forEach(item => {
+      if (!dayGroups[item.day]) dayGroups[item.day] = [];
+      dayGroups[item.day].push(item.sub);
+    });
+
+    Object.keys(dayGroups).forEach(dayStr => {
+      const day = Number(dayStr);
+      const subsOnDay = dayGroups[dayStr];
+      const basePct = Math.max(3, Math.min(97, ((day - 1) / (daysInMonth - 1)) * 100));
+
+      subsOnDay.forEach((s, idx) => {
+        // Horizontal offset for multiple chips on the same day so they sit side-by-side cleanly
+        const offset = (idx - (subsOnDay.length - 1) / 2) * 4.5;
+        const pct = Math.max(2, Math.min(98, basePct + offset));
+        
         const daysLeft = daysUntil(s.next);
         const urg = urgencyFor(daysLeft);
         const color = urg === 'urgent' ? '#ef4444' : urg === 'soon' ? '#f59e0b' : '#10b981';
         
-        html += `<div class="ruler-chip ${urg}" style="left:${pct}%; position:absolute; top:50%; transform:translate(-50%, -50%); width:18px; height:18px; border-radius:50%; background:${color}; border:2.5px solid #fff; box-shadow:0 0 12px ${color}; cursor:pointer; z-index:5; transition:transform 0.2s;" title="${s.name} (${day} ${monthsAzFull[rulerSelectedMonth]} · ${s.price} ${s.currency || 'AZN'})" onclick="showSubDetails(${s.id})"></div>`;
-      }
+        html += `<div class="ruler-chip ${urg}" style="left:${pct}%; position:absolute; top:50%; transform:translate(-50%, -50%); width:18px; height:18px; border-radius:50%; background:${color}; border:2.5px solid #fff; box-shadow:0 0 12px ${color}; cursor:pointer; z-index:5; transition:all 0.2s;" title="${s.name} (${day} ${monthsAzFull[rulerSelectedMonth]} · ${s.price} ${s.currency || 'AZN'})" onclick="showSubDetails(${s.id})"></div>`;
+      });
     });
 
     track.innerHTML = html;
