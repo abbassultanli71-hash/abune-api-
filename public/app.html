@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=3500.0.0">
+<link rel="manifest" href="/manifest.json?v=3600.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=3500.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3500.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3500.0.0">
+<link rel="icon" href="/icon-192.png?v=3600.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3600.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3600.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=3500.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=3600.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3196,39 +3196,54 @@
     
     // Official Brand Domain Map for High-Res 128px Real Brand Logos
     const BRAND_DOMAINS = {
+      // Local Fitness & Lifestyle (Push30, 180, etc.)
+      'push 30': 'push30.az', 'push30': 'push30.az', 'push30.az': 'push30.az', 'push 30.az': 'push30.az', 'push': 'push30.az',
+      '180': '180.az', '180.az': '180.az', '180 fitness': '180.az', 'gym': 'gym.az', 'fit': 'fit.az',
+
+      // Streaming & Music
       'netflix': 'netflix.com', 'neftlix': 'netflix.com',
       'spotify': 'spotify.com',
-      'linkedin': 'linkedin.com',
+      'youtube': 'youtube.com', 'yt': 'youtube.com', 'youtube premium': 'youtube.com',
+      'hbo': 'hbo.com', 'hbo max': 'max.com', 'max': 'max.com',
+      'disney': 'disneyplus.com', 'disney+': 'disneyplus.com', 'disney plus': 'disneyplus.com',
+      'paramount': 'paramountplus.com', 'hulu': 'hulu.com', 'crunchyroll': 'crunchyroll.com',
+      'deezer': 'deezer.com', 'tidal': 'tidal.com', 'soundcloud': 'soundcloud.com',
+
+      // AI & Tech Tools
+      'chatgpt': 'openai.com', 'openai': 'openai.com', 'claude': 'anthropic.com',
+      'midjourney': 'midjourney.com', 'perplexity': 'perplexity.ai', 'copilot': 'microsoft.com',
+      'gemini': 'google.com', 'runway': 'runwayml.com', 'elevenlabs': 'elevenlabs.io',
+      'figma': 'figma.com', 'canva': 'canva.com', 'notion': 'notion.so',
+
+      // Tech Giants & Social
+      'apple': 'apple.com', 'icloud': 'apple.com', 'itunes': 'apple.com', 'apple music': 'apple.com', 'apple tv': 'apple.com',
+      'google': 'google.com', 'drive': 'google.com', 'gmail': 'google.com', 'gsuite': 'google.com',
       'facebook': 'facebook.com', 'fb': 'facebook.com', 'meta': 'meta.com',
       'instagram': 'instagram.com', 'ig': 'instagram.com',
-      'youtube': 'youtube.com', 'yt': 'youtube.com',
-      'apple': 'apple.com', 'icloud': 'apple.com', 'itunes': 'apple.com', 'apple music': 'apple.com', 'apple tv': 'apple.com',
-      'chatgpt': 'openai.com', 'openai': 'openai.com',
-      'telegram': 'telegram.org',
-      'google': 'google.com', 'drive': 'google.com', 'gmail': 'google.com', 'gsuite': 'google.com',
-      'wolt': 'wolt.com',
-      'yandex': 'yandex.com',
-      'notion': 'notion.so',
-      'adobe': 'adobe.com', 'photoshop': 'adobe.com', 'illustrator': 'adobe.com',
-      'duolingo': 'duolingo.com',
-      'tiktok': 'tiktok.com',
-      'twitter': 'twitter.com', 'x': 'x.com', 'x.com': 'x.com',
-      'discord': 'discord.com',
-      'amazon': 'amazon.com', 'prime': 'amazon.com',
+      'linkedin': 'linkedin.com', 'telegram': 'telegram.org', 'tiktok': 'tiktok.com',
+      'twitter': 'twitter.com', 'x': 'x.com', 'x.com': 'x.com', 'discord': 'discord.com',
+      'amazon': 'amazon.com', 'prime': 'amazon.com', 'prime video': 'amazon.com',
       'microsoft': 'microsoft.com', 'office': 'office.com', 'onedrive': 'microsoft.com',
-      
-      // Local & Global Services
-      'azercell': 'azercell.com', 'bakcell': 'bakcell.com', 'nar': 'nar.az', 'nar mobile': 'nar.az',
+
+      // Local Azerbaijan Banks & FinTech
       'kapital': 'kapitalbank.az', 'kapital bank': 'kapitalbank.az', 'birbank': 'birbank.az',
       'abb': 'abb-bank.az', 'pasha': 'pashabank.az', 'pasha bank': 'pashabank.az',
-      'unibank': 'unibank.az', 'leobank': 'leobank.az', 'azerishiq': 'azerishiq.az',
-      'azersu': 'azersu.az', 'citynet': 'citynet.az', 'katv': 'katv1.az',
-      'hbo': 'hbo.com', 'hbo max': 'max.com', 'max': 'max.com', 'disney': 'disneyplus.com',
-      'disney+': 'disneyplus.com', 'disney plus': 'disneyplus.com', 'paramount': 'paramountplus.com',
-      'hulu': 'hulu.com', 'crunchyroll': 'crunchyroll.com', 'deezer': 'deezer.com', 'tidal': 'tidal.com',
-      'playstation': 'playstation.com', 'ps plus': 'playstation.com', 'xbox': 'xbox.com',
-      'nintendo': 'nintendo.com', 'steam': 'steampowered.com', 'twitch': 'twitch.tv',
-      'figma': 'figma.com', 'canva': 'canva.com', 'midjourney': 'midjourney.com', 'runway': 'runwayml.com',
+      'unibank': 'unibank.az', 'leobank': 'leobank.az', 'm10': 'm10.az', 'mpay': 'mpay.az',
+      'emanat': 'emanat.az', 'expressbank': 'expressbank.az', 'yelo': 'yelobank.az', 'yelo bank': 'yelobank.az',
+      'vtb': 'vtb.az', 'rabitabank': 'rabitabank.az', 'accessbank': 'accessbank.az', 'bank of baku': 'bankofbaku.com',
+
+      // Local Telecom & Utilities & Services
+      'azercell': 'azercell.com', 'bakcell': 'bakcell.com', 'nar': 'nar.az', 'nar mobile': 'nar.az',
+      'azerishiq': 'azerishiq.az', 'azərişıq': 'azerishiq.az',
+      'azersu': 'azersu.az', 'azərsu': 'azersu.az',
+      'azerigaz': 'azerigaz.az', 'azəriqaz': 'azerigaz.az',
+      'citynet': 'citynet.az', 'katv': 'katv1.az', 'katv1': 'katv1.az', 'connect': 'connect.az',
+      'wolt': 'wolt.com', 'bolt': 'bolt.eu', 'uber': 'uber.com', 'yandex': 'yandex.com',
+
+      // Gaming & Software
+      'playstation': 'playstation.com', 'ps plus': 'playstation.com', 'xbox': 'xbox.com', 'game pass': 'xbox.com',
+      'nintendo': 'nintendo.com', 'steam': 'steampowered.com', 'twitch': 'twitch.tv', 'roblox': 'roblox.com',
+      'adobe': 'adobe.com', 'photoshop': 'adobe.com', 'illustrator': 'adobe.com', 'duolingo': 'duolingo.com',
       'github': 'github.com', 'gitlab': 'gitlab.com', 'vercel': 'vercel.com', 'netlify': 'netlify.com',
       'dropbox': 'dropbox.com', 'slack': 'slack.com', 'zoom': 'zoom.us', 'linear': 'linear.app',
       'expressvpn': 'expressvpn.com', 'nordvpn': 'nordvpn.com', 'surfshark': 'surfshark.com', 'proton': 'proton.me',
