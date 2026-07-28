@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=16000.0.0">
+<link rel="manifest" href="/manifest.json?v=17000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=16000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=16000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=16000.0.0">
+<link rel="icon" href="/icon-192.png?v=17000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=17000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=17000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=16000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=17000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3106,7 +3106,7 @@
     // Render all at once
     renderSubs();
     renderNotifs();
-    renderRuler();
+    renderFinancialHeatmapGrid();
     renderBudgetCard();
     renderCards();
     updateCardDropdowns();
@@ -5018,8 +5018,11 @@ async function handleAddCard() {
     const pct = budgetState.limit > 0 ? Math.min(100, Math.round((budgetState.spent / budgetState.limit) * 100)) : 0;
     const free = Math.max(0, budgetState.limit - budgetState.spent);
     
-    document.querySelector('.budget-spent').textContent = sym + budgetState.spent.toFixed(2);
-    document.querySelector('.budget-limit').textContent = '/ ' + sym + budgetState.limit.toFixed(2);
+    const bSpent = document.querySelector('.budget-spent');
+    if (bSpent) bSpent.textContent = sym + budgetState.spent.toFixed(2);
+    
+    const bLimit = document.querySelector('.budget-limit');
+    if (bLimit) bLimit.textContent = '/ ' + sym + budgetState.limit.toFixed(2);
     
     const barFill = document.querySelector('.budget-bar-fill');
     if (barFill) {
@@ -5040,7 +5043,8 @@ async function handleAddCard() {
     if (ringPct) ringPct.textContent = pct + '%';
     
     // Update stats cards in dashboard
-    document.getElementById('dashboard-monthly-spend').textContent = sym + budgetState.spent.toFixed(2);
+    const dashSpent = document.getElementById('dashboard-monthly-spend');
+    if (dashSpent) dashSpent.textContent = sym + budgetState.spent.toFixed(2);
 
     // Update new figma-style dashboard budget card
     const dbSpent = document.getElementById('db-budget-spent');
@@ -5057,10 +5061,16 @@ async function handleAddCard() {
     const dbRingPct = document.getElementById('db-ring-pct');
     if (dbRingPct) dbRingPct.textContent = pct + '%';
     
-    document.querySelector('.budget-note').innerHTML =
-      `Limitin <strong style="color:var(--ink)">%${pct}</strong>-i istifadə olunub · ${sym}${free.toFixed(2)} sərbəst qalıb.`;
-    document.getElementById('budget-limit-display').textContent = sym + budgetState.limit.toFixed(2);
-    document.getElementById('budget-currency-display').textContent = budgetState.currency;
+    const bNote = document.querySelector('.budget-note');
+    if (bNote) {
+      bNote.innerHTML = `Limitin <strong style="color:var(--ink)">%${pct}</strong>-i istifadə olunub · ${sym}${free.toFixed(2)} sərbəst qalıb.`;
+    }
+    
+    const bLimitDisp = document.getElementById('budget-limit-display');
+    if (bLimitDisp) bLimitDisp.textContent = sym + budgetState.limit.toFixed(2);
+    
+    const bCurrDisp = document.getElementById('budget-currency-display');
+    if (bCurrDisp) bCurrDisp.textContent = budgetState.currency;
 
     // Advanced: Calculate Category Breakdown
     const categoryTotals = {};
