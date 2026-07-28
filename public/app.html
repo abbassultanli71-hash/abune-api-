@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=3800.0.0">
+<link rel="manifest" href="/manifest.json?v=3900.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=3800.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3800.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3800.0.0">
+<link rel="icon" href="/icon-192.png?v=3900.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3900.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3900.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=3800.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=3900.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3895,49 +3895,64 @@
       }
     });
 
-    // Group subscriptions by day to offset overlapping chips cleanly
+    // 1. Group subscriptions by exact day number
     const dayGroups = {};
     monthSubs.forEach(item => {
       if (!dayGroups[item.day]) dayGroups[item.day] = [];
       dayGroups[item.day].push(item.sub);
     });
 
-    // Collect and sort all chips by horizontal percentage
-    const chipItems = [];
-    Object.keys(dayGroups).forEach(dayStr => {
-      const day = Number(dayStr);
-      const subsOnDay = dayGroups[dayStr];
-      const basePct = Math.max(4, Math.min(96, ((day - 1) / (daysInMonth - 1)) * 100));
+    // 2. Build sorted array of unique payment days
+    const daysArray = Object.keys(dayGroups).map(Number).sort((a,b) => a - b);
 
-      subsOnDay.forEach((s, idx) => {
-        const offset = (idx - (subsOnDay.length - 1) / 2) * 4.5;
-        const pct = Math.max(3, Math.min(97, basePct + offset));
-        chipItems.push({ sub: s, day, pct });
-      });
-    });
+    // 3. Render 100% overlap-proof multi-tier staggered badges
+    daysArray.forEach((day, idx) => {
+      const subsOnDay = dayGroups[day];
+      const pct = Math.max(4, Math.min(96, ((day - 1) / (daysInMonth - 1)) * 100));
 
-    chipItems.sort((a,b) => a.pct - b.pct);
+      // Determine most urgent sub on this day
+      const mostUrgent = subsOnDay.reduce((prev, curr) => {
+        return daysUntil(curr.next) < daysUntil(prev.next) ? curr : prev;
+      }, subsOnDay[0]);
 
-    chipItems.forEach((item, idx) => {
-      const { sub: s, day, pct } = item;
-      const daysLeft = daysUntil(s.next);
+      const daysLeft = daysUntil(mostUrgent.next);
       const urg = urgencyFor(daysLeft);
       const color = urg === 'urgent' ? '#ef4444' : urg === 'soon' ? '#f59e0b' : '#10b981';
-      
-      // Determine if close to previous item (less than 12% horizontal distance)
-      const prevItem = chipItems[idx - 1];
-      const isClose = prevItem && (pct - prevItem.pct < 12);
-      
-      // Smart vertical staggering: alternate above (-24px) and below (+38px) when close
-      const isBelow = (idx % 2 === 1 && isClose);
-      const topPos = isBelow ? 'top:38px;' : 'top:-24px;';
 
-      // Compact sleek dot chip (10px)
-      html += `<div class="ruler-chip ${urg}" style="left:${pct}%; position:absolute; top:50%; transform:translate(-50%, -50%); width:10px; height:10px; border-radius:50%; background:${color}; border:2px solid #ffffff; box-shadow:0 0 10px ${color}; cursor:pointer; z-index:5; transition:all 0.2s;" title="${s.name} (${day} ${monthsAzFull[rulerSelectedMonth]} · ${s.price} ${s.currency || 'AZN'})" onclick="showSubDetails(${s.id})"></div>`;
+      // Multi-tier vertical staggering positions when days are close (within 3 days)
+      const prevDay = daysArray[idx - 1];
+      const isCloseToPrev = prevDay && (day - prevDay <= 3);
+
+      let verticalLevel = 0;
+      if (isCloseToPrev) {
+        verticalLevel = (idx % 3 === 1) ? 1 : (idx % 3 === 2) ? 2 : 0;
+      }
+      
+      const topPositions = ['top:-24px;', 'top:38px;', 'top:-42px;', 'top:54px;'];
+      const topPos = topPositions[verticalLevel] || 'top:-24px;';
+
+      // Text label content & tooltip
+      let badgeLabel = '';
+      let fullTitle = '';
+
+      if (subsOnDay.length === 1) {
+        const s = subsOnDay[0];
+        const shortName = s.name.length > 7 ? s.name.substring(0, 6) + '…' : s.name;
+        badgeLabel = `${shortName} · ${day}`;
+        fullTitle = `${s.name} (${day} ${monthsAzFull[rulerSelectedMonth]} · ${s.price} ${s.currency || 'AZN'})`;
+      } else {
+        // Grouped badge for multiple subscriptions on the same day
+        badgeLabel = `${subsOnDay.length} Abunəlik · ${day}`;
+        fullTitle = subsOnDay.map(s => `${s.name}: ${s.price} ${s.currency || 'AZN'}`).join('\n');
+      }
+
+      // Compact sleek dot chip (10px) with double ring for multi-subs
+      const ringStyle = subsOnDay.length > 1 ? `outline: 2px solid ${color}; outline-offset: 2px;` : '';
+      
+      html += `<div class="ruler-chip ${urg}" style="left:${pct}%; position:absolute; top:50%; transform:translate(-50%, -50%); width:10px; height:10px; border-radius:50%; background:${color}; border:2px solid #ffffff; box-shadow:0 0 10px ${color}; ${ringStyle} cursor:pointer; z-index:5; transition:all 0.2s;" title="${fullTitle}" onclick="showSubDetails(${mostUrgent.id})"></div>`;
 
       // Overlap-proof compact date pill badge
-      const shortName = s.name.length > 7 ? s.name.substring(0, 6) + '…' : s.name;
-      html += `<div style="left:${pct}%; position:absolute; ${topPos} transform:translateX(-50%); font-size:9px; font-weight:800; color:#ffffff; background:rgba(15,23,42,0.94); border:1px solid ${color}; padding:1px 6px; border-radius:6px; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,0.6); z-index:6; cursor:pointer; font-family:var(--font-mono);" onclick="showSubDetails(${s.id})" title="${s.name} - ${s.price} AZN">${shortName} · ${day}</div>`;
+      html += `<div style="left:${pct}%; position:absolute; ${topPos} transform:translateX(-50%); font-size:9px; font-weight:800; color:#ffffff; background:rgba(15,23,42,0.96); border:1px solid ${color}; padding:2px 7px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.6); z-index:6; cursor:pointer; font-family:var(--font-mono);" onclick="showSubDetails(${mostUrgent.id})" title="${fullTitle}">${badgeLabel}</div>`;
     });
 
     track.innerHTML = html;
