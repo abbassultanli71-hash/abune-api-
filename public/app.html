@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=19000.0.0">
+<link rel="manifest" href="/manifest.json?v=20000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=19000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=19000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=19000.0.0">
+<link rel="icon" href="/icon-192.png?v=20000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=19000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=20000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2303,6 +2303,25 @@
       </div>
     </div>
 
+    <!-- Bottom sheet: Day Summary Subscriptions -->
+    <div class="sheet-overlay" id="day-summary-sheet-overlay">
+      <div class="sheet" style="max-height:85vh; overflow-y:auto;">
+        <div class="sheet-handle"></div>
+        <div class="sheet-head">
+          <div>
+            <div class="eyebrow" id="day-summary-date-eyebrow">Təqvim Ödənişləri</div>
+            <div class="sheet-title" id="day-summary-title">Günün Ödənişləri 💳</div>
+          </div>
+          <button class="sheet-close" onclick="closeDaySummarySheet()">✕</button>
+        </div>
+        <div id="day-summary-total-banner" style="margin: 12px 20px 16px; padding: 14px 18px; border-radius: 16px; background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.25); display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 13px; font-weight: 600; color: var(--ink-muted);">Bu günün cəmi xərci:</span>
+          <span id="day-summary-total-amount" style="font-size: 17px; font-weight: 800; color: #f97316; font-family: var(--font-display);">0.00 AZN</span>
+        </div>
+        <div id="day-summary-subs-list" style="padding: 0 20px 24px; display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -3936,30 +3955,37 @@
           : '';
         const titleText = dueSubs.map(s => s.name + ' (' + s.price + ' ' + (s.currency||'AZN') + ')').join(' + ');
 
-        // Build logo strip: show up to 2 logos side by side, or 1 centered
+        window._calendarSubsCache = window._calendarSubsCache || {};
+        const cellKey = `cell_${rulerSelectedYear}_${rulerSelectedMonth}_${d}`;
+        window._calendarSubsCache[cellKey] = dueSubs;
+
+        // Build Avatar Stack logos for 1, 2, 3, 4+ subs
         let logosHtml = '';
         if (dueSubs.length === 1) {
-          // Single subscription: show logo centered
-          logosHtml = '<div style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px;margin-top:3px;">'
+          logosHtml = '<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:6px;margin-top:3px;">'
             + getCalendarLogoHTML(dueSubs[0].name)
             + '</div>';
         } else if (dueSubs.length === 2) {
-          // Two subscriptions: show both logos side by side (smaller)
-          logosHtml = '<div style="display:flex;gap:2px;margin-top:3px;align-items:center;justify-content:center;">'
-            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:4px;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
-            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:4px;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
+          logosHtml = '<div style="display:flex;align-items:center;justify-content:center;margin-top:3px;">'
+            + '<div style="width:19px;height:19px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);z-index:2;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
+            + '<div style="width:19px;height:19px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);margin-left:-6px;z-index:1;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
+            + '</div>';
+        } else if (dueSubs.length === 3) {
+          logosHtml = '<div style="display:flex;align-items:center;justify-content:center;margin-top:3px;">'
+            + '<div style="width:17px;height:17px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);z-index:3;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
+            + '<div style="width:17px;height:17px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);margin-left:-7px;z-index:2;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
+            + '<div style="width:17px;height:17px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);margin-left:-7px;z-index:1;">' + getCalendarLogoHTML(dueSubs[2].name) + '</div>'
             + '</div>';
         } else {
-          // 3+ subscriptions: show first 2 + count
           const extra = dueSubs.length - 2;
-          logosHtml = '<div style="display:flex;gap:1px;margin-top:3px;align-items:center;justify-content:center;flex-wrap:wrap;">'
-            + '<div style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:3px;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
-            + '<div style="width:14px;height:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:3px;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
-            + '<span style="font-size:8px;font-weight:800;color:#fff;background:rgba(0,0,0,0.5);border-radius:3px;padding:0 2px;">+' + extra + '</span>'
+          logosHtml = '<div style="display:flex;align-items:center;justify-content:center;margin-top:3px;">'
+            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);z-index:3;">' + getCalendarLogoHTML(dueSubs[0].name) + '</div>'
+            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;border:1.5px solid rgba(15,23,42,0.9);margin-left:-6px;z-index:2;">' + getCalendarLogoHTML(dueSubs[1].name) + '</div>'
+            + '<span style="font-size:8px;font-weight:900;color:#fff;background:#f97316;border-radius:50%;width:15px;height:15px;display:flex;align-items:center;justify-content:center;margin-left:-5px;z-index:1;border:1.5px solid rgba(15,23,42,0.9);">+' + extra + '</span>'
             + '</div>';
         }
 
-        html += '<div onclick="showSubDetails(' + primarySub.id + ')" title="' + titleText + '" style="position:relative;aspect-ratio:1/1;border-radius:14px;background:' + bc.bg + ';' + borderStyle + 'display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;transition:all 0.2s;">'
+        html += '<div onclick="handleCalendarCellClick(\'' + cellKey + '\', ' + d + ')" title="' + titleText + '" style="position:relative;aspect-ratio:1/1;border-radius:14px;background:' + bc.bg + ';' + borderStyle + 'display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;transition:all 0.2s;">'
           + '<span style="position:absolute;top:2px;left:3px;font-size:9px;font-weight:800;color:rgba(255,255,255,0.9);font-family:monospace;">' + d + '</span>'
           + todayBadge
           + logosHtml
@@ -3976,6 +4002,73 @@
     }
 
     grid.innerHTML = html;
+  }
+
+  function openDaySummarySheet(d, dueSubs) {
+    if (!dueSubs || dueSubs.length === 0) return;
+
+    const monthName = RULER_MONTH_NAMES_AZ[rulerSelectedMonth] || '';
+    const dateStr = `${d} ${monthName} ${rulerSelectedYear}`;
+
+    const eyebrow = document.getElementById('day-summary-date-eyebrow');
+    if (eyebrow) eyebrow.textContent = `${dueSubs.length} abunəlik var`;
+
+    const titleEl = document.getElementById('day-summary-title');
+    if (titleEl) titleEl.textContent = `${dateStr} ödənişləri 💳`;
+
+    let dayTotal = 0;
+    dueSubs.forEach(s => { dayTotal += convertCurrency(s.price, s.currency, 'AZN'); });
+
+    const totalEl = document.getElementById('day-summary-total-amount');
+    if (totalEl) totalEl.textContent = `${dayTotal.toFixed(2)} AZN`;
+
+    const listEl = document.getElementById('day-summary-subs-list');
+    if (listEl) {
+      listEl.innerHTML = dueSubs.map(s => {
+        const logoHTML = getCalendarLogoHTML(s.name);
+        const subJson = JSON.stringify(s).replace(/"/g, '&quot;');
+        return `
+          <div onclick="closeDaySummarySheet(); openManageSheet(${subJson});" style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--surface-2); border:1px solid var(--border); border-radius:18px; cursor:pointer; transition:transform 0.15s ease;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:var(--surface-3); flex-shrink:0;">
+                ${logoHTML}
+              </div>
+              <div>
+                <div style="font-size:14px; font-weight:700; color:var(--ink);">${s.name}</div>
+                <div style="font-size:11.5px; color:var(--ink-muted); margin-top:2px;">${s.category || 'Abunəlik'} · ${s.freq || 'Aylıq'}</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:15px; font-weight:800; color:var(--ink); font-family:var(--font-display);">${parseFloat(s.price).toFixed(2)} ${s.currency || 'AZN'}</div>
+              <span style="font-size:11px; color:var(--accent); font-weight:600;">Ətraflı →</span>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    const overlay = document.getElementById('day-summary-sheet-overlay');
+    if (overlay) {
+      overlay.classList.add('open');
+      updateBodyScrollLock();
+    }
+  }
+
+  function closeDaySummarySheet() {
+    const overlay = document.getElementById('day-summary-sheet-overlay');
+    if (overlay) {
+      overlay.classList.remove('open');
+      updateBodyScrollLock();
+    }
+  }
+
+  function handleCalendarCellClick(cellKey, dayNum) {
+    const subs = window._calendarSubsCache ? window._calendarSubsCache[cellKey] : null;
+    if (!subs || subs.length === 0) return;
+    if (subs.length === 1) {
+      openManageSheet(subs[0]);
+    } else {
+      openDaySummarySheet(dayNum, subs);
+    }
   }
 
   function renderSubs() {
