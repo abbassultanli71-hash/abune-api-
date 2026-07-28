@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=1400.0.0">
+<link rel="manifest" href="/manifest.json?v=1500.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=1400.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=1400.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=1400.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1400.0.0">
+<link rel="icon" href="/icon-192.png?v=1500.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=1500.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=1500.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1500.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=1400.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=1500.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3236,83 +3236,62 @@
     
     if (lower.includes('netflix') || lower.includes('neftlix')) {
       return {
-        bg: 'radial-gradient(circle at 0% 50%, rgba(229, 9, 20, 0.22), transparent 70%), linear-gradient(135deg, rgba(24, 10, 15, 0.90) 0%, rgba(14, 14, 20, 0.95) 100%)',
-        border: '1.5px solid rgba(229, 9, 20, 0.50)',
-        shadow: '0 8px 24px rgba(229, 9, 20, 0.22)',
+        bg: 'radial-gradient(circle at 0% 50%, rgba(229, 9, 20, 0.32), transparent 75%), linear-gradient(135deg, rgba(28, 10, 15, 0.95) 0%, rgba(12, 12, 18, 0.98) 100%)',
+        border: '1.5px solid rgba(229, 9, 20, 0.60)',
+        shadow: '0 10px 30px -5px rgba(229, 9, 20, 0.38)',
         accentColor: '#e50914',
-        badgeClass: 'bg-red-500/20 text-red-400 ring-1 ring-red-500/40 font-black'
+        pillGrad: 'linear-gradient(180deg, #ff2e3b 0%, #e50914 100%)',
+        priceStyle: 'background: rgba(229, 9, 20, 0.20); color: #ff4d55; border: 1.5px solid rgba(229, 9, 20, 0.60); box-shadow: 0 4px 16px rgba(229, 9, 20, 0.35); font-family: var(--font-mono);'
       };
     }
     if (lower.includes('spotify')) {
       return {
-        bg: 'radial-gradient(circle at 0% 50%, rgba(30, 215, 96, 0.22), transparent 70%), linear-gradient(135deg, rgba(10, 22, 14, 0.90) 0%, rgba(12, 18, 14, 0.95) 100%)',
-        border: '1.5px solid rgba(30, 215, 96, 0.50)',
-        shadow: '0 8px 24px rgba(30, 215, 96, 0.22)',
+        bg: 'radial-gradient(circle at 0% 50%, rgba(30, 215, 96, 0.32), transparent 75%), linear-gradient(135deg, rgba(10, 26, 15, 0.95) 0%, rgba(12, 18, 14, 0.98) 100%)',
+        border: '1.5px solid rgba(30, 215, 96, 0.60)',
+        shadow: '0 10px 30px -5px rgba(30, 215, 96, 0.38)',
         accentColor: '#1ed760',
-        badgeClass: 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/40 font-black'
+        pillGrad: 'linear-gradient(180deg, #1ed760 0%, #10b981 100%)',
+        priceStyle: 'background: rgba(30, 215, 96, 0.20); color: #34d399; border: 1.5px solid rgba(30, 215, 96, 0.60); box-shadow: 0 4px 16px rgba(30, 215, 96, 0.35); font-family: var(--font-mono);'
       };
     }
     if (lower.includes('youtube') || lower.includes('yt')) {
       return {
-        bg: 'radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.20), transparent 70%), linear-gradient(135deg, rgba(24, 10, 10, 0.90) 0%, rgba(15, 10, 10, 0.95) 100%)',
-        border: '1.5px solid rgba(255, 0, 0, 0.45)',
-        shadow: '0 8px 24px rgba(255, 0, 0, 0.20)',
+        bg: 'radial-gradient(circle at 0% 50%, rgba(255, 0, 0, 0.30), transparent 75%), linear-gradient(135deg, rgba(28, 10, 10, 0.95) 0%, rgba(15, 10, 10, 0.98) 100%)',
+        border: '1.5px solid rgba(255, 0, 0, 0.55)',
+        shadow: '0 10px 30px -5px rgba(255, 0, 0, 0.35)',
         accentColor: '#ff0000',
-        badgeClass: 'bg-rose-500/20 text-rose-400 ring-1 ring-rose-500/40 font-black'
+        pillGrad: 'linear-gradient(180deg, #ff3333 0%, #cc0000 100%)',
+        priceStyle: 'background: rgba(255, 0, 0, 0.20); color: #ff5555; border: 1.5px solid rgba(255, 0, 0, 0.60); box-shadow: 0 4px 16px rgba(255, 0, 0, 0.35); font-family: var(--font-mono);'
       };
     }
     if (lower.includes('apple') || lower.includes('icloud') || lower.includes('itunes')) {
       return {
-        bg: 'radial-gradient(circle at 0% 50%, rgba(168, 85, 247, 0.22), transparent 70%), linear-gradient(135deg, rgba(20, 14, 28, 0.90) 0%, rgba(14, 12, 20, 0.95) 100%)',
-        border: '1.5px solid rgba(168, 85, 247, 0.45)',
-        shadow: '0 8px 24px rgba(168, 85, 247, 0.20)',
+        bg: 'radial-gradient(circle at 0% 50%, rgba(168, 85, 247, 0.32), transparent 75%), linear-gradient(135deg, rgba(22, 14, 32, 0.95) 0%, rgba(14, 12, 20, 0.98) 100%)',
+        border: '1.5px solid rgba(168, 85, 247, 0.60)',
+        shadow: '0 10px 30px -5px rgba(168, 85, 247, 0.38)',
         accentColor: '#a855f7',
-        badgeClass: 'bg-purple-500/20 text-purple-400 ring-1 ring-purple-500/40 font-black'
+        pillGrad: 'linear-gradient(180deg, #c084fc 0%, #9333ea 100%)',
+        priceStyle: 'background: rgba(168, 85, 247, 0.20); color: #c084fc; border: 1.5px solid rgba(168, 85, 247, 0.60); box-shadow: 0 4px 16px rgba(168, 85, 247, 0.35); font-family: var(--font-mono);'
       };
     }
     if (lower.includes('linkedin')) {
       return {
-        bg: 'radial-gradient(circle at 0% 50%, rgba(10, 102, 194, 0.25), transparent 70%), linear-gradient(135deg, rgba(10, 20, 32, 0.90) 0%, rgba(10, 14, 22, 0.95) 100%)',
-        border: '1.5px solid rgba(10, 102, 194, 0.50)',
-        shadow: '0 8px 24px rgba(10, 102, 194, 0.22)',
+        bg: 'radial-gradient(circle at 0% 50%, rgba(10, 102, 194, 0.35), transparent 75%), linear-gradient(135deg, rgba(10, 22, 38, 0.95) 0%, rgba(10, 14, 22, 0.98) 100%)',
+        border: '1.5px solid rgba(10, 102, 194, 0.60)',
+        shadow: '0 10px 30px -5px rgba(10, 102, 194, 0.38)',
         accentColor: '#0a66c2',
-        badgeClass: 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/40 font-black'
-      };
-    }
-    if (lower.includes('chatgpt') || lower.includes('openai')) {
-      return {
-        bg: 'radial-gradient(circle at 0% 50%, rgba(16, 185, 129, 0.22), transparent 70%), linear-gradient(135deg, rgba(10, 24, 18, 0.90) 0%, rgba(10, 16, 14, 0.95) 100%)',
-        border: '1.5px solid rgba(16, 185, 129, 0.45)',
-        shadow: '0 8px 24px rgba(16, 185, 129, 0.20)',
-        accentColor: '#10b981',
-        badgeClass: 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/40 font-black'
-      };
-    }
-    if (lower.includes('duolingo')) {
-      return {
-        bg: 'radial-gradient(circle at 0% 50%, rgba(88, 204, 2, 0.25), transparent 70%), linear-gradient(135deg, rgba(14, 26, 10, 0.90) 0%, rgba(10, 16, 10, 0.95) 100%)',
-        border: '1.5px solid rgba(88, 204, 2, 0.50)',
-        shadow: '0 8px 24px rgba(88, 204, 2, 0.22)',
-        accentColor: '#58cc02',
-        badgeClass: 'bg-lime-500/20 text-lime-400 ring-1 ring-lime-500/40 font-black'
-      };
-    }
-    if (lower.includes('telegram')) {
-      return {
-        bg: 'radial-gradient(circle at 0% 50%, rgba(34, 158, 217, 0.25), transparent 70%), linear-gradient(135deg, rgba(10, 22, 30, 0.90) 0%, rgba(10, 14, 20, 0.95) 100%)',
-        border: '1.5px solid rgba(34, 158, 217, 0.50)',
-        shadow: '0 8px 24px rgba(34, 158, 217, 0.22)',
-        accentColor: '#229ed9',
-        badgeClass: 'bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/40 font-black'
+        pillGrad: 'linear-gradient(180deg, #38bdf8 0%, #0284c7 100%)',
+        priceStyle: 'background: rgba(10, 102, 194, 0.22); color: #38bdf8; border: 1.5px solid rgba(10, 102, 194, 0.60); box-shadow: 0 4px 16px rgba(10, 102, 194, 0.35); font-family: var(--font-mono);'
       };
     }
 
     return {
-      bg: 'radial-gradient(circle at 0% 50%, rgba(249, 115, 22, 0.18), transparent 70%), linear-gradient(135deg, rgba(24, 20, 18, 0.90) 0%, rgba(14, 14, 18, 0.95) 100%)',
-      border: '1.5px solid rgba(249, 115, 22, 0.40)',
-      shadow: '0 8px 24px rgba(249, 115, 22, 0.18)',
+      bg: 'radial-gradient(circle at 0% 50%, rgba(249, 115, 22, 0.25), transparent 75%), linear-gradient(135deg, rgba(28, 22, 20, 0.95) 0%, rgba(14, 14, 18, 0.98) 100%)',
+      border: '1.5px solid rgba(249, 115, 22, 0.50)',
+      shadow: '0 10px 30px -5px rgba(249, 115, 22, 0.30)',
       accentColor: '#f97316',
-      badgeClass: 'bg-orange-500/20 text-orange-400 ring-1 ring-orange-500/40 font-black'
+      pillGrad: 'linear-gradient(180deg, #fb923c 0%, #ea580c 100%)',
+      priceStyle: 'background: rgba(249, 115, 22, 0.20); color: #fb923c; border: 1.5px solid rgba(249, 115, 22, 0.55); box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3); font-family: var(--font-mono);'
     };
   }
 
@@ -3324,22 +3303,29 @@
     const theme = getBrandThemeStyle(s.name, s.category);
 
     const badgeTailwind = urg === 'urgent'
-      ? 'bg-rose-500/20 text-rose-400 ring-1 ring-rose-500/40 font-black'
+      ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 font-black'
       : urg === 'soon'
-      ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40 font-black'
+      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 font-black'
       : urg === 'paused'
-      ? 'bg-slate-800 text-slate-400 ring-1 ring-slate-700/50'
-      : 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/40 font-black';
+      ? 'bg-slate-800 text-slate-400 border border-slate-700/50'
+      : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-black';
 
     return `
-      <div class="sub-row relative overflow-hidden flex items-center justify-between gap-3.5 p-3.5 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] cursor-pointer group" 
+      <div class="sub-row relative overflow-hidden flex items-center justify-between gap-3.5 p-3.5 pl-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl active:scale-[0.98] cursor-pointer group" 
            style="background: ${theme.bg}; border: ${theme.border}; box-shadow: ${theme.shadow};"
            onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+        
+        <!-- Glowing Left Brand Indicator Bar -->
+        <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl" style="background: ${theme.pillGrad}; box-shadow: 0 0 14px ${theme.accentColor};"></div>
+
         <!-- Geometric mesh wave pattern overlay -->
-        <svg class="absolute inset-0 w-full h-full opacity-15 pointer-events-none group-hover:opacity-30 transition-opacity" viewBox="0 0 400 80" fill="none">
-          <path d="M-50 40 Q 100 -20 250 40 T 550 40" stroke="${theme.accentColor}" stroke-width="1.8"/>
+        <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none group-hover:opacity-35 transition-opacity" viewBox="0 0 400 80" fill="none">
+          <path d="M-50 40 Q 100 -20 250 40 T 550 40" stroke="${theme.accentColor}" stroke-width="2"/>
           <path d="M-50 60 Q 100 0 250 60 T 550 60" stroke="${theme.accentColor}" stroke-width="1.2" stroke-dasharray="4 4"/>
+          <circle cx="80" cy="20" r="1.5" fill="${theme.accentColor}" opacity="0.6"/>
+          <circle cx="320" cy="60" r="2" fill="${theme.accentColor}" opacity="0.6"/>
         </svg>
+
         <div class="flex items-center gap-3.5 min-w-0 relative z-10">
           <div class="sub-icon-wrap flex-shrink-0 transition-transform group-hover:scale-110 group-hover:rotate-3">
             ${getBrandIconHTML(s.name, s.category)}
@@ -3347,8 +3333,11 @@
           <div class="sub-name font-black text-slate-900 dark:text-slate-100 text-sm md:text-base truncate tracking-tight">${s.name}</div>
         </div>
         <div class="flex items-center gap-2.5 flex-shrink-0 relative z-10">
-          <div class="inline-flex items-center rounded-xl px-2.5 py-1 text-xs md:text-sm font-black ${theme.badgeClass}">${sym}${s.price.toFixed(2)}</div>
-          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-extrabold ${badgeTailwind}">${badgeText}</span>
+          <div class="inline-flex items-center rounded-xl px-3 py-1 text-xs md:text-sm font-extrabold" style="${theme.priceStyle}">${sym}${s.price.toFixed(2)}</div>
+          <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-extrabold ${badgeTailwind}">
+            <span class="w-1.5 h-1.5 rounded-full mr-1.5 inline-block" style="background: currentColor; box-shadow: 0 0 6px currentColor;"></span>
+            ${badgeText}
+          </span>
         </div>
       </div>`;
   }
