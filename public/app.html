@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=1800.0.0">
+<link rel="manifest" href="/manifest.json?v=1900.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=1800.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=1800.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=1800.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1800.0.0">
+<link rel="icon" href="/icon-192.png?v=1900.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=1900.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=1900.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1900.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=1800.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=1900.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3319,7 +3319,7 @@
     if (cat.includes('iş') || cat.includes('proyekt') || cat.includes('bulud')) return '💼 Bulud/İş';
     if (cat.includes('təhsil') || cat.includes('kurs')) return '📚 Təhsil';
     if (cat.includes('kommunal') || cat.includes('xidmət')) return '⚡ Xidmət';
-    return '⭐ Abunəlik';
+    return '💳 Abunəlik';
   }
 
   function handle3dCardTilt(e, card) {
@@ -3370,8 +3370,6 @@
         <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity" viewBox="0 0 400 80" fill="none">
           <path d="M-50 40 Q 100 -20 250 40 T 550 40" stroke="${theme.accentColor}" stroke-width="2.2"/>
           <path d="M-50 60 Q 100 0 250 60 T 550 60" stroke="${theme.accentColor}" stroke-width="1.2" stroke-dasharray="4 4"/>
-          <circle cx="80" cy="20" r="1.8" fill="${theme.accentColor}" opacity="0.8"/>
-          <circle cx="320" cy="60" r="2.2" fill="${theme.accentColor}" opacity="0.8"/>
         </svg>
 
         <!-- Specular Highlight Glare Sheet -->
