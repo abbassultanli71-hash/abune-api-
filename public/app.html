@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=3600.0.0">
+<link rel="manifest" href="/manifest.json?v=3700.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=3600.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3600.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3600.0.0">
+<link rel="icon" href="/icon-192.png?v=3700.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3700.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3700.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=3600.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=3700.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1692,10 +1692,10 @@
             <div class="ruler-track" id="ruler-track" style="position: relative; height: 38px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.15); overflow: visible;"></div>
             <div class="ruler-ticks" id="ruler-ticks-container" style="display: flex; justify-content: space-between; margin-top: 8px; color: #64748b; font-size: 11px; font-weight: 700; font-family: var(--font-mono); padding: 0 4px;"></div>
           </div>
-          <div class="ruler-legend" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
-            <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#ef4444; width:8px; height:8px; border-radius:50%; box-shadow: 0 0 8px rgba(239,68,68,0.6);"></span><span data-i18n="legend_urgent">Təcili (≤2 gün)</span></div>
-            <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#f59e0b; width:8px; height:8px; border-radius:50%; box-shadow: 0 0 8px rgba(245,158,11,0.6);"></span><span data-i18n="legend_soon">Yaxınlaşır (≤7 gün)</span></div>
-            <div class="legend-item" style="display: flex; align-items: center; gap: 6px;"><span class="legend-dot" style="background:#10b981; width:8px; height:8px; border-radius:50%; box-shadow: 0 0 8px rgba(16,185,129,0.6);"></span><span data-i18n="legend_normal">Normal</span></div>
+          <div class="ruler-legend" style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 700; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 14px; margin-top: 12px; gap: 6px; flex-wrap: wrap;">
+            <div class="legend-item" style="display: flex; align-items: center; gap: 6px; background: rgba(239,68,68,0.18); border: 1px solid rgba(239,68,68,0.4); padding: 4px 10px; border-radius: 12px;"><span class="legend-dot" style="background:#ef4444; width:8px; height:8px; border-radius:50%; box-shadow: 0 0 8px #ef4444;"></span><span data-i18n="legend_urgent" style="color: #fca5a5 !important; font-weight: 800;">Təcili (≤2 gün)</span></div>
+            <div class="legend-item" style="display: flex; align-items: center; gap: 6px; background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.4); padding: 4px 10px; border-radius: 12px;"><span class="legend-dot" style="background:#f59e0b; width:8px; height:8px; border-radius:50%; box-shadow: 0 0 8px #f59e0b;"></span><span data-i18n="legend_soon" style="color: #fde047 !important; font-weight: 800;">Yaxınlaşır (≤7 gün)</span></div>
+            <div class="legend-item" style="display: flex; align-items: center; gap: 6px; background: rgba(16,185,129,0.18); border: 1px solid rgba(16,185,129,0.4); padding: 4px 10px; border-radius: 12px;"><span class="legend-dot" style="background:#10b981; width:8px; height:8px; border-radius:50%; box-shadow: 0 0 8px #10b981;"></span><span data-i18n="legend_normal" style="color: #6ee7b7 !important; font-weight: 800;">Normal</span></div>
           </div>
         </div>
 
@@ -3905,18 +3905,23 @@
     Object.keys(dayGroups).forEach(dayStr => {
       const day = Number(dayStr);
       const subsOnDay = dayGroups[dayStr];
-      const basePct = Math.max(3, Math.min(97, ((day - 1) / (daysInMonth - 1)) * 100));
+      const basePct = Math.max(4, Math.min(96, ((day - 1) / (daysInMonth - 1)) * 100));
 
       subsOnDay.forEach((s, idx) => {
         // Horizontal offset for multiple chips on the same day so they sit side-by-side cleanly
-        const offset = (idx - (subsOnDay.length - 1) / 2) * 4.5;
-        const pct = Math.max(2, Math.min(98, basePct + offset));
+        const offset = (idx - (subsOnDay.length - 1) / 2) * 5.0;
+        const pct = Math.max(3, Math.min(97, basePct + offset));
         
         const daysLeft = daysUntil(s.next);
         const urg = urgencyFor(daysLeft);
         const color = urg === 'urgent' ? '#ef4444' : urg === 'soon' ? '#f59e0b' : '#10b981';
         
-        html += `<div class="ruler-chip ${urg}" style="left:${pct}%; position:absolute; top:50%; transform:translate(-50%, -50%); width:18px; height:18px; border-radius:50%; background:${color}; border:2.5px solid #fff; box-shadow:0 0 12px ${color}; cursor:pointer; z-index:5; transition:all 0.2s;" title="${s.name} (${day} ${monthsAzFull[rulerSelectedMonth]} · ${s.price} ${s.currency || 'AZN'})" onclick="showSubDetails(${s.id})"></div>`;
+        // Sleek compact dot chip (11px)
+        html += `<div class="ruler-chip ${urg}" style="left:${pct}%; position:absolute; top:50%; transform:translate(-50%, -50%); width:11px; height:11px; border-radius:50%; background:${color}; border:2px solid #ffffff; box-shadow:0 0 10px ${color}; cursor:pointer; z-index:5; transition:all 0.2s;" title="${s.name} (${day} ${monthsAzFull[rulerSelectedMonth]} · ${s.price} ${s.currency || 'AZN'})" onclick="showSubDetails(${s.id})"></div>`;
+
+        // Crystal-clear date badge printed above each chip
+        const monthShort = monthsAzFull[rulerSelectedMonth].substring(0,3);
+        html += `<div style="left:${pct}%; position:absolute; top:-24px; transform:translateX(-50%); font-size:9.5px; font-weight:800; color:#ffffff; background:rgba(15,23,42,0.92); border:1px solid ${color}; padding:1px 6px; border-radius:6px; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,0.5); z-index:6; cursor:pointer;" onclick="showSubDetails(${s.id})" title="${s.name}">${s.name.split(' ')[0]} · ${day} ${monthShort}</div>`;
       });
     });
 
