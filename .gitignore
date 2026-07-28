@@ -1,2 +1,5 @@
 node_modules/
 .env
+scratch/
+*.bak
+public/test_script.js
