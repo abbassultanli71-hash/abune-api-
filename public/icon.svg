@@ -1,65 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Deep Slate Glassmorphic Canvas -->
-    <linearGradient id="abuneMasterBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0b0f19"/>
-      <stop offset="50%" stop-color="#182234"/>
-      <stop offset="100%" stop-color="#070a12"/>
+    <linearGradient id="brandGrad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
     </linearGradient>
-
-    <!-- Luxury Gold-Orange Gradient -->
-    <linearGradient id="goldOrangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffb74d"/>
-      <stop offset="50%" stop-color="#f97316"/>
-      <stop offset="100%" stop-color="#e65100"/>
-    </linearGradient>
-
-    <!-- Cyan-Emerald Subscription Wave Gradient -->
-    <linearGradient id="cyanWaveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00f2fe"/>
-      <stop offset="50%" stop-color="#00d294"/>
-      <stop offset="100%" stop-color="#10b981"/>
-    </linearGradient>
-
-    <!-- Glowing Green Pearl -->
-    <linearGradient id="smartPearlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#34d399"/>
-      <stop offset="100%" stop-color="#059669"/>
-    </linearGradient>
-
-    <!-- Metallic Edge Ring -->
-    <linearGradient id="edgeRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f97316" stop-opacity="0.8"/>
-      <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#10b981" stop-opacity="0.8"/>
-    </linearGradient>
-
-    <!-- Neon Glow Filter -->
-    <filter id="masterGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="16" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
   </defs>
 
-  <!-- Squircle Base Canvas -->
-  <rect width="512" height="512" rx="136" fill="url(#abuneMasterBg)"/>
+  <rect width="120" height="120" rx="28" fill="url(#brandGrad)"/>
 
-  <!-- Metallic Gradient Border Ring -->
-  <rect width="492" height="492" x="10" y="10" rx="126" fill="none" stroke="url(#edgeRingGrad)" stroke-width="4"/>
+  <!-- the subscription: a single clean card -->
+  <rect x="24" y="30" width="68" height="50" rx="11" fill="#ffffff"/>
+  <rect x="35" y="46" width="32" height="6" rx="3" fill="#ea580c" fill-opacity="0.85"/>
+  <rect x="35" y="58" width="20" height="6" rx="3" fill="#ea580c" fill-opacity="0.45"/>
 
-  <!-- Ambient Light Center Aura -->
-  <circle cx="256" cy="260" r="160" fill="#f97316" opacity="0.1" filter="url(#masterGlow)"/>
-
-  <!-- Iconic 'A' Shield Mark -->
-  <g filter="url(#masterGlow)">
-    <!-- Left Leg of A -->
-    <path d="M 152 380 L 256 150 C 256 150, 260 142, 264 150 L 360 380" stroke="url(#goldOrangeGrad)" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
-
-    <!-- Dynamic Recurring Wave Crossbar -->
-    <path d="M 190 310 C 220 260, 292 350, 322 310" stroke="url(#cyanWaveGrad)" stroke-width="32" stroke-linecap="round" fill="none"/>
-
-    <!-- Glowing Smart Notification Pearl at Apex -->
-    <circle cx="256" cy="100" r="26" fill="url(#smartPearlGrad)"/>
-    <circle cx="256" cy="100" r="40" fill="#34d399" opacity="0.25"/>
-  </g>
+  <!-- the renewal: a clock, sitting on the card's corner -->
+  <circle cx="86" cy="76" r="20" fill="#ffffff" stroke="#ea580c" stroke-width="4"/>
+  <path d="M86 65 L86 76 L94 81" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

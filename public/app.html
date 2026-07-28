@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=2300.0.0">
+<link rel="manifest" href="/manifest.json?v=2600.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=2300.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=2300.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=2300.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=2300.0.0">
+<link rel="icon" href="/icon-192.png?v=2600.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=2600.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=2600.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=2600.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=2300.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=2600.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1560,24 +1560,20 @@
               <div class="hero-sub" data-i18n="dashboard_sub" style="color: rgba(255,255,255,0.85) !important; font-size: 12.5px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.6); margin-top: 4px;">Aktiv abunəlik izlənilir</div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 10px;">
-              <div class="hero-illustration p-1.5 rounded-2xl bg-gradient-to-tr from-orange-950/50 via-slate-900 to-amber-950/40 border border-orange-500/40 shadow-lg shadow-orange-500/20 transition-all duration-300 hover:rotate-6 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Rəsmi Loqosu">
-                <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-500/20 to-amber-500/20 blur-md opacity-75 group-hover:opacity-100 transition-opacity"></div>
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 36px; height: 36px; position:relative; z-index:1;">
+              <div class="hero-illustration p-1 rounded-2xl bg-gradient-to-tr from-orange-500/20 to-amber-500/10 border border-orange-500/30 shadow-lg shadow-orange-500/20 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer relative group" title="Abunəm Rəsmi Loqosu">
+                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" style="width: 40px; height: 40px; position:relative; z-index:1; border-radius: 10px; filter: drop-shadow(0 4px 12px rgba(249,115,22,0.35));">
                   <defs>
-                    <linearGradient id="goldOrangeGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#ffb74d"/>
-                      <stop offset="50%" stop-color="#f97316"/>
+                    <linearGradient id="brandGrad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#f97316"/>
                       <stop offset="100%" stop-color="#ea580c"/>
                     </linearGradient>
-                    <linearGradient id="cyanWaveGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#00f2fe"/>
-                      <stop offset="100%" stop-color="#10b981"/>
-                    </linearGradient>
                   </defs>
-                  <path d="M 28 74 L 50 25 L 72 74" stroke="url(#goldOrangeGrad2)" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M 36 60 C 42 50, 58 70, 64 60" stroke="url(#cyanWaveGrad2)" stroke-width="6.5" stroke-linecap="round" fill="none"/>
-                  <circle cx="50" cy="16" r="5.5" fill="#34d399"/>
-                  <circle cx="50" cy="16" r="8.5" fill="#34d399" opacity="0.25"/>
+                  <rect width="120" height="120" rx="28" fill="url(#brandGrad)"/>
+                  <rect x="24" y="30" width="68" height="50" rx="11" fill="#ffffff"/>
+                  <rect x="35" y="46" width="32" height="6" rx="3" fill="#ea580c" fill-opacity="0.85"/>
+                  <rect x="35" y="58" width="20" height="6" rx="3" fill="#ea580c" fill-opacity="0.45"/>
+                  <circle cx="86" cy="76" r="20" fill="#ffffff" stroke="#ea580c" stroke-width="4"/>
+                  <path d="M86 65 L86 76 L94 81" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                 </svg>
               </div>
               <div class="relative cursor-pointer group" onclick="triggerAvatarUpload()" title="Profil şəklini dəyiş">
