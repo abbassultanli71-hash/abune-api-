@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=2900.0.0">
+<link rel="manifest" href="/manifest.json?v=3000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=2900.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2900.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2900.0.0">
+<link rel="icon" href="/icon-192.png?v=3000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=2900.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=3000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1559,24 +1559,8 @@
               <div class="hero-sub" data-i18n="dashboard_sub" style="color: rgba(255,255,255,0.85) !important; font-size: 12.5px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.6); margin-top: 4px;">Aktiv abunəlik izlənilir</div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 10px;">
-              <div class="hero-illustration transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Rəsmi Loqosu">
-                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" style="width: 44px; height: 44px; position:relative; z-index:1; filter: drop-shadow(0 6px 18px rgba(249,115,22,0.6));">
-                  <defs>
-                    <linearGradient id="brandGrad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stop-color="#ff7d24"/>
-                      <stop offset="100%" stop-color="#ea580c"/>
-                    </linearGradient>
-                    <filter id="shadow3d" x="-20%" y="-20%" width="140%" height="140%">
-                      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000000" flood-opacity="0.35"/>
-                    </filter>
-                  </defs>
-                  <rect width="120" height="120" rx="28" fill="url(#brandGrad)"/>
-                  <rect x="24" y="30" width="68" height="50" rx="11" fill="#ffffff" filter="url(#shadow3d)"/>
-                  <rect x="35" y="44" width="34" height="6" rx="3" fill="#ea580c" fill-opacity="0.9"/>
-                  <rect x="35" y="56" width="22" height="6" rx="3" fill="#ea580c" fill-opacity="0.5"/>
-                  <circle cx="86" cy="76" r="20" fill="#ffffff" stroke="#ea580c" stroke-width="4.5" filter="url(#shadow3d)"/>
-                  <path d="M86 64 L86 76 L94 81" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                </svg>
+              <div class="hero-illustration transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer relative group" title="Abunəm Rəsmi 3D Loqosu">
+                <img src="/icon-192.png?v=3000.0.0" alt="Abunəm 3D Logo" style="width: 44px; height: 44px; border-radius: 12px; object-fit: cover; filter: drop-shadow(0 6px 18px rgba(249,115,22,0.65));">
               </div>
               <div class="relative cursor-pointer group" onclick="triggerAvatarUpload()" title="Profil şəklini dəyiş">
                 <div class="hero-avatar overflow-hidden flex items-center justify-center border-2 border-orange-400 shadow-lg shadow-orange-500/30 transition-all hover:scale-105" style="width:38px; height:38px;" id="hero-avatar-initials">U.U</div>
