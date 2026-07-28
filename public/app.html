@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=5000.0.0">
+<link rel="manifest" href="/manifest.json?v=6000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=5000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=5000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=5000.0.0">
+<link rel="icon" href="/icon-192.png?v=6000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=6000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=6000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=5000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=6000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3608,6 +3608,82 @@
     render();
   }
 
+  function getBrandColors(name) {
+    const lower = (name || '').toLowerCase().trim();
+
+    if (lower.includes('push') || lower.includes('push30') || lower.includes('push 30')) {
+      return { bg: 'rgba(249, 115, 22, 0.25)', border: '#f97316', glow: 'rgba(249, 115, 22, 0.4)' };
+    }
+    if (lower.includes('spotify')) {
+      return { bg: 'rgba(30, 215, 96, 0.25)', border: '#1db954', glow: 'rgba(30, 215, 96, 0.4)' };
+    }
+    if (lower.includes('netflix')) {
+      return { bg: 'rgba(229, 9, 20, 0.28)', border: '#e50914', glow: 'rgba(229, 9, 20, 0.4)' };
+    }
+    if (lower.includes('youtube') || lower.includes('yt')) {
+      return { bg: 'rgba(255, 0, 0, 0.25)', border: '#ff0000', glow: 'rgba(255, 0, 0, 0.4)' };
+    }
+    if (lower.includes('apple') || lower.includes('icloud') || lower.includes('itunes')) {
+      return { bg: 'rgba(250, 36, 60, 0.25)', border: '#fa243c', glow: 'rgba(250, 36, 60, 0.4)' };
+    }
+    if (lower.includes('chatgpt') || lower.includes('openai')) {
+      return { bg: 'rgba(16, 163, 127, 0.28)', border: '#10a37f', glow: 'rgba(16, 163, 127, 0.4)' };
+    }
+    if (lower.includes('claude') || lower.includes('anthropic')) {
+      return { bg: 'rgba(217, 119, 6, 0.28)', border: '#d97706', glow: 'rgba(217, 119, 6, 0.4)' };
+    }
+    if (lower.includes('kapital') || lower.includes('birbank')) {
+      return { bg: 'rgba(227, 6, 19, 0.28)', border: '#e30613', glow: 'rgba(227, 6, 19, 0.4)' };
+    }
+    if (lower.includes('abb')) {
+      return { bg: 'rgba(0, 114, 206, 0.28)', border: '#0072ce', glow: 'rgba(0, 114, 206, 0.4)' };
+    }
+    if (lower.includes('leobank') || lower.includes('leo')) {
+      return { bg: 'rgba(177, 240, 0, 0.25)', border: '#b1f000', glow: 'rgba(177, 240, 0, 0.4)' };
+    }
+    if (lower.includes('pasha')) {
+      return { bg: 'rgba(2, 132, 199, 0.28)', border: '#0284c7', glow: 'rgba(2, 132, 199, 0.4)' };
+    }
+    if (lower.includes('unibank')) {
+      return { bg: 'rgba(255, 102, 0, 0.28)', border: '#ff6600', glow: 'rgba(255, 102, 0, 0.4)' };
+    }
+    if (lower.includes('azercell')) {
+      return { bg: 'rgba(102, 45, 145, 0.3)', border: '#662d91', glow: 'rgba(102, 45, 145, 0.4)' };
+    }
+    if (lower.includes('bakcell')) {
+      return { bg: 'rgba(237, 27, 36, 0.28)', border: '#ed1b24', glow: 'rgba(237, 27, 36, 0.4)' };
+    }
+    if (lower.includes('nar')) {
+      return { bg: 'rgba(228, 0, 69, 0.28)', border: '#e40045', glow: 'rgba(228, 0, 69, 0.4)' };
+    }
+    if (lower.includes('wolt')) {
+      return { bg: 'rgba(0, 194, 232, 0.28)', border: '#00c2e8', glow: 'rgba(0, 194, 232, 0.4)' };
+    }
+    if (lower.includes('bolt')) {
+      return { bg: 'rgba(52, 187, 121, 0.28)', border: '#34bb79', glow: 'rgba(52, 187, 121, 0.4)' };
+    }
+    if (lower.includes('playstation') || lower.includes('ps')) {
+      return { bg: 'rgba(0, 112, 209, 0.28)', border: '#0070d1', glow: 'rgba(0, 112, 209, 0.4)' };
+    }
+    if (lower.includes('xbox')) {
+      return { bg: 'rgba(16, 124, 65, 0.28)', border: '#107c41', glow: 'rgba(16, 124, 65, 0.4)' };
+    }
+    if (lower.includes('steam')) {
+      return { bg: 'rgba(102, 192, 244, 0.25)', border: '#66c0f4', glow: 'rgba(102, 192, 244, 0.4)' };
+    }
+    if (lower.includes('telegram')) {
+      return { bg: 'rgba(36, 161, 222, 0.28)', border: '#24a1de', glow: 'rgba(36, 161, 222, 0.4)' };
+    }
+    if (lower.includes('discord')) {
+      return { bg: 'rgba(88, 101, 242, 0.28)', border: '#5865f2', glow: 'rgba(88, 101, 242, 0.4)' };
+    }
+    if (lower.includes('duolingo')) {
+      return { bg: 'rgba(88, 204, 2, 0.25)', border: '#58cc02', glow: 'rgba(88, 204, 2, 0.4)' };
+    }
+
+    return { bg: 'rgba(249, 115, 22, 0.22)', border: '#f97316', glow: 'rgba(249, 115, 22, 0.35)' };
+  }
+
   function renderFinancialHeatmapGrid() {
     const grid = document.getElementById('financial-heatmap-grid');
     if (!grid) return;
@@ -3663,14 +3739,16 @@
       });
 
       const isToday = isCurrentMonth && (d === todayDay);
-      
-      let borderStyle = isToday ? 'border: 2px solid #ef4444; box-shadow: 0 0 12px rgba(239,68,68,0.5);' : 'border: 1px solid rgba(255,255,255,0.12);';
-      let bgStyle = isToday ? 'background: rgba(239,68,68,0.18);' : 'background: rgba(30, 41, 59, 0.7);';
 
       if (dueSubs.length > 0) {
         const primarySub = dueSubs[0];
+        const brandColors = getBrandColors(primarySub.name);
         const logoHtml = getBrandLogoHTML(primarySub.name, primarySub.category);
-        const countBadge = dueSubs.length > 1 ? `<span style="position:absolute; bottom:2px; right:2px; font-size:8px; font-weight:800; background:#f97316; color:#fff; padding:1px 4px; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.5);">+${dueSubs.length - 1}</span>` : '';
+        
+        let borderStyle = isToday ? 'border: 2px solid #ef4444; box-shadow: 0 0 16px rgba(239,68,68,0.7);' : `border: 1.5px solid ${brandColors.border}; box-shadow: 0 0 12px ${brandColors.glow};`;
+        let bgStyle = `background: ${brandColors.bg};`;
+
+        const countBadge = dueSubs.length > 1 ? `<span style="position:absolute; bottom:2px; right:2px; font-size:8px; font-weight:800; background:${brandColors.border}; color:#fff; padding:1px 4px; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.5);">+${dueSubs.length - 1}</span>` : '';
         const todayBadge = isToday ? `<span style="position:absolute; top:2px; right:2px; font-size:7px; font-weight:800; background:#ef4444; color:#fff; padding:1px 3px; border-radius:4px;">BUGÜN</span>` : '';
 
         html += `
@@ -3683,6 +3761,8 @@
             ${countBadge}
           </div>`;
       } else {
+        let borderStyle = isToday ? 'border: 2px solid #ef4444; box-shadow: 0 0 12px rgba(239,68,68,0.5);' : 'border: 1px solid rgba(255,255,255,0.08);';
+        let bgStyle = isToday ? 'background: rgba(239,68,68,0.18);' : 'background: rgba(30, 41, 59, 0.5);';
         const todayBadge = isToday ? `<span style="position:absolute; top:2px; right:2px; font-size:7px; font-weight:800; background:#ef4444; color:#fff; padding:1px 3px; border-radius:4px;">BUGÜN</span>` : '';
 
         html += `
