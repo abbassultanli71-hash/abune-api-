@@ -2496,6 +2496,11 @@ app.post('/api/budceler', async (req, res) => {
     const totalSpend = await calculateTotalMonthlySpentInBudgetCurrency(userId, targetValyuta);
     const roundedTotal = Math.round(totalSpend * 100) / 100;
 
+    if (roundedTotal > parsedLimit) {
+      return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
+        `Mövcud abunəlik xərclərinin cəmi (${roundedTotal.toFixed(2)} ${targetValyuta}) daxil edilən yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur! Zəhmət olmasa limiti ən azı ${roundedTotal.toFixed(2)} ${targetValyuta} təyin edin.`);
+    }
+
     const existingPostBudget = await executeQuery(
       `SELECT id FROM budceler WHERE istifadeci_id = :userId`,
       { userId }
@@ -2570,6 +2575,11 @@ app.put('/api/budceler/:username', async (req, res) => {
     const targetValyuta = getValidCurrency(valyuta || 'AZN');
     const totalSpend = await calculateTotalMonthlySpentInBudgetCurrency(userId, targetValyuta);
     const roundedTotal = Math.round(totalSpend * 100) / 100;
+
+    if (roundedTotal > parsedLimit) {
+      return errorResponse(res, 400, 'Bad Request', 'BUDGET_EXCEEDED',
+        `Mövcud abunəlik xərclərinin cəmi (${roundedTotal.toFixed(2)} ${targetValyuta}) daxil edilən yeni limitdən (${parsedLimit.toFixed(2)} ${targetValyuta}) çoxdur! Zəhmət olmasa limiti ən azı ${roundedTotal.toFixed(2)} ${targetValyuta} təyin edin.`);
+    }
 
     const existingPutBudget = await executeQuery(
       `SELECT id FROM budceler WHERE istifadeci_id = :userId`,
