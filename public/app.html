@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=1900.0.0">
+<link rel="manifest" href="/manifest.json?v=2000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=1900.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=1900.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=1900.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1900.0.0">
+<link rel="icon" href="/icon-192.png?v=2000.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=2000.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=2000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=2000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=1900.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=2000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -126,8 +126,14 @@
     text-shadow: 0 1px 3px rgba(0,0,0,0.6);
   }
   input, select, textarea {
-    color: var(--ink) !important;
-    background-color: var(--surface-2) !important;
+    color: var(--ink);
+  }
+  .search-bar input {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
   }
   .page-title, .section-title, .hero-title, .stat-val, .profile-name, .sheet-title, .settings-row-label {
     color: var(--ink) !important;
@@ -746,14 +752,29 @@
     box-shadow: 0 6px 16px -3px rgba(249, 115, 22, 0.4);
   }
   .search-bar {
-    margin: 0 20px 14px; display: flex; align-items: center; gap: 8px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 11px 14px;
+    margin: 0 20px 14px; display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1.5px solid var(--border-strong); border-radius: 18px;
+    padding: 11px 16px;
     box-shadow: var(--shadow);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .search-bar:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 16px -2px rgba(249, 115, 22, 0.35);
   }
   .search-bar svg { width: 16px; height: 16px; color: var(--ink-faint); flex-shrink: 0; }
-  .search-bar input { flex: 1; background: none; border: none; color: var(--ink); font-size: 13px; outline: none; }
-  .search-bar input::placeholder { color: var(--ink-faint); }
+  .search-bar input {
+    flex: 1;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: var(--ink) !important;
+    font-size: 13.5px;
+    font-weight: 600;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  .search-bar input::placeholder { color: var(--ink-muted); opacity: 0.75; }
 
   /* ---- Settings ---- */
   .settings-group { margin: 0 20px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
