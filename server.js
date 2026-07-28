@@ -460,8 +460,10 @@ async function calculateTotalMonthlySpentInBudgetCurrency(userId, targetValyuta)
 async function getUserIdByUsername(username) {
   if (!username) return null;
   const result = await executeQuery(`SELECT id FROM istifadeciler WHERE username = :username`, { username });
-  if (result.rows.length === 0) return null;
-  return result.rows[0].ID;
+  if (!result.rows || result.rows.length === 0) return null;
+  const r = result.rows[0];
+  const val = r.id !== undefined ? r.id : (r.ID !== undefined ? r.ID : null);
+  return val !== null && val !== undefined ? Number(val) : null;
 }
 
 // baslama_tarixi və odenis_tezliyi-nə əsasən növbəti ödəniş tarixini avtomatik hesablayır.
@@ -744,7 +746,7 @@ app.post('/api/istifadeciler', authLimiter, async (req, res) => {
     );
 
     const userResult = await executeQuery(`SELECT id FROM istifadeciler WHERE username = :username`, { username: trimmedUsername });
-    const userId = userResult.rows[0].ID;
+    const userId = userResult.rows[0].id !== undefined ? userResult.rows[0].id : userResult.rows[0].ID;
     await executeQuery(
       `INSERT INTO istifadeci_ayarlari (istifadeci_id, esas_valyuta, bildiris_metodu, dil, tema, tema_rengi) VALUES (:userId, 'AZN', 'email', 'az', 'dark', 'gold')`,
       { userId }, { autoCommit: true }
@@ -925,7 +927,7 @@ app.post('/api/istifadeciler/register/verify', authLimiter, async (req, res) => 
     );
 
     const userResult = await executeQuery(`SELECT id FROM istifadeciler WHERE username = :username`, { username });
-    const userId = userResult.rows[0].ID;
+    const userId = userResult.rows[0].id !== undefined ? userResult.rows[0].id : userResult.rows[0].ID;
 
     // Create default settings & budget for new user
     await executeQuery(
@@ -1067,9 +1069,10 @@ app.post('/api/istifadeciler/change-password/verify', authLimiter, async (req, r
     const { newPasswordHash } = verification.payload;
 
     // Update user's password in the database
+    const userIdVal = user.id !== undefined ? user.id : user.ID;
     await executeQuery(
       `UPDATE istifadeciler SET password = :newPasswordHash WHERE id = :userId`,
-      { newPasswordHash, userId: user.ID },
+      { newPasswordHash, userId: userIdVal },
       { autoCommit: true }
     );
 

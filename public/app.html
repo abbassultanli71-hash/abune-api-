@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=14000.0.0">
+<link rel="manifest" href="/manifest.json?v=15000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=14000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=14000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=14000.0.0">
+<link rel="icon" href="/icon-192.png?v=15000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=15000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=15000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=14000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=15000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -5280,7 +5280,7 @@ async function handleAddCard() {
         closeBudgetEdit();
         showInAppToast('Büdcə Yeniləndi ✅', `Yeni limit: ${limit.toFixed(2)} ${currency}`);
       } else {
-        const errMsg = res.data?.error?.message || 'Büdcə yadda saxlanılmadı.';
+        const errMsg = res.data?.error?.message || (typeof res.data?.error === 'string' ? res.data.error : null) || res.data?.message || res.message || 'Büdcə yadda saxlanılmadı.';
         showBudgetError(errMsg);
         showInAppToast('Büdcə Xətası ⚠️', errMsg);
       }
