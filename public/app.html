@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=11000.0.0">
+<link rel="manifest" href="/manifest.json?v=12000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=11000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=11000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=11000.0.0">
+<link rel="icon" href="/icon-192.png?v=12000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=12000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=12000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=11000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=12000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1434,6 +1434,7 @@
   [data-theme="dark"] .ios-toast-drag-bar {
     background: rgba(255, 255, 255, 0.15);
   }
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 </style>
 </head>
 <body>
@@ -2997,12 +2998,27 @@
     return Number(price) || 0;
   }
 
-  // Load all user data from API
+// Load all user data from API — parallel for speed
   async function loadAllData() {
     if (!currentUser) return;
 
+    // Skeleton loading for cards
+    const cardsList = document.getElementById('cards-list');
+    if (cardsList) cardsList.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px;padding:8px 0;">'
+      + [1,2,3].map(() => '<div style="height:78px;border-radius:18px;background:rgba(255,255,255,0.05);animation:pulse 1.5s ease-in-out infinite;"></div>').join('')
+      + '</div>';
+
+    // Fire ALL 6 API requests simultaneously
+    const [settingsRes, subsRes, notifsRes, budgetRes, cardsRes, histRes] = await Promise.all([
+      apiFetch('GET', '/api/ayarlar/' + currentUser.username),
+      apiFetch('GET', '/api/abunelikler?username=' + currentUser.username),
+      apiFetch('GET', '/api/bildirisler?username=' + currentUser.username),
+      apiFetch('GET', '/api/budceler/' + currentUser.username),
+      apiFetch('GET', '/api/odenis-metodlari?username=' + currentUser.username),
+      apiFetch('GET', '/api/odenis-tarixcesi?username=' + currentUser.username),
+    ]);
+
     // 1. Settings
-    const settingsRes = await apiFetch('GET', `/api/ayarlar/${currentUser.username}`);
     if (settingsRes.ok && settingsRes.data && settingsRes.data.data && settingsRes.data.data.settings) {
       currentSettings = settingsRes.data.data.settings;
       setTheme(currentSettings.tema || 'light');
@@ -3014,9 +3030,7 @@
     }
 
     // 2. Subscriptions
-    const subsRes = await apiFetch('GET', `/api/abunelikler?username=${currentUser.username}`);
     if (subsRes.ok && subsRes.data && subsRes.data.data && subsRes.data.data.subscriptions) {
-      // Map API fields to UI models
       subscriptions = subsRes.data.data.subscriptions.map(s => ({
         id: s.abunelik_id,
         name: s.ad,
@@ -3030,12 +3044,9 @@
         status: s.status,
         odenis_metodu_id: s.odenis_metodu_id
       }));
-    } else {
-      subscriptions = [];
-    }
+    } else { subscriptions = []; }
 
     // 3. Notifications
-    const notifsRes = await apiFetch('GET', `/api/bildirisler?username=${currentUser.username}`);
     if (notifsRes.ok && notifsRes.data && notifsRes.data.data && notifsRes.data.data.notifications) {
       notifications = notifsRes.data.data.notifications.map(n => ({
         id: n.bildiris_id,
@@ -3044,36 +3055,19 @@
         urgency: getUrgency(n.basliq, n.mesaj),
         time: n.gonderilme_tarixi,
         is_read: n.is_read || false,
-        abunelik_id: n.abunelik_id || null  // linked subscription for push action
+        abunelik_id: n.abunelik_id || null
       }));
-
-      // 🔔 Auto-fire push notification for any unread renewal reminders
-      const today = new Date().toISOString().split('T')[0];
       const freshReminders = notifsRes.data.data.notifications.filter(n =>
-        !n.is_read &&
-        n.abunelik_id &&
-        (n.basliq || '').match(/Xatırlatması|Məlumatı|Yaxınlaşan|Bildirişi/)
+        !n.is_read && n.abunelik_id && (n.basliq || '').match(/Xatırlatması|Məlumatı|Yaxınlaşan|Bildirişi/)
       );
       freshReminders.forEach(n => {
-        triggerRenewalNotification(
-          n.basliq || 'Abunəlik Xatırlatması 🔔',
-          n.mesaj  || 'Abunəliyinizin yenilənmə tarixi yaxınlaşır.',
-          n.abunelik_id
-        );
+        triggerRenewalNotification(n.basliq || 'Abunəlik Xatırlatması 🔔', n.mesaj || 'Abunəliyinizin yenilənmə tarixi yaxınlaşır.', n.abunelik_id);
       });
-    } else {
-      notifications = [];
-    }
+    } else { notifications = []; }
 
     // 4. Budget
-    const budgetRes = await apiFetch('GET', `/api/budceler/${currentUser.username}`);
     const activeSubs = subscriptions.filter(s => s.status === 'active');
-    
-    // Read the budget currency first to do dynamic conversion
-    let targetCurrency = 'AZN';
-    let rawLimit = 300.00;
-    let budgetExists = false;
-
+    let targetCurrency = 'AZN', rawLimit = 300.00, budgetExists = false;
     if (budgetRes.ok && budgetRes.data && budgetRes.data.data) {
       const b = budgetRes.data.data.budget || (budgetRes.data.data.budgets && budgetRes.data.data.budgets[0]);
       if (b) {
@@ -3082,38 +3076,41 @@
         budgetExists = true;
       }
     }
-
-    // Calculate total spent (converting price to targetCurrency directly, ignoring frequency)
     let totalSpend = 0;
-    activeSubs.forEach(s => {
-      totalSpend += convertCurrency(s.price, s.currency, targetCurrency);
-    });
-
-    budgetState = {
-      limit: rawLimit,
-      spent: totalSpend,
-      currency: targetCurrency,
-      exists: budgetExists
-    };
-
-    // Update backend spent count if different and budget exists
+    activeSubs.forEach(s => { totalSpend += convertCurrency(s.price, s.currency, targetCurrency); });
+    budgetState = { limit: rawLimit, spent: totalSpend, currency: targetCurrency, exists: budgetExists };
     if (budgetExists) {
-      apiFetch('PUT', `/api/budceler/${currentUser.username}`, {
-        limit_mebleq: budgetState.limit,
-        valyuta: budgetState.currency,
-        hesab_mebleqi: totalSpend
-      });
+      apiFetch('PUT', '/api/budceler/' + currentUser.username, { limit_mebleq: budgetState.limit, valyuta: budgetState.currency, hesab_mebleqi: totalSpend });
     }
 
-    // Render components
+    // 5. Cards (already fetched in parallel — instant!)
+    if (cardsRes.ok && cardsRes.data && cardsRes.data.data && cardsRes.data.data.cards) {
+      cards = cardsRes.data.data.cards;
+    } else { cards = []; }
+
+    // 6. Payment history (already fetched in parallel — instant!)
+    if (histRes.ok && histRes.data && histRes.data.data) {
+      const raw = histRes.data.data.paymenthistory || histRes.data.data.payments || histRes.data.data.history || histRes.data.data || [];
+      paymentHistory = Array.isArray(raw) ? raw.map(p => ({
+        id: p.odenis_id || p.id,
+        subId: p.abunelik_id,
+        subName: p.ad || p.name || '—',
+        amount: parseFloat(p.mebleg || p.amount || 0),
+        currency: p.valyuta || p.currency || 'AZN',
+        date: p.odenis_tarixi || p.date || '',
+        method: p.odenis_metodu || p.method || '—',
+        status: p.status || 'completed'
+      })) : [];
+    } else { paymentHistory = []; }
+
+    // Render all at once
     renderSubs();
     renderNotifs();
     renderRuler();
     renderBudgetCard();
-
-    // 5. Cards & Payment History
-    await loadCards();
-    await loadPaymentHistory();
+    renderCards();
+    updateCardDropdowns();
+    renderPaymentHistory();
   }
 
   function getUrgency(basliq, mesaj) {
