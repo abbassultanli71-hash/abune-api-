@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=1600.0.0">
+<link rel="manifest" href="/manifest.json?v=1700.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=1600.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=1600.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=1600.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1600.0.0">
+<link rel="icon" href="/icon-192.png?v=1700.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=1700.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=1700.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1700.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=1600.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=1700.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3311,47 +3311,90 @@
     };
   }
 
+  function getCategoryTagPill(category) {
+    const cat = (category || '').toLowerCase();
+    if (cat.includes('film') || cat.includes('strim') || cat.includes('kino') || cat.includes('video')) return '🎬 Film/Striming';
+    if (cat.includes('musiqi') || cat.includes('audio') || cat.includes('ses')) return '🎵 Musiqi';
+    if (cat.includes('oyun') || cat.includes('gaming')) return '🎮 Gaming';
+    if (cat.includes('iş') || cat.includes('proyekt') || cat.includes('bulud')) return '💼 Bulud/İş';
+    if (cat.includes('təhsil') || cat.includes('kurs')) return '📚 Təhsil';
+    if (cat.includes('kommunal') || cat.includes('xidmət')) return '⚡ Xidmət';
+    return '⭐ Abunəlik';
+  }
+
+  function handle3dCardTilt(e, card) {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -6;
+    const rotateY = ((x - centerX) / centerX) * 6;
+
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+    card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+  }
+
+  function reset3dCardTilt(card) {
+    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+  }
+
   function subRowHTML(s) {
     const days = daysUntil(s.next);
     const urg = s.status === 'deactive' ? 'paused' : urgencyFor(days);
     const badgeText = s.status === 'deactive' ? 'dayandırılıb' : badgeLabel(days);
     const sym = currencySymbol(s.currency);
     const theme = getBrandThemeStyle(s.name, s.category);
+    const catTag = getCategoryTagPill(s.category);
 
     const badgeTailwind = urg === 'urgent'
-      ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 font-black'
+      ? 'bg-rose-500/25 text-rose-300 border border-rose-500/50 font-black shadow-lg shadow-rose-500/20'
       : urg === 'soon'
-      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 font-black'
+      ? 'bg-amber-500/25 text-amber-300 border border-amber-500/50 font-black shadow-lg shadow-amber-500/20'
       : urg === 'paused'
-      ? 'bg-slate-800 text-slate-400 border border-slate-700/50'
-      : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-black';
+      ? 'bg-slate-800/80 text-slate-400 border border-slate-700/60'
+      : 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/50 font-black shadow-lg shadow-emerald-500/20';
 
     return `
-      <div class="sub-row relative overflow-hidden flex items-center justify-between gap-3.5 p-3.5 pl-5 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl active:scale-[0.98] cursor-pointer group" 
+      <div class="sub-row interactive-3d-card relative overflow-hidden flex items-center justify-between gap-3 p-3.5 pl-5 rounded-2xl transition-all duration-300 hover:shadow-2xl active:scale-[0.98] cursor-pointer group" 
            style="background: ${theme.bg}; border: ${theme.border}; box-shadow: ${theme.shadow};"
+           onmousemove="handle3dCardTilt(event, this)"
+           onmouseleave="reset3dCardTilt(this)"
            onclick="openManageSheet(${JSON.stringify(s).replace(/"/g, '&quot;')})">
         
         <!-- Glowing Left Brand Indicator Bar -->
-        <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl" style="background: ${theme.pillGrad}; box-shadow: 0 0 14px ${theme.accentColor};"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl" style="background: ${theme.pillGrad}; box-shadow: 0 0 16px ${theme.accentColor};"></div>
 
         <!-- Geometric mesh wave pattern overlay -->
-        <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none group-hover:opacity-35 transition-opacity" viewBox="0 0 400 80" fill="none">
-          <path d="M-50 40 Q 100 -20 250 40 T 550 40" stroke="${theme.accentColor}" stroke-width="2"/>
+        <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity" viewBox="0 0 400 80" fill="none">
+          <path d="M-50 40 Q 100 -20 250 40 T 550 40" stroke="${theme.accentColor}" stroke-width="2.2"/>
           <path d="M-50 60 Q 100 0 250 60 T 550 60" stroke="${theme.accentColor}" stroke-width="1.2" stroke-dasharray="4 4"/>
-          <circle cx="80" cy="20" r="1.5" fill="${theme.accentColor}" opacity="0.6"/>
-          <circle cx="320" cy="60" r="2" fill="${theme.accentColor}" opacity="0.6"/>
+          <circle cx="80" cy="20" r="1.8" fill="${theme.accentColor}" opacity="0.8"/>
+          <circle cx="320" cy="60" r="2.2" fill="${theme.accentColor}" opacity="0.8"/>
         </svg>
 
-        <div class="flex items-center gap-3.5 min-w-0 relative z-10">
-          <div class="sub-icon-wrap flex-shrink-0 transition-transform group-hover:scale-110 group-hover:rotate-3">
+        <!-- Specular Highlight Glare Sheet -->
+        <div class="card-glare absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.15), transparent 60%);"></div>
+
+        <div class="flex items-center gap-3 min-w-0 relative z-10 flex-1">
+          <div class="sub-icon-wrap flex-shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" style="filter: drop-shadow(0 4px 12px ${theme.accentColor}55);">
             ${getBrandIconHTML(s.name, s.category)}
           </div>
-          <div class="sub-name font-black text-white text-sm md:text-base truncate tracking-tight" style="color: #ffffff !important; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">${s.name}</div>
+          <div class="min-w-0 flex-1">
+            <div class="sub-name font-black text-white text-sm md:text-base tracking-tight leading-snug flex items-center gap-2" style="color: #ffffff !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">
+              <span class="truncate">${s.name}</span>
+            </div>
+            <div class="text-[10px] font-bold text-slate-300/80 flex items-center gap-1 mt-0.5">
+              <span class="px-1.5 py-0.2 rounded-md bg-white/10 border border-white/15 backdrop-blur-sm text-[9px] text-slate-200">${catTag}</span>
+            </div>
+          </div>
         </div>
-        <div class="flex items-center gap-2.5 flex-shrink-0 relative z-10">
-          <div class="inline-flex items-center rounded-xl px-3 py-1 text-xs md:text-sm font-extrabold" style="${theme.priceStyle}">${sym}${s.price.toFixed(2)}</div>
+
+        <div class="flex items-center gap-2 flex-shrink-0 relative z-10">
+          <div class="inline-flex items-center rounded-xl px-3 py-1.2 text-xs md:text-sm font-black tracking-tight" style="${theme.priceStyle}">${sym}${s.price.toFixed(2)}</div>
           <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-extrabold ${badgeTailwind}">
-            <span class="w-1.5 h-1.5 rounded-full mr-1.5 inline-block" style="background: currentColor; box-shadow: 0 0 6px currentColor;"></span>
+            <span class="w-1.5 h-1.5 rounded-full mr-1.5 inline-block animate-pulse" style="background: currentColor; box-shadow: 0 0 8px currentColor;"></span>
             ${badgeText}
           </span>
         </div>
