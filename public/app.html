@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=9000.0.0">
+<link rel="manifest" href="/manifest.json?v=10000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=9000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=9000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=9000.0.0">
+<link rel="icon" href="/icon-192.png?v=10000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=10000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=10000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=9000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=10000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3832,94 +3832,128 @@
     const isCurrentMonth = (rulerSelectedYear === TODAY.getFullYear() && rulerSelectedMonth === TODAY.getMonth());
     const todayDay = TODAY.getDate();
 
-    const monthsAzFull = ['YANVAR', 'FEVRAL', 'MART', 'APREL', 'MAY', 'İYUN', 'İYUL', 'AVQUST', 'SENTYABR', 'OKTYABR', 'NOYABR', 'DEKABR'];
+    const monthsAzFull = ['YANVAR','FEVRAL','MART','APREL','MAY','İYUN','İYUL','AVQUST','SENTYABR','OKTYABR','NOYABR','DEKABR'];
     const monthTitleEl = document.getElementById('calendar-grid-month-title');
-    
     if (monthTitleEl) {
-      monthTitleEl.textContent = `${monthsAzFull[rulerSelectedMonth]} ${rulerSelectedYear}`;
+      monthTitleEl.textContent = monthsAzFull[rulerSelectedMonth] + ' ' + rulerSelectedYear;
       monthTitleEl.style.color = isCurrentMonth ? '#fb923c' : '#38bdf8';
     }
 
-    // First day of week padding (Monday = 0 ... Sunday = 6)
+    // First day of week (Monday=0 ... Sunday=6)
     const firstDayObj = new Date(rulerSelectedYear, rulerSelectedMonth, 1);
     let firstDayIndex = firstDayObj.getDay() - 1;
     if (firstDayIndex < 0) firstDayIndex = 6;
 
     let html = '';
-
-    // Empty offset padding cells before Day 1
     for (let i = 0; i < firstDayIndex; i++) {
-      html += `<div class="aspect-square rounded-2xl bg-slate-900/30 border border-slate-800/40 opacity-20"></div>`;
+      html += '<div style="aspect-ratio:1/1;border-radius:14px;background:rgba(15,23,42,0.3);border:1px solid rgba(255,255,255,0.04);opacity:0.2;"></div>';
     }
 
     const activeSubs = subscriptions.filter(s => s.status === 'active');
 
-    for (let d = 1; d <= daysInMonth; d++) {
-      // Find subscriptions due on day 'd' of the selected month
-      const dueSubs = activeSubs.filter(s => {
-        if (!s.next) return false;
-        const parts = s.next.split('-');
-        if (parts.length < 3) return false;
-        const sYear  = Number(parts[0]);
-        const sMonth = Number(parts[1]) - 1; // 0-indexed
-        const sDay   = Number(parts[2]);
+    // Build map: day -> [subscriptions]
+    // Show subscription only in the month/year of s.next (actual next payment date)
+    const dayMap = {};
+    activeSubs.forEach(s => {
+      if (!s.next) return;
+      const parts = s.next.split('-');
+      if (parts.length < 3) return;
+      const nYear  = Number(parts[0]);
+      const nMonth = Number(parts[1]) - 1; // 0-indexed
+      const nDay   = Number(parts[2]);
+      if (nYear !== rulerSelectedYear || nMonth !== rulerSelectedMonth) return;
+      const day = Math.min(nDay, daysInMonth);
+      if (!dayMap[day]) dayMap[day] = [];
+      dayMap[day].push(s);
+    });
 
-        // The effective day this sub falls on (clamped to month length)
-        const effectiveDay = Math.min(sDay, daysInMonth);
-        if (effectiveDay !== d) return false; // wrong day — skip
+    // Helper: get favicon logo HTML from subscription name
+    function getCalendarLogoHTML(name) {
+      const lowerName = (name || '').toLowerCase().trim();
+      const BD = {
+        'netflix':'netflix.com','neftlix':'netflix.com',
+        'spotify':'spotify.com',
+        'youtube premium':'youtube.com','youtube':'youtube.com','yt premium':'youtube.com',
+        'chatgpt':'openai.com','openai':'openai.com',
+        'claude':'anthropic.com','anthropic':'anthropic.com',
+        'apple music':'apple.com','apple tv':'apple.com','icloud':'apple.com','itunes':'apple.com','apple':'apple.com',
+        'google one':'one.google.com','google':'google.com','gmail':'google.com','drive':'google.com',
+        'linkedin':'linkedin.com','telegram':'telegram.org','tiktok':'tiktok.com',
+        'twitter':'twitter.com','discord':'discord.com','instagram':'instagram.com','facebook':'facebook.com',
+        'amazon prime':'amazon.com','prime video':'amazon.com','amazon':'amazon.com','prime':'amazon.com',
+        'microsoft 365':'microsoft.com','office 365':'office.com','microsoft':'microsoft.com','office':'office.com','onedrive':'microsoft.com',
+        'copilot':'microsoft.com','gemini':'google.com',
+        'figma':'figma.com','canva':'canva.com','notion':'notion.so',
+        'kapital bank':'kapitalbank.az','kapital':'kapitalbank.az','birbank':'birbank.az',
+        'pasha bank':'pashabank.az','pasha':'pashabank.az',
+        'abb':'abb-bank.az','unibank':'unibank.az','leobank':'leobank.az',
+        'azercell':'azercell.com','bakcell':'bakcell.com','nar mobile':'nar.az','nar':'nar.az',
+        'wolt':'wolt.com','bolt':'bolt.eu','uber':'uber.com','yandex':'yandex.com',
+        'ps plus':'playstation.com','playstation':'playstation.com',
+        'game pass':'xbox.com','xbox':'xbox.com',
+        'steam':'steampowered.com','twitch':'twitch.tv','roblox':'roblox.com','nintendo':'nintendo.com',
+        'adobe':'adobe.com','photoshop':'adobe.com',
+        'duolingo':'duolingo.com','grammarly':'grammarly.com',
+        'github':'github.com','dropbox':'dropbox.com',
+        'slack':'slack.com','zoom':'zoom.us','notion':'notion.so',
+        'nordvpn':'nordvpn.com','expressvpn':'expressvpn.com','proton':'proton.me',
+        'coursera':'coursera.org','udemy':'udemy.com',
+        'push 30':'push30.app','push30':'push30.app',
+        'midjourney':'midjourney.com','perplexity':'perplexity.ai',
+      };
 
-        const cycle = (s.billing_cycle || 'monthly').toLowerCase();
-
-        if (cycle === 'yearly' || cycle === 'annual') {
-          // Yearly: only show in the SAME month as the payment month
-          return sMonth === rulerSelectedMonth;
+      // Exact match first, then partial
+      let domain = BD[lowerName];
+      if (!domain) {
+        for (const key in BD) {
+          if (lowerName.includes(key)) { domain = BD[key]; break; }
         }
+      }
 
-        // Weekly / monthly (default): show on this day every month
-        // Only if the subscription has already started by this selected month
-        const subStartTime = new Date(sYear, sMonth, 1).getTime();
-        const selectedMonthTime = new Date(rulerSelectedYear, rulerSelectedMonth, 1).getTime();
-        return subStartTime <= selectedMonthTime;
-      });
+      const initial = (name || '?')[0].toUpperCase();
+      if (domain) {
+        return '<img src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=64" width="22" height="22" style="border-radius:5px;object-fit:contain;display:block;" /><span style="width:22px;height:22px;border-radius:5px;background:#f97316;color:#fff;font-size:10px;font-weight:900;display:none;align-items:center;justify-content:center;">' + initial + '</span>';
+      }
+      const colors = ['#f97316','#8b5cf6','#06b6d4','#10b981','#f43f5e','#3b82f6','#ec4899','#a855f7'];
+      const ci = ((name||'A').charCodeAt(0)) % colors.length;
+      return '<span style="width:22px;height:22px;border-radius:5px;background:' + colors[ci] + ';color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;">' + initial + '</span>';
+    }
 
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dueSubs = dayMap[d] || [];
       const isToday = isCurrentMonth && (d === todayDay);
 
       if (dueSubs.length > 0) {
         const primarySub = dueSubs[0];
-        const brandColors = getBrandColors(primarySub.name);
-        const logoHtml = getBrandLogoHTML(primarySub.name, primarySub.category);
-        
-        let borderStyle = isToday
-          ? 'border: 2px solid #ef4444; box-shadow: 0 0 16px rgba(239,68,68,0.7);'
-          : `border: 1.5px solid ${brandColors.border}; box-shadow: 0 0 12px ${brandColors.glow};`;
-        let bgStyle = `background: ${brandColors.bg};`;
-
+        const bc = getBrandColors(primarySub.name);
+        const logoHtml = getCalendarLogoHTML(primarySub.name);
+        const borderStyle = isToday
+          ? 'border:2px solid #ef4444;box-shadow:0 0 16px rgba(239,68,68,0.7);'
+          : 'border:1.5px solid ' + bc.border + ';box-shadow:0 0 10px ' + bc.glow + ';';
         const countBadge = dueSubs.length > 1
-          ? `<span style="position:absolute; bottom:2px; right:2px; font-size:8px; font-weight:800; background:${brandColors.border}; color:#fff; padding:1px 4px; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.5);">+${dueSubs.length - 1}</span>`
+          ? '<span style="position:absolute;bottom:2px;right:2px;font-size:7px;font-weight:800;background:' + bc.border + ';color:#fff;padding:1px 3px;border-radius:5px;">+' + (dueSubs.length - 1) + '</span>'
           : '';
         const todayBadge = isToday
-          ? `<span style="position:absolute; top:2px; right:2px; font-size:7px; font-weight:800; background:#ef4444; color:#fff; padding:1px 3px; border-radius:4px;">BUGÜN</span>`
+          ? '<span style="position:absolute;top:1px;right:2px;font-size:6px;font-weight:800;background:#ef4444;color:#fff;padding:1px 2px;border-radius:3px;">BUG.</span>'
           : '';
+        const titleText = dueSubs.map(s => s.name + ' (' + s.price + ' ' + (s.currency||'AZN') + ')').join(', ');
 
-        html += `
-          <div onclick="showSubDetails(${primarySub.id})" title="${primarySub.name} — ${d} ${monthsAzFull[rulerSelectedMonth]} · ${primarySub.price} ${primarySub.currency || 'AZN'}" style="position:relative; aspect-ratio:1/1; border-radius:16px; ${bgStyle} ${borderStyle} display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; padding:3px; transition:all 0.2s;" onmouseover="this.style.transform='scale(1.08)'; this.style.zIndex='10';" onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1';">
-            <span style="position:absolute; top:3px; left:4px; font-size:10px; font-weight:800; color:#fff; font-family:var(--font-mono);">${d}</span>
-            ${todayBadge}
-            <div style="width:26px; height:26px; margin-top:6px; display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:6px;">
-              ${logoHtml}
-            </div>
-            ${countBadge}
-          </div>`;
+        html += '<div onclick="showSubDetails(' + primarySub.id + ')" title="' + titleText + '" style="position:relative;aspect-ratio:1/1;border-radius:14px;background:' + bc.bg + ';' + borderStyle + 'display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;transition:all 0.2s;">'
+          + '<span style="position:absolute;top:2px;left:3px;font-size:9px;font-weight:800;color:rgba(255,255,255,0.9);font-family:monospace;">' + d + '</span>'
+          + todayBadge
+          + '<div style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;margin-top:4px;overflow:hidden;border-radius:5px;">'
+          + logoHtml
+          + '</div>'
+          + countBadge
+          + '</div>';
       } else {
-        let borderStyle = isToday ? 'border: 2px solid #ef4444; box-shadow: 0 0 12px rgba(239,68,68,0.5);' : 'border: 1px solid rgba(255,255,255,0.08);';
-        let bgStyle = isToday ? 'background: rgba(239,68,68,0.18);' : 'background: rgba(30, 41, 59, 0.5);';
-        const todayBadge = isToday ? `<span style="position:absolute; top:2px; right:2px; font-size:7px; font-weight:800; background:#ef4444; color:#fff; padding:1px 3px; border-radius:4px;">BUGÜN</span>` : '';
-
-        html += `
-          <div style="position:relative; aspect-ratio:1/1; border-radius:16px; ${bgStyle} ${borderStyle} display:flex; align-items:center; justify-content:center; padding:3px; opacity:${isToday ? '1' : '0.6'};">
-            <span style="font-size:11px; font-weight:800; color:${isToday ? '#ef4444' : '#94a3b8'}; font-family:var(--font-mono);">${d}</span>
-            ${todayBadge}
-          </div>`;
+        const borderStyle = isToday ? 'border:2px solid #ef4444;box-shadow:0 0 10px rgba(239,68,68,0.5);' : 'border:1px solid rgba(255,255,255,0.07);';
+        const bgStyle    = isToday ? 'background:rgba(239,68,68,0.15);' : 'background:rgba(15,23,42,0.5);';
+        const todayBadge = isToday ? '<span style="position:absolute;top:1px;right:2px;font-size:6px;font-weight:800;background:#ef4444;color:#fff;padding:1px 2px;border-radius:3px;">BUG.</span>' : '';
+        html += '<div style="position:relative;aspect-ratio:1/1;border-radius:14px;' + bgStyle + borderStyle + 'display:flex;align-items:center;justify-content:center;opacity:' + (isToday?'1':'0.55') + ';">'
+          + '<span style="font-size:11px;font-weight:700;color:' + (isToday?'#ef4444':'#475569') + ';font-family:monospace;">' + d + '</span>'
+          + todayBadge
+          + '</div>';
       }
     }
 
