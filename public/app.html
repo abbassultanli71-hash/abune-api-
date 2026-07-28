@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=1300.0.0">
+<link rel="manifest" href="/manifest.json?v=1400.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=1300.0.0" type="image/png" sizes="192x192">
-<link rel="icon" href="/icon.svg?v=1300.0.0" type="image/svg+xml" sizes="any">
-<link rel="apple-touch-icon" href="/icon-192.png?v=1300.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1300.0.0">
+<link rel="icon" href="/icon-192.png?v=1400.0.0" type="image/png" sizes="192x192">
+<link rel="icon" href="/icon.svg?v=1400.0.0" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/icon-192.png?v=1400.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png?v=1400.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=1300.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=1400.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1543,9 +1543,8 @@
                   <circle cx="50" cy="16" r="8.5" fill="#34d399" opacity="0.25"/>
                 </svg>
               </div>
-              <div class="relative group cursor-pointer" onclick="switchScreen('settings')" title="Ayarlar">
-                <div class="hero-avatar" id="hero-avatar-initials">U.U</div>
-                <div class="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-[8px] font-black text-white shadow-md uppercase tracking-wider border border-amber-300/40">🔥 PRO</div>
+              <div class="relative cursor-pointer group" onclick="triggerAvatarUpload()" title="Profil şəklini dəyiş">
+                <div class="hero-avatar overflow-hidden flex items-center justify-center border-2 border-orange-500/40 shadow-lg shadow-orange-500/20 transition-all hover:scale-105" id="hero-avatar-initials">U.U</div>
               </div>
             </div>
           </div>
@@ -1839,11 +1838,16 @@
             </div>
           </div>
         </div>
-        <div class="profile-card">
-          <div class="avatar-lg" id="profile-initials">U.U</div>
-          <div>
-            <div class="profile-name" id="profile-fullname">User</div>
-            <div class="profile-sub" id="profile-username">@username</div>
+        <input type="file" id="user-avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarFileSelect(event)">
+        <div class="profile-card relative group cursor-pointer transition-all hover:border-orange-500/40" onclick="triggerAvatarUpload()" title="Profil şəklini dəyiş">
+          <div class="avatar-lg overflow-hidden flex items-center justify-center border-2 border-orange-500/40 shadow-lg shadow-orange-500/20" id="profile-initials">U.U</div>
+          <div class="flex-1 min-w-0">
+            <div class="profile-name font-black text-slate-900 dark:text-slate-100 truncate" id="profile-fullname">User</div>
+            <div class="profile-sub text-xs text-orange-500 dark:text-orange-400 font-bold truncate" id="profile-username">@username</div>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-orange-500/10 text-orange-500 dark:text-orange-400 border border-orange-500/20 text-xs font-extrabold flex items-center gap-1.5 hover:bg-orange-500/20 transition-colors">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Şəkil dəyiş</span>
           </div>
         </div>
         <!-- Settings Group 1: Account/Preferences -->
@@ -2843,6 +2847,51 @@
     }
   }
 
+  function triggerAvatarUpload() {
+    triggerHaptic('light');
+    const input = document.getElementById('user-avatar-file-input');
+    if (input) input.click();
+  }
+
+  function handleAvatarFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Şəkil ölçüsü maksimum 5MB ola bilər.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const base64Data = event.target.result;
+      if (currentUser && currentUser.username) {
+        localStorage.setItem(`abunem_avatar_${currentUser.username}`, base64Data);
+      }
+      updateUserAvatarUI(base64Data);
+      showInAppToast('Profil şəkli yeniləndi! 📸', 'Yeni profil şəkliniz uğurla saxlanıldı.');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function updateUserAvatarUI(avatarDataUrl) {
+    if (!currentUser) return;
+    const storedAvatar = avatarDataUrl || localStorage.getItem(`abunem_avatar_${currentUser.username}`);
+
+    const heroEl = document.getElementById('hero-avatar-initials');
+    const profEl = document.getElementById('profile-initials');
+
+    if (storedAvatar) {
+      const imgHtml = `<img src="${storedAvatar}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" alt="Profil Şəkli">`;
+      if (heroEl) heroEl.innerHTML = imgHtml;
+      if (profEl) profEl.innerHTML = imgHtml;
+    } else {
+      const initStr = initials(currentUser.ad || 'User');
+      if (heroEl) heroEl.textContent = initStr;
+      if (profEl) profEl.textContent = initStr;
+    }
+  }
+
   function handleLogout() {
     localStorage.removeItem('abunelik_user');
     localStorage.removeItem('abunelik_token');
@@ -2875,12 +2924,10 @@
       });
     }
     
-    // Set profile names
+    // Set profile names & avatar
     document.getElementById('profile-fullname').textContent = currentUser.ad;
     document.getElementById('profile-username').textContent = '@' + currentUser.username;
-    document.getElementById('profile-initials').textContent = initials(currentUser.ad);
-    const heroAvatarEl = document.getElementById('hero-avatar-initials');
-    if (heroAvatarEl) heroAvatarEl.textContent = initials(currentUser.ad);
+    updateUserAvatarUI();
     
     // Update date on dashboard
     const monthsAz = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'];
