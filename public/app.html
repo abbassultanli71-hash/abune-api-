@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=49000.0.0">
+<link rel="manifest" href="/manifest.json?v=50000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=49000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=49000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=49000.0.0">
+<link rel="icon" href="/icon-192.png?v=50000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=50000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=50000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=49000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=50000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -5004,11 +5004,10 @@
   function renderBankLogo(bank) {
     if (!bank) return '';
     const imgPath = '/images/bank-logos/' + bank.logoFile;
-    // Seamless, 100% transparent brand logo rendering on card top-left (NO white boxes / pills!)
-    return '<div style="display:inline-flex;align-items:center;height:24px;">' +
+    return '<div style="display:inline-flex;align-items:center;height:24px;z-index:3;">' +
       '<img src="' + imgPath + '" alt="' + bank.bank + '" ' +
-      'style="height:22px;max-width:130px;width:auto;object-fit:contain;display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.4));" ' +
-      'onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'font-family:var(--font-display);font-weight:900;font-size:14px;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.6);\\\'>' + bank.bank + '</span>\';">' +
+      'style="height:22px;max-width:140px;width:auto;object-fit:contain;display:block;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.8));" ' +
+      'onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'font-family:var(--font-display);font-weight:900;font-size:14px;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;text-shadow:0 1px 4px rgba(0,0,0,0.9);\\\'>' + bank.bank + '</span>\';">' +
       '</div>';
   }
 
