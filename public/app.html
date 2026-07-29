@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=53000.0.0">
+<link rel="manifest" href="/manifest.json?v=54000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=53000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=53000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=53000.0.0">
+<link rel="icon" href="/icon-192.png?v=54000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=54000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=54000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=53000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=54000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -5021,9 +5021,9 @@
   // falling back to the inline badge if the image fails to load (e.g. not yet added).
   let __bankLogoUid = 0;
   const BANK_WORDMARKS = {
-  "Leobank": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#111215;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"none\"><circle cx=\"50\" cy=\"50\" r=\"42\" fill=\"#111215\"/><path d=\"M30 35 L42 20 L50 35 L58 20 L70 35 M36 60 Q50 72 64 60\" stroke=\"#b1f000\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#111215;letter-spacing:-0.3px;\">Leobank</span></div>",
-  "Yelo Bank": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#facc15;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"none\"><path d=\"M35 30 L50 55 L65 30 M50 55 V75\" stroke=\"#0f172a\" stroke-width=\"14\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#0f172a;letter-spacing:-0.3px;\">Yelo Bank</span></div>",
-  "PASHA Bank": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#2e2a24;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"#e0bd68\"><path d=\"M50 10 L63 35 L92 38 L70 58 L77 87 L50 72 L23 87 L30 58 L8 38 L37 35 Z\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#2e2a24;letter-spacing:-0.3px;\">PASHA Bank</span></div>"
+  "Leobank": "<div style=\"display:inline-flex;align-items:center;padding:4px 12px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><span style=\"font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-weight:700;font-size:16px;color:#000000;letter-spacing:-0.4px;\">Leobank</span></div>",
+  "PASHA Bank": "<div style=\"display:inline-flex;align-items:center;gap:7px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 100 100\" fill=\"none\"><rect x=\"34\" y=\"8\" width=\"32\" height=\"32\" fill=\"#008a4c\" rx=\"2\"/><rect x=\"60\" y=\"34\" width=\"32\" height=\"32\" fill=\"#d91438\" rx=\"2\"/><rect x=\"34\" y=\"60\" width=\"32\" height=\"32\" fill=\"#008a4c\" rx=\"2\"/><rect x=\"8\" y=\"34\" width=\"32\" height=\"32\" fill=\"#d91438\" rx=\"2\"/><path d=\"M50 24 L56 44 L76 50 L56 56 L50 76 L44 56 L24 50 L44 44 Z\" fill=\"#ffffff\"/></svg><div style=\"font-family:'Inter',-apple-system,sans-serif;font-weight:800;font-size:15px;line-height:1;letter-spacing:-0.2px;\"><span style=\"color:#008a4c;\">PASHA </span><span style=\"color:#d91438;\">Bank</span></div></div>",
+  "Yelo Bank": "<div style=\"display:inline-flex;align-items:center;padding:4px 12px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"font-family:'Inter',-apple-system,sans-serif;font-weight:900;font-size:17.5px;color:#000000;letter-spacing:-0.7px;line-height:1;\"><span>ye</span><span style=\"display:inline-block;transform:skewX(-14deg);margin:0 -0.5px;font-weight:900;color:#000000;\">/</span><span>obank</span></div></div>"
 };
 
   function renderBankLogo(bank) {
