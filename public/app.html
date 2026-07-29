@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=23000.0.0">
+<link rel="manifest" href="/manifest.json?v=24000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=23000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=23000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=23000.0.0">
+<link rel="icon" href="/icon-192.png?v=24000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=24000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=24000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=23000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=24000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2278,6 +2278,20 @@
       </div>
     </div>
 
+    <!-- Custom Confirm Modal -->
+    <div class="sheet-overlay" id="custom-confirm-overlay" style="z-index: 100005;">
+      <div class="sheet" style="max-width:380px; margin:auto; border-radius:24px; padding:24px 20px; text-align:center; background:var(--surface-1); border:1px solid var(--border); box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);">
+        <div style="width:52px; height:52px; border-radius:18px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:24px; margin:0 auto 14px;">🗑️</div>
+        <div style="font-size:12px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">ABUNƏM</div>
+        <div id="confirm-modal-title" style="font-size:18px; font-weight:800; color:var(--ink); font-family:var(--font-display); margin-bottom:8px;">Silinməni Təsdiqləyin</div>
+        <div id="confirm-modal-msg" style="font-size:13px; color:var(--ink-muted); line-height:1.4; margin-bottom:20px;">Bu əməliyyatı yerinə yetirmək istədiyinizdən əminsiniz?</div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn" style="flex:1; border-radius:14px; background:var(--surface-3); color:var(--ink);" onclick="closeCustomConfirm(false)">İmtina</button>
+          <button class="btn btn-primary" id="confirm-modal-action-btn" style="flex:1; border-radius:14px; background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; border:none; font-weight:700;" onclick="closeCustomConfirm(true)">Bəli, sil</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2588,6 +2602,35 @@
       toast.classList.remove('show');
       setTimeout(() => toast.remove(), 350);
     });
+  }
+
+  let _confirmCallback = null;
+
+  function showCustomConfirm(title, message, callback, actionBtnText = 'Bəli, sil') {
+    document.getElementById('confirm-modal-title').textContent = title;
+    document.getElementById('confirm-modal-msg').textContent = message;
+    const btn = document.getElementById('confirm-modal-action-btn');
+    if (btn) btn.textContent = actionBtnText;
+    _confirmCallback = callback;
+
+    const overlay = document.getElementById('custom-confirm-overlay');
+    if (overlay) {
+      overlay.classList.add('open');
+      updateBodyScrollLock();
+    }
+  }
+
+  function closeCustomConfirm(isConfirmed) {
+    const overlay = document.getElementById('custom-confirm-overlay');
+    if (overlay) {
+      overlay.classList.remove('open');
+      updateBodyScrollLock();
+    }
+    if (_confirmCallback) {
+      const cb = _confirmCallback;
+      _confirmCallback = null;
+      cb(isConfirmed);
+    }
   }
 
   // General Notification Trigger (combining In-App Toast & Native Web Push)
@@ -4146,27 +4189,30 @@
   }
 
   // ── Cancel subscription directly from notification card ────────────────────
-  async function handleCancelSubscriptionFromNotif(abunelikId, notifId, btnEl) {
+  function handleCancelSubscriptionFromNotif(abunelikId, notifId, btnEl) {
     if (!abunelikId) return;
-    if (!confirm('Bu abunəliyi həqiqətən ləğv etmək istəyirsiniz?')) return;
+    showCustomConfirm(
+      'Abunəliyi Ləğv Et 🗑️',
+      'Bu abunəliyi həqiqətən ləğv etmək istəyirsiniz?',
+      async (confirmed) => {
+        if (!confirmed) return;
+        btnEl.classList.add('loading');
+        btnEl.textContent = 'Silinir...';
 
-    // Show loading state on button
-    btnEl.classList.add('loading');
-    btnEl.textContent = 'Silinir...';
+        const res = await apiFetch('DELETE', `/api/abunelikler/${abunelikId}`);
 
-    const res = await apiFetch('DELETE', `/api/abunelikler/${abunelikId}`);
-
-    if (res.ok) {
-      // Remove this notification from local list + refresh everything
-      notifications = notifications.filter(n => n.id !== notifId);
-      renderNotifs();
-      triggerSubscriptionNotification('Abunəlik Ləğv Edildi ✅', 'Abunəliyiniz uğurla sistemdən silindi.');
-      await loadAllData();
-    } else {
-      btnEl.classList.remove('loading');
-      btnEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Abunəliyi Ləğv Et`;
-      showInAppToast('Abunəlik Ləğv Edilmədi ⚠️', res.data?.error?.message || 'Abunəlik ləğv edilə bilmədi. Yenidən cəhd edin.');
-    }
+        if (res.ok) {
+          notifications = notifications.filter(n => n.id !== notifId);
+          renderNotifs();
+          triggerSubscriptionNotification('Abunəlik Ləğv Edildi ✅', 'Abunəliyiniz uğurla sistemdən silindi.');
+          await loadAllData();
+        } else {
+          btnEl.classList.remove('loading');
+          btnEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Abunəliyi Ləğv Et`;
+          showInAppToast('Abunəlik Ləğv Edilmədi ⚠️', res.data?.error?.message || 'Abunəlik ləğv edilə bilmədi. Yenidən cəhd edin.');
+        }
+      }
+    );
   }
 
   function switchScreen(name) {
@@ -4512,18 +4558,23 @@
   }
 
   // Handle Delete subscription API
-  async function handleDeleteSubscription() {
+  function handleDeleteSubscription() {
     const id = document.getElementById('manage-sub-id').value;
-    if (confirm('Bu abunəliyi silmək istədiyinizdən əminsiniz?')) {
-      const res = await apiFetch('DELETE', `/api/abunelikler/${id}`);
-      if (res.ok) {
-        showInAppToast('Abunəlik Silindi ✅', 'Abunəlik uğurla ləğv edildi.');
-        closeManageSheet();
-        loadAllData();
-      } else {
-        showInAppToast('Silinmə Xətası ⚠️', res.data?.error?.message || 'Silinmə zamanı xəta baş verdi.');
+    showCustomConfirm(
+      'Abunəliyi Silmək İstəyirsiniz? 🗑️',
+      'Bu abunəlik sistemdən həmişəlik silinəcək.',
+      async (confirmed) => {
+        if (!confirmed) return;
+        const res = await apiFetch('DELETE', `/api/abunelikler/${id}`);
+        if (res.ok) {
+          showInAppToast('Abunəlik Silindi ✅', 'Abunəlik uğurla ləğv edildi.');
+          closeManageSheet();
+          loadAllData();
+        } else {
+          showInAppToast('Silinmə Xətası ⚠️', res.data?.error?.message || 'Silinmə zamanı xəta baş verdi.');
+        }
       }
-    }
+    );
   }
 
   // ---- Cards (Ödəniş Metodları) ----
@@ -4727,18 +4778,23 @@
     }
   }
 
-  async function handleDeleteCard(id) {
-    if (!confirm('Bu kartı silmək istəyirsiniz?')) return;
-    const res = await apiFetch('DELETE', `/api/odenis-metodlari/${id}`);
-    if (res.ok) {
-      showInAppToast('Kart Silindi ✅', 'Ödəniş metodu uğurla silindi.');
-      await loadCards();
-    } else if (res.status === 409) {
-      // Payment method in use
-      showInAppToast('Kart Silinə Bilməz ⚠️', 'Bu kart aktiv abunəliklərdə istifadə olunur. Əvvəlcə abunəliyi başqa karta keçirin və ya silin.');
-    } else {
-      showInAppToast('Kart Silinmədi ⚠️', res.data?.error?.message || 'Kart silinə bilmədi.');
-    }
+  function handleDeleteCard(id) {
+    showCustomConfirm(
+      'Kartı Silmək İstəyirsiniz? 💳',
+      'Bu ödəniş metodu sistemdən silinəcək.',
+      async (confirmed) => {
+        if (!confirmed) return;
+        const res = await apiFetch('DELETE', `/api/odenis-metodlari/${id}`);
+        if (res.ok) {
+          showInAppToast('Kart Silindi ✅', 'Ödəniş metodu uğurla silindi.');
+          await loadCards();
+        } else if (res.status === 409) {
+          showInAppToast('Kart Silinə Bilməz ⚠️', 'Bu kart aktiv abunəliklərdə istifadə olunur. Əvvəlcə abunəliyi başqa karta keçirin və ya silin.');
+        } else {
+          showInAppToast('Kart Silinmədi ⚠️', res.data?.error?.message || 'Kart silinə bilmədi.');
+        }
+      }
+    );
   }
 
   let cardSheetReturnTarget = null;
