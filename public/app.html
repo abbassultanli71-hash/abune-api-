@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=27000.0.0">
+<link rel="manifest" href="/manifest.json?v=28000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=27000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=27000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=27000.0.0">
+<link rel="icon" href="/icon-192.png?v=28000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=28000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=28000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=27000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=28000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3851,6 +3851,63 @@
     return `<span style="width:24px; height:24px; border-radius:6px; background:${colors[colorIdx]}; color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center;">${(name||'?')[0].toUpperCase()}</span>`;
   }
 
+  // Global Helper: get favicon logo HTML from subscription name
+  function getCalendarLogoHTML(name, size = 22) {
+    const lowerName = (name || '').toLowerCase().trim();
+    const BD = {
+      'netflix':'netflix.com','neftlix':'netflix.com',
+      'spotify':'spotify.com',
+      'youtube premium':'youtube.com','youtube':'youtube.com','yt premium':'youtube.com',
+      'chatgpt':'openai.com','openai':'openai.com',
+      'claude':'anthropic.com','anthropic':'anthropic.com',
+      'apple music':'apple.com','apple tv':'apple.com','icloud':'apple.com','itunes':'apple.com','apple':'apple.com',
+      'google one':'one.google.com','google':'google.com','gmail':'google.com','drive':'google.com',
+      'linkedin':'linkedin.com','telegram':'telegram.org','tiktok':'tiktok.com',
+      'twitter':'twitter.com','discord':'discord.com','instagram':'instagram.com','facebook':'facebook.com',
+      'amazon prime':'amazon.com','prime video':'amazon.com','amazon':'amazon.com','prime':'amazon.com',
+      'microsoft 365':'microsoft.com','office 365':'office.com','microsoft':'microsoft.com','office':'office.com','onedrive':'microsoft.com',
+      'copilot':'microsoft.com','gemini':'google.com',
+      'figma':'figma.com','canva':'canva.com','notion':'notion.so',
+      'kapital bank':'kapitalbank.az','kapital':'kapitalbank.az','birbank':'birbank.az',
+      'pasha bank':'pashabank.az','pasha':'pashabank.az',
+      'abb':'abb-bank.az','unibank':'unibank.az','leobank':'leobank.az',
+      'azercell':'azercell.com','bakcell':'bakcell.com','nar mobile':'nar.az','nar':'nar.az',
+      'wolt':'wolt.com','bolt':'bolt.eu','uber':'uber.com','yandex':'yandex.com',
+      'ps plus':'playstation.com','playstation':'playstation.com',
+      'game pass':'xbox.com','xbox':'xbox.com',
+      'steam':'steampowered.com','twitch':'twitch.tv','roblox':'roblox.com','nintendo':'nintendo.com',
+      'adobe':'adobe.com','photoshop':'adobe.com',
+      'duolingo':'duolingo.com','grammarly':'grammarly.com',
+      'github':'github.com','dropbox':'dropbox.com',
+      'slack':'slack.com','zoom':'zoom.us','notion':'notion.so',
+      'nordvpn':'nordvpn.com','expressvpn':'expressvpn.com','proton':'proton.me',
+      'coursera':'coursera.org','udemy':'udemy.com',
+      'push 30':'push30.app','push30':'push30.app',
+      'midjourney':'midjourney.com','perplexity':'perplexity.ai',
+    };
+
+    let domain = BD[lowerName];
+    if (!domain) {
+      for (const key in BD) {
+        if (lowerName.includes(key)) { domain = BD[key]; break; }
+      }
+    }
+    if (!domain && (lowerName.includes('.az') || lowerName.includes('.com') || lowerName.includes('.org') || lowerName.includes('.app') || lowerName.includes('.net'))) {
+      domain = lowerName;
+    }
+
+    const initial = (name || '?')[0].toUpperCase();
+    const px = size + 'px';
+    const fontPx = Math.max(7, Math.floor(size * 0.45)) + 'px';
+    const colors = ['#f97316','#8b5cf6','#06b6d4','#10b981','#f43f5e','#3b82f6','#ec4899','#a855f7'];
+    const ci = ((name||'A').charCodeAt(0)) % colors.length;
+
+    if (domain) {
+      return '<img src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=64" style="width:' + px + ';height:' + px + ';border-radius:3px;object-fit:contain;display:block;" onerror="this.onerror=null;this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" /><span style="width:' + px + ';height:' + px + ';border-radius:3px;background:' + colors[ci] + ';color:#fff;font-size:' + fontPx + ';font-weight:900;display:none;align-items:center;justify-content:center;">' + initial + '</span>';
+    }
+    return '<span style="width:' + px + ';height:' + px + ';border-radius:3px;background:' + colors[ci] + ';color:#fff;font-size:' + fontPx + ';font-weight:900;display:flex;align-items:center;justify-content:center;">' + initial + '</span>';
+  }
+
   function renderFinancialHeatmapGrid() {
     const grid = document.getElementById('financial-heatmap-grid');
     if (!grid) return;
@@ -3893,61 +3950,6 @@
       if (!dayMap[day]) dayMap[day] = [];
       dayMap[day].push(s);
     });
-
-    // Helper: get favicon logo HTML from subscription name
-    function getCalendarLogoHTML(name, size = 22) {
-      const lowerName = (name || '').toLowerCase().trim();
-      const BD = {
-        'netflix':'netflix.com','neftlix':'netflix.com',
-        'spotify':'spotify.com',
-        'youtube premium':'youtube.com','youtube':'youtube.com','yt premium':'youtube.com',
-        'chatgpt':'openai.com','openai':'openai.com',
-        'claude':'anthropic.com','anthropic':'anthropic.com',
-        'apple music':'apple.com','apple tv':'apple.com','icloud':'apple.com','itunes':'apple.com','apple':'apple.com',
-        'google one':'one.google.com','google':'google.com','gmail':'google.com','drive':'google.com',
-        'linkedin':'linkedin.com','telegram':'telegram.org','tiktok':'tiktok.com',
-        'twitter':'twitter.com','discord':'discord.com','instagram':'instagram.com','facebook':'facebook.com',
-        'amazon prime':'amazon.com','prime video':'amazon.com','amazon':'amazon.com','prime':'amazon.com',
-        'microsoft 365':'microsoft.com','office 365':'office.com','microsoft':'microsoft.com','office':'office.com','onedrive':'microsoft.com',
-        'copilot':'microsoft.com','gemini':'google.com',
-        'figma':'figma.com','canva':'canva.com','notion':'notion.so',
-        'kapital bank':'kapitalbank.az','kapital':'kapitalbank.az','birbank':'birbank.az',
-        'pasha bank':'pashabank.az','pasha':'pashabank.az',
-        'abb':'abb-bank.az','unibank':'unibank.az','leobank':'leobank.az',
-        'azercell':'azercell.com','bakcell':'bakcell.com','nar mobile':'nar.az','nar':'nar.az',
-        'wolt':'wolt.com','bolt':'bolt.eu','uber':'uber.com','yandex':'yandex.com',
-        'ps plus':'playstation.com','playstation':'playstation.com',
-        'game pass':'xbox.com','xbox':'xbox.com',
-        'steam':'steampowered.com','twitch':'twitch.tv','roblox':'roblox.com','nintendo':'nintendo.com',
-        'adobe':'adobe.com','photoshop':'adobe.com',
-        'duolingo':'duolingo.com','grammarly':'grammarly.com',
-        'github':'github.com','dropbox':'dropbox.com',
-        'slack':'slack.com','zoom':'zoom.us','notion':'notion.so',
-        'nordvpn':'nordvpn.com','expressvpn':'expressvpn.com','proton':'proton.me',
-        'coursera':'coursera.org','udemy':'udemy.com',
-        'push 30':'push30.app','push30':'push30.app',
-        'midjourney':'midjourney.com','perplexity':'perplexity.ai',
-      };
-
-      // Exact match first, then partial
-      let domain = BD[lowerName];
-      if (!domain) {
-        for (const key in BD) {
-          if (lowerName.includes(key)) { domain = BD[key]; break; }
-        }
-      }
-
-      const initial = (name || '?')[0].toUpperCase();
-      const px = size + 'px';
-      const fontPx = Math.max(7, Math.floor(size * 0.45)) + 'px';
-
-      if (domain) {
-        return '<img src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=64" style="width:' + px + ';height:' + px + ';border-radius:3px;object-fit:contain;display:block;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" /><span style="width:' + px + ';height:' + px + ';border-radius:3px;background:#f97316;color:#fff;font-size:' + fontPx + ';font-weight:900;display:none;align-items:center;justify-content:center;">' + initial + '</span>';
-      }
-      const colors = ['#f97316','#8b5cf6','#06b6d4','#10b981','#f43f5e','#3b82f6','#ec4899','#a855f7'];
-      const ci = ((name||'A').charCodeAt(0)) % colors.length;
-      return '<span style="width:' + px + ';height:' + px + ';border-radius:3px;background:' + colors[ci] + ';color:#fff;font-size:' + fontPx + ';font-weight:900;display:flex;align-items:center;justify-content:center;">' + initial + '</span>';
-    }
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dueSubs = dayMap[d] || [];
