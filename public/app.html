@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=51000.0.0">
+<link rel="manifest" href="/manifest.json?v=52000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=51000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=51000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=51000.0.0">
+<link rel="icon" href="/icon-192.png?v=52000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=52000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=52000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=51000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=52000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -5020,16 +5020,32 @@
   // Renders the official bank logo image if the file exists in /public/bank-logos/,
   // falling back to the inline badge if the image fails to load (e.g. not yet added).
   let __bankLogoUid = 0;
+  const BANK_WORDMARKS = {
+  "Kapital Bank": "<div style=\"display:inline-flex;align-items:center;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><img src=\"/images/bank-logos/kapitalbank.svg\" alt=\"Kapital Bank\" style=\"height:20px;max-width:130px;width:auto;object-fit:contain;display:block;\"></div>",
+  "Leobank": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#111215;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"none\"><circle cx=\"50\" cy=\"50\" r=\"42\" fill=\"#111215\"/><path d=\"M30 35 L42 20 L50 35 L58 20 L70 35 M36 60 Q50 72 64 60\" stroke=\"#b1f000\" stroke-width=\"10\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#111215;letter-spacing:-0.3px;\">Leobank</span></div>",
+  "ABB": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#294998;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"none\"><path d=\"M50 12 L63 32 H88 L70 52 L78 78 L50 62 L22 78 L30 52 L12 32 H37 Z\" fill=\"#ffffff\"/><circle cx=\"50\" cy=\"46\" r=\"10\" fill=\"#294998\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#1c3674;letter-spacing:-0.3px;\">ABB</span></div>",
+  "Yelo Bank": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#facc15;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"none\"><path d=\"M35 30 L50 55 L65 30 M50 55 V75\" stroke=\"#0f172a\" stroke-width=\"14\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#0f172a;letter-spacing:-0.3px;\">Yelo Bank</span></div>",
+  "PASHA Bank": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#2e2a24;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"#e0bd68\"><path d=\"M50 10 L63 35 L92 38 L70 58 L77 87 L50 72 L23 87 L30 58 L8 38 L37 35 Z\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#2e2a24;letter-spacing:-0.3px;\">PASHA Bank</span></div>",
+  "Unibank": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#ff6600;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"none\"><path d=\"M25 15 V50 A25 25 0 0 0 75 50 V15\" stroke=\"#ffffff\" stroke-width=\"18\" stroke-linecap=\"round\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#ff6600;letter-spacing:-0.3px;\">Unibank</span></div>",
+  "Rabitabank": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#00a651;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#ffffff\" stroke-width=\"12\"><circle cx=\"50\" cy=\"50\" r=\"40\"/><path d=\"M30 70 V30 H55 A15 15 0 0 1 55 50 H30 M50 50 L70 70\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#00a651;letter-spacing:-0.3px;\">Rabitabank</span></div>",
+  "Expressbank": "<div style=\"display:inline-flex;align-items:center;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><img src=\"/images/bank-logos/expressbank.svg\" alt=\"Expressbank\" style=\"height:20px;max-width:130px;width:auto;object-fit:contain;display:block;\"></div>",
+  "Bank of Baku": "<div style=\"display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><div style=\"width:20px;height:20px;border-radius:5px;background:#ed1c24;display:flex;align-items:center;justify-content:center;flex-shrink:0;\"><svg width=\"13\" height=\"13\" viewBox=\"0 0 100 100\" fill=\"#ffffff\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><path d=\"M30 30 H55 C65 30 65 45 55 45 C68 45 68 65 55 65 H30 Z M42 40 V44 H53 C56 44 56 40 53 40 Z M42 51 V57 H54 C58 57 58 51 54 51 Z\" fill=\"#ed1c24\"/></svg></div><span style=\"font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#ed1c24;letter-spacing:-0.3px;\">Bank of Baku</span></div>"
+};
+
   function renderBankLogo(bank) {
     if (!bank) return '';
-    const imgPath = '/images/bank-logos/' + bank.logoFile;
+    
+    // Check if we have custom wide wordmark HTML for this bank
+    if (BANK_WORDMARKS && BANK_WORDMARKS[bank.bank]) {
+      return BANK_WORDMARKS[bank.bank];
+    }
 
-    // Uniform crisp white container pill for ALL bank logos (Kapital, ABB, Yelo, Leo, Pasha, Unibank, etc.)
-    // Fixed height (20px image, 28px pill) to ensure 100% identical sizing across all banks
-    return '<div style="display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;box-sizing:border-box;">' +
+    const imgPath = '/images/bank-logos/' + bank.logoFile;
+    return '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;box-sizing:border-box;">' +
       '<img src="' + imgPath + '" alt="' + bank.bank + '" ' +
       'style="height:20px;max-width:120px;width:auto;object-fit:contain;display:block;" ' +
-      'onerror="this.parentNode.style.background=\'none\'; this.parentNode.style.padding=\'0\'; this.parentNode.style.boxShadow=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'font-weight:900;font-size:14px;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);\\\'>' + bank.bank + '</span>\';">' +
+      'onerror="this.style.display=\'none\';">' +
+      '<span style="font-family:var(--font-display);font-weight:900;font-size:14.5px;color:#0f172a;letter-spacing:-0.3px;">' + bank.bank + '</span>' +
       '</div>';
   }
 
