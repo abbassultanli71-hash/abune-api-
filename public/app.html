@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=33000.0.0">
+<link rel="manifest" href="/manifest.json?v=34000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=33000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=33000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=33000.0.0">
+<link rel="icon" href="/icon-192.png?v=34000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=34000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=34000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=33000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=34000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -4632,85 +4632,74 @@
   // ---- Azerbaijan Bank Card BIN & Theme Engine ----
   const AZERBAIJAN_BANK_BINS = [
     {
-      bank: 'LEOBANK',
-      logoBadge: 'LEOBANK',
-      keywords: ['leo', 'leobank'],
-      prefixes: ['409858', '409830', '409871', '530090', '4098', '5300', '5169'],
-      bg: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%), linear-gradient(135deg, #18191c 0%, #0d0f12 60%, #060708 100%)',
-      color: '#b1f000',
-      shadow: '0 14px 35px rgba(177, 240, 0, 0.25)'
+      bank: 'Kapital Bank',
+      logoBadge: 'Kapital Bank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:800;font-size:15px;color:#fff;letter-spacing:-0.2px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2L4 10l8 8 8-8-8-8zm0 4.5L16.5 10 12 14.5 7.5 10 12 6.5z"/></svg> Kapital Bank</div>`,
+      keywords: ['kapital', 'birbank', 'kapital bank'],
+      prefixes: ['41697388', '416973', '534824', '416922', '4282', '4169', '5348'],
+      bg: 'linear-gradient(135deg, #a01b3d 0%, #8d1834 60%, #680f24 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(141,24,52,0.4)'
     },
     {
-      bank: 'BIRBANK',
-      logoBadge: 'BIRBANK',
-      keywords: ['kapital', 'birbank', 'kapital bank'],
-      prefixes: ['416973', '534824', '416922', '4282', '4169', '5348'],
-      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #ff1a30 0%, #d60015 50%, #6e000b 100%)',
-      color: '#ffffff',
-      shadow: '0 14px 35px rgba(255, 26, 48, 0.35)'
+      bank: 'Leobank',
+      logoBadge: 'Leobank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:16px;color:#b1f000;letter-spacing:0.5px;">Leobank</div>`,
+      keywords: ['leo', 'leobank'],
+      prefixes: ['40985844', '409858', '409830', '409871', '530090', '4098', '5300', '5169'],
+      bg: 'linear-gradient(135deg, #1f2125 0%, #111215 60%, #08090a 100%)',
+      color: '#b1f000',
+      shadow: '0 14px 35px rgba(177,240,0,0.25)'
     },
     {
       bank: 'ABB',
       logoBadge: 'ABB',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:16px;color:#fff;letter-spacing:1px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#005bb5"><rect width="24" height="24" rx="5" fill="#fff"/><text x="12" y="16" font-size="11" text-anchor="middle" fill="#005bb5" font-weight="bold">ABB</text></svg> ABB</div>`,
       keywords: ['abb', 'iba', 'beynelxalq', 'beynəlxalq', 'tamkart'],
-      prefixes: ['402094', '523988', '402033', '5322', '4020', '5239'],
-      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #0072ce 0%, #004da8 60%, #002654 100%)',
+      prefixes: ['40209422', '402094', '523988', '402033', '5322', '4020', '5239'],
+      bg: 'linear-gradient(135deg, #005bb5 0%, #004488 60%, #002b55 100%)',
       color: '#ffffff',
-      shadow: '0 14px 35px rgba(0, 114, 206, 0.35)'
+      shadow: '0 14px 35px rgba(0,91,181,0.35)'
     },
     {
-      bank: 'PASHA BANK',
-      logoBadge: 'PASHA BANK',
+      bank: 'PASHA Bank',
+      logoBadge: 'PASHA Bank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:800;font-size:14px;color:#e0bd68;letter-spacing:0.5px;">PASHA Bank</div>`,
       keywords: ['pasha', 'paşa', 'pasha bank'],
-      prefixes: ['402643', '510122', '4026', '5101'],
-      bg: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%), linear-gradient(135deg, #37332c 0%, #1e1a14 60%, #0d0c09 100%)',
+      prefixes: ['40264311', '402643', '510122', '4026', '5101'],
+      bg: 'linear-gradient(135deg, #2e2a24 0%, #1a1713 60%, #0b0a08 100%)',
       color: '#e0bd68',
-      shadow: '0 14px 35px rgba(224, 189, 104, 0.25)'
+      shadow: '0 14px 35px rgba(224,189,104,0.25)'
     },
     {
-      bank: 'UNIBANK',
-      logoBadge: 'UNIBANK',
+      bank: 'Unibank',
+      logoBadge: 'Unibank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;letter-spacing:0.5px;">Unibank</div>`,
       keywords: ['unibank', 'ucard'],
-      prefixes: ['412012', '520048', '4120', '5200'],
-      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #ff6600 0%, #d44d00 60%, #7a2b00 100%)',
+      prefixes: ['41201211', '412012', '520048', '4120', '5200'],
+      bg: 'linear-gradient(135deg, #ff6600 0%, #d45500 60%, #803300 100%)',
       color: '#ffffff',
-      shadow: '0 14px 35px rgba(255, 102, 0, 0.35)'
+      shadow: '0 14px 35px rgba(255,102,0,0.35)'
     },
     {
-      bank: 'YELO BANK',
-      logoBadge: 'YELO BANK',
+      bank: 'Yelo Bank',
+      logoBadge: 'Yelo Bank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#0f172a;letter-spacing:0.5px;">Yelo Bank</div>`,
       keywords: ['yelo', 'yelo bank'],
-      prefixes: ['425390', '4253', '5390'],
-      bg: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, #facc15 0%, #eab308 40%, #0f172a 100%)',
+      prefixes: ['42539011', '425390', '4253', '5390'],
+      bg: 'linear-gradient(135deg, #facc15 0%, #eab308 50%, #0f172a 100%)',
       color: '#0f172a',
-      shadow: '0 14px 35px rgba(250, 204, 21, 0.3)'
+      shadow: '0 14px 35px rgba(250,204,21,0.3)'
     },
     {
-      bank: 'RABİTABANK',
-      logoBadge: 'RABİTABANK',
+      bank: 'Rabitabank',
+      logoBadge: 'Rabitabank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;letter-spacing:0.5px;">Rabitabank</div>`,
       keywords: ['rabita', 'rabitabank', 'kartmane'],
-      prefixes: ['409870', '4038', '5338'],
-      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #0d9488 0%, #0f766e 60%, #115e59 100%)',
+      prefixes: ['40987011', '409870', '4038', '5338'],
+      bg: 'linear-gradient(135deg, #0d9488 0%, #0f766e 60%, #115e59 100%)',
       color: '#ffffff',
-      shadow: '0 14px 35px rgba(13, 148, 136, 0.35)'
-    },
-    {
-      bank: 'ACCESSBANK',
-      logoBadge: 'ACCESSBANK',
-      keywords: ['access', 'accessbank'],
-      prefixes: ['4177', '5298'],
-      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)',
-      color: '#ffffff',
-      shadow: '0 14px 35px rgba(79, 70, 229, 0.35)'
-    },
-    {
-      bank: 'EXPRESSBANK',
-      logoBadge: 'EXPRESSBANK',
-      keywords: ['express', 'expressbank'],
-      prefixes: ['412077'],
-      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
-      color: '#ffffff',
-      shadow: '0 14px 35px rgba(220, 38, 38, 0.35)'
+      shadow: '0 14px 35px rgba(13,148,136,0.35)'
     }
   ];
 
@@ -4718,11 +4707,12 @@
     const cleanPan = String(pan || '').replace(/\s/g, '');
     const lowerName = (cardName || '').toLowerCase().trim();
 
-    // 1. Check card number BIN prefix (first 6 or 4 digits)
+    // 1. Check card number BIN prefix (preferring 8-digit exact prefixes)
     if (cleanPan.length >= 4) {
-      for (const b of AZERBAIJAN_BANK_BINS) {
-        for (const p of b.prefixes) {
-          if (cleanPan.startsWith(p)) {
+      for (let len = Math.min(8, cleanPan.length); len >= 4; len--) {
+        const sub = cleanPan.substring(0, len);
+        for (const b of AZERBAIJAN_BANK_BINS) {
+          if (b.prefixes.includes(sub)) {
             return b;
           }
         }
@@ -4895,15 +4885,32 @@
     // User card nickname for top-left
     const userCardName = cardNameInp ? cardNameInp.value : '';
 
+    // Format card number like real banking apps (typed digits in bold, remaining as 0000)
+    const numEl = document.getElementById('preview-card-number');
+    if (numEl) {
+      if (cleaned.length === 0) {
+        numEl.innerHTML = '<span style="opacity:0.4;">•••• •••• •••• ••••</span>';
+      } else {
+        let typedPart = '';
+        for (let i = 0; i < cleaned.length && i < 16; i++) {
+          if (i > 0 && i % 4 === 0) typedPart += ' ';
+          typedPart += cleaned[i];
+        }
+        let remainingPart = '';
+        for (let i = cleaned.length; i < 16; i++) {
+          if (i > 0 && i % 4 === 0) remainingPart += ' ';
+          remainingPart += '0';
+        }
+        numEl.innerHTML = `<span style="font-weight:800; opacity:1;">${typedPart}</span>${remainingPart ? ` <span style="opacity:0.35;">${remainingPart}</span>` : ''}`;
+      }
+    }
+
     // 1. Detect Azerbaijan Bank from BIN
     const azBank = detectAzBank(cleaned, userCardName);
     if (azBank) {
-      if (bankBadgePill) {
-        bankBadgePill.textContent = azBank.logoBadge;
-        bankBadgePill.style.display = 'inline-block';
-      }
+      if (bankBadgePill) bankBadgePill.style.display = 'none';
       if (bankNameEl) {
-        bankNameEl.textContent = userCardName ? userCardName.toUpperCase() : azBank.bank;
+        bankNameEl.innerHTML = userCardName ? `<span style="font-weight:800; font-size:13px; text-transform:uppercase;">${userCardName}</span>` : azBank.logoHTML;
       }
       if (cardFront) {
         cardFront.style.background = azBank.bg;
