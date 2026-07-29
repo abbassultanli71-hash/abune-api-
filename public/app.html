@@ -4826,9 +4826,9 @@
   {
     "bank": "Expressbank",
     "logoBadge": "Expressbank",
-    "logoFile": "expressbank_white.svg",
+    "logoFile": "expressbank.svg",
     "logoFileColor": "expressbank.svg",
-    "useWhitePill": false,
+    "useWhitePill": true,
     "keywords": [
       "express",
       "expressbank"
@@ -5024,21 +5024,13 @@
     if (!bank) return '';
     const imgPath = '/images/bank-logos/' + bank.logoFile;
 
-    if (bank.useWhitePill) {
-      // High-contrast crisp white rounded container pill for PNG/JPG bank logos
-      return '<div style="display:inline-flex;align-items:center;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);max-height:28px;">' +
-        '<img src="' + imgPath + '" alt="' + bank.bank + '" ' +
-        'style="height:20px;max-width:120px;width:auto;object-fit:contain;display:block;" ' +
-        'onerror="this.parentNode.style.background=\'none\'; this.parentNode.style.padding=\'0\'; this.parentNode.style.boxShadow=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'font-weight:900;font-size:14px;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);\\\'>' + bank.bank + '</span>\';">' +
-        '</div>';
-    } else {
-      // Pure white vector SVG directly on card header
-      return '<div style="display:inline-flex;align-items:center;max-height:26px;">' +
-        '<img src="' + imgPath + '" alt="' + bank.bank + '" ' +
-        'style="height:22px;max-width:140px;width:auto;object-fit:contain;display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.6));" ' +
-        'onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'font-weight:900;font-size:14px;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);\\\'>' + bank.bank + '</span>\';">' +
-        '</div>';
-    }
+    // Uniform crisp white container pill for ALL bank logos (Kapital, ABB, Yelo, Leo, Pasha, Unibank, etc.)
+    // Fixed height (20px image, 28px pill) to ensure 100% identical sizing across all banks
+    return '<div style="display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;box-sizing:border-box;">' +
+      '<img src="' + imgPath + '" alt="' + bank.bank + '" ' +
+      'style="height:20px;max-width:120px;width:auto;object-fit:contain;display:block;" ' +
+      'onerror="this.parentNode.style.background=\'none\'; this.parentNode.style.padding=\'0\'; this.parentNode.style.boxShadow=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'font-weight:900;font-size:14px;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);\\\'>' + bank.bank + '</span>\';">' +
+      '</div>';
   }
 
   function detectAzBank(pan, cardName) {
