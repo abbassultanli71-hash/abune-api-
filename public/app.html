@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=30000.0.0">
+<link rel="manifest" href="/manifest.json?v=31000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=30000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=30000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=30000.0.0">
+<link rel="icon" href="/icon-192.png?v=31000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=31000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=31000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=30000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=31000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -4626,40 +4626,140 @@
     );
   }
 
-  // ---- Cards (Ödəniş Metodları) ----
-  function getCardStyleByName(cardName, cardType) {
-    const name = (cardName || '').toLowerCase();
+  // ---- Azerbaijan Bank Card BIN & Theme Engine ----
+  const AZERBAIJAN_BANK_BINS = [
+    {
+      bank: 'LEOBANK',
+      logoBadge: '🦁 LEOBANK',
+      keywords: ['leo', 'leobank'],
+      prefixes: ['409858', '409830', '409871', '530090', '4098', '5300', '5169'],
+      bg: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%), linear-gradient(135deg, #18191c 0%, #0d0f12 60%, #060708 100%)',
+      color: '#b1f000',
+      shadow: '0 14px 35px rgba(177, 240, 0, 0.25)'
+    },
+    {
+      bank: 'BIRBANK',
+      logoBadge: '🔴 BIRBANK',
+      keywords: ['kapital', 'birbank', 'kapital bank'],
+      prefixes: ['416973', '534824', '416922', '4282', '4169', '5348'],
+      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #ff1a30 0%, #d60015 50%, #6e000b 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(255, 26, 48, 0.35)'
+    },
+    {
+      bank: 'ABB',
+      logoBadge: '🔹 ABB',
+      keywords: ['abb', 'iba', 'beynelxalq', 'beynəlxalq', 'tamkart'],
+      prefixes: ['402094', '523988', '402033', '5322', '4020', '5239'],
+      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #0072ce 0%, #004da8 60%, #002654 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(0, 114, 206, 0.35)'
+    },
+    {
+      bank: 'PASHA BANK',
+      logoBadge: '👑 PASHA BANK',
+      keywords: ['pasha', 'paşa', 'pasha bank'],
+      prefixes: ['402643', '510122', '4026', '5101'],
+      bg: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%), linear-gradient(135deg, #37332c 0%, #1e1a14 60%, #0d0c09 100%)',
+      color: '#e0bd68',
+      shadow: '0 14px 35px rgba(224, 189, 104, 0.25)'
+    },
+    {
+      bank: 'UNIBANK',
+      logoBadge: '🍊 UNIBANK',
+      keywords: ['unibank', 'ucard'],
+      prefixes: ['412012', '520048', '4120', '5200'],
+      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #ff6600 0%, #d44d00 60%, #7a2b00 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(255, 102, 0, 0.35)'
+    },
+    {
+      bank: 'YELO BANK',
+      logoBadge: '💛 YELO BANK',
+      keywords: ['yelo', 'yelo bank'],
+      prefixes: ['425390', '4253', '5390'],
+      bg: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, #facc15 0%, #eab308 40%, #0f172a 100%)',
+      color: '#0f172a',
+      shadow: '0 14px 35px rgba(250, 204, 21, 0.3)'
+    },
+    {
+      bank: 'RABİTABANK',
+      logoBadge: '🌐 RABİTABANK',
+      keywords: ['rabita', 'rabitabank', 'kartmane'],
+      prefixes: ['409870', '4038', '5338'],
+      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #0d9488 0%, #0f766e 60%, #115e59 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(13, 148, 136, 0.35)'
+    },
+    {
+      bank: 'ACCESSBANK',
+      logoBadge: '💎 ACCESSBANK',
+      keywords: ['access', 'accessbank'],
+      prefixes: ['4177', '5298'],
+      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(79, 70, 229, 0.35)'
+    },
+    {
+      bank: 'EXPRESSBANK',
+      logoBadge: '⚡ EXPRESSBANK',
+      keywords: ['express', 'expressbank'],
+      prefixes: ['412077'],
+      bg: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(220, 38, 38, 0.35)'
+    }
+  ];
+
+  function detectAzBank(pan, cardName) {
+    const cleanPan = String(pan || '').replace(/\s/g, '');
+    const lowerName = (cardName || '').toLowerCase().trim();
+
+    // 1. Check card number BIN prefix (first 6 or 4 digits)
+    if (cleanPan.length >= 4) {
+      for (const b of AZERBAIJAN_BANK_BINS) {
+        for (const p of b.prefixes) {
+          if (cleanPan.startsWith(p)) {
+            return b;
+          }
+        }
+      }
+    }
+
+    // 2. Check card name keywords
+    if (lowerName) {
+      for (const b of AZERBAIJAN_BANK_BINS) {
+        for (const k of b.keywords) {
+          if (lowerName.includes(k)) {
+            return b;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  function getCardStyleByName(cardName, cardType, pan) {
+    const bank = detectAzBank(pan, cardName);
+    if (bank) {
+      return { bg: bank.bg, color: bank.color, shadow: bank.shadow, bankName: bank.logoBadge };
+    }
+
     const type = (cardType || '').toLowerCase();
-    
     let bg = 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 60%, rgba(255,255,255,0.0) 100%), linear-gradient(210deg, #1e1948 0%, #110e25 100%)';
     let color = '#ffffff';
     let shadow = '0 12px 30px rgba(0,0,0,0.5)';
-    
-    if (name.includes('kapital')) {
-      bg = 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #FF3344 0%, #850010 100%)';
-      shadow = '0 12px 32px rgba(255, 51, 68, 0.2)';
-    } else if (name.includes('abb') || name.includes('beynəlxalq') || name.includes('beynelxalq') || name.includes('iba')) {
-      bg = 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%), linear-gradient(135deg, #0072ff 0%, #002244 100%)';
-      shadow = '0 12px 32px rgba(0, 114, 255, 0.2)';
-    } else if (name.includes('pasha') || name.includes('paşa')) {
-      bg = 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%), linear-gradient(135deg, #37332c 0%, #11100e 100%)';
-      shadow = '0 12px 32px rgba(0,0,0,0.6)';
-      color = '#e0bd68';
-    } else if (name.includes('leo')) {
-      bg = 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%), linear-gradient(135deg, #18191c 0%, #060708 100%)';
-      color = '#1fe0c2';
-      shadow = '0 12px 32px rgba(31,224,194,0.12)';
-    } else if (type === 'visa') {
+
+    if (type === 'visa') {
       bg = 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, #1A1F71 0%, #0056B2 60%, #1434CB 100%)';
       shadow = '0 14px 35px rgba(0, 102, 178, 0.35)';
-      color = '#ffffff';
     } else if (type === 'mastercard') {
       bg = 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%), linear-gradient(135deg, #1f1416 0%, #850b1b 50%, #eb001b 100%)';
       shadow = '0 14px 35px rgba(235, 0, 27, 0.35)';
-      color = '#ffffff';
     }
-    
-    return { bg, color, shadow };
+
+    return { bg, color, shadow, bankName: (cardName || 'BANK KARTI').toUpperCase() };
   }
 
   function cardRowHTML(c) {
@@ -4778,13 +4878,39 @@
     });
   }
 
-  // Card Brand Detection UI
+  // Card Brand & Azerbaijan Bank BIN Detection UI
   function detectCardBrandUI(pan) {
     const badge = document.getElementById('card-brand-badge');
     const errorEl = document.getElementById('card-pan-error');
     const cleaned = String(pan).replace(/\s/g, '');
     const logoEl = document.getElementById('preview-brand-logo');
+    const bankNameEl = document.getElementById('preview-bank-name');
+    const cardNameInp = document.getElementById('card-name');
+    const cardFront = document.querySelector('#live-preview-card .preview-card-front');
     
+    // 1. Detect Azerbaijan Bank from BIN
+    const azBank = detectAzBank(cleaned, cardNameInp ? cardNameInp.value : '');
+    if (azBank) {
+      if (bankNameEl) bankNameEl.textContent = azBank.logoBadge;
+      if (cardFront) {
+        cardFront.style.background = azBank.bg;
+        cardFront.style.color = azBank.color;
+        cardFront.style.boxShadow = azBank.shadow;
+      }
+      if (cardNameInp && (!cardNameInp.value || cardNameInp.value === 'Kartım' || cardNameInp.value === 'Bank Kartı')) {
+        cardNameInp.value = azBank.bank;
+      }
+    } else {
+      const userCardName = cardNameInp ? cardNameInp.value : '';
+      if (bankNameEl) bankNameEl.textContent = userCardName.toUpperCase() || 'BANK ADI';
+      const fallbackStyle = getCardStyleByName(userCardName, detectCardBrandFromPan(cleaned), cleaned);
+      if (cardFront) {
+        cardFront.style.background = fallbackStyle.bg;
+        cardFront.style.color = fallbackStyle.color;
+        cardFront.style.boxShadow = fallbackStyle.shadow;
+      }
+    }
+
     if (cleaned.length < 2) {
       badge.style.display = 'none';
       errorEl.style.display = 'none';
@@ -4792,6 +4918,7 @@
       return;
     }
     
+    // 2. Detect Visa vs Mastercard
     let brand = null;
     if (cleaned.startsWith('4')) {
       brand = 'Visa';
