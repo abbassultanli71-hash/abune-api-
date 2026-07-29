@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=34000.0.0">
+<link rel="manifest" href="/manifest.json?v=35000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=34000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=34000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=34000.0.0">
+<link rel="icon" href="/icon-192.png?v=35000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=35000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=35000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=34000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=35000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -4630,6 +4630,7 @@
   }
 
   // ---- Azerbaijan Bank Card BIN & Theme Engine ----
+  // ---- Azerbaijan Bank Card BIN & Theme Engine ----
   const AZERBAIJAN_BANK_BINS = [
     {
       bank: 'Kapital Bank',
@@ -4642,19 +4643,9 @@
       shadow: '0 14px 35px rgba(141,24,52,0.4)'
     },
     {
-      bank: 'Leobank',
-      logoBadge: 'Leobank',
-      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:16px;color:#b1f000;letter-spacing:0.5px;">Leobank</div>`,
-      keywords: ['leo', 'leobank'],
-      prefixes: ['40985844', '409858', '409830', '409871', '530090', '4098', '5300', '5169'],
-      bg: 'linear-gradient(135deg, #1f2125 0%, #111215 60%, #08090a 100%)',
-      color: '#b1f000',
-      shadow: '0 14px 35px rgba(177,240,0,0.25)'
-    },
-    {
       bank: 'ABB',
       logoBadge: 'ABB',
-      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:16px;color:#fff;letter-spacing:1px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#005bb5"><rect width="24" height="24" rx="5" fill="#fff"/><text x="12" y="16" font-size="11" text-anchor="middle" fill="#005bb5" font-weight="bold">ABB</text></svg> ABB</div>`,
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:16px;color:#fff;letter-spacing:1px;"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#005bb5"/><path d="M7 16l5-7h8l5 7-5 7h-8l-5-7z" fill="#fff"/><circle cx="16" cy="16" r="3" fill="#005bb5"/></svg> ABB</div>`,
       keywords: ['abb', 'iba', 'beynelxalq', 'beynəlxalq', 'tamkart'],
       prefixes: ['40209422', '402094', '523988', '402033', '5322', '4020', '5239'],
       bg: 'linear-gradient(135deg, #005bb5 0%, #004488 60%, #002b55 100%)',
@@ -4662,9 +4653,29 @@
       shadow: '0 14px 35px rgba(0,91,181,0.35)'
     },
     {
+      bank: 'Rabitabank',
+      logoBadge: 'Rabitabank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;letter-spacing:0.5px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="2.5"/><path d="M12 6v12M6 12h12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg> Rabitabank</div>`,
+      keywords: ['rabita', 'rabitabank', 'kartmane'],
+      prefixes: ['40987011', '409870', '4038', '5338'],
+      bg: 'linear-gradient(135deg, #0d9488 0%, #0f766e 60%, #115e59 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(13,148,136,0.35)'
+    },
+    {
+      bank: 'Leobank',
+      logoBadge: 'Leobank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:16px;color:#b1f000;letter-spacing:0.5px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#b1f000" stroke-width="2.5"/><path d="M8 12h8" stroke="#b1f000" stroke-width="2.5" stroke-linecap="round"/></svg> Leobank</div>`,
+      keywords: ['leo', 'leobank'],
+      prefixes: ['40985844', '409858', '409830', '409871', '530090', '4098', '5300', '5169'],
+      bg: 'linear-gradient(135deg, #1f2125 0%, #111215 60%, #08090a 100%)',
+      color: '#b1f000',
+      shadow: '0 14px 35px rgba(177,240,0,0.25)'
+    },
+    {
       bank: 'PASHA Bank',
       logoBadge: 'PASHA Bank',
-      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:800;font-size:14px;color:#e0bd68;letter-spacing:0.5px;">PASHA Bank</div>`,
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:800;font-size:14px;color:#e0bd68;letter-spacing:0.5px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#e0bd68"><path d="M12 2l3 6 6 1-4.5 4.5 1 6.5-5.5-3-5.5 3 1-6.5L3 9l6-1z"/></svg> PASHA Bank</div>`,
       keywords: ['pasha', 'paşa', 'pasha bank'],
       prefixes: ['40264311', '402643', '510122', '4026', '5101'],
       bg: 'linear-gradient(135deg, #2e2a24 0%, #1a1713 60%, #0b0a08 100%)',
@@ -4674,7 +4685,7 @@
     {
       bank: 'Unibank',
       logoBadge: 'Unibank',
-      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;letter-spacing:0.5px;">Unibank</div>`,
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;letter-spacing:0.5px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 4v8a6 6 0 0012 0V4" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg> Unibank</div>`,
       keywords: ['unibank', 'ucard'],
       prefixes: ['41201211', '412012', '520048', '4120', '5200'],
       bg: 'linear-gradient(135deg, #ff6600 0%, #d45500 60%, #803300 100%)',
@@ -4684,7 +4695,7 @@
     {
       bank: 'Yelo Bank',
       logoBadge: 'Yelo Bank',
-      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#0f172a;letter-spacing:0.5px;">Yelo Bank</div>`,
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#0f172a;letter-spacing:0.5px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#0f172a"><circle cx="12" cy="12" r="9"/></svg> Yelo Bank</div>`,
       keywords: ['yelo', 'yelo bank'],
       prefixes: ['42539011', '425390', '4253', '5390'],
       bg: 'linear-gradient(135deg, #facc15 0%, #eab308 50%, #0f172a 100%)',
@@ -4692,14 +4703,54 @@
       shadow: '0 14px 35px rgba(250,204,21,0.3)'
     },
     {
-      bank: 'Rabitabank',
-      logoBadge: 'Rabitabank',
-      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;letter-spacing:0.5px;">Rabitabank</div>`,
-      keywords: ['rabita', 'rabitabank', 'kartmane'],
-      prefixes: ['40987011', '409870', '4038', '5338'],
-      bg: 'linear-gradient(135deg, #0d9488 0%, #0f766e 60%, #115e59 100%)',
+      bank: 'AccessBank',
+      logoBadge: 'AccessBank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 2L2 22h20L12 2zm0 5l6.5 13h-13L12 7z"/></svg> AccessBank</div>`,
+      keywords: ['access', 'accessbank'],
+      prefixes: ['41772211', '417722', '4177', '5298'],
+      bg: 'linear-gradient(135deg, #4f46e5 0%, #3730a3 60%, #1e1b4b 100%)',
       color: '#ffffff',
-      shadow: '0 14px 35px rgba(13,148,136,0.35)'
+      shadow: '0 14px 35px rgba(79,70,229,0.35)'
+    },
+    {
+      bank: 'Expressbank',
+      logoBadge: 'Expressbank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M13 2L3 14h7v8l10-12h-7V2z"/></svg> Expressbank</div>`,
+      keywords: ['express', 'expressbank'],
+      prefixes: ['41207711', '412077'],
+      bg: 'linear-gradient(135deg, #dc2626 0%, #991b1b 60%, #450a0a 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(220,38,38,0.35)'
+    },
+    {
+      bank: 'Bank Respublika',
+      logoBadge: 'Bank Respublika',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:14px;color:#fff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M3 3h18v4H3V3zm0 7h18v4H3v-4zm0 7h18v4H3v-4z"/></svg> Bank Respublika</div>`,
+      keywords: ['respublika', 'bank respublika'],
+      prefixes: ['40208811', '402088', '5288'],
+      bg: 'linear-gradient(135deg, #1e3a8a 0%, #1e293b 60%, #0f172a 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(30,58,138,0.35)'
+    },
+    {
+      bank: 'Xalq Bank',
+      logoBadge: 'Xalq Bank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M7 12h10" stroke="#fff" stroke-width="2.5"/></svg> Xalq Bank</div>`,
+      keywords: ['xalq', 'xalq bank'],
+      prefixes: ['40265511', '402655'],
+      bg: 'linear-gradient(135deg, #0284c7 0%, #0369a1 60%, #0c4a6e 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(2,132,199,0.35)'
+    },
+    {
+      bank: 'TuranBank',
+      logoBadge: 'TuranBank',
+      logoHTML: `<div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:900;font-size:15px;color:#fff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l10 18H2L12 2z"/></svg> TuranBank</div>`,
+      keywords: ['turan', 'turanbank'],
+      prefixes: ['40206611', '402066'],
+      bg: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 60%, #1e40af 100%)',
+      color: '#ffffff',
+      shadow: '0 14px 35px rgba(37,99,235,0.35)'
     }
   ];
 
