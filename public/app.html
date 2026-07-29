@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=38000.0.0">
+<link rel="manifest" href="/manifest.json?v=39000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=38000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=38000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=38000.0.0">
+<link rel="icon" href="/icon-192.png?v=39000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=39000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=39000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=38000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=39000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2184,44 +2184,44 @@
         <div class="preview-card-container">
           <div class="preview-card" id="live-preview-card">
             <!-- Front of the card -->
-            <div class="preview-card-front">
+            <div class="preview-card-front" style="padding: 20px 22px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; overflow: hidden; position: relative;">
               <div class="preview-card-glow"></div>
-              <!-- Futuristic background mesh -->
-              <svg class="card-bg-mesh" viewBox="0 0 290 170" fill="none" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.12; pointer-events: none; z-index: 1;">
+              <!-- Subtle background mesh -->
+              <svg class="card-bg-mesh" viewBox="0 0 290 170" fill="none" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.08; pointer-events: none; z-index: 1;">
                 <path d="M0 30h290M0 60h290M0 90h290M0 120h290M0 150h290M50 0v170M100 0v170M150 0v170M200 0v170M250 0v170" stroke="rgba(255,255,255,0.4)" stroke-width="0.5"/>
-                <circle cx="145" cy="85" r="50" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-                <circle cx="145" cy="85" r="80" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+                <circle cx="145" cy="85" r="60" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
               </svg>
-              <div class="preview-card-header">
-                <span class="preview-bank-name" id="preview-bank-name">KARTIM</span>
-                <div style="display:flex; align-items:center; gap:8px; z-index:2;">
-                  <span id="preview-bank-badge-pill" style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:10px; background:rgba(255,255,255,0.18); backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,0.25); color:#fff; display:none; letter-spacing:0.5px;"></span>
-                  <span class="preview-brand-logo" id="preview-brand-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></span>
+              
+              <!-- Header: Top-Left Official Bank Logo/Name, Top-Right Scan Icon -->
+              <div class="preview-card-header" style="display: flex; justify-content: space-between; align-items: center; z-index: 2;">
+                <div class="preview-bank-name" id="preview-bank-name">
+                  <div style="display:flex;align-items:center;gap:6px;opacity:0.8;font-weight:700;font-size:14px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> BANK KARTI</div>
+                </div>
+                <div class="preview-scan-btn" style="opacity:0.85; z-index:2; cursor:pointer; display:flex; align-items:center;" title="Skan et">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="9" width="10" height="6" rx="1"/></svg>
                 </div>
               </div>
-              <div class="preview-card-chip">
-                <svg viewBox="0 0 32 24" fill="none" style="width: 100%; height: 100%;">
-                  <rect width="32" height="24" rx="4" fill="url(#chip-grad)" />
-                  <path d="M0 8h32M0 16h32M10 0v24M22 0v24" stroke="rgba(0,0,0,0.2)" stroke-width="1" />
-                  <rect x="10" y="8" width="12" height="8" rx="2" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>
-                  <defs>
-                    <linearGradient id="chip-grad" x1="0" y1="0" x2="32" y2="24" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#ffe8a3"/>
-                      <stop offset="0.5" stop-color="#ffd066"/>
-                      <stop offset="1" stop-color="#d49a17"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
+
+              <!-- Middle: Label & Large Card Number -->
+              <div style="margin-top:14px; margin-bottom:10px; z-index:2;">
+                <div style="font-size:11px; font-weight:600; opacity:0.65; margin-bottom:4px; letter-spacing:0.3px;">Kart nömrəsi</div>
+                <div class="preview-card-number" id="preview-card-number" style="font-size:21px; font-weight:800; letter-spacing:1.8px; font-family:var(--font-mono); font-feature-settings:'tnum';">•••• •••• •••• ••••</div>
               </div>
-              <div class="preview-card-number" id="preview-card-number">•••• •••• •••• ••••</div>
-              <div class="preview-card-footer">
-                <div class="preview-card-holder">
-                  <div class="preview-label">KART SAHİBİ</div>
-                  <div class="preview-value" id="preview-card-name">ABBAS SULTANLI</div>
+
+              <!-- Footer: Bottom-Left Holder/Expiry, Bottom-Right Visa/Mastercard Logo -->
+              <div class="preview-card-footer" style="display: flex; justify-content: space-between; align-items: flex-end; z-index: 2;">
+                <div style="display:flex; gap:16px;">
+                  <div class="preview-card-holder">
+                    <div class="preview-label" style="font-size:9px; opacity:0.6; font-weight:700; text-transform:uppercase; margin-bottom:2px;">KART SAHİBİ</div>
+                    <div class="preview-value" id="preview-card-name" style="font-size:12px; font-weight:800; text-transform:uppercase;">ABBAS SULTANLI</div>
+                  </div>
+                  <div class="preview-card-expiry">
+                    <div class="preview-label" style="font-size:9px; opacity:0.6; font-weight:700; text-transform:uppercase; margin-bottom:2px;">SON TARİX</div>
+                    <div class="preview-value" id="preview-card-expiry" style="font-size:12px; font-weight:800;">AA/İİ</div>
+                  </div>
                 </div>
-                <div class="preview-card-expiry">
-                  <div class="preview-label">SON TARİX</div>
-                  <div class="preview-value" id="preview-card-expiry">AA/İİ</div>
+                <div class="preview-brand-logo" id="preview-brand-logo" style="display:flex; align-items:center; justify-content:flex-end;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                 </div>
               </div>
             </div>
