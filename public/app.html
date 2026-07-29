@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=29000.0.0">
+<link rel="manifest" href="/manifest.json?v=30000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=29000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=29000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=29000.0.0">
+<link rel="icon" href="/icon-192.png?v=30000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=30000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=30000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=29000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=30000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3815,91 +3815,125 @@
       return `<svg width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="#ff6600"><circle cx="12" cy="12" r="10"/><text x="12" y="16" font-size="9" text-anchor="middle" fill="#fff" font-weight="bold">UNI</text></svg>`;
     }
 
-    // ── Favicon fallback for unknown apps ──────────────────────────────────
-    const domainMap = {
-      'amazon': 'amazon.com', 'prime': 'amazon.com',
-      'google': 'google.com', 'google one': 'one.google.com',
-      'microsoft': 'microsoft.com', 'office': 'microsoft.com', 'office365': 'microsoft.com', 'm365': 'microsoft.com',
-      'adobe': 'adobe.com',
-      'github': 'github.com', 'copilot': 'github.com',
-      'figma': 'figma.com',
-      'notion': 'notion.so',
-      'canva': 'canva.com',
-      'dropbox': 'dropbox.com',
-      'zoom': 'zoom.us',
-      'slack': 'slack.com',
-      'linear': 'linear.app',
-      '1password': '1password.com',
-      'lastpass': 'lastpass.com',
-      'nordvpn': 'nordvpn.com',
-      'expressvpn': 'expressvpn.com',
-      'proton': 'proton.me',
-      'headspace': 'headspace.com',
-      'calm': 'calm.com',
-      'grammarly': 'grammarly.com',
-      'medium': 'medium.com',
-      'coursera': 'coursera.org',
-      'udemy': 'udemy.com',
-    };
-
-    let faviconDomain = null;
-    for (const [key, domain] of Object.entries(domainMap)) {
-      if (lower.includes(key)) { faviconDomain = domain; break; }
-    }
-
-    if (faviconDomain) {
-      return `<img src="https://www.google.com/s2/favicons?domain=${faviconDomain}&sz=32" width="24" height="24" style="border-radius:5px; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /><span style="display:none; width:24px; height:24px; border-radius:6px; background:rgba(249,115,22,0.4); color:#fb923c; font-size:10px; font-weight:800; align-items:center; justify-content:center;">${(name||'?')[0].toUpperCase()}</span>`;
-    }
-
-    // Generic: first letter avatar
-    const colors = ['#f97316','#8b5cf6','#06b6d4','#10b981','#f43f5e','#a855f7','#3b82f6','#ec4899'];
-    const colorIdx = (name || 'A').charCodeAt(0) % colors.length;
-    return `<span style="width:24px; height:24px; border-radius:6px; background:${colors[colorIdx]}; color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center;">${(name||'?')[0].toUpperCase()}</span>`;
+    // ── Universal Global App Logo Engine (Clearbit + Google S2 + DuckDuckGo + Custom SVGs) ───
+    return getUniversalLogoHTML(name, 24);
   }
 
-  // Global Helper: get favicon logo HTML from subscription name
-  function getCalendarLogoHTML(name, size = 22) {
-    const lowerName = (name || '').toLowerCase().trim();
-    const BD = {
-      'netflix':'netflix.com','neftlix':'netflix.com',
-      'spotify':'spotify.com',
-      'youtube premium':'youtube.com','youtube':'youtube.com','yt premium':'youtube.com',
-      'chatgpt':'openai.com','openai':'openai.com',
-      'claude':'anthropic.com','anthropic':'anthropic.com',
-      'apple music':'apple.com','apple tv':'apple.com','icloud':'apple.com','itunes':'apple.com','apple':'apple.com',
-      'google one':'one.google.com','google':'google.com','gmail':'google.com','drive':'google.com',
-      'linkedin':'linkedin.com','telegram':'telegram.org','tiktok':'tiktok.com',
-      'twitter':'twitter.com','discord':'discord.com','instagram':'instagram.com','facebook':'facebook.com',
-      'amazon prime':'amazon.com','prime video':'amazon.com','amazon':'amazon.com','prime':'amazon.com',
-      'microsoft 365':'microsoft.com','office 365':'office.com','microsoft':'microsoft.com','office':'office.com','onedrive':'microsoft.com',
-      'copilot':'microsoft.com','gemini':'google.com',
-      'figma':'figma.com','canva':'canva.com','notion':'notion.so',
-      'kapital bank':'kapitalbank.az','kapital':'kapitalbank.az','birbank':'birbank.az',
-      'pasha bank':'pashabank.az','pasha':'pashabank.az',
-      'abb':'abb-bank.az','unibank':'unibank.az','leobank':'leobank.az',
-      'azercell':'azercell.com','bakcell':'bakcell.com','nar mobile':'nar.az','nar':'nar.az',
-      'wolt':'wolt.com','bolt':'bolt.eu','uber':'uber.com','yandex':'yandex.com',
-      'ps plus':'playstation.com','playstation':'playstation.com',
-      'game pass':'xbox.com','xbox':'xbox.com',
-      'steam':'steampowered.com','twitch':'twitch.tv','roblox':'roblox.com','nintendo':'nintendo.com',
-      'adobe':'adobe.com','photoshop':'adobe.com',
-      'duolingo':'duolingo.com','grammarly':'grammarly.com',
-      'github':'github.com','dropbox':'dropbox.com',
-      'slack':'slack.com','zoom':'zoom.us','notion':'notion.so',
-      'nordvpn':'nordvpn.com','expressvpn':'expressvpn.com','proton':'proton.me',
-      'coursera':'coursera.org','udemy':'udemy.com',
-      'push 30':'push30.app','push30':'push30.app',
-      'midjourney':'midjourney.com','perplexity':'perplexity.ai',
-    };
+  const GLOBAL_APP_DOMAINS = {
+    // Streaming & Entertainment
+    'netflix': 'netflix.com', 'neftlix': 'netflix.com',
+    'spotify': 'spotify.com',
+    'youtube': 'youtube.com', 'youtube premium': 'youtube.com', 'yt premium': 'youtube.com',
+    'disney': 'disneyplus.com', 'disney+': 'disneyplus.com', 'disney plus': 'disneyplus.com',
+    'hbo': 'max.com', 'hbo max': 'max.com', 'max': 'max.com',
+    'hulu': 'hulu.com',
+    'paramount': 'paramountplus.com', 'paramount+': 'paramountplus.com',
+    'peacock': 'peacocktv.com',
+    'apple tv': 'tv.apple.com', 'apple music': 'music.apple.com', 'apple': 'apple.com', 'icloud': 'apple.com', 'itunes': 'apple.com',
+    'prime video': 'primevideo.com', 'amazon prime': 'amazon.com', 'amazon': 'amazon.com',
+    'crunchyroll': 'crunchyroll.com',
+    'mubi': 'mubi.com',
+    'twitch': 'twitch.tv',
+    'soundcloud': 'soundcloud.com',
+    'tidal': 'tidal.com',
+    'deezer': 'deezer.com',
+    'qobuz': 'qobuz.com',
+    'audible': 'audible.com',
+    'patreon': 'patreon.com',
+    'substack': 'substack.com',
+    'medium': 'medium.com',
 
-    let domain = BD[lowerName];
+    // AI & Dev Tools
+    'chatgpt': 'openai.com', 'openai': 'openai.com',
+    'claude': 'anthropic.com', 'anthropic': 'anthropic.com',
+    'midjourney': 'midjourney.com',
+    'perplexity': 'perplexity.ai',
+    'cursor': 'cursor.com',
+    'copilot': 'github.com', 'github': 'github.com',
+    'gitlab': 'gitlab.com',
+    'jetbrains': 'jetbrains.com', 'pycharm': 'jetbrains.com', 'webstorm': 'jetbrains.com',
+    'adobe': 'adobe.com', 'photoshop': 'adobe.com', 'illustrator': 'adobe.com',
+    'figma': 'figma.com',
+    'canva': 'canva.com',
+    'notion': 'notion.so',
+    'slack': 'slack.com',
+    'zoom': 'zoom.us',
+    'linear': 'linear.app',
+    'raycast': 'raycast.com',
+    'setapp': 'setapp.com',
+    'webflow': 'webflow.com',
+    'framer': 'framer.com',
+
+    // Fitness, Health & Education
+    '1fit': '1fit.app', '1 fit': '1fit.app', 'fit': '1fit.app', 'onefit': '1fit.app', 'fit.az': '1fit.app',
+    'push30': 'push30.az', 'push 30': 'push30.az', 'push': 'push30.az',
+    '180 fitness': '180.az', '180': '180.az',
+    'strava': 'strava.com',
+    'myfitnesspal': 'myfitnesspal.com',
+    'duolingo': 'duolingo.com',
+    'grammarly': 'grammarly.com',
+    'headspace': 'headspace.com',
+    'calm': 'calm.com',
+    'whoop': 'whoop.com',
+    'coursera': 'coursera.org',
+    'udemy': 'udemy.com',
+    'masterclass': 'masterclass.com',
+    'skillshare': 'skillshare.com',
+
+    // Security, VPN & Utilities
+    '1password': '1password.com',
+    'bitwarden': 'bitwarden.com',
+    'dashlane': 'dashlane.com',
+    'nordvpn': 'nordvpn.com',
+    'expressvpn': 'expressvpn.com',
+    'surfshark': 'surfshark.com',
+    'proton': 'proton.me', 'protonvpn': 'proton.me', 'protonmail': 'proton.me',
+    'mullvad': 'mullvad.net',
+    'dropbox': 'dropbox.com',
+    'google one': 'one.google.com', 'google': 'google.com',
+
+    // Azerbaijan Local & Utilities
+    'kapital': 'kapitalbank.az', 'kapital bank': 'kapitalbank.az', 'birbank': 'birbank.az',
+    'pasha': 'pashabank.az', 'pasha bank': 'pashabank.az',
+    'abb': 'abb-bank.az',
+    'unibank': 'unibank.az',
+    'leobank': 'leobank.az', 'leo': 'leobank.az',
+    'azercell': 'azercell.com',
+    'bakcell': 'bakcell.com',
+    'nar': 'nar.az', 'nar mobile': 'nar.az',
+    'citynet': 'citynet.az',
+    'katv': 'katv14.az', 'katv14': 'katv14.az',
+    'connect': 'connect.az',
+    'wolt': 'wolt.com',
+    'bolt': 'bolt.eu',
+    'yandex': 'yandex.com',
+    'cinemaplus': 'cinemaplus.az',
+    'parkcinema': 'parkcinema.az',
+    'resant': 'resant.az',
+
+    // Gaming
+    'playstation': 'playstation.com', 'ps plus': 'playstation.com', 'ps5': 'playstation.com',
+    'xbox': 'xbox.com', 'game pass': 'xbox.com',
+    'steam': 'steampowered.com',
+    'roblox': 'roblox.com',
+    'nintendo': 'nintendo.com'
+  };
+
+  function getUniversalLogoHTML(name, size = 24) {
+    const lower = (name || '').toLowerCase().trim();
+    let domain = GLOBAL_APP_DOMAINS[lower];
     if (!domain) {
-      for (const key in BD) {
-        if (lowerName.includes(key)) { domain = BD[key]; break; }
+      for (const [key, d] of Object.entries(GLOBAL_APP_DOMAINS)) {
+        if (lower.includes(key)) { domain = d; break; }
       }
     }
-    if (!domain && (lowerName.includes('.az') || lowerName.includes('.com') || lowerName.includes('.org') || lowerName.includes('.app') || lowerName.includes('.net'))) {
-      domain = lowerName;
+    if (!domain) {
+      if (lower.includes('.az') || lower.includes('.com') || lower.includes('.org') || lower.includes('.app') || lower.includes('.io') || lower.includes('.net') || lower.includes('.ai') || lower.includes('.me') || lower.includes('.eu')) {
+        domain = lower.replace(/[^a-z0-9.-]/g, '');
+      } else {
+        const cleanName = lower.replace(/[^a-z0-9]/g, '');
+        if (cleanName.length > 1) domain = cleanName + '.com';
+      }
     }
 
     const initial = (name || '?')[0].toUpperCase();
@@ -3908,14 +3942,20 @@
     const colors = ['#f97316','#8b5cf6','#06b6d4','#10b981','#f43f5e','#3b82f6','#ec4899','#a855f7'];
     const ci = ((name||'A').charCodeAt(0)) % colors.length;
 
-    if (lowerName.includes('1fit') || lowerName.includes('fit') || lowerName.includes('1 fit') || lowerName.includes('onefit')) {
-      return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 24 24" fill="#00E5FF" style="border-radius:3px;display:block;"><circle cx="12" cy="12" r="10"/><path d="M7 16V8l3-1v9H7zm5-4h5v2h-5v-2zm0-4h5v2h-5V8z" fill="#0b0f19"/></svg>';
+    if (domain) {
+      return `<img src="https://logo.clearbit.com/${domain}" style="width:${px};height:${px};border-radius:4px;object-fit:contain;display:block;" onerror="this.onerror=null; this.src='https://www.google.com/s2/favicons?domain=${domain}&sz=128'; this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='flex';};" /><span style="width:${px};height:${px};border-radius:4px;background:${colors[ci]};color:#fff;font-size:${fontPx};font-weight:900;display:none;align-items:center;justify-content:center;">${initial}</span>`;
     }
 
-    if (domain) {
-      return '<img src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=64" style="width:' + px + ';height:' + px + ';border-radius:3px;object-fit:contain;display:block;" onerror="this.onerror=null;this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" /><span style="width:' + px + ';height:' + px + ';border-radius:3px;background:' + colors[ci] + ';color:#fff;font-size:' + fontPx + ';font-weight:900;display:none;align-items:center;justify-content:center;">' + initial + '</span>';
+    return `<span style="width:${px};height:${px};border-radius:4px;background:${colors[ci]};color:#fff;font-size:${fontPx};font-weight:900;display:flex;align-items:center;justify-content:center;">${initial}</span>`;
+  }
+
+  function getCalendarLogoHTML(name, size = 22) {
+    const lower = (name || '').toLowerCase().trim();
+    if (lower.includes('1fit') || lower.includes('fit') || lower.includes('1 fit') || lower.includes('onefit')) {
+      const px = size + 'px';
+      return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 24 24" fill="#00E5FF" style="border-radius:3px;display:block;"><circle cx="12" cy="12" r="10"/><path d="M7 16V8l3-1v9H7zm5-4h5v2h-5v-2zm0-4h5v2h-5V8z" fill="#0b0f19"/></svg>';
     }
-    return '<span style="width:' + px + ';height:' + px + ';border-radius:3px;background:' + colors[ci] + ';color:#fff;font-size:' + fontPx + ';font-weight:900;display:flex;align-items:center;justify-content:center;">' + initial + '</span>';
+    return getUniversalLogoHTML(name, size);
   }
 
   function renderFinancialHeatmapGrid() {
