@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=64000.0.0">
+<link rel="manifest" href="/manifest.json?v=65000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=64000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=64000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=64000.0.0">
+<link rel="icon" href="/icon-192.png?v=65000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=65000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=65000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=64000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=65000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2393,7 +2393,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=64000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=65000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
@@ -2428,7 +2428,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=64000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=65000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
@@ -5015,6 +5015,26 @@
 
   
   // ---- User Payment Cards Engine ----
+  
+  function updateCardDropdowns() {
+    const newCardSel = document.getElementById('new-sub-card');
+    const manageCardSel = document.getElementById('manage-sub-card');
+    
+    const optionsHTML = cards && cards.length > 0
+      ? cards.map(c => {
+          const panClean = String(c.pan || '').replace(/\s/g, '');
+          const last4 = panClean.length >= 4 ? panClean.slice(-4) : '••••';
+          const bank = detectAzBank(panClean, c.ad || '');
+          const bankName = bank ? bank.bank : (c.ad || 'Kart');
+          return `<option value="${c.id}">${bankName} (•••• ${last4})</option>`;
+        }).join('')
+      : '<option value="">Ödəniş kartı yoxdur</option>';
+
+    if (newCardSel) newCardSel.innerHTML = optionsHTML;
+    if (manageCardSel) manageCardSel.innerHTML = optionsHTML;
+  }
+
+
   function renderCards() {
     const cardsList = document.getElementById('cards-list');
     if (!cardsList) return;
