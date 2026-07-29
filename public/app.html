@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=21000.0.0">
+<link rel="manifest" href="/manifest.json?v=22000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=21000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=21000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=21000.0.0">
+<link rel="icon" href="/icon-192.png?v=22000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=22000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=22000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=21000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=22000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1364,79 +1364,35 @@
     transform: scale(0.9);
   }
 
-  /* iOS-Style Toast Notifications */
+  /* Modern Floating Mobile Toast Notification (Bottom Screen) */
   .ios-toast-notification {
-    position: absolute;
-    top: -140px;
-    left: 5%;
+    position: fixed;
+    bottom: 86px;
+    left: 50%;
+    transform: translateX(-50%) translateY(30px);
     width: 90%;
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    max-width: 380px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 20px;
     padding: 12px 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    z-index: 10000;
-    transition: top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    color: #1c1c1e;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-  [data-theme="dark"] .ios-toast-notification {
-    background: rgba(28, 28, 30, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #f2f2f7;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(249, 115, 22, 0.15);
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: #fff;
+    font-family: var(--font-body);
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
   .ios-toast-notification.show {
-    top: 50px; /* Positions below the iPhone status bar mockup */
-  }
-  .ios-toast-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 4px;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    opacity: 0.8;
-  }
-  .ios-toast-app-icon {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    background: var(--purple-soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 6px;
-  }
-  .ios-toast-app-name {
-    margin-right: auto;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .ios-toast-time {
-    font-weight: 400;
-    opacity: 0.6;
-  }
-  .ios-toast-body {
-    font-size: 12px;
-    line-height: 1.35;
-  }
-  .ios-toast-title {
-    font-weight: 700;
-    margin-bottom: 1px;
-  }
-  .ios-toast-message {
-    font-weight: 400;
-    opacity: 0.95;
-  }
-  .ios-toast-drag-bar {
-    width: 30px;
-    height: 3.5px;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 2px;
-    margin: 6px auto -2px auto;
-  }
-  [data-theme="dark"] .ios-toast-drag-bar {
-    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
   }
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 </style>
@@ -2581,48 +2537,56 @@
     }
   }
 
-  // iOS-style In-App Toast Notification
-  function showInAppToast(title, body) {
-    const phoneContainer = document.querySelector('.phone');
-    if (!phoneContainer) return;
-    
-    // Create elements
+  // Modern Floating Mobile Toast Notification (Bottom Screen)
+  function showInAppToast(title, body, type = 'info') {
+    const existing = document.querySelector('.ios-toast-notification');
+    if (existing) existing.remove();
+
+    let iconSymbol = '🔔';
+    let iconBg = 'rgba(249, 115, 22, 0.2)';
+    let iconBorder = 'rgba(249, 115, 22, 0.4)';
+
+    if (title.includes('✅') || title.includes('🎉') || type === 'success') {
+      iconSymbol = '✓';
+      iconBg = 'rgba(34, 197, 94, 0.2)';
+      iconBorder = 'rgba(34, 197, 94, 0.4)';
+    } else if (title.includes('⚠️') || title.includes('Xəta') || type === 'error' || type === 'warning') {
+      iconSymbol = '⚠️';
+      iconBg = 'rgba(239, 68, 68, 0.2)';
+      iconBorder = 'rgba(239, 68, 68, 0.4)';
+    }
+
     const toast = document.createElement('div');
     toast.className = 'ios-toast-notification';
-    
     toast.innerHTML = `
-      <div class="ios-toast-header">
-        <div class="ios-toast-app-icon p-0.5 bg-slate-900 rounded-md border border-indigo-500/40">
-          <img src="/icon.svg" style="width:16px; height:16px; border-radius:4px;" alt="Abunəm Logo">
-        </div>
-        <span class="ios-toast-app-name font-bold tracking-wider text-slate-900 dark:text-white">ABUNƏM</span>
-        <span class="ios-toast-time">indi</span>
+      <div style="width:36px; height:36px; border-radius:12px; background:${iconBg}; border:1px solid ${iconBorder}; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
+        ${iconSymbol}
       </div>
-      <div class="ios-toast-body">
-        <div class="ios-toast-title">${title}</div>
-        <div class="ios-toast-message">${body}</div>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:13.5px; font-weight:700; color:#fff; line-height:1.2; margin-bottom:2px;">${title}</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.75); line-height:1.3; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${body}</div>
       </div>
-      <div class="ios-toast-drag-bar"></div>
+      <button style="background:none; border:none; color:rgba(255,255,255,0.5); font-size:16px; font-weight:700; cursor:pointer; padding:4px;" onclick="this.parentElement.classList.remove('show'); setTimeout(()=>this.parentElement.remove(), 350);">✕</button>
     `;
-    
-    phoneContainer.appendChild(toast);
-    
-    // Animate in
-    setTimeout(() => {
+
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
       toast.classList.add('show');
-    }, 50);
-    
-    // Dismiss after 4.5 seconds
+    });
+
     const dismissTimer = setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 400);
-    }, 4500);
-    
-    // Tap to dismiss immediately
-    toast.addEventListener('click', () => {
+      if (toast && toast.parentElement) {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 350);
+      }
+    }, 3500);
+
+    toast.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
       clearTimeout(dismissTimer);
       toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 400);
+      setTimeout(() => toast.remove(), 350);
     });
   }
 
@@ -2898,7 +2862,7 @@
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Şəkil ölçüsü maksimum 5MB ola bilər.');
+      showInAppToast('Fayl Çox Böyükdür ⚠️', 'Şəkil ölçüsü maksimum 5MB ola bilər.');
       return;
     }
 
@@ -3962,39 +3926,23 @@
         const cellKey = `cell_${rulerSelectedYear}_${rulerSelectedMonth}_${d}`;
         window._calendarSubsCache[cellKey] = dueSubs;
 
-        // Build logos layout: 1 sub (large centered), 2 subs (side-by-side), 3+ subs (symmetrical 2x2 folder grid)
-        let logosHtml = '';
+        // Build indicator badge: 1 sub (clean logo), 2+ subs (notification badge pill)
+        let indicatorHtml = '';
         if (dueSubs.length === 1) {
-          logosHtml = '<div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:5px;margin-top:3px;">'
+          indicatorHtml = '<div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:5px;margin-top:4px;">'
             + getCalendarLogoHTML(dueSubs[0].name, 22)
             + '</div>';
-        } else if (dueSubs.length === 2) {
-          logosHtml = '<div style="display:flex;gap:3px;margin-top:4px;align-items:center;justify-content:center;">'
-            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:4px;">' + getCalendarLogoHTML(dueSubs[0].name, 16) + '</div>'
-            + '<div style="width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:4px;">' + getCalendarLogoHTML(dueSubs[1].name, 16) + '</div>'
-            + '</div>';
-        } else if (dueSubs.length === 3) {
-          // 3 subs: Ultra-clean 2x2 mini-folder grid (12x12px each)
-          logosHtml = '<div style="display:grid;grid-template-columns:12px 12px;gap:2px;margin-top:4px;align-items:center;justify-content:center;">'
-            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[0].name, 12) + '</div>'
-            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[1].name, 12) + '</div>'
-            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;grid-column:span 2;justify-self:center;">' + getCalendarLogoHTML(dueSubs[2].name, 12) + '</div>'
-            + '</div>';
         } else {
-          // 4+ subs: 2x2 grid (3 logos + +N badge)
-          const extra = dueSubs.length - 3;
-          logosHtml = '<div style="display:grid;grid-template-columns:12px 12px;gap:2px;margin-top:4px;align-items:center;justify-content:center;">'
-            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[0].name, 12) + '</div>'
-            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[1].name, 12) + '</div>'
-            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">' + getCalendarLogoHTML(dueSubs[2].name, 12) + '</div>'
-            + '<div style="width:12px;height:12px;display:flex;align-items:center;justify-content:center;background:#f97316;color:#fff;border-radius:3px;font-size:7px;font-weight:900;line-height:1;">+' + extra + '</div>'
+          indicatorHtml = '<div style="margin-top:5px;padding:2px 6px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:20px;font-size:9.5px;font-weight:900;display:flex;align-items:center;gap:3px;box-shadow:0 3px 8px rgba(249,115,22,0.4);">'
+            + '<span style="width:4.5px;height:4.5px;background:#fff;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;"></span>'
+            + dueSubs.length + ' ödəniş'
             + '</div>';
         }
 
-        html += '<div onclick="handleCalendarCellClick(\'' + cellKey + '\', ' + d + ')" title="' + titleText + '" style="position:relative;aspect-ratio:1/1;border-radius:14px;background:' + bc.bg + ';' + borderStyle + 'display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;transition:all 0.2s;">'
-          + '<span style="position:absolute;top:2px;left:3px;font-size:9px;font-weight:800;color:rgba(255,255,255,0.9);font-family:monospace;">' + d + '</span>'
+        html += '<div onclick="handleCalendarCellClick(\'' + cellKey + '\', ' + d + ')" title="' + titleText + '" style="position:relative;aspect-ratio:1/1;border-radius:14px;background:' + bc.bg + ';' + borderStyle + 'display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;transition:transform 0.15s ease;" onmouseover="this.style.transform=\'scale(1.04)\'" onmouseout="this.style.transform=\'scale(1)\'">'
+          + '<span style="position:absolute;top:2px;left:4px;font-size:9.5px;font-weight:800;color:rgba(255,255,255,0.9);font-family:monospace;">' + d + '</span>'
           + todayBadge
-          + logosHtml
+          + indicatorHtml
           + '</div>';
       } else {
         const borderStyle = isToday ? 'border:2px solid #ef4444;box-shadow:0 0 10px rgba(239,68,68,0.5);' : 'border:1px solid rgba(255,255,255,0.07);';
@@ -4221,7 +4169,7 @@
     } else {
       btnEl.classList.remove('loading');
       btnEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Abunəliyi Ləğv Et`;
-      alert(res.data?.error?.message || 'Abunəlik silinə bilmədi. Yenidən cəhd edin.');
+      showInAppToast('Abunəlik Ləğv Edilmədi ⚠️', res.data?.error?.message || 'Abunəlik ləğv edilə bilmədi. Yenidən cəhd edin.');
     }
   }
 
@@ -4446,9 +4394,9 @@
         banner.style.display = 'block';
         banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } else if (errCode === 'ACCOUNT_NOT_FOUND') {
-        alert('Abunəlik hesabı tapılmadı! Email və şifrəni yoxlayın.');
+        showInAppToast('Hesab Tapılmadı ⚠️', 'Abunəlik hesabı tapılmadı! Email və şifrəni yoxlayın.');
       } else {
-        alert(errMsg);
+        showInAppToast('Xəta ⚠️', errMsg);
       }
     }
   }
@@ -4560,9 +4508,9 @@
         banner.style.display = 'block';
         banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } else if (errCode === 'ACCOUNT_NOT_FOUND') {
-        alert('Abunəlik hesabı tapılmadı! Email və şifrəni yoxlayın.');
+        showInAppToast('Hesab Tapılmadı ⚠️', 'Abunəlik hesabı tapılmadı! Email və şifrəni yoxlayın.');
       } else {
-        alert(errMsg);
+        showInAppToast('Xəta ⚠️', errMsg);
       }
     }
   }
@@ -4573,10 +4521,11 @@
     if (confirm('Bu abunəliyi silmək istədiyinizdən əminsiniz?')) {
       const res = await apiFetch('DELETE', `/api/abunelikler/${id}`);
       if (res.ok) {
+        showInAppToast('Abunəlik Silindi ✅', 'Abunəlik uğurla ləğv edildi.');
         closeManageSheet();
         loadAllData();
       } else {
-        alert(res.data?.error?.message || 'Silinmə zamanı xəta baş verdi.');
+        showInAppToast('Silinmə Xətası ⚠️', res.data?.error?.message || 'Silinmə zamanı xəta baş verdi.');
       }
     }
   }
@@ -4786,12 +4735,13 @@
     if (!confirm('Bu kartı silmək istəyirsiniz?')) return;
     const res = await apiFetch('DELETE', `/api/odenis-metodlari/${id}`);
     if (res.ok) {
+      showInAppToast('Kart Silindi ✅', 'Ödəniş metodu uğurla silindi.');
       await loadCards();
     } else if (res.status === 409) {
       // Payment method in use
-      alert('Bu kart aktiv abunəliklərdə istifadə olunur. Əvvəlcə abunəliyi başqa karta keçirin və ya silin.');
+      showInAppToast('Kart Silinə Bilməz ⚠️', 'Bu kart aktiv abunəliklərdə istifadə olunur. Əvvəlcə abunəliyi başqa karta keçirin və ya silin.');
     } else {
-      alert(res.data?.error?.message || 'Kart silinə bilmədi.');
+      showInAppToast('Kart Silinmədi ⚠️', res.data?.error?.message || 'Kart silinə bilmədi.');
     }
   }
 
