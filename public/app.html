@@ -4636,7 +4636,9 @@
   {
     "bank": "Kapital Bank",
     "logoBadge": "Kapital Bank",
-    "logoFile": "kapitalbank.svg",
+    "logoFile": "kapitalbank_white.svg",
+    "logoFileColor": "kapitalbank.svg",
+    "useWhitePill": false,
     "keywords": [
       "kapital",
       "birbank",
@@ -4662,6 +4664,7 @@
     "bank": "ABB",
     "logoBadge": "ABB",
     "logoFile": "abb.png",
+    "useWhitePill": true,
     "keywords": [
       "abb",
       "iba",
@@ -4695,6 +4698,7 @@
     "bank": "Leobank",
     "logoBadge": "Leobank",
     "logoFile": "leobank.jpg",
+    "useWhitePill": true,
     "keywords": [
       "leo",
       "leobank"
@@ -4719,6 +4723,7 @@
     "bank": "PASHA Bank",
     "logoBadge": "PASHA Bank",
     "logoFile": "pashabank.png",
+    "useWhitePill": true,
     "keywords": [
       "pasha",
       "paşa",
@@ -4747,6 +4752,7 @@
     "bank": "Unibank",
     "logoBadge": "Unibank",
     "logoFile": "unibank.png",
+    "useWhitePill": true,
     "keywords": [
       "unibank",
       "ucard",
@@ -4774,6 +4780,7 @@
     "bank": "Yelo Bank",
     "logoBadge": "Yelo Bank",
     "logoFile": "yelobank.png",
+    "useWhitePill": true,
     "keywords": [
       "yelo",
       "yelo bank",
@@ -4797,6 +4804,7 @@
     "bank": "Rabitabank",
     "logoBadge": "Rabitabank",
     "logoFile": "rabitabank.jpg",
+    "useWhitePill": true,
     "keywords": [
       "rabita",
       "rabitabank",
@@ -4818,7 +4826,9 @@
   {
     "bank": "Expressbank",
     "logoBadge": "Expressbank",
-    "logoFile": "expressbank.svg",
+    "logoFile": "expressbank_white.svg",
+    "logoFileColor": "expressbank.svg",
+    "useWhitePill": false,
     "keywords": [
       "express",
       "expressbank"
@@ -4838,6 +4848,7 @@
     "bank": "Bank of Baku",
     "logoBadge": "Bank of Baku",
     "logoFile": "bankofbaku.png",
+    "useWhitePill": true,
     "keywords": [
       "baku",
       "bank of baku",
@@ -4856,6 +4867,7 @@
     "bank": "AccessBank",
     "logoBadge": "AccessBank",
     "logoFile": "accessbank.png",
+    "useWhitePill": true,
     "keywords": [
       "access",
       "accessbank"
@@ -4878,6 +4890,7 @@
     "bank": "Bank Respublika",
     "logoBadge": "Bank Respublika",
     "logoFile": "respublika.png",
+    "useWhitePill": true,
     "keywords": [
       "respublika",
       "neokart",
@@ -4899,6 +4912,7 @@
     "bank": "Xalq Bank",
     "logoBadge": "Xalq Bank",
     "logoFile": "xalqbank.png",
+    "useWhitePill": true,
     "keywords": [
       "xalq",
       "xalq bank"
@@ -4918,6 +4932,7 @@
     "bank": "TuranBank",
     "logoBadge": "TuranBank",
     "logoFile": "turanbank.png",
+    "useWhitePill": true,
     "keywords": [
       "turan",
       "turanbank"
@@ -4935,6 +4950,7 @@
     "bank": "Premium Bank",
     "logoBadge": "Premium Bank",
     "logoFile": "premiumbank.png",
+    "useWhitePill": true,
     "keywords": [
       "premium",
       "premium bank",
@@ -4954,6 +4970,7 @@
     "bank": "Ziraat Bank",
     "logoBadge": "Ziraat Bank",
     "logoFile": "ziraatbank.png",
+    "useWhitePill": true,
     "keywords": [
       "ziraat",
       "ziraat bank"
@@ -4970,6 +4987,7 @@
     "bank": "Bank Avrasiya",
     "logoBadge": "Bank Avrasiya",
     "logoFile": "bankavrasiya.png",
+    "useWhitePill": true,
     "keywords": [
       "avrasiya",
       "bank avrasiya"
@@ -4985,6 +5003,7 @@
     "bank": "AFB Bank",
     "logoBadge": "AFB Bank",
     "logoFile": "afbbank.png",
+    "useWhitePill": true,
     "keywords": [
       "afb",
       "afb bank"
@@ -5004,11 +5023,22 @@
   function renderBankLogo(bank) {
     if (!bank) return '';
     const imgPath = '/images/bank-logos/' + bank.logoFile;
-    return '<div style="display:inline-flex;align-items:center;height:24px;">' +
-      '<img src="' + imgPath + '" alt="' + bank.bank + '" ' +
-      'style="height:22px;max-width:130px;width:auto;object-fit:contain;display:block;" ' +
-      'onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'font-weight:900;font-size:13px;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;\\\'>' + bank.bank + '</span>\';">' +
-      '</div>';
+
+    if (bank.useWhitePill) {
+      // High-contrast crisp white rounded container pill for PNG/JPG bank logos
+      return '<div style="display:inline-flex;align-items:center;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);max-height:28px;">' +
+        '<img src="' + imgPath + '" alt="' + bank.bank + '" ' +
+        'style="height:20px;max-width:120px;width:auto;object-fit:contain;display:block;" ' +
+        'onerror="this.parentNode.style.background=\'none\'; this.parentNode.style.padding=\'0\'; this.parentNode.style.boxShadow=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'font-weight:900;font-size:14px;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);\\\'>' + bank.bank + '</span>\';">' +
+        '</div>';
+    } else {
+      // Pure white vector SVG directly on card header
+      return '<div style="display:inline-flex;align-items:center;max-height:26px;">' +
+        '<img src="' + imgPath + '" alt="' + bank.bank + '" ' +
+        'style="height:22px;max-width:140px;width:auto;object-fit:contain;display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.6));" ' +
+        'onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'font-weight:900;font-size:14px;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,0.8);\\\'>' + bank.bank + '</span>\';">' +
+        '</div>';
+    }
   }
 
   function detectAzBank(pan, cardName) {
