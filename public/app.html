@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=63000.0.0">
+<link rel="manifest" href="/manifest.json?v=64000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=63000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=63000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=63000.0.0">
+<link rel="icon" href="/icon-192.png?v=64000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=64000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=64000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=63000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=64000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2393,7 +2393,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=63000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=64000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
@@ -2428,7 +2428,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=63000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=64000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
@@ -3120,6 +3120,7 @@
     if (cardsRes.ok && cardsRes.data && cardsRes.data.data && cardsRes.data.data.cards) {
       cards = cardsRes.data.data.cards;
     } else { cards = []; }
+    renderCards();
 
     // 6. Payment history (already fetched in parallel — instant!)
     if (histRes.ok && histRes.data && histRes.data.data) {
@@ -5011,6 +5012,111 @@
         '</div>';
     }
   }
+
+  
+  // ---- User Payment Cards Engine ----
+  function renderCards() {
+    const cardsList = document.getElementById('cards-list');
+    if (!cardsList) return;
+
+    if (!cards || cards.length === 0) {
+      cardsList.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.12);border-radius:24px;margin-top:12px;">
+          <div style="width:56px;height:56px;border-radius:18px;background:rgba(249,115,22,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="3"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+          </div>
+          <h3 style="font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px;">Ödəniş kartı yoxdur</h3>
+          <p style="font-size:13px;color:var(--ink-muted);max-width:260px;margin-bottom:20px;line-height:1.4;">Abunəliklərinizi izləmək üçün yeni ödəniş kartı əlavə edin.</p>
+          <button onclick="openCardSheet()" style="padding:12px 24px;border-radius:14px;background:linear-gradient(135deg,#f97316 0%,#ea580c 100%);color:#fff;font-family:var(--font-display);font-weight:700;font-size:14px;box-shadow:0 8px 20px rgba(249,115,22,0.3);border:none;cursor:pointer;">+ Kart Əlavə Et</button>
+        </div>
+      `;
+      return;
+    }
+
+    cardsList.innerHTML = cards.map(c => {
+      const panClean = String(c.pan || '').replace(/\s/g, '');
+      const bank = detectAzBank(panClean, c.ad || '');
+
+      const bg = bank ? bank.bg : 'linear-gradient(135deg, #1e1948 0%, #110e25 100%)';
+      const shadow = bank ? bank.shadow : '0 14px 35px rgba(0,0,0,0.65)';
+      const color = bank ? bank.color : '#ffffff';
+      const logoHTML = bank ? renderBankLogo(bank) : `<span style="font-family:var(--font-display);font-weight:800;font-size:13px;color:#fff;">${(c.ad || 'KART').toUpperCase()}</span>`;
+
+      const last4 = panClean.length >= 4 ? panClean.slice(-4) : '••••';
+      const formattedPan = `•••• •••• •••• ${last4}`;
+
+      const isMastercard = /^5[1-5]/.test(panClean) || (c.brend && c.brend.toLowerCase().includes('master'));
+      const brandLogo = isMastercard 
+        ? `<svg width="34" height="20" viewBox="0 0 34 20" fill="none"><circle cx="11" cy="10" r="9" fill="#EB001B"/><circle cx="23" cy="10" r="9" fill="#F79E1B" fill-opacity="0.92"/></svg>`
+        : `<span style="font-family:var(--font-display);font-weight:900;font-style:italic;font-size:16px;color:#fff;letter-spacing:1px;">VISA</span>`;
+
+      return `
+        <div class="wallet-card" style="background:${bg};box-shadow:${shadow};color:${color};position:relative;margin-bottom:16px;border-radius:20px;padding:20px;box-sizing:border-box;overflow:hidden;border:1px solid rgba(255,255,255,0.18);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+            <div>${logoHTML}</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button onclick="confirmDeleteCard('${c.id}')" style="background:rgba(255,255,255,0.15);border:none;width:28px;height:28px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px);" title="Kartı sil">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="font-family:var(--font-mono);font-size:17px;font-weight:700;letter-spacing:2px;margin-bottom:20px;text-shadow:0 1px 3px rgba(0,0,0,0.5);">
+            ${formattedPan}
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div>
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;opacity:0.6;letter-spacing:0.5px;margin-bottom:2px;">KART SAHİBİ</div>
+              <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">${c.ad || 'ABUNƏÇİ'}</div>
+            </div>
+            <div>
+              <div style="font-size:8px;font-weight:700;text-transform:uppercase;opacity:0.6;letter-spacing:0.5px;margin-bottom:2px;">SON TARİX</div>
+              <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;">${c.son_tarix || 'AA/İİ'}</div>
+            </div>
+            <div>
+              ${brandLogo}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function loadCards() {
+    if (!currentUser) return;
+    try {
+      const res = await apiFetch('GET', '/api/odenis-metodlari?username=' + currentUser.username);
+      if (res.ok && res.data && res.data.data && res.data.data.cards) {
+        cards = res.data.data.cards;
+      } else {
+        cards = [];
+      }
+    } catch (err) {
+      cards = [];
+    }
+    renderCards();
+  }
+
+  async function confirmDeleteCard(cardId) {
+    if (!confirm('Bu kartı silməyə əminsiniz?')) return;
+    try {
+      const res = await apiFetch('DELETE', '/api/odenis-metodlari/' + cardId);
+      if (res.ok) {
+        cards = cards.filter(c => c.id !== cardId);
+        renderCards();
+        showToast('Kart silindi.');
+      } else {
+        showToast('Kart silinə bilmədi.');
+      }
+    } catch (err) {
+      showToast('Xəta baş verdi.');
+    }
+  }
+
 
   function detectAzBank(pan, cardName) {
     const cleanPan = String(pan || '').replace(/\s/g, '');
