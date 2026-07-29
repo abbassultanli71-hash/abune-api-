@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=57000.0.0">
+<link rel="manifest" href="/manifest.json?v=58000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=57000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=57000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=57000.0.0">
+<link rel="icon" href="/icon-192.png?v=58000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=58000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=58000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=57000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=58000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -5023,7 +5023,7 @@
   const BANK_WORDMARKS = {
   "Leobank": "<div style=\"display:inline-flex;align-items:center;padding:4px 12px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><span style=\"font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-weight:700;font-size:16px;color:#000000;letter-spacing:-0.4px;\">Leobank</span></div>",
       "PASHA Bank": "<div style=\"display:inline-flex;align-items:center;gap:7px;padding:4px 10px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 100 100\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n  <rect x=\"15\" y=\"15\" width=\"30\" height=\"30\" fill=\"#008c58\"/>\n  <rect x=\"55\" y=\"15\" width=\"30\" height=\"30\" fill=\"#008c58\"/>\n  <rect x=\"55\" y=\"55\" width=\"30\" height=\"30\" fill=\"#008c58\"/>\n  <rect x=\"15\" y=\"55\" width=\"30\" height=\"30\" fill=\"#008c58\"/>\n  <polygon points=\"50,2 62,20 50,38 38,20\" fill=\"#db1d38\"/>\n  <polygon points=\"98,50 80,62 62,50 80,38\" fill=\"#db1d38\"/>\n  <polygon points=\"50,98 38,80 50,62 62,80\" fill=\"#db1d38\"/>\n  <polygon points=\"2,50 20,38 38,50 20,62\" fill=\"#db1d38\"/>\n  <path d=\"M50 36 L54 46 L64 50 L54 54 L50 64 L46 54 L36 50 L46 46 Z\" fill=\"#ffffff\"/>\n</svg><div style=\"font-family:'Inter',-apple-system,sans-serif;font-weight:900;font-size:15px;line-height:1;letter-spacing:-0.2px;\"><span style=\"color:#008c58;\">PASHA </span><span style=\"color:#db1d38;\">Bank</span></div></div>",
-    "Yelo Bank": "<div style=\"display:inline-flex;align-items:center;padding:4px 12px;background:#ffffff;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.35);height:28px;\"><img src=\"/images/bank-logos/yelobank.png\" alt=\"Yelo Bank\" style=\"height:20px;max-width:120px;width:auto;object-fit:contain;display:block;\"></div>"
+      "Yelo Bank": "<div style=\"display:inline-flex;align-items:center;padding:4px 12px;background:#facc15;border-radius:8px;box-shadow:0 3px 10px rgba(250,204,21,0.45);height:28px;box-sizing:border-box;\"><div style=\"font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-weight:900;font-size:17px;color:#000000;letter-spacing:-0.7px;line-height:1;display:flex;align-items:center;\"><span>ye</span><svg width=\"9\" height=\"18\" viewBox=\"0 0 10 20\" fill=\"none\" style=\"margin:0 1px 0 0.5px;display:inline-block;\"><path d=\"M 8 1.5 L 1.5 18.5 H 4.5 L 11 1.5 Z\" fill=\"#000000\"/></svg><span>obank</span></div></div>"
 };
 
   function renderBankLogo(bank) {
