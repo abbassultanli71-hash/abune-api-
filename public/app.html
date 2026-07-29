@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=36000.0.0">
+<link rel="manifest" href="/manifest.json?v=37000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=36000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=36000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=36000.0.0">
+<link rel="icon" href="/icon-192.png?v=37000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=37000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=37000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=36000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=37000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -4787,7 +4787,7 @@
   function getCardStyleByName(cardName, cardType, pan) {
     const bank = detectAzBank(pan, cardName);
     if (bank) {
-      return { bg: bank.bg, color: bank.color, shadow: bank.shadow, bankName: bank.logoBadge };
+      return { bg: bank.bg, color: bank.color, shadow: bank.shadow, bankName: bank.logoBadge, logoHTML: bank.logoHTML };
     }
 
     const type = (cardType || '').toLowerCase();
@@ -4803,7 +4803,9 @@
       shadow = '0 14px 35px rgba(235, 0, 27, 0.35)';
     }
 
-    return { bg, color, shadow, bankName: (cardName || 'BANK KARTI').toUpperCase() };
+    const defaultLogoHTML = `<div style="display:flex;align-items:center;gap:6px;opacity:0.8;font-weight:700;font-size:14px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> ${cardName ? cardName.toUpperCase() : 'BANK KARTI'}</div>`;
+
+    return { bg, color, shadow, bankName: (cardName || 'BANK KARTI').toUpperCase(), logoHTML: defaultLogoHTML };
   }
 
   function cardRowHTML(c) {
@@ -4815,7 +4817,7 @@
       ? '•••• •••• •••• ' + panRaw.slice(-4)
       : '•••• •••• •••• ••••';
     
-    const style = getCardStyleByName(name, cardType);
+    const style = getCardStyleByName(name, cardType, panRaw);
     const brandLogoHTML = cardType === 'visa'
       ? `<img src="/visa.svg?v=1.3" style="height: 24px; width: 44px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Visa">`
       : `<img src="/mastercard.svg?v=1.3" style="height: 24px; width: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Mastercard">`;
@@ -4828,7 +4830,7 @@
       <div class="wallet-card" style="background: ${style.bg}; color: ${style.color}; box-shadow: ${style.shadow};">
         <div class="wallet-card-glow"></div>
         <div class="wallet-card-header">
-          <span class="wallet-bank-name">${name.toUpperCase()}</span>
+          <span class="wallet-bank-name">${style.logoHTML}</span>
           <div class="wallet-brand-logo">${brandLogoHTML}</div>
         </div>
         <div class="wallet-card-chip">
@@ -4960,9 +4962,7 @@
     const azBank = detectAzBank(cleaned, userCardName);
     if (azBank) {
       if (bankBadgePill) bankBadgePill.style.display = 'none';
-      if (bankNameEl) {
-        bankNameEl.innerHTML = userCardName ? `<span style="font-weight:800; font-size:13px; text-transform:uppercase;">${userCardName}</span>` : azBank.logoHTML;
-      }
+      if (bankNameEl) bankNameEl.innerHTML = azBank.logoHTML;
       if (cardFront) {
         cardFront.style.background = azBank.bg;
         cardFront.style.color = azBank.color;
