@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=28000.0.0">
+<link rel="manifest" href="/manifest.json?v=29000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=28000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=28000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=28000.0.0">
+<link rel="icon" href="/icon-192.png?v=29000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=29000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=29000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=28000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=29000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3660,6 +3660,9 @@
   function getBrandColors(name) {
     const lower = (name || '').toLowerCase().trim();
 
+    if (lower.includes('1fit') || lower.includes('fit') || lower.includes('1 fit') || lower.includes('onefit')) {
+      return { bg: 'rgba(0, 229, 255, 0.25)', border: '#00e5ff', glow: 'rgba(0, 229, 255, 0.4)' };
+    }
     if (lower.includes('push') || lower.includes('push30') || lower.includes('push 30')) {
       return { bg: 'rgba(249, 115, 22, 0.25)', border: '#f97316', glow: 'rgba(249, 115, 22, 0.4)' };
     }
@@ -3781,6 +3784,9 @@
     if (lower.includes('bolt') || lower.includes('taxify')) {
       return `<svg width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="#34BB79"><path d="M14.5 2L6 13.5h5.5L9 22l10-12h-6z"/></svg>`;
     }
+    if (lower.includes('1fit') || lower.includes('fit') || lower.includes('1 fit') || lower.includes('onefit')) {
+      return `<svg width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="#00E5FF"><circle cx="12" cy="12" r="10"/><path d="M7 16V8l3-1v9H7zm5-4h5v2h-5v-2zm0-4h5v2h-5V8z" fill="#0b0f19"/></svg>`;
+    }
     if (lower.includes('push') || lower.includes('push30')) {
       return `<svg width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="#f97316"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>`;
     }
@@ -3901,6 +3907,10 @@
     const fontPx = Math.max(7, Math.floor(size * 0.45)) + 'px';
     const colors = ['#f97316','#8b5cf6','#06b6d4','#10b981','#f43f5e','#3b82f6','#ec4899','#a855f7'];
     const ci = ((name||'A').charCodeAt(0)) % colors.length;
+
+    if (lowerName.includes('1fit') || lowerName.includes('fit') || lowerName.includes('1 fit') || lowerName.includes('onefit')) {
+      return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 24 24" fill="#00E5FF" style="border-radius:3px;display:block;"><circle cx="12" cy="12" r="10"/><path d="M7 16V8l3-1v9H7zm5-4h5v2h-5v-2zm0-4h5v2h-5V8z" fill="#0b0f19"/></svg>';
+    }
 
     if (domain) {
       return '<img src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=64" style="width:' + px + ';height:' + px + ';border-radius:3px;object-fit:contain;display:block;" onerror="this.onerror=null;this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';" /><span style="width:' + px + ';height:' + px + ';border-radius:3px;background:' + colors[ci] + ';color:#fff;font-size:' + fontPx + ';font-weight:900;display:none;align-items:center;justify-content:center;">' + initial + '</span>';
