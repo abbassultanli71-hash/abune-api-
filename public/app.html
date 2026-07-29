@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=65000.0.0">
+<link rel="manifest" href="/manifest.json?v=66000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=65000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=65000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=65000.0.0">
+<link rel="icon" href="/icon-192.png?v=66000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=66000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=66000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=65000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=66000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2393,7 +2393,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=65000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=66000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
@@ -2428,7 +2428,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=65000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=66000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
@@ -5062,8 +5062,7 @@
 
       const bg = bank ? bank.bg : 'linear-gradient(135deg, #1e1948 0%, #110e25 100%)';
       const shadow = bank ? bank.shadow : '0 14px 35px rgba(0,0,0,0.65)';
-      const color = bank ? bank.color : '#ffffff';
-      const logoHTML = bank ? renderBankLogo(bank) : `<span style="font-family:var(--font-display);font-weight:800;font-size:13px;color:#fff;">${(c.ad || 'KART').toUpperCase()}</span>`;
+      const logoHTML = bank ? renderBankLogo(bank) : `<span style="font-family:var(--font-display);font-weight:800;font-size:13px;color:#ffffff;">${(c.ad || 'KART').toUpperCase()}</span>`;
 
       const last4 = panClean.length >= 4 ? panClean.slice(-4) : '••••';
       const formattedPan = `•••• •••• •••• ${last4}`;
@@ -5071,31 +5070,47 @@
       const isMastercard = /^5[1-5]/.test(panClean) || (c.brend && c.brend.toLowerCase().includes('master'));
       const brandLogo = isMastercard 
         ? `<svg width="34" height="20" viewBox="0 0 34 20" fill="none"><circle cx="11" cy="10" r="9" fill="#EB001B"/><circle cx="23" cy="10" r="9" fill="#F79E1B" fill-opacity="0.92"/></svg>`
-        : `<span style="font-family:var(--font-display);font-weight:900;font-style:italic;font-size:16px;color:#fff;letter-spacing:1px;">VISA</span>`;
+        : `<span style="font-family:var(--font-display);font-weight:900;font-style:italic;font-size:16px;color:#ffffff;letter-spacing:1px;">VISA</span>`;
 
       return `
-        <div class="wallet-card" style="background:${bg};box-shadow:${shadow};color:${color};position:relative;margin-bottom:16px;border-radius:20px;padding:20px;box-sizing:border-box;overflow:hidden;border:1px solid rgba(255,255,255,0.18);">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+        <div class="wallet-card" style="background:${bg};box-shadow:${shadow};color:#ffffff;">
+          <div class="wallet-card-glow"></div>
+          
+          <!-- Header -->
+          <div class="wallet-card-header">
             <div>${logoHTML}</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button onclick="confirmDeleteCard('${c.id}')" style="background:rgba(255,255,255,0.15);border:none;width:28px;height:28px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px);" title="Kartı sil">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              </button>
-            </div>
+            <button onclick="confirmDeleteCard('${c.id}')" style="background:rgba(255,255,255,0.12);border:none;width:28px;height:28px;border-radius:8px;color:#ffffff;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px);z-index:3;" title="Kartı sil">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
           </div>
 
-          <div style="font-family:var(--font-mono);font-size:17px;font-weight:700;letter-spacing:2px;margin-bottom:20px;text-shadow:0 1px 3px rgba(0,0,0,0.5);">
+          <!-- EMV Chip -->
+          <div style="z-index:2;margin-top:2px;">
+            <svg class="wallet-card-chip" viewBox="0 0 40 30" fill="none" style="width:34px;height:24px;">
+              <defs>
+                <linearGradient id="chip-g-${c.id}" x1="0" y1="0" x2="40" y2="30" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#f6d365"/><stop offset="1" stop-color="#fda085"/>
+                </linearGradient>
+              </defs>
+              <rect width="40" height="30" rx="5" fill="url(#chip-g-${c.id})"/>
+              <path d="M12 0v30M28 0v30M0 15h40M0 9h12M28 9h12M0 21h12M28 21h12" stroke="rgba(0,0,0,0.25)" stroke-width="1.2"/>
+            </svg>
+          </div>
+
+          <!-- Card Number -->
+          <div class="wallet-card-number" style="color:#ffffff;text-shadow:0 1px 3px rgba(0,0,0,0.5);">
             ${formattedPan}
           </div>
 
-          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <!-- Footer -->
+          <div class="wallet-card-footer">
             <div>
-              <div style="font-size:8px;font-weight:700;text-transform:uppercase;opacity:0.6;letter-spacing:0.5px;margin-bottom:2px;">KART SAHİBİ</div>
-              <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">${c.ad || 'ABUNƏÇİ'}</div>
+              <div class="wallet-label" style="color:#ffffff;opacity:0.65;">KART SAHİBİ</div>
+              <div class="wallet-value" style="color:#ffffff;">${c.ad || 'ABUNƏÇİ'}</div>
             </div>
             <div>
-              <div style="font-size:8px;font-weight:700;text-transform:uppercase;opacity:0.6;letter-spacing:0.5px;margin-bottom:2px;">SON TARİX</div>
-              <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;">${c.son_tarix || 'AA/İİ'}</div>
+              <div class="wallet-label" style="color:#ffffff;opacity:0.65;">SON TARİX</div>
+              <div class="wallet-value" style="color:#ffffff;">${c.son_tarix || 'AA/İİ'}</div>
             </div>
             <div>
               ${brandLogo}
