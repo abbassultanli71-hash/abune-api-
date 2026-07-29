@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=31000.0.0">
+<link rel="manifest" href="/manifest.json?v=32000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=31000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=31000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=31000.0.0">
+<link rel="icon" href="/icon-192.png?v=32000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=32000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=32000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=31000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=32000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2193,8 +2193,11 @@
                 <circle cx="145" cy="85" r="80" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
               </svg>
               <div class="preview-card-header">
-                <span class="preview-bank-name" id="preview-bank-name">BANK ADI</span>
-                <span class="preview-brand-logo" id="preview-brand-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></span>
+                <span class="preview-bank-name" id="preview-bank-name">KARTIM</span>
+                <div style="display:flex; align-items:center; gap:8px; z-index:2;">
+                  <span id="preview-bank-badge-pill" style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:10px; background:rgba(255,255,255,0.18); backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,0.25); color:#fff; display:none; letter-spacing:0.5px;"></span>
+                  <span class="preview-brand-logo" id="preview-brand-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; opacity:0.5; color:#fff;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></span>
+                </div>
               </div>
               <div class="preview-card-chip">
                 <svg viewBox="0 0 32 24" fill="none" style="width: 100%; height: 100%;">
@@ -4885,13 +4888,23 @@
     const cleaned = String(pan).replace(/\s/g, '');
     const logoEl = document.getElementById('preview-brand-logo');
     const bankNameEl = document.getElementById('preview-bank-name');
+    const bankBadgePill = document.getElementById('preview-bank-badge-pill');
     const cardNameInp = document.getElementById('card-name');
     const cardFront = document.querySelector('#live-preview-card .preview-card-front');
     
+    // User card nickname for top-left
+    const userCardName = cardNameInp ? cardNameInp.value : '';
+
     // 1. Detect Azerbaijan Bank from BIN
-    const azBank = detectAzBank(cleaned, cardNameInp ? cardNameInp.value : '');
+    const azBank = detectAzBank(cleaned, userCardName);
     if (azBank) {
-      if (bankNameEl) bankNameEl.textContent = azBank.logoBadge;
+      if (bankBadgePill) {
+        bankBadgePill.textContent = azBank.logoBadge;
+        bankBadgePill.style.display = 'inline-block';
+      }
+      if (bankNameEl) {
+        bankNameEl.textContent = userCardName ? userCardName.toUpperCase() : azBank.bank;
+      }
       if (cardFront) {
         cardFront.style.background = azBank.bg;
         cardFront.style.color = azBank.color;
@@ -4901,8 +4914,8 @@
         cardNameInp.value = azBank.bank;
       }
     } else {
-      const userCardName = cardNameInp ? cardNameInp.value : '';
-      if (bankNameEl) bankNameEl.textContent = userCardName.toUpperCase() || 'BANK ADI';
+      if (bankBadgePill) bankBadgePill.style.display = 'none';
+      if (bankNameEl) bankNameEl.textContent = userCardName ? userCardName.toUpperCase() : 'KARTIM';
       const fallbackStyle = getCardStyleByName(userCardName, detectCardBrandFromPan(cleaned), cleaned);
       if (cardFront) {
         cardFront.style.background = fallbackStyle.bg;
@@ -5774,34 +5787,18 @@ async function handleAddCard() {
 
     if (cardNameInp) {
       cardNameInp.addEventListener('input', (e) => {
-        const bankName = e.target.value;
-        document.getElementById('preview-bank-name').textContent = bankName.toUpperCase() || 'BANK ADI';
-        
+        const userCardName = e.target.value;
+        const bankNameEl = document.getElementById('preview-bank-name');
+        if (bankNameEl) bankNameEl.textContent = userCardName ? userCardName.toUpperCase() : 'KARTIM';
         const pan = cardPanInp ? cardPanInp.value : '';
-        const brand = detectCardBrandFromPan(pan);
-        const style = getCardStyleByName(bankName, brand);
-        const cardFront = document.querySelector('#live-preview-card .preview-card-front');
-        if (cardFront) {
-          cardFront.style.background = style.bg;
-          cardFront.style.color = style.color;
-          cardFront.style.boxShadow = style.shadow;
-        }
+        detectCardBrandUI(pan);
       });
     }
     if (cardPanInp) {
       cardPanInp.addEventListener('input', (e) => {
         const pan = e.target.value;
         document.getElementById('preview-card-number').textContent = pan || '•••• •••• •••• ••••';
-        
-        const brand = detectCardBrandFromPan(pan);
-        const bankName = cardNameInp ? cardNameInp.value : '';
-        const style = getCardStyleByName(bankName, brand);
-        const cardFront = document.querySelector('#live-preview-card .preview-card-front');
-        if (cardFront) {
-          cardFront.style.background = style.bg;
-          cardFront.style.color = style.color;
-          cardFront.style.boxShadow = style.shadow;
-        }
+        detectCardBrandUI(pan);
       });
     }
     if (cardExpiryInp) {
