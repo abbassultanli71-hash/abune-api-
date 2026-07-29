@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=22000.0.0">
+<link rel="manifest" href="/manifest.json?v=23000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=22000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=22000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=22000.0.0">
+<link rel="icon" href="/icon-192.png?v=23000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=23000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=23000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=22000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=23000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -3926,23 +3926,19 @@
         const cellKey = `cell_${rulerSelectedYear}_${rulerSelectedMonth}_${d}`;
         window._calendarSubsCache[cellKey] = dueSubs;
 
-        // Build indicator badge: 1 sub (clean logo), 2+ subs (notification badge pill)
-        let indicatorHtml = '';
-        if (dueSubs.length === 1) {
-          indicatorHtml = '<div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:5px;margin-top:4px;">'
-            + getCalendarLogoHTML(dueSubs[0].name, 22)
-            + '</div>';
-        } else {
-          indicatorHtml = '<div style="margin-top:5px;padding:2px 6px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:20px;font-size:9.5px;font-weight:900;display:flex;align-items:center;gap:3px;box-shadow:0 3px 8px rgba(249,115,22,0.4);">'
-            + '<span style="width:4.5px;height:4.5px;background:#fff;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;"></span>'
-            + dueSubs.length + ' ödəniş'
-            + '</div>';
-        }
+        // 1st sub logo in center, top-right +N badge if more than 1 sub
+        const centerLogoHtml = '<div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:5px;margin-top:3px;">'
+          + getCalendarLogoHTML(dueSubs[0].name, 22)
+          + '</div>';
+
+        const extraBadgeHtml = dueSubs.length > 1
+          ? '<span style="position:absolute;top:2px;right:3px;background:#f97316;color:#fff;font-size:9px;font-weight:900;padding:1px 4px;border-radius:5px;line-height:1.1;box-shadow:0 2px 5px rgba(0,0,0,0.4);z-index:2;">+' + (dueSubs.length - 1) + '</span>'
+          : todayBadge;
 
         html += '<div onclick="handleCalendarCellClick(\'' + cellKey + '\', ' + d + ')" title="' + titleText + '" style="position:relative;aspect-ratio:1/1;border-radius:14px;background:' + bc.bg + ';' + borderStyle + 'display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:2px;transition:transform 0.15s ease;" onmouseover="this.style.transform=\'scale(1.04)\'" onmouseout="this.style.transform=\'scale(1)\'">'
           + '<span style="position:absolute;top:2px;left:4px;font-size:9.5px;font-weight:800;color:rgba(255,255,255,0.9);font-family:monospace;">' + d + '</span>'
-          + todayBadge
-          + indicatorHtml
+          + extraBadgeHtml
+          + centerLogoHtml
           + '</div>';
       } else {
         const borderStyle = isToday ? 'border:2px solid #ef4444;box-shadow:0 0 10px rgba(239,68,68,0.5);' : 'border:1px solid rgba(255,255,255,0.07);';
