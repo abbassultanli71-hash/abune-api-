@@ -1,6 +1,6 @@
-// ─── Service Worker: Abunəm Instant Auto-Update Engine (v37000.0.0) ───
+// ─── Service Worker: Abunəm Instant Auto-Update Engine (v38000.0.0) ───
 
-const CACHE_VERSION = 'abune-v37000.0.0';
+const CACHE_VERSION = 'abune-v38000.0.0';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -16,10 +16,25 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event handler required by Chrome for WebAPK PWA installation
 self.addEventListener('fetch', (event) => {
-  // Pass through fetch requests cleanly
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+
+  // Cross-origin requests (e.g. logo.clearbit.com, google.com favicon CDN)
+  if (url.origin !== self.location.origin) {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return new Response('', { status: 404, statusText: 'CDN Fetch Error' });
+      })
+    );
+    return;
+  }
+
+  // Same-origin app resources:
   event.respondWith(
-    fetch(event.request).catch(function() {
-      return caches.match(event.request);
+    fetch(event.request).catch(async () => {
+      const cached = await caches.match(event.request);
+      if (cached) return cached;
+      return new Response('', { status: 404, statusText: 'Not Found' });
     })
   );
 });
