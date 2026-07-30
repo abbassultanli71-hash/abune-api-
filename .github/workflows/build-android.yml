@@ -32,7 +32,7 @@ jobs:
       run: npm install --legacy-peer-deps
 
     - name: Copy Capacitor Assets
-      run: npx cap copy android
+      run: ./node_modules/.bin/cap copy android
 
     - name: Ensure Executable Gradle Wrapper
       run: chmod +x android/gradlew
