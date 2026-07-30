@@ -1,5 +1,9 @@
 {
   "appId": "com.abunem.app",
-  "appName": "Abunem",
-  "webDir": "public"
+  "appName": "Abunəm",
+  "webDir": "public",
+  "server": {
+    "url": "https://abune-api-2.onrender.com/app",
+    "cleartext": true
+  }
 }
