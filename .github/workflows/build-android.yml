@@ -53,11 +53,13 @@ jobs:
     - name: Release Direct Downloadable APK
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.ref_name }}
-        name: "Abunəm Mobile Android Release (${{ github.ref_name }})"
-        body: "Rəsmi Abunəm Android APK faylı"
+        tag_name: v1.0.0
+        name: "Abunəm Mobile Android Release (Latest)"
+        body: "Rəsmi Yenilənmiş Abunəm Android APK faylı"
         draft: false
         prerelease: false
+        make_latest: true
+        overwrite: true
         files: android/app/build/outputs/apk/debug/abunem.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
