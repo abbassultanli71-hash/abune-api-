@@ -51,9 +51,9 @@ jobs:
     - name: Release Direct Downloadable APK
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: latest
-        name: "Abunəm Latest Android Release"
-        body: "Otomatik hazırlanan Abunəm Android APK faylı"
+        tag_name: v1.0.0
+        name: "Abunəm Mobile Android Release"
+        body: "Rəsmi Abunəm Android APK faylı"
         draft: false
         prerelease: false
         files: android/app/build/outputs/apk/debug/abunem.apk
