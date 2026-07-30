@@ -6,6 +6,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -38,8 +41,26 @@ jobs:
       working-directory: ./android
       run: ./gradlew assembleDebug --stacktrace
 
+    - name: Prepare Direct APK for Release
+      run: |
+        cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/abunem.apk
+        mkdir -p public
+        cp android/app/build/outputs/apk/debug/app-debug.apk public/abunem.apk
+
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: abune-android-apk
-        path: android/app/build/outputs/apk/debug/app-debug.apk
+        path: android/app/build/outputs/apk/debug/abunem.apk
+
+    - name: Release Direct Downloadable APK
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: "Abunəm Latest Android Release"
+        body: "Otomatik hazırlanan Abunəm Android APK faylı"
+        draft: false
+        prerelease: false
+        files: android/app/build/outputs/apk/debug/abunem.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
