@@ -54,7 +54,8 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: v1.0.0
-        name: "Abunəm Mobile Android Release (Latest)"
+        target_commitish: ${{ github.sha }}
+        name: "Abunəm Mobile Android Release"
         body: "Rəsmi Yenilənmiş Abunəm Android APK faylı"
         draft: false
         prerelease: false
