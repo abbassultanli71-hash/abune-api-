@@ -18,6 +18,8 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -40,27 +42,12 @@ jobs:
       working-directory: ./android
       run: ./gradlew assembleDebug --stacktrace
 
-    - name: Prepare Direct APK for Release
+    - name: Prepare and Auto-Commit Fresh APK to Repository
       run: |
-        cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/abunem.apk
-
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: abune-android-apk
-        path: android/app/build/outputs/apk/debug/abunem.apk
-
-    - name: Release Direct Downloadable APK
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: v1.0.0
-        target_commitish: ${{ github.sha }}
-        name: "Abunəm Mobile Android Release"
-        body: "Rəsmi Yenilənmiş Abunəm Android APK faylı"
-        draft: false
-        prerelease: false
-        make_latest: true
-        overwrite: true
-        files: android/app/build/outputs/apk/debug/abunem.apk
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        mkdir -p downloads
+        cp android/app/build/outputs/apk/debug/app-debug.apk downloads/abunem.apk
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add downloads/abunem.apk
+        git commit -m "build(apk): auto-commit fresh compiled APK to downloads/abunem.apk [skip ci]" || echo "No changes to commit"
+        git push origin main || echo "Push skipped"
