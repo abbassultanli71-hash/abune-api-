@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=84000.0.0">
-<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="/manifest.json?v=85000.0.0">
+<meta name="theme-color" content="#0b0f19">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=84000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=84000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=84000.0.0">
+<link rel="icon" href="/icon-192.png?v=85000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=85000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=85000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=84000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=85000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1194,11 +1194,13 @@
     z-index: 2;
   }
   .preview-label {
-    font-size: 7.5px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.75) !important;
-    letter-spacing: 0.6px;
+    font-size: 8.5px;
+    font-weight: 800;
+    color: #ffffff !important;
+    opacity: 0.95 !important;
+    letter-spacing: 0.8px;
     margin-bottom: 2px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
   }
   .preview-value {
     font-size: 10.5px;
@@ -1334,11 +1336,13 @@
     z-index: 2;
   }
   .wallet-label {
-    font-size: 7px;
-    font-weight: 600;
-    opacity: 0.6;
-    letter-spacing: 0.5px;
+    font-size: 8.5px;
+    font-weight: 800;
+    color: #ffffff !important;
+    opacity: 0.95 !important;
+    letter-spacing: 0.8px;
     margin-bottom: 2px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
   }
   .wallet-value {
     font-size: 11px;
@@ -2352,7 +2356,7 @@
 
               <!-- Middle: Label & Large Card Number (white-space: nowrap prevents line-break cut-off) -->
               <div style="margin-top:6px; margin-bottom:4px; z-index:2;">
-                <div style="font-size:9.5px; font-weight:600; opacity:0.6; margin-bottom:2px; letter-spacing:0.3px;">Kart nömrəsi</div>
+                <div style="font-size:8.5px; font-weight:800; color:#ffffff !important; opacity:0.95 !important; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; text-shadow:0 1px 3px rgba(0,0,0,0.75);">Kart nömrəsi</div>
                 <div class="preview-card-number" id="preview-card-number" style="font-size:16.5px; font-weight:800; letter-spacing:1.2px; font-family:var(--font-mono); font-feature-settings:'tnum'; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">•••• •••• •••• ••••</div>
               </div>
 
@@ -2545,7 +2549,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=84000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=85000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
@@ -2580,7 +2584,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=84000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=85000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
