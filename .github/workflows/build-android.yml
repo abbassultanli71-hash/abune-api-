@@ -23,17 +23,6 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: Install Dependencies
-      run: npm install --legacy-peer-deps
-
-    - name: Copy Capacitor Assets
-      run: npx cap copy android
-
     - name: Ensure Executable Gradle Wrapper
       run: chmod +x android/gradlew
 
