@@ -301,11 +301,8 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 // Public routes - no auth needed
-app.get('/', (req, res) => { res.redirect('/app'); });
-app.get('/app', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'app.html')); });
-app.get('/abunem.apk', (req, res) => {
-  res.redirect('https://github.com/abbassultanli71-hash/abune-api-/releases/download/v1.0.0/abunem.apk');
-});
+app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
+app.get('/app', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'admin.html')); });
 
 // Telegram webhook - registered WITHOUT /api prefix so authMiddleware NEVER touches it
