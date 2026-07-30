@@ -23,18 +23,6 @@ allprojects {
     }
 }
 
-subprojects {
-    configurations.all {
-        resolutionStrategy {
-            force "androidx.core:core:1.12.0"
-            force "androidx.core:core-ktx:1.12.0"
-            force "androidx.core:core-splashscreen:1.0.1"
-            force "androidx.activity:activity:1.8.0"
-            force "androidx.activity:activity-ktx:1.8.0"
-        }
-    }
-}
-
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
