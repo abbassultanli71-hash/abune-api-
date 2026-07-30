@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=81000.0.0">
+<link rel="manifest" href="/manifest.json?v=82000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=81000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=81000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=81000.0.0">
+<link rel="icon" href="/icon-192.png?v=82000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=82000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=82000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=81000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=82000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2397,7 +2397,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=81000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=82000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
@@ -2432,7 +2432,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=81000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=82000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
@@ -3002,11 +3002,55 @@
   }
 
   // Dynamic currency conversion base rates (AZN base 1.0, USD 1.70, EUR 1.85)
-  const VALYUTA_RATES_AZN = {
+  let VALYUTA_RATES_AZN = {
     AZN: 1.0,
     USD: 1.70,
-    EUR: 1.85
+    EUR: 1.94,
+    TRY: 0.036,
+    RUB: 0.021,
+    GBP: 2.26
   };
+
+  async function fetchCBARRates() {
+    try {
+      const cached = localStorage.getItem('cbar_rates_cache');
+      const cachedTime = localStorage.getItem('cbar_rates_time');
+      const now = Date.now();
+      if (cached && cachedTime && (now - Number(cachedTime) < 3600000)) {
+        const parsed = JSON.parse(cached);
+        Object.assign(VALYUTA_RATES_AZN, parsed);
+        updateCbarRatesUI();
+        return;
+      }
+      const res = await fetch('https://open.er-api.com/v6/latest/AZN');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.rates) {
+          const liveRates = {
+            AZN: 1.0,
+            USD: 1.70,
+            EUR: Number((1 / data.rates.EUR).toFixed(4)),
+            TRY: Number((1 / data.rates.TRY).toFixed(4)),
+            RUB: Number((1 / data.rates.RUB).toFixed(4)),
+            GBP: Number((1 / data.rates.GBP).toFixed(4))
+          };
+          Object.assign(VALYUTA_RATES_AZN, liveRates);
+          localStorage.setItem('cbar_rates_cache', JSON.stringify(liveRates));
+          localStorage.setItem('cbar_rates_time', String(now));
+          updateCbarRatesUI();
+        }
+      }
+    } catch (e) {
+      console.warn('CBAR rates fetch fallback to default:', e);
+    }
+  }
+
+  function updateCbarRatesUI() {
+    const badge = document.getElementById('cbar-rates-badge');
+    if (badge) {
+      badge.innerHTML = `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10b981;margin-right:5px;box-shadow:0 0 6px #10b981;"></span>CBAR Məzənnə: 1$ = 1.70₼ | 1€ = ${VALYUTA_RATES_AZN.EUR}₼ | 1₺ = ${VALYUTA_RATES_AZN.TRY}₼`;
+    }
+  }
 
   function getValidCurrency(valyuta) {
     if (!valyuta) return 'AZN';
@@ -3037,6 +3081,7 @@
 
 // Load all user data from API — parallel for speed
   async function loadAllData() {
+    fetchCBARRates();
     if (!currentUser) return;
 
     // Skeleton loading for cards
