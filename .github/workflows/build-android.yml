@@ -34,7 +34,8 @@ jobs:
     - name: Copy Capacitor Assets
       run: |
         mkdir -p android/app/src/main/assets/public
-        npx cap copy android
+        cp -r public/* android/app/src/main/assets/public/
+        cp capacitor.config.json android/app/src/main/assets/capacitor.config.json
 
     - name: Ensure Executable Gradle Wrapper
       run: chmod +x android/gradlew
