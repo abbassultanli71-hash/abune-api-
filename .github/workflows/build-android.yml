@@ -44,13 +44,11 @@ jobs:
       run: |
         cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/abunem.apk
 
-    - name: Release Direct Downloadable APK
-      uses: softprops/action-gh-release@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        tag_name: ${{ github.ref_name }}
-        name: "Abunəm Mobile Release (${{ github.ref_name }})"
-        body: "Rəsmi Yenilənmiş Abunəm Android APK faylı"
-        draft: false
-        prerelease: false
-        files: android/app/build/outputs/apk/debug/abunem.apk
+    - name: Create Official GitHub Release via GH CLI
+      run: |
+        gh release delete v3.0.0 --yes || true
+        git tag -d v3.0.0 || true
+        git push --delete origin v3.0.0 || true
+        gh release create v3.0.0 android/app/build/outputs/apk/debug/abunem.apk --title "Abunəm Mobile Official Release v3.0.0" --notes "Rəsmi Yenilənmiş Zipalign + Signed Abunəm Android APK"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
