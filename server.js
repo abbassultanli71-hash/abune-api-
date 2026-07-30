@@ -110,7 +110,7 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/abunem.apk', (req, res) => {
-  res.redirect('https://github.com/abbassultanli71-hash/abune-api-/releases/download/v1.0.0-release/abunem.apk');
+  res.redirect('https://github.com/abbassultanli71-hash/abune-api-/releases/download/v2.0.0/abunem.apk');
 });
 
 const jwt = require('jsonwebtoken');
