@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const { executeQuery } = require('./db');
@@ -107,6 +108,16 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/abunem.apk', (req, res) => {
+  const apkPath = path.join(__dirname, 'downloads', 'abunem.apk');
+  if (fs.existsSync(apkPath)) {
+    res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+    res.download(apkPath, 'abunem.apk');
+  } else {
+    res.status(404).send('APK file not found');
+  }
+});
 
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-change-me-in-production';
