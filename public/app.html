@@ -4062,7 +4062,9 @@ YPE html>
       return `<svg width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="#e30613"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`;
     }
     if (lower.includes('abb')) {
-      return `<svg width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="#0072CE"><rect x="2" y="4" width="20" height="16" rx="3" ry="3"/><path d="M6 10h4m-2-2v4M14 10h4M14 12h3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+      return `<div style="width: ${iconSize}; height: ${iconSize}; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+        <img src="https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://abb-bank.az&size=128" style="width: 100%; height: 140%; object-fit: cover; object-position: top;" alt="ABB" crossorigin="anonymous">
+      </div>`;
     }
     if (lower.includes('azercell')) {
       return `<svg width="${iconSize}" height="${iconSize}" viewBox="0 0 24 24" fill="#662D91"><circle cx="12" cy="12" r="10"/><path d="M8 16l4-8 4 8H8z" fill="#fff"/></svg>`;
