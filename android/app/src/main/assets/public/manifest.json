@@ -1,0 +1,33 @@
+{
+  "name": "Abunəm — Abunəlik İdarəetməsi",
+  "short_name": "Abunəm",
+  "description": "Abunəliklərinizi asanlıqla idarə edin. Xərclərinizi və ödəniş tarixlərinizi nəzarətdə saxlayın.",
+  "start_url": "/app",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#0b0f19",
+  "theme_color": "#0b0f19",
+  "orientation": "portrait",
+  "id": "/app",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
