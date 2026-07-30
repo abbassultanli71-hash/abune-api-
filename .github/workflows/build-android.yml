@@ -23,6 +23,17 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Dependencies
+      run: npm install --legacy-peer-deps
+
+    - name: Copy Capacitor Assets
+      run: npx cap copy android
+
     - name: Ensure Executable Gradle Wrapper
       run: chmod +x android/gradlew
 
@@ -33,8 +44,6 @@ jobs:
     - name: Prepare Direct APK for Release
       run: |
         cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/abunem.apk
-        mkdir -p public
-        cp android/app/build/outputs/apk/debug/app-debug.apk public/abunem.apk
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
