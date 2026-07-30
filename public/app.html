@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=68000.0.0">
+<link rel="manifest" href="/manifest.json?v=70000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=68000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=68000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=68000.0.0">
+<link rel="icon" href="/icon-192.png?v=70000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=70000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=70000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=68000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=70000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2393,7 +2393,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=68000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=70000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
@@ -2428,7 +2428,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=68000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=70000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
@@ -5210,12 +5210,12 @@
 
   function cardRowHTML(c) {
     if (!c) return '';
-    const name = String(c.ad || c.name || 'Ads─▒z Kart');
+    const name = String(c.ad || c.name || 'Adsız Kart');
     const cardType = String(c.kart_tipi || c.card_type || 'visa').toLowerCase();
     const panRaw = c.pan ? String(c.pan).replace(/\s/g, '') : '';
     const panDisplay = panRaw.length >= 4
-      ? 'ΓÇóΓÇóΓÇóΓÇó ΓÇóΓÇóΓÇóΓÇó ΓÇóΓÇóΓÇóΓÇó ' + panRaw.slice(-4)
-      : 'ΓÇóΓÇóΓÇóΓÇó ΓÇóΓÇóΓÇóΓÇó ΓÇóΓÇóΓÇóΓÇó ΓÇóΓÇóΓÇóΓÇó';
+      ? '•••• •••• •••• ' + panRaw.slice(-4)
+      : '•••• •••• •••• ••••';
     
     const style = getCardStyleByName(name, cardType, panRaw);
     const brandLogoHTML = cardType === 'visa'
@@ -5223,8 +5223,8 @@
       : `<img src="/mastercard.svg?v=1.3" style="height: 24px; width: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));" alt="Mastercard">`;
 
     const cardId = c.card_id !== undefined ? c.card_id : (c.id !== undefined ? c.id : 0);
-    const holderName = (currentUser && currentUser.ad ? String(currentUser.ad) : 'ABUN╞Å├ç─░').toUpperCase();
-    const expiryDate = String(c.kart_istifade_tarixi || c.expiry || 'AA/─░─░');
+    const holderName = (currentUser && currentUser.ad ? String(currentUser.ad) : 'ABUNƏÇİ').toUpperCase();
+    const expiryDate = String(c.kart_istifade_tarixi || c.expiry || 'AA/İİ');
 
     return `
       <div class="wallet-card" style="background: ${style.bg}; color: ${style.color}; box-shadow: ${style.shadow};">
@@ -5250,11 +5250,11 @@
         <div class="wallet-card-number">${panDisplay}</div>
         <div class="wallet-card-footer">
           <div class="wallet-card-holder">
-            <div class="wallet-label">KART SAH─░B─░</div>
+            <div class="wallet-label">KART SAHİBİ</div>
             <div class="wallet-value">${holderName}</div>
           </div>
           <div class="wallet-card-expiry">
-            <div class="wallet-label">SON TAR─░X</div>
+            <div class="wallet-label">SON TARİX</div>
             <div class="wallet-value">${expiryDate}</div>
           </div>
           <button class="wallet-card-delete" onclick="event.stopPropagation(); handleDeleteCard(${cardId})" title="Sil">
@@ -5290,20 +5290,20 @@
       if (!Array.isArray(cards) || cards.length === 0) {
         list.innerHTML = `
           <div class="hint" style="padding:24px 16px; text-align:center;">
-            <div style="font-size:44px;margin-bottom:12px;">≡ƒÆ│</div>
-            <div style="font-weight:700;font-size:15px;margin-bottom:6px;color:var(--ink);">H╔Öl╔Ö kart ╔Ölav╔Ö edilm╔Öyib</div>
-            <span style="color:var(--ink-muted);font-size:12px;">Yeni kart ╔Ölav╔Ö etm╔Ök ├╝├º├╝n a┼ƒa─ƒ─▒dak─▒ <strong style="color:var(--accent);">+</strong> d├╝ym╔Ösini istifad╔Ö edin.</span>
+            <div style="font-size:44px;margin-bottom:12px;">💳</div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:6px;color:var(--ink);">Hələ kart əlavə edilməyib</div>
+            <span style="color:var(--ink-muted);font-size:12px;">Yeni kart əlavə etmək üçün aşağıdakı <strong style="color:var(--accent);">+</strong> düyməsini istifadə edin.</span>
           </div>
         `;
-        if (sub) sub.textContent = '0 ├╢d╔Öni┼ƒ metodu';
+        if (sub) sub.textContent = '0 ödəniş metodu';
       } else {
         list.innerHTML = cards.map(c => cardRowHTML(c)).join('');
-        if (sub) sub.textContent = `${cards.length} ├╢d╔Öni┼ƒ metodu`;
+        if (sub) sub.textContent = `${cards.length} ödəniş metodu`;
         if (typeof applyCard3DTiltEngine === 'function') applyCard3DTiltEngine();
       }
     } catch (err) {
       console.error('renderCards error:', err);
-      list.innerHTML = '<div class="hint" style="padding:20px 0;">Kartlar g├╢st╔Öril╔Örk╔Ön x╔Öta ba┼ƒ verdi.</div>';
+      list.innerHTML = '<div class="hint" style="padding:20px 0;">Kartlar göstərilərkən xəta baş verdi.</div>';
     }
   }
 
@@ -5312,7 +5312,7 @@
       const sel = document.getElementById(id);
       if (!sel) return;
       const currentVal = sel.value;
-      sel.innerHTML = '<option value="">-- Kart se├ºilm╔Öyib --</option>';
+      sel.innerHTML = '<option value="">-- Kart seçilməyib --</option>';
       cards.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.card_id;
