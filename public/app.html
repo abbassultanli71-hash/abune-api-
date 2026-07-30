@@ -15,6 +15,18 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=87000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+      for(let registration of registrations) { registration.unregister(); }
+    }).catch(function(){});
+  }
+  if ('caches' in window) {
+    caches.keys().then(function(names) {
+      for (let name of names) { caches.delete(name); }
+    }).catch(function(){});
+  }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js?v=87000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
