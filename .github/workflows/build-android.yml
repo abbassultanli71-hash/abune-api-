@@ -20,6 +20,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -48,6 +49,6 @@ jobs:
         cp android/app/build/outputs/apk/debug/app-debug.apk downloads/abunem.apk
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add downloads/abunem.apk
-        git commit -m "build(apk): auto-commit fresh compiled APK to downloads/abunem.apk [skip ci]" || echo "No changes to commit"
-        git push origin main || echo "Push skipped"
+        git add -f downloads/abunem.apk
+        git commit -m "build(apk): auto-commit fresh compiled APK to downloads/abunem.apk [skip ci]" || echo "No changes"
+        git push origin HEAD:main
