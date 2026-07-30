@@ -9,6 +9,9 @@
     "tunnel": "ssh -o StrictHostKeyChecking=no -R abune-api:80:localhost:3000 serveo.net"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
