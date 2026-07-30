@@ -301,7 +301,7 @@ app.get('/abunem.apk', (req, res) => {
   // Fallback: Redirect to GitHub Actions Artifacts / Releases page if APK is building
   return res.redirect('https://github.com/abbassultanli71-hash/abune-api-/actions');
 });
-app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
+app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'admin.html')); });
 
 // Telegram webhook - registered WITHOUT /api prefix so authMiddleware NEVER touches it
 const telegramBot = require('./telegramBot');
