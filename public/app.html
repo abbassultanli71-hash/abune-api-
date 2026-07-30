@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=86000.0.0">
+<link rel="manifest" href="/manifest.json?v=87000.0.0">
 <meta name="theme-color" content="#0b0f19">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=86000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=86000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=86000.0.0">
+<link rel="icon" href="/icon-192.png?v=87000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=87000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=87000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=86000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=87000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -852,12 +852,17 @@
 
   /* ---- Modal (bottom sheet) ---- */
   .sheet-overlay {
-    position: absolute; inset: 0; background: rgba(6,6,8,0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    display: none; align-items: flex-end; z-index: 40;
+    position: fixed; inset: 0; background: rgba(5, 7, 12, 0.75);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    display: none; align-items: flex-end; z-index: 999999;
     overflow: hidden; max-width: 100%; box-sizing: border-box;
-    animation: sheetOverlayFadeIn 0.25s ease-out;
+    opacity: 0; transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity;
+    -webkit-backface-visibility: hidden; backface-visibility: hidden;
+  }
+  .sheet-overlay.open {
+    display: flex;
+    opacity: 1;
   }
   @keyframes sheetOverlayFadeIn {
     from { opacity: 0; }
@@ -2549,7 +2554,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=86000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=87000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
@@ -2584,7 +2589,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=86000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=87000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
@@ -4273,6 +4278,22 @@
     }
 
     grid.innerHTML = html;
+  }
+
+  function showSheetOverlay(el) {
+    if (!el) return;
+    el.style.display = 'flex';
+    requestAnimationFrame(() => {
+      el.classList.add('open');
+    });
+  }
+
+  function hideSheetOverlay(el) {
+    if (!el) return;
+    el.classList.remove('open');
+    setTimeout(() => {
+      if (!el.classList.contains('open')) el.style.display = 'none';
+    }, 220);
   }
 
   function openDaySummarySheet(d, dueSubs) {
