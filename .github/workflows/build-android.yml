@@ -29,10 +29,10 @@ jobs:
         node-version: '20'
 
     - name: Install Dependencies
-      run: npm install
+      run: npm install --legacy-peer-deps
 
     - name: Sync Capacitor
-      run: npx cap sync android
+      run: npx --yes @capacitor/cli sync android
 
     - name: Ensure Executable Gradle Wrapper
       run: chmod +x android/gradlew
