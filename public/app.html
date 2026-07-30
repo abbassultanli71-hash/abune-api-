@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=72000.0.0">
+<link rel="manifest" href="/manifest.json?v=73000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=72000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=72000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=72000.0.0">
+<link rel="icon" href="/icon-192.png?v=73000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=73000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=73000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=72000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=73000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -2397,7 +2397,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=72000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=73000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
@@ -2432,7 +2432,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=72000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=73000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
@@ -3832,134 +3832,109 @@
 
   const GLOBAL_APP_DOMAINS = {
     // Streaming & Entertainment
-    'netflix': 'netflix.com', 'neftlix': 'netflix.com',
-    'spotify': 'spotify.com',
-    'youtube': 'youtube.com', 'youtube premium': 'youtube.com', 'yt premium': 'youtube.com',
+    'netflix': 'netflix.com', 'neftlix': 'netflix.com', 'neflix': 'netflix.com', 'netflik': 'netflix.com',
+    'spotify': 'spotify.com', 'spotfy': 'spotify.com', 'spotifay': 'spotify.com',
+    'youtube': 'youtube.com', 'yt': 'youtube.com', 'youtube premium': 'youtube.com',
     'disney': 'disneyplus.com', 'disney+': 'disneyplus.com', 'disney plus': 'disneyplus.com',
     'hbo': 'max.com', 'hbo max': 'max.com', 'max': 'max.com',
-    'hulu': 'hulu.com',
-    'paramount': 'paramountplus.com', 'paramount+': 'paramountplus.com',
-    'peacock': 'peacocktv.com',
+    'hulu': 'hulu.com', 'paramount': 'paramountplus.com', 'peacock': 'peacocktv.com',
     'apple tv': 'tv.apple.com', 'apple music': 'music.apple.com', 'apple': 'apple.com', 'icloud': 'apple.com', 'itunes': 'apple.com',
     'prime video': 'primevideo.com', 'amazon prime': 'amazon.com', 'amazon': 'amazon.com',
-    'crunchyroll': 'crunchyroll.com',
-    'mubi': 'mubi.com',
-    'twitch': 'twitch.tv',
-    'soundcloud': 'soundcloud.com',
-    'tidal': 'tidal.com',
-    'deezer': 'deezer.com',
-    'qobuz': 'qobuz.com',
-    'audible': 'audible.com',
-    'patreon': 'patreon.com',
-    'substack': 'substack.com',
-    'medium': 'medium.com',
+    'crunchyroll': 'crunchyroll.com', 'mubi': 'mubi.com', 'twitch': 'twitch.tv',
+    'soundcloud': 'soundcloud.com', 'tidal': 'tidal.com', 'deezer': 'deezer.com', 'qobuz': 'qobuz.com', 'audible': 'audible.com',
 
-    // AI & Dev Tools
-    'chatgpt': 'openai.com', 'openai': 'openai.com',
+    // Social, Professional & Creator
+    'linkedin': 'linkedin.com', 'linkin': 'linkedin.com', 'linked in': 'linkedin.com',
+    'instagram': 'instagram.com', 'ig': 'instagram.com', 'insta': 'instagram.com',
+    'facebook': 'facebook.com', 'fb': 'facebook.com', 'meta': 'meta.com',
+    'telegram': 'telegram.org', 'tg': 'telegram.org',
+    'tiktok': 'tiktok.com', 'tik tok': 'tiktok.com',
+    'twitter': 'x.com', 'x': 'x.com', 'x.com': 'x.com',
+    'discord': 'discord.com',
+    'patreon': 'patreon.com', 'substack': 'substack.com', 'medium': 'medium.com',
+
+    // AI, Design & Creation
+    'capcut': 'capcut.com', 'cap cut': 'capcut.com',
+    'chatgpt': 'openai.com', 'openai': 'openai.com', 'gpt': 'openai.com',
     'claude': 'anthropic.com', 'anthropic': 'anthropic.com',
-    'midjourney': 'midjourney.com',
-    'perplexity': 'perplexity.ai',
-    'cursor': 'cursor.com',
-    'copilot': 'github.com', 'github': 'github.com',
-    'gitlab': 'gitlab.com',
-    'jetbrains': 'jetbrains.com', 'pycharm': 'jetbrains.com', 'webstorm': 'jetbrains.com',
-    'adobe': 'adobe.com', 'photoshop': 'adobe.com', 'illustrator': 'adobe.com',
-    'figma': 'figma.com',
-    'canva': 'canva.com',
-    'notion': 'notion.so',
-    'slack': 'slack.com',
-    'zoom': 'zoom.us',
-    'linear': 'linear.app',
-    'raycast': 'raycast.com',
-    'setapp': 'setapp.com',
-    'webflow': 'webflow.com',
-    'framer': 'framer.com',
+    'midjourney': 'midjourney.com', 'perplexity': 'perplexity.ai', 'elevenlabs': 'elevenlabs.io',
+    'runway': 'runwayml.com', 'sora': 'openai.com', 'suno': 'suno.com', 'udio': 'udio.com',
+    'adobe': 'adobe.com', 'photoshop': 'adobe.com', 'illustrator': 'adobe.com', 'premiere': 'adobe.com',
+    'figma': 'figma.com', 'canva': 'canva.com', 'notion': 'notion.so',
+    'cursor': 'cursor.com', 'copilot': 'github.com', 'github': 'github.com', 'gitlab': 'gitlab.com',
+    'jetbrains': 'jetbrains.com', 'webflow': 'webflow.com', 'framer': 'framer.com',
 
-    // Fitness, Health & Education
-    '1fit': '1fit.app', '1 fit': '1fit.app', 'fit': '1fit.app', 'onefit': '1fit.app', 'fit.az': '1fit.app',
-    'push30': 'push30.az', 'push 30': 'push30.az', 'push': 'push30.az',
-    '180 fitness': '180.az', '180': '180.az',
-    'strava': 'strava.com',
-    'myfitnesspal': 'myfitnesspal.com',
-    'duolingo': 'duolingo.com',
-    'grammarly': 'grammarly.com',
-    'headspace': 'headspace.com',
-    'calm': 'calm.com',
-    'whoop': 'whoop.com',
-    'coursera': 'coursera.org',
-    'udemy': 'udemy.com',
-    'masterclass': 'masterclass.com',
-    'skillshare': 'skillshare.com',
+    // Productivity & Utilities
+    'slack': 'slack.com', 'zoom': 'zoom.us', 'linear': 'linear.app', 'raycast': 'raycast.com',
+    'microsoft': 'microsoft.com', 'office': 'office.com', 'office365': 'office.com', '365': 'office.com',
+    'google': 'google.com', 'drive': 'google.com', 'one': 'one.google.com',
+    'dropbox': 'dropbox.com', '1password': '1password.com', 'nordvpn': 'nordvpn.com', 'expressvpn': 'expressvpn.com',
 
-    // Security, VPN & Utilities
-    '1password': '1password.com',
-    'bitwarden': 'bitwarden.com',
-    'dashlane': 'dashlane.com',
-    'nordvpn': 'nordvpn.com',
-    'expressvpn': 'expressvpn.com',
-    'surfshark': 'surfshark.com',
-    'proton': 'proton.me', 'protonvpn': 'proton.me', 'protonmail': 'proton.me',
-    'mullvad': 'mullvad.net',
-    'dropbox': 'dropbox.com',
-    'google one': 'one.google.com', 'google': 'google.com',
-
-    // Azerbaijan Local & Utilities
-    'kapital': 'kapitalbank.az', 'kapital bank': 'kapitalbank.az', 'birbank': 'birbank.az',
-    'pasha': 'pashabank.az', 'pasha bank': 'pashabank.az',
-    'abb': 'abb-bank.az',
-    'unibank': 'unibank.az',
-    'leobank': 'leobank.az', 'leo': 'leobank.az',
-    'azercell': 'azercell.com',
-    'bakcell': 'bakcell.com',
-    'nar': 'nar.az', 'nar mobile': 'nar.az',
-    'citynet': 'citynet.az',
-    'katv': 'katv14.az', 'katv14': 'katv14.az',
-    'connect': 'connect.az',
-    'wolt': 'wolt.com',
-    'bolt': 'bolt.eu',
-    'yandex': 'yandex.com',
-    'cinemaplus': 'cinemaplus.az',
-    'parkcinema': 'parkcinema.az',
-    'resant': 'resant.az',
-
-    // Gaming
-    'playstation': 'playstation.com', 'ps plus': 'playstation.com', 'ps5': 'playstation.com',
-    'xbox': 'xbox.com', 'game pass': 'xbox.com',
-    'steam': 'steampowered.com',
-    'roblox': 'roblox.com',
-    'nintendo': 'nintendo.com'
+    // Education, Health & Gaming
+    'duolingo': 'duolingo.com', 'coursera': 'coursera.org', 'udemy': 'udemy.com',
+    'strava': 'strava.com', '1fit': '1fit.app', 'headspace': 'headspace.com', 'calm': 'calm.com',
+    'playstation': 'playstation.com', 'psn': 'playstation.com', 'ps plus': 'playstation.com',
+    'xbox': 'xbox.com', 'game pass': 'xbox.com', 'steam': 'steampowered.com', 'nintendo': 'nintendo.com'
   };
 
   function getUniversalLogoHTML(name, size = 24) {
-    const lower = (name || '').toLowerCase().trim();
-    let domain = GLOBAL_APP_DOMAINS[lower];
+    const raw = (name || '').trim();
+    if (!raw) return '<div style="width:'+size+'px;height:'+size+'px;border-radius:6px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;">🌐</div>';
+
+    // Clean subscription title from common suffixes
+    const lower = raw.toLowerCase();
+    const cleanName = lower
+      .replace(/\b(abunə|abunəsi|abune|abuneliye|subscription|pro|premium|plus|monthly|yearly|plan|pay|kod|card)\b/gi, '')
+      .trim() || lower;
+
+    // First check if getBrandLogoHTML has a built-in SVG logo for this brand
+    const svgLogo = getBrandLogoHTML(cleanName, '');
+    if (svgLogo && svgLogo.includes('<svg')) {
+      return svgLogo.replace(/width="\d+px?"/g, `width="${size}px"`).replace(/height="\d+px?"/g, `height="${size}px"`);
+    }
+
+    // Lookup domain from dictionary or guess
+    let domain = GLOBAL_APP_DOMAINS[cleanName] || GLOBAL_APP_DOMAINS[lower];
     if (!domain) {
       for (const [key, d] of Object.entries(GLOBAL_APP_DOMAINS)) {
-        if (lower.includes(key)) { domain = d; break; }
-      }
-    }
-    if (!domain) {
-      if (lower.includes('.az') || lower.includes('.com') || lower.includes('.org') || lower.includes('.app') || lower.includes('.io') || lower.includes('.net') || lower.includes('.ai') || lower.includes('.me') || lower.includes('.eu')) {
-        domain = lower.replace(/[^a-z0-9.-]/g, '');
-      } else {
-        const cleanName = lower.replace(/[^a-z0-9]/g, '');
-        if (cleanName.length > 1) domain = cleanName + '.com';
+        if (key.length <= 2) {
+          const words = cleanName.split(/\s+/);
+          if (words.includes(key) || cleanName === key) { domain = d; break; }
+        } else {
+          if (cleanName.includes(key) || lower.includes(key)) { domain = d; break; }
+        }
       }
     }
 
-    const initial = (name || '?')[0].toUpperCase();
+    if (!domain) {
+      if (cleanName.includes('.az') || cleanName.includes('.com') || cleanName.includes('.org') || cleanName.includes('.app') || cleanName.includes('.io') || cleanName.includes('.net') || cleanName.includes('.ai') || cleanName.includes('.me') || cleanName.includes('.eu')) {
+        domain = cleanName.replace(/[^a-z0-9.-]/g, '');
+      } else {
+        const pureName = cleanName.replace(/[^a-z0-9]/g, '');
+        if (pureName.length > 1) domain = pureName + '.com';
+      }
+    }
+
+    const firstChar = (raw.charAt(0) || 'S').toUpperCase();
     const px = size + 'px';
-    const fontPx = Math.max(7, Math.floor(size * 0.45)) + 'px';
-    const colors = ['#f97316','#8b5cf6','#06b6d4','#10b981','#f43f5e','#3b82f6','#ec4899','#a855f7'];
-    const ci = ((name||'A').charCodeAt(0)) % colors.length;
+    const fontPx = Math.max(8, Math.floor(size * 0.45)) + 'px';
+
+    // Vibrant 3D gradient brand badge fallback
+    const charCode = firstChar.charCodeAt(0);
+    const hues = [210, 260, 330, 25, 160, 280, 190, 340, 140];
+    const hue = hues[charCode % hues.length];
+    const fallbackBadge = `<div style="width:${px};height:${px};border-radius:6px;background:linear-gradient(135deg, hsl(${hue},85%,55%), hsl(${hue+30},90%,40%));color:#ffffff;font-family:var(--font-display);font-size:${fontPx};font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,0.3);text-shadow:0 1px 2px rgba(0,0,0,0.4);">${firstChar}</div>`;
 
     if (domain) {
       const primaryUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-      const secondaryUrl = `https://logo.clearbit.com/${domain}`;
-      return `<img src="${primaryUrl}" style="width:${px};height:${px};border-radius:4px;object-fit:contain;display:block;" onerror="this.onerror=null; this.src='${secondaryUrl}'; this.onerror=function(){this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';};" /><span style="width:${px};height:${px};border-radius:4px;background:${colors[ci]};color:#fff;font-size:${fontPx};font-weight:900;display:none;align-items:center;justify-content:center;">${initial}</span>`;
+      const secondaryUrl = `https://icon.horse/icon/${domain}`;
+      const tertiaryUrl = `https://logo.clearbit.com/${domain}`;
+
+      return `<img src="${primaryUrl}" style="width:${px};height:${px};border-radius:6px;object-fit:contain;display:block;" onerror="this.onerror=null; this.src='${secondaryUrl}'; this.onerror=function(){this.onerror=null; this.src='${tertiaryUrl}'; this.onerror=function(){this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';};};" alt="${raw}">
+      <div style="display:none;align-items:center;justify-content:center;">${fallbackBadge}</div>`;
     }
 
-    return `<span style="width:${px};height:${px};border-radius:4px;background:${colors[ci]};color:#fff;font-size:${fontPx};font-weight:900;display:flex;align-items:center;justify-content:center;">${initial}</span>`;
+    return fallbackBadge;
   }
 
   function getCalendarLogoHTML(name, size = 22) {
