@@ -32,7 +32,7 @@ jobs:
       run: npm install --legacy-peer-deps
 
     - name: Sync Capacitor
-      run: npx --yes @capacitor/cli sync android
+      run: npm run cap:sync
 
     - name: Ensure Executable Gradle Wrapper
       run: chmod +x android/gradlew

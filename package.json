@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "cap:sync": "cap sync android",
     "tunnel": "ssh -o StrictHostKeyChecking=no -R abune-api:80:localhost:3000 serveo.net"
   },
   "dependencies": {
