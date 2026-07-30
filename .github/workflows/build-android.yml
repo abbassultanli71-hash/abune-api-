@@ -25,6 +25,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Setup Android SDK 35
+      uses: android-actions/setup-android@v3
+      with:
+        packages: 'platforms;android-35 build-tools;35.0.0'
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -32,10 +37,6 @@ jobs:
 
     - name: Install Dependencies
       run: npm install --legacy-peer-deps
-
-    - name: Install Android SDK 35
-      run: |
-        yes | sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
     - name: Ensure Executable Gradle Wrapper
       run: chmod +x android/gradlew
