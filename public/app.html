@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Abunəm — Mobil App</title>
-<link rel="manifest" href="/manifest.json?v=82000.0.0">
+<link rel="manifest" href="/manifest.json?v=83000.0.0">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Abunəm">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/icon-192.png?v=82000.0.0" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=82000.0.0">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=82000.0.0">
+<link rel="icon" href="/icon-192.png?v=83000.0.0" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=83000.0.0">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=83000.0.0">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=82000.0.0').then(function(reg) {
+    navigator.serviceWorker.register('/sw.js?v=83000.0.0').then(function(reg) {
       reg.update();
       reg.addEventListener('updatefound', function() {
         const newWorker = reg.installing;
@@ -1396,7 +1396,171 @@
   }
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 </style>
+<style>
+  /* ── Ultra-Premium PWA Animated Launch Splash Screen ──────────────── */
+  #pwa-animated-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: radial-gradient(circle at 50% 35%, #151a28 0%, #0b0f19 60%, #06080d 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #pwa-animated-splash.splash-fade-out {
+    opacity: 0 !important;
+    transform: scale(1.06) !important;
+    filter: blur(14px) !important;
+    pointer-events: none !important;
+  }
+
+  .splash-ambient-glow-1 {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251, 146, 60, 0.25) 0%, rgba(249, 115, 22, 0.08) 50%, transparent 80%);
+    filter: blur(50px);
+    animation: splashPulseGlow 3.5s ease-in-out infinite alternate;
+  }
+
+  .splash-ambient-glow-2 {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(14, 165, 233, 0.05) 50%, transparent 80%);
+    filter: blur(60px);
+    animation: splashPulseGlow 4s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes splashPulseGlow {
+    0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  }
+
+  .splash-icon-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    z-index: 2;
+    animation: splashFloatIcon 3.2s ease-in-out infinite;
+  }
+
+  @keyframes splashFloatIcon {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.03); }
+  }
+
+  .splash-aura-ring {
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #fb923c, #38bdf8, #8b5cf6, #fb923c);
+    opacity: 0.45;
+    filter: blur(12px);
+    animation: splashRotateAura 6s linear infinite;
+  }
+
+  @keyframes splashRotateAura {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .splash-logo-img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    position: relative;
+    z-index: 3;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    border: 2.5px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .splash-brand-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff 0%, #ffe8d6 40%, #fb923c 75%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    margin-bottom: 6px;
+    z-index: 2;
+    animation: splashFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .splash-tagline {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.5px;
+    text-align: center;
+    margin-bottom: 36px;
+    z-index: 2;
+    animation: splashFadeUp 0.8s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes splashFadeUp {
+    0% { opacity: 0; transform: translateY(12px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .splash-progress-track {
+    width: 160px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
+  .splash-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #f97316 0%, #fb923c 50%, #38bdf8 100%);
+    border-radius: 99px;
+    box-shadow: 0 0 10px #fb923c;
+    transition: width 0.4s ease-out;
+  }
+</style>
 </head>
+
+  <!-- Ultra-Premium PWA Animated Launch Splash Overlay -->
+  <div id="pwa-animated-splash">
+    <div class="splash-ambient-glow-1"></div>
+    <div class="splash-ambient-glow-2"></div>
+    <div class="splash-icon-container">
+      <div class="splash-aura-ring"></div>
+      <img src="/icon-512.png" alt="Abunəm Logo" class="splash-logo-img">
+    </div>
+    <div class="splash-brand-title">Abunəm</div>
+    <div class="splash-tagline">Abunəliklərinizi Asanlıqla Nəzarətdə Saxlayın</div>
+    <div class="splash-progress-track">
+      <div class="splash-progress-bar" id="splash-progress-bar"></div>
+    </div>
+  </div>
+
 <body>
 
 <div class="device-stage">
@@ -2397,7 +2561,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=82000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=83000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 6px;">Android Tətbiqini Quraşdırın</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 16px;">Tətbiqi brauzer çərçivəsi olmadan Play Store rahatlığında telefonunuza yükləyin:</p>
@@ -2432,7 +2596,7 @@
       <div class="sheet" style="padding: 24px 20px 32px; border-radius: 28px 28px 0 0; text-align: center;">
         <div class="sheet-handle"></div>
         <div style="margin-bottom: 12px; display: flex; justify-content: center;">
-          <img src="/icon-192.png?v=82000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
+          <img src="/icon-192.png?v=83000.0.0" style="width: 72px; height: 72px; border-radius: 18px; object-fit: cover; box-shadow: 0 10px 28px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.15);" alt="Abunəm Logo">
         </div>
         <h3 style="font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 8px;">iPhone / iPad-ə Yükləyin</h3>
         <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px;">Abunəm tətbiqini brauzer çərçivəsi olmadan real iOS tətbiqi kimi istifadə etmək üçün:</p>
@@ -3080,6 +3244,40 @@
   }
 
 // Load all user data from API — parallel for speed
+  
+  // PWA Animated Splash Screen Dissolve Controller
+  let splashProgress = 0;
+  const splashProgressEl = document.getElementById('splash-progress-bar');
+  const splashOverlay = document.getElementById('pwa-animated-splash');
+
+  function updateSplashProgress(pct) {
+    if (splashProgressEl && pct > splashProgress) {
+      splashProgress = pct;
+      splashProgressEl.style.width = pct + '%';
+    }
+  }
+
+  function hidePwaSplash() {
+    updateSplashProgress(100);
+    setTimeout(() => {
+      if (splashOverlay) {
+        splashOverlay.classList.add('splash-fade-out');
+        setTimeout(() => {
+          splashOverlay.style.display = 'none';
+        }, 650);
+      }
+    }, 250);
+  }
+
+  // Animate progress bar during initial load
+  setTimeout(() => updateSplashProgress(35), 100);
+  setTimeout(() => updateSplashProgress(75), 400);
+
+  // Auto-hide splash after data load or fallback timer
+  window.addEventListener('load', () => setTimeout(hidePwaSplash, 600));
+  setTimeout(hidePwaSplash, 1600);
+
+
   async function loadAllData() {
     fetchCBARRates();
     if (!currentUser) return;
