@@ -110,7 +110,15 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/abunem.apk', (req, res) => {
-  res.redirect('https://github.com/abbassultanli71-hash/abune-api-/releases/download/v3.0.0/abunem.apk');
+  const apkPath = path.join(__dirname, 'downloads', 'abunem.apk');
+  if (fs.existsSync(apkPath)) {
+    const stat = fs.statSync(apkPath);
+    res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+    res.setHeader('Content-Length', stat.size);
+    res.setHeader('Content-Disposition', 'attachment; filename="abunem.apk"');
+    return res.sendFile(apkPath);
+  }
+  res.status(404).send('APK file not found');
 });
 
 const jwt = require('jsonwebtoken');
