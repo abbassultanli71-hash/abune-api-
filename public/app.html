@@ -869,33 +869,40 @@
 
   /* ---- Modal (bottom sheet) ---- */
   .sheet-overlay {
-    position: fixed; inset: 0; background: rgba(5, 7, 12, 0.75);
-    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-    display: none; align-items: flex-end; z-index: 999999;
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.35);
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    display: flex; align-items: flex-end; z-index: 999999;
     overflow: hidden; max-width: 100%; box-sizing: border-box;
-    opacity: 0; transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity;
+    opacity: 0; pointer-events: none; visibility: hidden;
+    transition: opacity 0.24s ease, visibility 0.24s ease;
+    will-change: opacity, visibility;
+    transform: translateZ(0);
     -webkit-backface-visibility: hidden; backface-visibility: hidden;
   }
+  [data-theme="dark"] .sheet-overlay {
+    background: rgba(0, 0, 0, 0.55);
+  }
   .sheet-overlay.open {
-    display: flex;
     opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
   }
-  @keyframes sheetOverlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  .sheet-overlay.open { display: flex; }
   .sheet {
-    width: 100%; max-width: 100%; box-sizing: border-box; background: var(--bg); border-radius: 32px 32px 0 0;
+    width: 100%; max-width: 100%; box-sizing: border-box; background: var(--bg); border-radius: 28px 28px 0 0;
     padding: 12px 20px calc(24px + var(--safe-bottom));
     max-height: 85%; overflow-y: auto; overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    border-top: 2px solid var(--border-strong);
-    box-shadow: 0 -20px 40px rgba(0,0,0,0.35);
-    animation: nativeSheetUp 0.35s cubic-bezier(0.32, 1.25, 0.375, 1.15);
+    border-top: 1px solid var(--border-strong);
+    box-shadow: 0 -12px 32px rgba(0,0,0,0.18);
+    transform: translate3d(0, 100%, 0);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .sheet-overlay.open .sheet {
+    transform: translate3d(0, 0, 0);
   }
   @keyframes nativeSheetUp {
     from { transform: translate3d(0, 100%, 0); }
