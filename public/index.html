@@ -293,7 +293,7 @@
   .screens { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; }
   .screen {
     position: absolute; inset: 0;
-    display: none;
+    display: flex;
     flex-direction: column;
     overflow-y: auto;
     overflow-x: hidden;
@@ -301,6 +301,20 @@
     touch-action: auto;
     padding-top: 6px;
     padding-bottom: 112px;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transform: translate3d(0, 4px, 0) scale(0.99);
+    transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.18s ease;
+    will-change: opacity, transform, visibility;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .screen.active {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transform: translate3d(0, 0, 0) scale(1);
   }
   .screen > * { flex-shrink: 0; }
 
@@ -379,7 +393,7 @@
     flex-shrink: 0;
     box-shadow: var(--shadow);
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
   }
   .icon-round:active { transform: scale(0.9); }
   @media (hover: hover) {
@@ -399,7 +413,7 @@
     align-items: center;
     justify-content: space-between;
     box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.45);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
   }
   .dashboard-budget-card:active { transform: scale(0.97); }
   .db-left { display: flex; flex-direction: column; gap: 4px; }
@@ -620,7 +634,7 @@
     background: none; border: none; color: var(--ink-faint); cursor: pointer; padding: 4px;
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%; width: 28px; height: 28px;
-    transition: all 0.2s ease;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.18s ease;
   }
   .card-delete:hover { background: var(--coral-soft); color: var(--coral); }
   .badge-success { background: var(--teal-soft); color: var(--teal); font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
@@ -645,7 +659,7 @@
     font-size: 11.5px; font-weight: 700; letter-spacing: 0.3px;
     background: linear-gradient(135deg, rgba(239,68,68,0.18), rgba(239,68,68,0.08));
     color: #ef4444; border: 1.5px solid rgba(239,68,68,0.35);
-    transition: all 0.2s ease;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.18s ease;
   }
   .notif-cancel-btn:hover { background: rgba(239,68,68,0.28); transform: translateY(-1px); }
   .notif-cancel-btn:active { transform: scale(0.95); }
@@ -734,7 +748,7 @@
     color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 7px 0;
     border-radius: 18px; position: relative;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.18s ease;
   }
   .tab-item:active { transform: scale(0.94); }
   .tab-item svg { width: 20px; height: 20px; transition: transform 0.2s ease; }
@@ -759,7 +773,7 @@
     flex-shrink: 0; padding: 8px 18px; border-radius: 20px; font-size: 12.5px; font-weight: 700;
     background: var(--surface-2); border: 1.5px solid var(--border-strong); color: var(--ink-muted);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.18s ease;
   }
   .filter-chip:active { transform: scale(0.94); }
   .filter-chip.selected {
@@ -848,7 +862,7 @@
   .accent-opt {
     flex: 1; height: 38px; display: flex; align-items: center; justify-content: center;
     border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
-    cursor: pointer; transition: all 0.2s ease;
+    cursor: pointer; transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.18s ease;
   }
   .accent-opt .color-dot {
     width: 14px; height: 14px; border-radius: 50%;
@@ -923,7 +937,7 @@
     background: var(--surface-2); border: 2px solid var(--border); border-radius: 18px;
     padding: 13px 16px; color: var(--ink); font-size: 14px;
     outline: none;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
   }
   .field select:focus, .field input:focus {
     border-color: var(--accent);
@@ -1047,7 +1061,7 @@
     border-radius: 8px;
     cursor: pointer;
     color: var(--ink-muted);
-    transition: all 0.2s ease;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, background-color 0.18s ease;
   }
   .auth-tab.active {
     background: var(--surface-3);
@@ -1577,6 +1591,29 @@
     transition: width 0.4s ease-out;
   }
 </style>
+
+  /* ---------------------------------------------------- */
+  /* 120 FPS PRO-MOTION & GPU COMPOSITOR OPTIMIZATIONS   */
+  /* ---------------------------------------------------- */
+  html, body {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    scroll-behavior: smooth !important;
+    text-rendering: optimizeLegibility !important;
+  }
+
+  .card, .sub-card, .btn, .nav-item, .stat-card, .fab, .accent-opt, .theme-opt, .sheet-overlay, .sheet, .topbar, .app-tabbar {
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0);
+  }
+
+  .btn:active, .nav-item:active, .sub-card:active, .fab:active, .stat-card:active, .theme-opt:active, .accent-opt:active {
+    transform: scale(0.96) translateZ(0) !important;
+    transition: transform 0.08s ease !important;
+  }
+
 </head>
 
   <!-- Ultra-Premium PWA Animated Launch Splash Overlay -->
